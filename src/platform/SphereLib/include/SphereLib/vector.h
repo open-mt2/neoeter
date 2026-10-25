@@ -39,6 +39,9 @@ public:
 		y = b;
 		z = c;
 	};
+
+	Vector3d* operator & () { return this; }
+	const Vector3d* operator & () const { return this; }
 	
 	bool operator==(const Vector3d &a) const
 	{
