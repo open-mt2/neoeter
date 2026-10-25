@@ -5,6 +5,36 @@
 #include <chrono>
 #include <cstdio>
 #include <cassert>
+#include <filesystem>
+#include <algorithm>
+
+namespace fs = std::filesystem;
+
+static std::string FindCaseInsensitiveFile(const std::string& path)
+{
+	if (_access(path.c_str(), 0) == 0)
+		return path;
+
+	std::error_code ec;
+	fs::path p(path);
+	fs::path parent = p.parent_path();
+	if (parent.empty()) parent = ".";
+	std::string filename = p.filename().string();
+	std::string lowerFilename = filename;
+	std::transform(lowerFilename.begin(), lowerFilename.end(), lowerFilename.begin(), ::tolower);
+
+	if (fs::is_directory(parent, ec)) {
+		for (const auto& entry : fs::directory_iterator(parent, ec)) {
+			std::string entryName = entry.path().filename().string();
+			std::string entryLower = entryName;
+			std::transform(entryLower.begin(), entryLower.end(), entryLower.begin(), ::tolower);
+			if (entryLower == lowerFilename) {
+				return (parent / entryName).string();
+			}
+		}
+	}
+	return "";
+}
 
 #include "EterPackManager.h"
 
@@ -221,11 +251,12 @@ bool CEterPackManager::PackExists(const std::string& name, const std::string& co
 {
 	std::string normName = NormalizeSeparators(name);
 	if (container == "FOLDER") {
-		return _access(normName.c_str(), 0) == 0;
+		std::string realFolder = FindCaseInsensitiveFile(normName);
+		return !realFolder.empty();
 	}
 	else if (container == "ZIP") {
-		std::string zipName = normName + ".zip";
-		return _access(zipName.c_str(), 0) == 0;
+		std::string realZip = FindCaseInsensitiveFile(normName + ".zip");
+		return !realZip.empty();
 	}
 
 	throw std::runtime_error("Unexpected container type: " + container + "!");
@@ -243,10 +274,16 @@ bool CEterPackManager::RegisterPack(const std::string& name, const std::string& 
 		std::shared_ptr<FileProvider> pack;
 
 		// Determine requested container type
-		if (container == "FOLDER")
-			pack = std::make_shared<Folder>(normName);
-		else if (container == "ZIP")
-			pack = std::make_shared<ZIP>(normName + ".zip");
+		if (container == "FOLDER") {
+			std::string realFolder = FindCaseInsensitiveFile(normName);
+			if (realFolder.empty()) realFolder = normName;
+			pack = std::make_shared<Folder>(realFolder);
+		}
+		else if (container == "ZIP") {
+			std::string realZip = FindCaseInsensitiveFile(normName + ".zip");
+			if (realZip.empty()) realZip = normName + ".zip";
+			pack = std::make_shared<ZIP>(realZip);
+		}
 		else
 			throw std::runtime_error("Unexpected container type: " + container + "!");
 
