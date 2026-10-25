@@ -8,6 +8,7 @@
 #include <EterGrnLib/Motion.h>
 #include <EterGrnLib/Material.h>
 
+#undef NDEBUG
 #include <cassert>
 #include <cmath>
 #include <cstdio>
@@ -45,7 +46,8 @@ void test_granny_skeleton_and_world_pose_math()
     skel.Bones = bones;
 
     granny_int32x foundIdx = -1;
-    assert(GrannyFindBoneByName(&skel, "bip01_r_hand", &foundIdx));
+    bool foundBone = GrannyFindBoneByName(&skel, "bip01_r_hand", &foundIdx);
+    assert(foundBone);
     assert(foundIdx == 1);
 
     granny_local_pose* localPose = GrannyNewLocalPose(2);
@@ -147,7 +149,8 @@ void test_motion_and_thing_loading()
 
     CGrannyMotion motion;
     assert(motion.IsEmpty());
-    assert(motion.BindGrannyAnimation(&anim));
+    bool bound = motion.BindGrannyAnimation(&anim);
+    assert(bound);
     assert(!motion.IsEmpty());
     assert(std::strcmp(motion.GetName(), "combo_attack_01") == 0);
     assert(std::fabs(motion.GetDuration() - 1.25f) < 1e-4f);
@@ -250,7 +253,8 @@ void test_motion_and_thing_loading()
     };
 
     TestGraphicThing thing("item/weapon/sword_001.gr2");
-    assert(thing.LoadMemory(sizeof(env), &env));
+    bool loaded = thing.LoadMemory(sizeof(env), &env);
+    assert(loaded);
     assert(thing.GetModelCount() == 1);
     assert(thing.GetMotionCount() == 1);
     assert(thing.GetModelPointer(0) != nullptr);
@@ -263,7 +267,8 @@ void test_motion_and_thing_loading()
     modelInst->SetMainModelPointer(thing.GetModelPointer(0), nullptr);
 
     int boneIdx = -1;
-    assert(modelInst->GetBoneIndexByName("Bip01", &boneIdx));
+    bool gotBone = modelInst->GetBoneIndexByName("Bip01", &boneIdx);
+    assert(gotBone);
     assert(boneIdx == 0);
 
     D3DXMATRIX worldMat;
