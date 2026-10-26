@@ -42,6 +42,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 endif()
 
 find_package(Threads REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(MINIAUDIO REQUIRED miniaudio)
 
 set(MILESLIB_SOURCES
     src/SoundBase.cpp
@@ -83,6 +85,8 @@ target_include_directories(MilesLib
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/MilesLib>
         $<INSTALL_INTERFACE:include>
+        ${MINIAUDIO_INCLUDE_DIRS}
+        /usr/include/miniaudio
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -93,6 +97,9 @@ target_link_libraries(MilesLib
         EterPack
         EterLib
         Threads::Threads
+        ${MINIAUDIO_LIBRARIES}
+        dl
+        m
 )
 
 # Unit Tests

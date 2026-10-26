@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Platform/Platform.h"
+#include <miniaudio/miniaudio.h>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 
 #ifndef AILCALLBACK
 #define AILCALLBACK
@@ -67,42 +69,6 @@ struct AIL_DigitalDriver {
 };
 typedef AIL_DigitalDriver* HDIGDRIVER;
 
-struct AIL_Sample2D {
-    HDIGDRIVER driver = nullptr;
-    const void* data = nullptr;
-    S32 size = 0;
-    S32 loop_count = 1;
-    U32 status = SMP_DONE;
-    float volume = 1.0f;
-    float pan = 0.5f;
-};
-typedef AIL_Sample2D* HSAMPLE;
-
-struct AIL_Object3D {
-    HPROVIDER provider = 0;
-    const void* data = nullptr;
-    U32 loop_count = 1;
-    U32 status = SMP_DONE;
-    float volume = 1.0f;
-    float x = 0.0f, y = 0.0f, z = 0.0f;
-    float vx = 0.0f, vy = 0.0f, vz = 0.0f, vmag = 0.0f;
-    float fx = 0.0f, fy = 0.0f, fz = 1.0f;
-    float ux = 0.0f, uy = 1.0f, uz = 0.0f;
-    S32 auto_update = 0;
-};
-typedef AIL_Object3D* H3DPOBJECT;
-typedef AIL_Object3D* H3DSAMPLE;
-
-struct AIL_Stream {
-    HDIGDRIVER driver = nullptr;
-    char filename[256] = {};
-    S32 loop_count = 1;
-    S32 status = -1; // -1 = done/stopped, 0 = playing, 1 = paused
-    float left_vol = 1.0f;
-    float right_vol = 1.0f;
-};
-typedef AIL_Stream* HSTREAM;
-
 typedef U32 (AILCALLBACK *AIL_file_open_callback)(char const* filename, U32* file_handle);
 typedef void (AILCALLBACK *AIL_file_close_callback)(U32 file_handle);
 typedef S32 (AILCALLBACK *AIL_file_seek_callback)(U32 file_handle, S32 offset, U32 type);
@@ -125,7 +91,124 @@ namespace MilesCompatInternal {
         static AIL_file_read_callback s_cb = nullptr;
         return s_cb;
     }
+
+    struct EngineHolder {
+        ma_engine engine;
+        bool initialized = false;
+
+        EngineHolder() {
+            ma_engine_config config = ma_engine_config_init();
+            config.sampleRate = 44100;
+            config.channels = 2;
+            if (ma_engine_init(&config, &engine) == MA_SUCCESS) {
+                initialized = true;
+            }
+        }
+
+        ~EngineHolder() {
+            if (initialized) {
+                ma_engine_uninit(&engine);
+                initialized = false;
+            }
+        }
+    };
+
+    inline ma_engine* GetEngine() {
+        static EngineHolder s_holder;
+        return s_holder.initialized ? &s_holder.engine : nullptr;
+    }
 }
+
+struct AIL_Sample2D {
+    HDIGDRIVER driver = nullptr;
+    const void* data = nullptr;
+    S32 size = 0;
+    S32 loop_count = 1;
+    U32 status = SMP_DONE;
+    float volume = 1.0f;
+    float pan = 0.5f;
+
+    ma_decoder decoder;
+    bool decoder_initialized = false;
+    ma_sound sound;
+    bool sound_initialized = false;
+
+    void cleanup() {
+        if (sound_initialized) {
+            ma_sound_uninit(&sound);
+            sound_initialized = false;
+        }
+        if (decoder_initialized) {
+            ma_decoder_uninit(&decoder);
+            decoder_initialized = false;
+        }
+    }
+
+    ~AIL_Sample2D() {
+        cleanup();
+    }
+};
+typedef AIL_Sample2D* HSAMPLE;
+
+struct AIL_Object3D {
+    HPROVIDER provider = 0;
+    const void* data = nullptr;
+    S32 size = 0;
+    U32 loop_count = 1;
+    U32 status = SMP_DONE;
+    float volume = 1.0f;
+    float x = 0.0f, y = 0.0f, z = 0.0f;
+    float vx = 0.0f, vy = 0.0f, vz = 0.0f, vmag = 0.0f;
+    float fx = 0.0f, fy = 0.0f, fz = 1.0f;
+    float ux = 0.0f, uy = 1.0f, uz = 0.0f;
+    S32 auto_update = 0;
+
+    ma_decoder decoder;
+    bool decoder_initialized = false;
+    ma_sound sound;
+    bool sound_initialized = false;
+
+    void cleanup() {
+        if (sound_initialized) {
+            ma_sound_uninit(&sound);
+            sound_initialized = false;
+        }
+        if (decoder_initialized) {
+            ma_decoder_uninit(&decoder);
+            decoder_initialized = false;
+        }
+    }
+
+    ~AIL_Object3D() {
+        cleanup();
+    }
+};
+typedef AIL_Object3D* H3DPOBJECT;
+typedef AIL_Object3D* H3DSAMPLE;
+
+struct AIL_Stream {
+    HDIGDRIVER driver = nullptr;
+    char filename[256] = {};
+    S32 loop_count = 1;
+    S32 status = -1; // -1 = done/stopped, 0 = playing, 1 = paused
+    float left_vol = 1.0f;
+    float right_vol = 1.0f;
+
+    ma_sound sound;
+    bool sound_initialized = false;
+
+    void cleanup() {
+        if (sound_initialized) {
+            ma_sound_uninit(&sound);
+            sound_initialized = false;
+        }
+    }
+
+    ~AIL_Stream() {
+        cleanup();
+    }
+};
+typedef AIL_Stream* HSTREAM;
 
 inline char* AIL_set_redist_directory(const char* /*dir*/) {
     static char s_dir[] = "miles";
@@ -133,6 +216,7 @@ inline char* AIL_set_redist_directory(const char* /*dir*/) {
 }
 
 inline S32 AIL_startup() {
+    MilesCompatInternal::GetEngine();
     return 1;
 }
 
@@ -140,7 +224,7 @@ inline void AIL_shutdown() {
 }
 
 inline const char* AIL_last_error() {
-    return "No error (MilesCompat)";
+    return "No error (miniaudio)";
 }
 
 inline void AIL_set_file_callbacks(
@@ -274,7 +358,10 @@ inline S32 AIL_decompress_ASI(const void* inData, U32 inSize, const char* /*file
 
 // 2D Digital Driver & Sample Functions
 inline HDIGDRIVER AIL_open_digital_driver(U32 freq, S32 bits, S32 chans, U32 flags) {
+    (void)flags;
+    (void)bits;
     HDIGDRIVER drv = new AIL_DigitalDriver{freq, bits, chans, flags};
+    MilesCompatInternal::GetEngine();
     return drv;
 }
 
@@ -290,11 +377,15 @@ inline HSAMPLE AIL_allocate_sample_handle(HDIGDRIVER drv) {
 }
 
 inline void AIL_release_sample_handle(HSAMPLE s) {
+    if (!s) return;
     delete s;
 }
 
 inline void AIL_init_sample(HSAMPLE s) {
     if (!s) return;
+    s->cleanup();
+    s->data = nullptr;
+    s->size = 0;
     s->loop_count = 1;
     s->status = SMP_DONE;
     s->volume = 1.0f;
@@ -304,35 +395,92 @@ inline void AIL_init_sample(HSAMPLE s) {
 inline S32 AIL_set_sample_file(HSAMPLE s, const void* file_image, S32 block) {
     if (!s || !file_image)
         return 0;
+
+    s->cleanup();
     s->data = file_image;
     s->size = block;
     s->status = SMP_DONE;
+
+    if (s->size <= 0) {
+        const char* p = static_cast<const char*>(file_image);
+        if (p[0] == 'R' && p[1] == 'I' && p[2] == 'F' && p[3] == 'F') {
+            uint32_t riffSize = *reinterpret_cast<const uint32_t*>(p + 4);
+            s->size = static_cast<S32>(riffSize + 8);
+        }
+    }
+
+    ma_engine* engine = MilesCompatInternal::GetEngine();
+    if (engine && s->size > 0) {
+        ma_decoder_config dcfg = ma_decoder_config_init(ma_format_f32, 2, 44100);
+        if (ma_decoder_init_memory(s->data, s->size, &dcfg, &s->decoder) == MA_SUCCESS) {
+            s->decoder_initialized = true;
+            if (ma_sound_init_from_data_source(engine, &s->decoder, 0, NULL, &s->sound) == MA_SUCCESS) {
+                s->sound_initialized = true;
+                ma_sound_set_volume(&s->sound, s->volume);
+                ma_sound_set_pan(&s->sound, s->pan * 2.0f - 1.0f);
+                ma_sound_set_looping(&s->sound, s->loop_count == 0 ? MA_TRUE : MA_FALSE);
+            }
+        }
+    }
+
     return 1;
 }
 
 inline U32 AIL_sample_status(HSAMPLE s) {
     if (!s) return SMP_DONE;
+    if (s->sound_initialized) {
+        if (ma_sound_at_end(&s->sound) && !ma_sound_is_looping(&s->sound)) {
+            s->status = SMP_DONE;
+        } else if (ma_sound_is_playing(&s->sound)) {
+            s->status = SMP_PLAYING;
+        }
+    }
     return s->status;
 }
 
 inline void AIL_set_sample_loop_count(HSAMPLE s, S32 loop_count) {
-    if (s) s->loop_count = loop_count;
+    if (!s) return;
+    s->loop_count = loop_count;
+    if (s->sound_initialized) {
+        ma_sound_set_looping(&s->sound, loop_count == 0 ? MA_TRUE : MA_FALSE);
+    }
 }
 
 inline void AIL_start_sample(HSAMPLE s) {
-    if (s) s->status = SMP_DONE; // Immediately ready for reuse in headless/stub mode
+    if (!s) return;
+    if (s->sound_initialized) {
+        ma_sound_seek_to_pcm_frame(&s->sound, 0);
+        ma_sound_set_looping(&s->sound, s->loop_count == 0 ? MA_TRUE : MA_FALSE);
+        ma_sound_start(&s->sound);
+        s->status = SMP_PLAYING;
+    } else {
+        s->status = SMP_DONE;
+    }
 }
 
 inline void AIL_stop_sample(HSAMPLE s) {
-    if (s) s->status = SMP_STOPPED;
+    if (!s) return;
+    if (s->sound_initialized) {
+        ma_sound_stop(&s->sound);
+    }
+    s->status = SMP_STOPPED;
 }
 
 inline void AIL_resume_sample(HSAMPLE s) {
-    if (s) s->status = SMP_DONE;
+    if (!s) return;
+    if (s->sound_initialized) {
+        ma_sound_start(&s->sound);
+        s->status = SMP_PLAYING;
+    }
 }
 
 inline void AIL_end_sample(HSAMPLE s) {
-    if (s) s->status = SMP_DONE;
+    if (!s) return;
+    if (s->sound_initialized) {
+        ma_sound_stop(&s->sound);
+        ma_sound_seek_to_pcm_frame(&s->sound, 0);
+    }
+    s->status = SMP_DONE;
 }
 
 inline void AIL_sample_volume_pan(HSAMPLE s, float* volume, float* pan) {
@@ -344,6 +492,10 @@ inline void AIL_set_sample_volume_pan(HSAMPLE s, float volume, float pan) {
     if (!s) return;
     s->volume = volume;
     s->pan = pan;
+    if (s->sound_initialized) {
+        ma_sound_set_volume(&s->sound, volume);
+        ma_sound_set_pan(&s->sound, pan * 2.0f - 1.0f);
+    }
 }
 
 // 3D Provider, Listener & 3D Sample Functions
@@ -385,40 +537,102 @@ inline H3DSAMPLE AIL_allocate_3D_sample_handle(HPROVIDER lib) {
 }
 
 inline void AIL_release_3D_sample_handle(H3DSAMPLE s) {
+    if (!s) return;
     delete s;
 }
 
 inline S32 AIL_set_3D_sample_file(H3DSAMPLE s, const void* file_image) {
     if (!s || !file_image)
         return 0;
+
+    s->cleanup();
     s->data = file_image;
     s->status = SMP_DONE;
+
+    s->size = 0;
+    const char* p = static_cast<const char*>(file_image);
+    if (p[0] == 'R' && p[1] == 'I' && p[2] == 'F' && p[3] == 'F') {
+        uint32_t riffSize = *reinterpret_cast<const uint32_t*>(p + 4);
+        s->size = static_cast<S32>(riffSize + 8);
+    } else {
+        s->size = static_cast<S32>(*(reinterpret_cast<const uint32_t*>(p) - 1));
+    }
+
+    ma_engine* engine = MilesCompatInternal::GetEngine();
+    if (engine && s->size > 0) {
+        ma_decoder_config dcfg = ma_decoder_config_init(ma_format_f32, 2, 44100);
+        if (ma_decoder_init_memory(s->data, s->size, &dcfg, &s->decoder) == MA_SUCCESS) {
+            s->decoder_initialized = true;
+            if (ma_sound_init_from_data_source(engine, &s->decoder, 0, NULL, &s->sound) == MA_SUCCESS) {
+                s->sound_initialized = true;
+                ma_sound_set_spatialization_enabled(&s->sound, MA_TRUE);
+                ma_sound_set_position(&s->sound, s->x, s->y, s->z);
+                ma_sound_set_min_distance(&s->sound, 200.0f);
+                ma_sound_set_max_distance(&s->sound, 5000.0f);
+                ma_sound_set_volume(&s->sound, s->volume);
+                ma_sound_set_looping(&s->sound, s->loop_count == 0 ? MA_TRUE : MA_FALSE);
+            }
+        }
+    }
+
     return 1;
 }
 
 inline U32 AIL_3D_sample_status(H3DSAMPLE s) {
     if (!s) return SMP_DONE;
+    if (s->sound_initialized) {
+        if (ma_sound_at_end(&s->sound) && !ma_sound_is_looping(&s->sound)) {
+            s->status = SMP_DONE;
+        } else if (ma_sound_is_playing(&s->sound)) {
+            s->status = SMP_PLAYING;
+        }
+    }
     return s->status;
 }
 
 inline void AIL_set_3D_sample_loop_count(H3DSAMPLE s, U32 loops) {
-    if (s) s->loop_count = loops;
+    if (!s) return;
+    s->loop_count = loops;
+    if (s->sound_initialized) {
+        ma_sound_set_looping(&s->sound, loops == 0 ? MA_TRUE : MA_FALSE);
+    }
 }
 
 inline void AIL_start_3D_sample(H3DSAMPLE s) {
-    if (s) s->status = SMP_DONE;
+    if (!s) return;
+    if (s->sound_initialized) {
+        ma_sound_seek_to_pcm_frame(&s->sound, 0);
+        ma_sound_set_looping(&s->sound, s->loop_count == 0 ? MA_TRUE : MA_FALSE);
+        ma_sound_start(&s->sound);
+        s->status = SMP_PLAYING;
+    } else {
+        s->status = SMP_DONE;
+    }
 }
 
 inline void AIL_stop_3D_sample(H3DSAMPLE s) {
-    if (s) s->status = SMP_STOPPED;
+    if (!s) return;
+    if (s->sound_initialized) {
+        ma_sound_stop(&s->sound);
+    }
+    s->status = SMP_STOPPED;
 }
 
 inline void AIL_resume_3D_sample(H3DSAMPLE s) {
-    if (s) s->status = SMP_DONE;
+    if (!s) return;
+    if (s->sound_initialized) {
+        ma_sound_start(&s->sound);
+        s->status = SMP_PLAYING;
+    }
 }
 
 inline void AIL_end_3D_sample(H3DSAMPLE s) {
-    if (s) s->status = SMP_DONE;
+    if (!s) return;
+    if (s->sound_initialized) {
+        ma_sound_stop(&s->sound);
+        ma_sound_seek_to_pcm_frame(&s->sound, 0);
+    }
+    s->status = SMP_DONE;
 }
 
 inline float AIL_3D_sample_volume(H3DSAMPLE s) {
@@ -426,7 +640,11 @@ inline float AIL_3D_sample_volume(H3DSAMPLE s) {
 }
 
 inline void AIL_set_3D_sample_volume(H3DSAMPLE s, float volume) {
-    if (s) s->volume = volume;
+    if (!s) return;
+    s->volume = volume;
+    if (s->sound_initialized) {
+        ma_sound_set_volume(&s->sound, volume);
+    }
 }
 
 inline void AIL_set_3D_position(H3DPOBJECT obj, float x, float y, float z) {
@@ -434,6 +652,9 @@ inline void AIL_set_3D_position(H3DPOBJECT obj, float x, float y, float z) {
     obj->x = x;
     obj->y = y;
     obj->z = z;
+    if (obj->sound_initialized) {
+        ma_sound_set_position(&obj->sound, x, y, z);
+    }
 }
 
 inline void AIL_set_3D_orientation(H3DPOBJECT obj, float fx, float fy, float fz, float ux, float uy, float uz) {
@@ -444,6 +665,9 @@ inline void AIL_set_3D_orientation(H3DPOBJECT obj, float fx, float fy, float fz,
     obj->ux = ux;
     obj->uy = uy;
     obj->uz = uz;
+    if (obj->sound_initialized) {
+        ma_sound_set_direction(&obj->sound, fx, fy, fz);
+    }
 }
 
 inline void AIL_set_3D_velocity(H3DPOBJECT obj, float dx, float dy, float dz, float mag) {
@@ -452,6 +676,24 @@ inline void AIL_set_3D_velocity(H3DPOBJECT obj, float dx, float dy, float dz, fl
     obj->vy = dy;
     obj->vz = dz;
     obj->vmag = mag;
+    if (obj->sound_initialized) {
+        ma_sound_set_velocity(&obj->sound, dx, dy, dz);
+    }
+}
+
+inline void AIL_set_listener_3D_position(HPROVIDER /*lib*/, float x, float y, float z) {
+    ma_engine* engine = MilesCompatInternal::GetEngine();
+    if (engine) {
+        ma_engine_listener_set_position(engine, 0, x, y, z);
+    }
+}
+
+inline void AIL_set_listener_3D_orientation(HPROVIDER /*lib*/, float fx, float fy, float fz, float ux, float uy, float uz) {
+    ma_engine* engine = MilesCompatInternal::GetEngine();
+    if (engine) {
+        ma_engine_listener_set_direction(engine, 0, fx, fy, fz);
+        ma_engine_listener_set_world_up(engine, 0, ux, uy, uz);
+    }
 }
 
 inline void AIL_auto_update_3D_position(H3DSAMPLE s, S32 enable) {
@@ -468,29 +710,94 @@ inline HSTREAM AIL_open_stream(HDIGDRIVER drv, const char* filename, S32 /*strea
     HSTREAM st = new AIL_Stream();
     st->driver = drv;
     std::strncpy(st->filename, filename, sizeof(st->filename) - 1);
-    st->status = 0;
+    st->status = -1;
+
+    std::string normPath = filename;
+    for (char& c : normPath) {
+        if (c == '\\') c = '/';
+    }
+
+    ma_engine* engine = MilesCompatInternal::GetEngine();
+    if (engine) {
+        ma_result res = ma_sound_init_from_file(engine, normPath.c_str(), MA_SOUND_FLAG_STREAM, NULL, NULL, &st->sound);
+        if (res != MA_SUCCESS) {
+            if (normPath.length() >= 4 && (normPath[0] == 'b' || normPath[0] == 'B') &&
+                (normPath[1] == 'g' || normPath[1] == 'G') &&
+                (normPath[2] == 'm' || normPath[2] == 'M') && normPath[3] == '/') {
+                std::string alt = "BGM/" + normPath.substr(4);
+                res = ma_sound_init_from_file(engine, alt.c_str(), MA_SOUND_FLAG_STREAM, NULL, NULL, &st->sound);
+                if (res != MA_SUCCESS) {
+                    alt = "bgm/" + normPath.substr(4);
+                    res = ma_sound_init_from_file(engine, alt.c_str(), MA_SOUND_FLAG_STREAM, NULL, NULL, &st->sound);
+                }
+            } else if (normPath.find('/') == std::string::npos) {
+                std::string bgmPath = "BGM/" + normPath;
+                res = ma_sound_init_from_file(engine, bgmPath.c_str(), MA_SOUND_FLAG_STREAM, NULL, NULL, &st->sound);
+                if (res != MA_SUCCESS) {
+                    bgmPath = "bgm/" + normPath;
+                    res = ma_sound_init_from_file(engine, bgmPath.c_str(), MA_SOUND_FLAG_STREAM, NULL, NULL, &st->sound);
+                }
+            }
+        }
+        if (res == MA_SUCCESS) {
+            st->sound_initialized = true;
+            ma_sound_set_volume(&st->sound, (st->left_vol + st->right_vol) * 0.5f);
+            ma_sound_set_looping(&st->sound, st->loop_count == 0 ? MA_TRUE : MA_FALSE);
+        }
+    }
+
     return st;
 }
 
 inline void AIL_close_stream(HSTREAM st) {
+    if (!st) return;
     delete st;
 }
 
 inline S32 AIL_stream_status(HSTREAM st) {
     if (!st) return -1;
+    if (st->sound_initialized) {
+        if (ma_sound_at_end(&st->sound) && !ma_sound_is_looping(&st->sound)) {
+            st->status = -1;
+        } else if (ma_sound_is_playing(&st->sound)) {
+            st->status = 0;
+        }
+    }
     return st->status;
 }
 
 inline void AIL_set_stream_loop_count(HSTREAM st, S32 count) {
-    if (st) st->loop_count = count;
+    if (!st) return;
+    st->loop_count = count;
+    if (st->sound_initialized) {
+        ma_sound_set_looping(&st->sound, count == 0 ? MA_TRUE : MA_FALSE);
+    }
 }
 
 inline void AIL_start_stream(HSTREAM st) {
-    if (st) st->status = 0;
+    if (!st) return;
+    if (st->sound_initialized) {
+        ma_sound_set_looping(&st->sound, st->loop_count == 0 ? MA_TRUE : MA_FALSE);
+        ma_sound_start(&st->sound);
+        st->status = 0;
+    } else {
+        st->status = 0;
+    }
 }
 
 inline void AIL_pause_stream(HSTREAM st, S32 onoff) {
-    if (st) st->status = onoff ? 1 : 0;
+    if (!st) return;
+    if (st->sound_initialized) {
+        if (onoff) {
+            ma_sound_stop(&st->sound);
+            st->status = 1;
+        } else {
+            ma_sound_start(&st->sound);
+            st->status = 0;
+        }
+    } else {
+        st->status = onoff ? 1 : 0;
+    }
 }
 
 inline void AIL_stream_volume_levels(HSTREAM st, float* left, float* right) {
@@ -502,4 +809,7 @@ inline void AIL_set_stream_volume_levels(HSTREAM st, float left, float right) {
     if (!st) return;
     st->left_vol = left;
     st->right_vol = right;
+    if (st->sound_initialized) {
+        ma_sound_set_volume(&st->sound, (left + right) * 0.5f);
+    }
 }
