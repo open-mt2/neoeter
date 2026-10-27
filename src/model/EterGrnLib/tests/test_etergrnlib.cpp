@@ -7,6 +7,7 @@
 #include <EterGrnLib/Mesh.h>
 #include <EterGrnLib/Motion.h>
 #include <EterGrnLib/Material.h>
+#include <EterLib/ResourceManager.h>
 
 #undef NDEBUG
 #include <cassert>
@@ -291,6 +292,117 @@ void test_motion_and_thing_loading()
     std::printf("[PASS] test_motion_and_thing_loading\n");
 }
 
+void test_native_gr2_parsing_and_model_loading()
+{
+    CResourceManager resMgr;
+
+    class TestGraphicThing : public CGraphicThing
+    {
+    public:
+        explicit TestGraphicThing(const char* name) : CGraphicThing(name) {}
+        bool LoadMemory(int size, const void* buf) { return OnLoad(size, buf); }
+    };
+
+    auto try_read_file = [](const std::vector<std::string>& candidates) -> std::vector<uint8_t> {
+        for (const auto& path : candidates) {
+            FILE* fp = std::fopen(path.c_str(), "rb");
+            if (!fp) continue;
+            std::fseek(fp, 0, SEEK_END);
+            long sz = std::ftell(fp);
+            std::fseek(fp, 0, SEEK_SET);
+            if (sz > 0) {
+                std::vector<uint8_t> data(sz);
+                size_t readBytes = std::fread(data.data(), 1, sz, fp);
+                std::fclose(fp);
+                if (readBytes == static_cast<size_t>(sz))
+                    return data;
+            } else {
+                std::fclose(fp);
+            }
+        }
+        return {};
+    };
+
+    // Test 1: Rigid mesh (general_obj_fence03.gr2)
+    std::vector<uint8_t> fenceData = try_read_file({
+        "bin/pack/Zone/ymir work/zone/b/obj/general_obj_fence03.gr2",
+        "../bin/pack/Zone/ymir work/zone/b/obj/general_obj_fence03.gr2",
+        "../../bin/pack/Zone/ymir work/zone/b/obj/general_obj_fence03.gr2"
+    });
+
+    if (!fenceData.empty()) {
+        TestGraphicThing thingFence("general_obj_fence03.gr2");
+        bool loaded = thingFence.LoadMemory(fenceData.size(), fenceData.data());
+        assert(loaded);
+        assert(thingFence.GetModelCount() >= 1);
+        CGrannyModel* model = thingFence.GetModelPointer(0);
+        assert(model != nullptr);
+        assert(model->GetMeshCount() >= 1);
+        assert(model->GetRigidVertexCount() > 0);
+        assert(model->GetRigidVertexCount() == 59);
+        assert(model->GetMeshCount() == 1);
+
+        CGrannyModelInstance* inst = CGrannyModelInstance::New();
+        assert(inst != nullptr);
+        inst->SetMainModelPointer(model, nullptr);
+
+        D3DXMATRIX worldMat;
+        D3DXMatrixIdentity(&worldMat);
+        inst->DeformNoSkin(&worldMat);
+
+        D3DXVECTOR3 vtMin, vtMax;
+        inst->GetBoundBox(&vtMin, &vtMax);
+        assert(vtMax.x > vtMin.x);
+
+        CGrannyModelInstance::Delete(inst);
+        thingFence.DestroyDeviceObjects();
+        std::printf("[PASS] test_native_gr2_parsing_and_model_loading: rigid mesh verified\n");
+    }
+
+    // Test 2: Deformable skinned character mesh (warrior_novice.gr2)
+    std::vector<uint8_t> warriorData = try_read_file({
+        "bin/pack/PC/ymir work/pc/warrior/warrior_novice.gr2",
+        "../bin/pack/PC/ymir work/pc/warrior/warrior_novice.gr2",
+        "../../bin/pack/PC/ymir work/pc/warrior/warrior_novice.gr2"
+    });
+
+    if (!warriorData.empty()) {
+        TestGraphicThing thingWarrior("warrior_novice.gr2");
+        bool loaded = thingWarrior.LoadMemory(warriorData.size(), warriorData.data());
+        assert(loaded);
+        assert(thingWarrior.GetModelCount() >= 1);
+        CGrannyModel* model = thingWarrior.GetModelPointer(0);
+        assert(model != nullptr);
+        assert(model->GetMeshCount() >= 1);
+        assert(model->GetDeformVertexCount() > 0);
+        assert(model->GetDeformVertexCount() == 2207);
+        assert(model->GetMeshCount() == 3);
+
+        CGrannyModelInstance* inst = CGrannyModelInstance::New();
+        assert(inst != nullptr);
+        inst->SetMainModelPointer(model, nullptr);
+
+        D3DXMATRIX worldMat;
+        D3DXMatrixIdentity(&worldMat);
+        inst->Deform(&worldMat);
+
+        D3DXVECTOR3 vtMin, vtMax;
+        inst->GetBoundBox(&vtMin, &vtMax);
+        assert(vtMax.z > vtMin.z);
+
+        int boneIdx = -1;
+        bool foundBip = inst->GetBoneIndexByName("Bip01", &boneIdx);
+        assert(foundBip);
+        assert(boneIdx >= 0);
+
+        CGrannyModelInstance::Delete(inst);
+        thingWarrior.DestroyDeviceObjects();
+        std::printf("[PASS] test_native_gr2_parsing_and_model_loading: deformable skinned character verified\n");
+    }
+
+    CGrannyModelInstance::DestroySystem();
+}
+
 } // namespace
 
 int main()
@@ -298,6 +410,7 @@ int main()
     test_granny_skeleton_and_world_pose_math();
     test_granny_vertex_deformer_skinning();
     test_motion_and_thing_loading();
+    test_native_gr2_parsing_and_model_loading();
 
     std::printf("All EterGrnLib smoke tests passed!\n");
     return 0;

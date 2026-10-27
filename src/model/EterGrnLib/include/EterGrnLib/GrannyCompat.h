@@ -413,6 +413,7 @@ struct granny_animation
     const char* Name;
     granny_real32 Duration;
     granny_real32 TimeStep;
+    granny_real32 Oversampling;
     granny_int32 TrackGroupCount;
     granny_track_group** TrackGroups;
 };
@@ -467,6 +468,7 @@ struct granny_file
     void* ConversionBuffer;
     granny_file_info* FileInfo;
     bool OwnsFileInfo;
+    void* InternalData = nullptr;
 };
 
 // Logging & System Clock
@@ -686,6 +688,16 @@ inline void GrannyConvertSingleObject(
     }
 }
 
+// Forward declarations for native GR2 parser
+#ifdef __cplusplus
+extern "C" {
+#endif
+granny_file* GrannyParseGR2FromMemory(int size, const void* memory);
+void GrannyFreeParsedGR2(granny_file* file);
+#ifdef __cplusplus
+}
+#endif
+
 // ============================================================================
 // File Loading & Memory Management
 // ============================================================================
@@ -695,21 +707,27 @@ inline granny_file* GrannyReadEntireFileFromMemory(int MemorySize, void* Memory)
     if (!Memory || MemorySize <= 0)
         return nullptr;
 
-    granny_file* file = new granny_file();
-    std::memset(file, 0, sizeof(granny_file));
-
     if (static_cast<size_t>(MemorySize) >= sizeof(OpenGrannyMemoryEnvelope))
     {
         const OpenGrannyMemoryEnvelope* env = static_cast<const OpenGrannyMemoryEnvelope*>(Memory);
         if (env->magic == OPEN_GRANNY_MEM_MAGIC && env->fileInfo != nullptr)
         {
+            granny_file* file = new granny_file();
+            std::memset(file, 0, sizeof(granny_file));
             file->FileInfo = env->fileInfo;
             file->OwnsFileInfo = false;
             return file;
         }
     }
 
-    // Create an empty valid file_info container if raw unparsed bytes are passed
+    // Attempt to parse binary .gr2 container
+    granny_file* parsedFile = GrannyParseGR2FromMemory(MemorySize, Memory);
+    if (parsedFile)
+        return parsedFile;
+
+    // Fallback to empty valid file_info container if parsing is not applicable
+    granny_file* file = new granny_file();
+    std::memset(file, 0, sizeof(granny_file));
     file->FileInfo = new granny_file_info();
     std::memset(file->FileInfo, 0, sizeof(granny_file_info));
     file->OwnsFileInfo = true;
@@ -731,6 +749,13 @@ inline void GrannyFreeFile(granny_file* File)
 {
     if (!File)
         return;
+
+    if (File->InternalData)
+    {
+        GrannyFreeParsedGR2(File);
+        return;
+    }
+
     if (File->OwnsFileInfo && File->FileInfo)
         delete File->FileInfo;
     delete File;
