@@ -7,7 +7,6 @@
 #include <map>
 #include <string>
 #include <memory>
-#include <functional>
 #include <cstring>
 #include <cstdint>
 
@@ -21,26 +20,24 @@ struct GR2ParsedContext
     std::vector<std::unique_ptr<granny_model>> models;
     std::vector<granny_model*> modelPtrs;
     std::vector<std::unique_ptr<granny_skeleton>> skeletons;
-    std::deque<std::vector<granny_bone>> skeletonBones;
-    std::deque<std::vector<granny_model_mesh_binding>> modelMeshBindings;
+    std::vector<std::vector<granny_bone>> skeletonBones;
+    std::vector<std::vector<granny_model_mesh_binding>> modelMeshBindings;
     std::vector<std::unique_ptr<granny_mesh>> meshes;
     std::vector<std::unique_ptr<granny_vertex_data>> vertexDatas;
     std::vector<std::unique_ptr<granny_tri_topology>> topologies;
-    std::deque<std::vector<granny_tri_material_group>> triGroups;
-    std::deque<std::vector<granny_material_binding>> meshMaterialBindings;
+    std::vector<std::vector<granny_tri_material_group>> triGroups;
+    std::vector<std::vector<granny_material_binding>> meshMaterialBindings;
     std::vector<std::unique_ptr<granny_material>> materials;
-    std::vector<granny_material*> matPtrs;
-    std::deque<std::vector<granny_material_map>> materialMaps;
+    std::vector<std::vector<granny_material_map>> materialMaps;
     std::vector<std::unique_ptr<granny_texture>> textures;
-    std::vector<granny_texture*> texPtrs;
-    std::deque<std::vector<granny_bone_binding>> meshBoneBindings;
+    std::vector<std::vector<granny_bone_binding>> meshBoneBindings;
     std::vector<std::unique_ptr<granny_animation>> animations;
     std::vector<granny_animation*> animPtrs;
     std::vector<std::unique_ptr<granny_track_group>> trackGroups;
     std::vector<granny_track_group*> tgPtrs;
-    std::deque<std::vector<granny_transform_track>> tgTransformTracks;
-    std::deque<std::vector<float>> curveKnots;
-    std::deque<std::vector<float>> curveControls;
+    std::vector<std::vector<granny_transform_track>> tgTransformTracks;
+    std::vector<std::vector<float>> curveKnots;
+    std::vector<std::vector<float>> curveControls;
     std::deque<std::string> stringStore;
 
     const char* StoreString(const char* s)
@@ -141,10 +138,6 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
         return nullptr;
 
     // Dynamically discover member offsets from root type definition
-    uint32_t texturesOffset = 0x0C;
-    bool hasTextures = false;
-    uint32_t materialsOffset = 0x14;
-    bool hasMaterials = false;
     uint32_t modelsOffset = 0x3C;
     bool hasModels = false;
     uint32_t animsOffset = 0x4C;
@@ -179,13 +172,7 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
                 default: memberSize = 4; break;
             }
 
-            if (mName == "Textures") {
-                texturesOffset = curDataOff;
-                hasTextures = true;
-            } else if (mName == "Materials") {
-                materialsOffset = curDataOff;
-                hasMaterials = true;
-            } else if (mName == "Models") {
+            if (mName == "Models") {
                 modelsOffset = curDataOff;
                 hasModels = true;
             } else if (mName == "Animations") {
@@ -195,104 +182,6 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
 
             curDataOff += memberSize;
             curTypeOff += 32;
-        }
-    }
-
-    // Material and Texture caches
-    std::map<std::pair<uint32_t, uint32_t>, granny_texture*> texCache;
-    std::map<std::pair<uint32_t, uint32_t>, granny_material*> matCache;
-
-    std::function<granny_texture*(uint32_t, uint32_t)> GetOrCreateTexture =
-        [&](uint32_t sec, uint32_t off) -> granny_texture* {
-            if (sec >= ctx->sections.size() || off >= ctx->sections[sec].size())
-                return nullptr;
-            auto key = std::make_pair(sec, off);
-            auto it = texCache.find(key);
-            if (it != texCache.end())
-                return it->second;
-
-            auto tex = std::make_unique<granny_texture>();
-            std::memset(tex.get(), 0, sizeof(granny_texture));
-            tex->FromFileName = const_cast<char*>(ctx->StoreString(ResolveString(ctx->sections, fixups, sec, off + 0)));
-            granny_texture* p = tex.get();
-            ctx->textures.push_back(std::move(tex));
-            ctx->texPtrs.push_back(p);
-            texCache[key] = p;
-            return p;
-        };
-
-    std::function<granny_material*(uint32_t, uint32_t)> GetOrCreateMaterial =
-        [&](uint32_t sec, uint32_t off) -> granny_material* {
-            if (sec >= ctx->sections.size() || off + 12 > ctx->sections[sec].size())
-                return nullptr;
-            auto key = std::make_pair(sec, off);
-            auto it = matCache.find(key);
-            if (it != matCache.end())
-                return it->second;
-
-            const uint8_t* pMat = &ctx->sections[sec][off];
-            auto mat = std::make_unique<granny_material>();
-            std::memset(mat.get(), 0, sizeof(granny_material));
-            mat->Name = ctx->StoreString(ResolveString(ctx->sections, fixups, sec, off + 0));
-            granny_material* p = mat.get();
-            matCache[key] = p;
-
-            if (fixups[sec].count(off + 12)) {
-                auto [tSec, tOff] = fixups[sec][off + 12];
-                p->Texture = GetOrCreateTexture(tSec, tOff);
-            }
-
-            int32_t mapCount = *reinterpret_cast<const int32_t*>(pMat + 4);
-            p->MapCount = std::max(0, mapCount);
-            if (mapCount > 0 && fixups[sec].count(off + 8)) {
-                auto [mapSec, mapOff] = fixups[sec][off + 8];
-                ctx->materialMaps.emplace_back(mapCount);
-                auto& maps = ctx->materialMaps.back();
-                for (int mp = 0; mp < mapCount; ++mp) {
-                    uint32_t curMapOff = mapOff + mp * 8;
-                    maps[mp].Usage = ctx->StoreString(ResolveString(ctx->sections, fixups, mapSec, curMapOff + 0));
-                    if (fixups[mapSec].count(curMapOff + 4)) {
-                        auto [subMSec, subMOff] = fixups[mapSec][curMapOff + 4];
-                        maps[mp].Material = GetOrCreateMaterial(subMSec, subMOff);
-                    }
-                }
-                p->Maps = maps.data();
-            }
-
-            ctx->materials.push_back(std::move(mat));
-            ctx->matPtrs.push_back(p);
-            return p;
-        };
-
-    // Unmarshal Root Textures
-    int32_t rootTexCount = 0;
-    if (hasTextures && rootNodeSec < ctx->sections.size() && texturesOffset + 8 <= ctx->sections[rootNodeSec].size()) {
-        rootTexCount = *reinterpret_cast<const int32_t*>(&ctx->sections[rootNodeSec][texturesOffset]);
-        if (rootTexCount < 0 || rootTexCount > 2000) rootTexCount = 0;
-    }
-    if (rootTexCount > 0 && fixups[rootNodeSec].count(texturesOffset + 4)) {
-        auto [tArrSec, tArrOff] = fixups[rootNodeSec][texturesOffset + 4];
-        for (int t = 0; t < rootTexCount; ++t) {
-            if (fixups[tArrSec].count(tArrOff + t * 4)) {
-                auto [tSec, tOff] = fixups[tArrSec][tArrOff + t * 4];
-                GetOrCreateTexture(tSec, tOff);
-            }
-        }
-    }
-
-    // Unmarshal Root Materials
-    int32_t rootMatCount = 0;
-    if (hasMaterials && rootNodeSec < ctx->sections.size() && materialsOffset + 8 <= ctx->sections[rootNodeSec].size()) {
-        rootMatCount = *reinterpret_cast<const int32_t*>(&ctx->sections[rootNodeSec][materialsOffset]);
-        if (rootMatCount < 0 || rootMatCount > 2000) rootMatCount = 0;
-    }
-    if (rootMatCount > 0 && fixups[rootNodeSec].count(materialsOffset + 4)) {
-        auto [mArrSec, mArrOff] = fixups[rootNodeSec][materialsOffset + 4];
-        for (int m = 0; m < rootMatCount; ++m) {
-            if (fixups[mArrSec].count(mArrOff + m * 4)) {
-                auto [mSec, mOff] = fixups[mArrSec][mArrOff + m * 4];
-                GetOrCreateMaterial(mSec, mOff);
-            }
         }
     }
 
@@ -386,29 +275,6 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
                             auto vData = std::make_unique<granny_vertex_data>();
                             std::memset(vData.get(), 0, sizeof(granny_vertex_data));
                             vData->VertexCount = *reinterpret_cast<const int32_t*>(pVtx + 4);
-
-                            // Detect VertexType
-                            vData->VertexType = GrannyPNT332VertexType;
-                            if (fixups[vtxSec].count(vtxOff + 0)) {
-                                auto [typeSec, typeOff] = fixups[vtxSec][vtxOff + 0];
-                                uint32_t curTypeOff = typeOff;
-                                bool hasBoneWeights = false;
-                                bool hasTexCoord1 = false;
-                                while (typeSec < ctx->sections.size() && curTypeOff + 32 <= ctx->sections[typeSec].size()) {
-                                    uint32_t mType = *reinterpret_cast<const uint32_t*>(&ctx->sections[typeSec][curTypeOff]);
-                                    if (mType == 0) break;
-                                    std::string mName = ResolveString(ctx->sections, fixups, typeSec, curTypeOff + 4);
-                                    if (mName == "BoneWeights") hasBoneWeights = true;
-                                    else if (mName == "TextureCoordinates1") hasTexCoord1 = true;
-                                    curTypeOff += 32;
-                                }
-                                if (hasBoneWeights) {
-                                    vData->VertexType = GrannyPWNT3432VertexType;
-                                } else if (hasTexCoord1) {
-                                    vData->VertexType = GrannyPNT3322VertexType;
-                                }
-                            }
-
                             if (fixups[vtxSec].count(vtxOff + 8)) {
                                 auto [dSec, dOff] = fixups[vtxSec][vtxOff + 8];
                                 if (dSec < ctx->sections.size() && dOff < ctx->sections[dSec].size()) {
@@ -471,7 +337,42 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
                         for (int m_idx = 0; m_idx < matCount; ++m_idx) {
                             if (!fixups[matArrSec].count(matArrOff + m_idx * 4)) continue;
                             auto [matSec, matOff] = fixups[matArrSec][matArrOff + m_idx * 4];
-                            matBindings[m_idx].Material = GetOrCreateMaterial(matSec, matOff);
+                            if (matSec >= ctx->sections.size() || matOff + 12 > ctx->sections[matSec].size()) continue;
+
+                            const uint8_t* pMat = &ctx->sections[matSec][matOff];
+                            auto mat = std::make_unique<granny_material>();
+                            std::memset(mat.get(), 0, sizeof(granny_material));
+                            mat->Name = ctx->StoreString(ResolveString(ctx->sections, fixups, matSec, matOff + 0));
+                            int32_t mapCount = *reinterpret_cast<const int32_t*>(pMat + 4);
+                            mat->MapCount = std::max(0, mapCount);
+
+                            if (mapCount > 0 && fixups[matSec].count(matOff + 8)) {
+                                auto [mapSec, mapOff] = fixups[matSec][matOff + 8];
+                                ctx->materialMaps.emplace_back(mapCount);
+                                auto& maps = ctx->materialMaps.back();
+                                for (int mp = 0; mp < mapCount; ++mp) {
+                                    uint32_t curMapOff = mapOff + mp * 8;
+                                    maps[mp].Usage = ctx->StoreString(ResolveString(ctx->sections, fixups, mapSec, curMapOff + 0));
+                                    if (fixups[mapSec].count(curMapOff + 4)) {
+                                        auto [subMSec, subMOff] = fixups[mapSec][curMapOff + 4];
+                                        auto subMat = std::make_unique<granny_material>();
+                                        std::memset(subMat.get(), 0, sizeof(granny_material));
+                                        if (fixups[subMSec].count(subMOff + 12)) {
+                                            auto [texSec, texOff] = fixups[subMSec][subMOff + 12];
+                                            auto tex = std::make_unique<granny_texture>();
+                                            std::memset(tex.get(), 0, sizeof(granny_texture));
+                                            tex->FromFileName = const_cast<char*>(ctx->StoreString(ResolveString(ctx->sections, fixups, texSec, texOff + 0)));
+                                            subMat->Texture = tex.get();
+                                            ctx->textures.push_back(std::move(tex));
+                                        }
+                                        maps[mp].Material = subMat.get();
+                                        ctx->materials.push_back(std::move(subMat));
+                                    }
+                                }
+                                mat->Maps = maps.data();
+                            }
+                            matBindings[m_idx].Material = mat.get();
+                            ctx->materials.push_back(std::move(mat));
                         }
                         mesh->MaterialBindings = matBindings.data();
                     }
@@ -617,11 +518,6 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
         ctx->fileInfo.Animations = ctx->animPtrs.empty() ? nullptr : ctx->animPtrs.data();
         ctx->fileInfo.AnimationCount = static_cast<granny_int32>(ctx->animPtrs.size());
     }
-
-    ctx->fileInfo.TextureCount  = static_cast<granny_int32>(ctx->texPtrs.size());
-    ctx->fileInfo.Textures      = ctx->texPtrs.empty() ? nullptr : ctx->texPtrs.data();
-    ctx->fileInfo.MaterialCount = static_cast<granny_int32>(ctx->matPtrs.size());
-    ctx->fileInfo.Materials     = ctx->matPtrs.empty() ? nullptr : ctx->matPtrs.data();
 
     ctx->file.FileInfo     = &ctx->fileInfo;
     ctx->file.OwnsFileInfo = false;
