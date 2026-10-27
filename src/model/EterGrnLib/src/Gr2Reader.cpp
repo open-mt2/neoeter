@@ -454,6 +454,13 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
                     std::memset(trackGroup.get(), 0, sizeof(granny_track_group));
                     trackGroup->Name = ctx->StoreString(ResolveString(ctx->sections, fixups, tgSec, tgOff + 0));
 
+                    if (tgOff + 116 <= ctx->sections[tgSec].size()) {
+                        const float* pLoopTrans = reinterpret_cast<const float*>(pTG + 104);
+                        trackGroup->LoopTranslation[0] = pLoopTrans[0];
+                        trackGroup->LoopTranslation[1] = pLoopTrans[1];
+                        trackGroup->LoopTranslation[2] = pLoopTrans[2];
+                    }
+
                     int32_t ttCount = *reinterpret_cast<const int32_t*>(pTG + 12);
                     if (ttCount > 0 && fixups[tgSec].count(tgOff + 16)) {
                         auto [ttArrSec, ttArrOff] = fixups[tgSec][tgOff + 16];

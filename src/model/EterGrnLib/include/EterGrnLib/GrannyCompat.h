@@ -1715,14 +1715,48 @@ inline void GrannySampleModelAnimationsAccelerated(
 }
 
 inline void GrannyUpdateModelMatrix(
-    const granny_model_instance* /*ModelInstance*/,
-    granny_real32 /*SecondsElapsed*/,
+    const granny_model_instance* ModelInstance,
+    granny_real32 SecondsElapsed,
     const granny_real32* ModelMatrix4x4,
     granny_real32* DestMatrix4x4)
 {
     if (ModelMatrix4x4 && DestMatrix4x4 && ModelMatrix4x4 != DestMatrix4x4)
     {
         std::memcpy(DestMatrix4x4, ModelMatrix4x4, sizeof(granny_matrix_4x4));
+    }
+    if (!ModelInstance || !DestMatrix4x4 || SecondsElapsed <= 0.0f)
+        return;
+
+    granny_triple delta = {0.0f, 0.0f, 0.0f};
+    bool hasDelta = false;
+
+    for (const auto* ctrl : ModelInstance->Controls)
+    {
+        if (!ctrl || !ctrl->Animation || ctrl->IsCompleted) continue;
+        if (ctrl->Animation->Duration <= 0.0f) continue;
+        for (int i = 0; i < ctrl->Animation->TrackGroupCount; ++i)
+        {
+            const auto* tg = ctrl->Animation->TrackGroups[i];
+            if (!tg) continue;
+            if (tg->LoopTranslation[0] != 0.0f || tg->LoopTranslation[1] != 0.0f || tg->LoopTranslation[2] != 0.0f)
+            {
+                float factor = (SecondsElapsed * ctrl->Speed) / ctrl->Animation->Duration;
+                delta[0] += tg->LoopTranslation[0] * factor;
+                delta[1] += tg->LoopTranslation[1] * factor;
+                delta[2] += tg->LoopTranslation[2] * factor;
+                hasDelta = true;
+            }
+        }
+    }
+
+    if (hasDelta)
+    {
+        float dx = delta[0] * ModelMatrix4x4[0] + delta[1] * ModelMatrix4x4[4] + delta[2] * ModelMatrix4x4[8];
+        float dy = delta[0] * ModelMatrix4x4[1] + delta[1] * ModelMatrix4x4[5] + delta[2] * ModelMatrix4x4[9];
+        float dz = delta[0] * ModelMatrix4x4[2] + delta[1] * ModelMatrix4x4[6] + delta[2] * ModelMatrix4x4[10];
+        DestMatrix4x4[12] += dx;
+        DestMatrix4x4[13] += dy;
+        DestMatrix4x4[14] += dz;
     }
 }
 
