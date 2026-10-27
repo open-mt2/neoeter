@@ -1464,6 +1464,149 @@ inline granny_real32 GrannyEaseControlOut(granny_control* Control, granny_real32
     return Duration;
 }
 
+inline void GrannySampleCurveVec3(const granny_curve& curve, float t, float* outVec3)
+{
+    if (curve.ControlCount <= 0 || !curve.Controls)
+        return;
+
+    if (curve.Degree == 0 || curve.KnotCount <= 1 || !curve.Knots)
+    {
+        outVec3[0] = curve.Controls[0];
+        outVec3[1] = curve.Controls[1];
+        outVec3[2] = curve.Controls[2];
+        return;
+    }
+
+    if (t <= curve.Knots[0])
+    {
+        outVec3[0] = curve.Controls[0];
+        outVec3[1] = curve.Controls[1];
+        outVec3[2] = curve.Controls[2];
+        return;
+    }
+
+    if (t >= curve.Knots[curve.KnotCount - 1])
+    {
+        int last = (curve.KnotCount - 1) * 3;
+        if (last + 2 < curve.ControlCount)
+        {
+            outVec3[0] = curve.Controls[last];
+            outVec3[1] = curve.Controls[last + 1];
+            outVec3[2] = curve.Controls[last + 2];
+        }
+        return;
+    }
+
+    int k = 0;
+    while (k + 1 < curve.KnotCount && t > curve.Knots[k + 1])
+        ++k;
+
+    float dt = curve.Knots[k + 1] - curve.Knots[k];
+    float u = (dt > 1e-6f) ? (t - curve.Knots[k]) / dt : 0.0f;
+
+    int idx0 = k * 3;
+    int idx1 = (k + 1) * 3;
+    if (idx1 + 2 < curve.ControlCount)
+    {
+        outVec3[0] = curve.Controls[idx0 + 0] + u * (curve.Controls[idx1 + 0] - curve.Controls[idx0 + 0]);
+        outVec3[1] = curve.Controls[idx0 + 1] + u * (curve.Controls[idx1 + 1] - curve.Controls[idx0 + 1]);
+        outVec3[2] = curve.Controls[idx0 + 2] + u * (curve.Controls[idx1 + 2] - curve.Controls[idx0 + 2]);
+    }
+}
+
+inline void GrannySampleCurveQuat(const granny_curve& curve, float t, float* outQuat)
+{
+    if (curve.ControlCount <= 0 || !curve.Controls)
+        return;
+
+    if (curve.Degree == 0 || curve.KnotCount <= 1 || !curve.Knots)
+    {
+        outQuat[0] = curve.Controls[0];
+        outQuat[1] = curve.Controls[1];
+        outQuat[2] = curve.Controls[2];
+        outQuat[3] = curve.Controls[3];
+        return;
+    }
+
+    if (t <= curve.Knots[0])
+    {
+        outQuat[0] = curve.Controls[0];
+        outQuat[1] = curve.Controls[1];
+        outQuat[2] = curve.Controls[2];
+        outQuat[3] = curve.Controls[3];
+        return;
+    }
+
+    if (t >= curve.Knots[curve.KnotCount - 1])
+    {
+        int last = (curve.KnotCount - 1) * 4;
+        if (last + 3 < curve.ControlCount)
+        {
+            outQuat[0] = curve.Controls[last];
+            outQuat[1] = curve.Controls[last + 1];
+            outQuat[2] = curve.Controls[last + 2];
+            outQuat[3] = curve.Controls[last + 3];
+        }
+        return;
+    }
+
+    int k = 0;
+    while (k + 1 < curve.KnotCount && t > curve.Knots[k + 1])
+        ++k;
+
+    float dt = curve.Knots[k + 1] - curve.Knots[k];
+    float u = (dt > 1e-6f) ? (t - curve.Knots[k]) / dt : 0.0f;
+
+    int idx0 = k * 4;
+    int idx1 = (k + 1) * 4;
+    if (idx1 + 3 < curve.ControlCount)
+    {
+        D3DXQUATERNION q0(curve.Controls[idx0], curve.Controls[idx0 + 1], curve.Controls[idx0 + 2], curve.Controls[idx0 + 3]);
+        D3DXQUATERNION q1(curve.Controls[idx1], curve.Controls[idx1 + 1], curve.Controls[idx1 + 2], curve.Controls[idx1 + 3]);
+        D3DXQUATERNION outQ;
+        D3DXQuaternionSlerp(&outQ, &q0, &q1, u);
+        outQuat[0] = outQ.x;
+        outQuat[1] = outQ.y;
+        outQuat[2] = outQ.z;
+        outQuat[3] = outQ.w;
+    }
+}
+
+inline void GrannySampleCurveScaleShear(const granny_curve& curve, float t, float* outMat3x3)
+{
+    if (curve.ControlCount < 9 || !curve.Controls)
+        return;
+
+    if (curve.Degree == 0 || curve.KnotCount <= 1 || !curve.Knots || t <= curve.Knots[0])
+    {
+        std::memcpy(outMat3x3, curve.Controls, sizeof(float) * 9);
+        return;
+    }
+
+    if (t >= curve.Knots[curve.KnotCount - 1])
+    {
+        int last = (curve.KnotCount - 1) * 9;
+        if (last + 8 < curve.ControlCount)
+            std::memcpy(outMat3x3, &curve.Controls[last], sizeof(float) * 9);
+        return;
+    }
+
+    int k = 0;
+    while (k + 1 < curve.KnotCount && t > curve.Knots[k + 1])
+        ++k;
+
+    float dt = curve.Knots[k + 1] - curve.Knots[k];
+    float u = (dt > 1e-6f) ? (t - curve.Knots[k]) / dt : 0.0f;
+
+    int idx0 = k * 9;
+    int idx1 = (k + 1) * 9;
+    if (idx1 + 8 < curve.ControlCount)
+    {
+        for (int i = 0; i < 9; ++i)
+            outMat3x3[i] = curve.Controls[idx0 + i] + u * (curve.Controls[idx1 + i] - curve.Controls[idx0 + i]);
+    }
+}
+
 inline void GrannySampleModelAnimations(
     const granny_model_instance* ModelInstance,
     granny_int32x FirstBone,
@@ -1480,9 +1623,65 @@ inline void GrannySampleModelAnimations(
     if (endBone > Result->BoneCount)
         endBone = Result->BoneCount;
 
+    // 1. Base rest pose transforms
     for (int i = FirstBone; i < endBone; ++i)
     {
         Result->Transforms[static_cast<size_t>(i)] = skel->Bones[i].LocalTransform;
+    }
+
+    // 2. Sample active controls
+    for (const granny_control* ctrl : ModelInstance->Controls)
+    {
+        if (!ctrl || ctrl->IsCompleted || !ctrl->Animation)
+            continue;
+
+        const granny_animation* anim = ctrl->Animation;
+        if (anim->TrackGroupCount <= 0 || !anim->TrackGroups)
+            continue;
+
+        const granny_track_group* tg = anim->TrackGroups[0];
+        if (!tg || tg->TransformTrackCount <= 0 || !tg->TransformTracks)
+            continue;
+
+        float animTime = ctrl->RawLocalClock;
+        if (anim->Duration > 0.0f)
+        {
+            if (ctrl->LoopCount == 0)
+                animTime = std::fmod(animTime, anim->Duration);
+            else if (animTime > anim->Duration)
+                animTime = anim->Duration;
+        }
+
+        for (int t = 0; t < tg->TransformTrackCount; ++t)
+        {
+            const granny_transform_track& track = tg->TransformTracks[t];
+            if (!track.Name || !*track.Name)
+                continue;
+
+            for (int b = FirstBone; b < endBone; ++b)
+            {
+                if (skel->Bones[b].Name && std::strcmp(track.Name, skel->Bones[b].Name) == 0)
+                {
+                    granny_transform& tr = Result->Transforms[static_cast<size_t>(b)];
+                    if (track.PositionCurve.ControlCount >= 3)
+                    {
+                        GrannySampleCurveVec3(track.PositionCurve, animTime, tr.Position);
+                        tr.Flags |= GrannyHasPosition;
+                    }
+                    if (track.OrientationCurve.ControlCount >= 4)
+                    {
+                        GrannySampleCurveQuat(track.OrientationCurve, animTime, tr.Orientation);
+                        tr.Flags |= GrannyHasOrientation;
+                    }
+                    if (track.ScaleShearCurve.ControlCount >= 9)
+                    {
+                        GrannySampleCurveScaleShear(track.ScaleShearCurve, animTime, reinterpret_cast<float*>(tr.ScaleShear));
+                        tr.Flags |= GrannyHasScaleShear;
+                    }
+                    break;
+                }
+            }
+        }
     }
 }
 

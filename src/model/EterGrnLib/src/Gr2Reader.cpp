@@ -33,6 +33,11 @@ struct GR2ParsedContext
     std::vector<std::vector<granny_bone_binding>> meshBoneBindings;
     std::vector<std::unique_ptr<granny_animation>> animations;
     std::vector<granny_animation*> animPtrs;
+    std::vector<std::unique_ptr<granny_track_group>> trackGroups;
+    std::vector<granny_track_group*> tgPtrs;
+    std::vector<std::vector<granny_transform_track>> tgTransformTracks;
+    std::vector<std::vector<float>> curveKnots;
+    std::vector<std::vector<float>> curveControls;
     std::deque<std::string> stringStore;
 
     const char* StoreString(const char* s)
@@ -86,6 +91,8 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
 
     uint32_t secOffset   = *reinterpret_cast<const uint32_t*>(&buf[32 + 12]);
     uint32_t numSec      = *reinterpret_cast<const uint32_t*>(&buf[32 + 16]);
+    uint32_t rootTypeSec = *reinterpret_cast<const uint32_t*>(&buf[32 + 20]);
+    uint32_t rootTypeOff = *reinterpret_cast<const uint32_t*>(&buf[32 + 24]);
     uint32_t rootNodeSec = *reinterpret_cast<const uint32_t*>(&buf[32 + 28]);
     uint32_t rootNodeOff = *reinterpret_cast<const uint32_t*>(&buf[32 + 32]);
 
@@ -127,19 +134,75 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
         }
     }
 
-    if (rootNodeSec >= ctx->sections.size() || rootNodeOff + 84 > ctx->sections[rootNodeSec].size())
+    if (rootNodeSec >= ctx->sections.size() || rootNodeOff + 16 > ctx->sections[rootNodeSec].size())
         return nullptr;
 
-    const uint8_t* pRoot = &ctx->sections[rootNodeSec][rootNodeOff];
-    int32_t modelCount = *reinterpret_cast<const int32_t*>(pRoot + 0x3C);
-    int32_t animCount  = *reinterpret_cast<const int32_t*>(pRoot + 0x4C);
+    // Dynamically discover member offsets from root type definition
+    uint32_t modelsOffset = 0x3C;
+    bool hasModels = false;
+    uint32_t animsOffset = 0x4C;
+    bool hasAnims = false;
+
+    if (rootTypeSec < ctx->sections.size()) {
+        uint32_t curTypeOff = rootTypeOff;
+        uint32_t curDataOff = rootNodeOff;
+        const auto& typeSec = ctx->sections[rootTypeSec];
+
+        while (curTypeOff + 32 <= typeSec.size()) {
+            uint32_t mType = *reinterpret_cast<const uint32_t*>(&typeSec[curTypeOff]);
+            if (mType == 0) break; // GrannyEndMember
+
+            std::string mName;
+            if (fixups[rootTypeSec].count(curTypeOff + 4)) {
+                auto [nSec, nOff] = fixups[rootTypeSec][curTypeOff + 4];
+                if (nSec < ctx->sections.size() && nOff < ctx->sections[nSec].size()) {
+                    mName = reinterpret_cast<const char*>(&ctx->sections[nSec][nOff]);
+                }
+            }
+
+            uint32_t memberSize = 4;
+            switch (mType) {
+                case 1: memberSize = 0; break;
+                case 2: case 8: case 10: case 15: case 16: memberSize = 4; break;
+                case 3: case 4: case 5: memberSize = 8; break;
+                case 7: memberSize = 12; break;
+                case 9: memberSize = 68; break;
+                case 11: case 12: memberSize = 1; break;
+                case 13: case 14: memberSize = 2; break;
+                default: memberSize = 4; break;
+            }
+
+            if (mName == "Models") {
+                modelsOffset = curDataOff;
+                hasModels = true;
+            } else if (mName == "Animations") {
+                animsOffset = curDataOff;
+                hasAnims = true;
+            }
+
+            curDataOff += memberSize;
+            curTypeOff += 32;
+        }
+    }
+
+    int32_t modelCount = 0;
+    if (hasModels && rootNodeSec < ctx->sections.size() && modelsOffset + 8 <= ctx->sections[rootNodeSec].size()) {
+        modelCount = *reinterpret_cast<const int32_t*>(&ctx->sections[rootNodeSec][modelsOffset]);
+        if (modelCount < 0 || modelCount > 2000) modelCount = 0;
+    }
+
+    int32_t animCount = 0;
+    if (hasAnims && rootNodeSec < ctx->sections.size() && animsOffset + 8 <= ctx->sections[rootNodeSec].size()) {
+        animCount = *reinterpret_cast<const int32_t*>(&ctx->sections[rootNodeSec][animsOffset]);
+        if (animCount < 0 || animCount > 2000) animCount = 0;
+    }
 
     ctx->fileInfo.ModelCount     = std::max(0, modelCount);
     ctx->fileInfo.AnimationCount = std::max(0, animCount);
 
     // Unmarshal Models
-    if (modelCount > 0 && fixups[rootNodeSec].count(rootNodeOff + 0x40)) {
-        auto [mArrSec, mArrOff] = fixups[rootNodeSec][rootNodeOff + 0x40];
+    if (modelCount > 0 && fixups[rootNodeSec].count(modelsOffset + 4)) {
+        auto [mArrSec, mArrOff] = fixups[rootNodeSec][modelsOffset + 4];
         ctx->models.reserve(modelCount);
         ctx->modelMeshBindings.resize(modelCount);
 
@@ -351,12 +414,13 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
             ctx->modelPtrs.push_back(model.get());
             ctx->models.push_back(std::move(model));
         }
-        ctx->fileInfo.Models = ctx->modelPtrs.data();
+        ctx->fileInfo.Models = ctx->modelPtrs.empty() ? nullptr : ctx->modelPtrs.data();
+        ctx->fileInfo.ModelCount = static_cast<granny_int32>(ctx->modelPtrs.size());
     }
 
     // Unmarshal Animations
-    if (animCount > 0 && fixups[rootNodeSec].count(rootNodeOff + 0x50)) {
-        auto [aArrSec, aArrOff] = fixups[rootNodeSec][rootNodeOff + 0x50];
+    if (animCount > 0 && fixups[rootNodeSec].count(animsOffset + 4)) {
+        auto [aArrSec, aArrOff] = fixups[rootNodeSec][animsOffset + 4];
         ctx->animations.reserve(animCount);
 
         for (int a = 0; a < animCount; ++a) {
@@ -370,13 +434,89 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
             anim->Name         = ctx->StoreString(ResolveString(ctx->sections, fixups, aSec, aOff + 0));
             anim->Duration     = *reinterpret_cast<const float*>(pAnim + 4);
             anim->TimeStep     = *reinterpret_cast<const float*>(pAnim + 8);
-            anim->Oversampling = *reinterpret_cast<const float*>(pAnim + 12);
+            anim->Oversampling = 0.0f;
+
+            int32_t tgCount = *reinterpret_cast<const int32_t*>(pAnim + 12);
             anim->TrackGroupCount = 0;
+            anim->TrackGroups = nullptr;
+
+            if (tgCount > 0 && fixups[aSec].count(aOff + 16)) {
+                auto [tgArrSec, tgArrOff] = fixups[aSec][aOff + 16];
+                size_t tgStartIdx = ctx->tgPtrs.size();
+
+                for (int tgIdx = 0; tgIdx < tgCount; ++tgIdx) {
+                    if (!fixups[tgArrSec].count(tgArrOff + tgIdx * 4)) continue;
+                    auto [tgSec, tgOff] = fixups[tgArrSec][tgArrOff + tgIdx * 4];
+                    if (tgSec >= ctx->sections.size() || tgOff + 20 > ctx->sections[tgSec].size()) continue;
+
+                    const uint8_t* pTG = &ctx->sections[tgSec][tgOff];
+                    auto trackGroup = std::make_unique<granny_track_group>();
+                    std::memset(trackGroup.get(), 0, sizeof(granny_track_group));
+                    trackGroup->Name = ctx->StoreString(ResolveString(ctx->sections, fixups, tgSec, tgOff + 0));
+
+                    int32_t ttCount = *reinterpret_cast<const int32_t*>(pTG + 12);
+                    if (ttCount > 0 && fixups[tgSec].count(tgOff + 16)) {
+                        auto [ttArrSec, ttArrOff] = fixups[tgSec][tgOff + 16];
+                        ctx->tgTransformTracks.emplace_back();
+                        auto& ttracks = ctx->tgTransformTracks.back();
+                        ttracks.resize(ttCount);
+
+                        for (int t = 0; t < ttCount; ++t) {
+                            uint32_t curTTOff = ttArrOff + t * 64;
+                            if (ttArrSec >= ctx->sections.size() || curTTOff + 64 > ctx->sections[ttArrSec].size()) break;
+                            const uint8_t* pTT = &ctx->sections[ttArrSec][curTTOff];
+                            ttracks[t].Name = ctx->StoreString(ResolveString(ctx->sections, fixups, ttArrSec, curTTOff + 0));
+
+                            auto parseCurve = [&](uint32_t curveOff, granny_curve& curve) {
+                                curve.Degree = *reinterpret_cast<const int32_t*>(pTT + curveOff + 0);
+                                int32_t knotCount = *reinterpret_cast<const int32_t*>(pTT + curveOff + 4);
+                                int32_t ctrlCount = *reinterpret_cast<const int32_t*>(pTT + curveOff + 12);
+
+                                curve.KnotCount = std::max(0, knotCount);
+                                curve.ControlCount = std::max(0, ctrlCount);
+
+                                if (knotCount > 0 && fixups[ttArrSec].count(curTTOff + curveOff + 8)) {
+                                    auto [kSec, kOff] = fixups[ttArrSec][curTTOff + curveOff + 8];
+                                    if (kSec < ctx->sections.size() && kOff + knotCount * 4 <= ctx->sections[kSec].size()) {
+                                        ctx->curveKnots.emplace_back(knotCount);
+                                        std::memcpy(ctx->curveKnots.back().data(), &ctx->sections[kSec][kOff], knotCount * 4);
+                                        curve.Knots = ctx->curveKnots.back().data();
+                                    }
+                                }
+                                if (ctrlCount > 0 && fixups[ttArrSec].count(curTTOff + curveOff + 16)) {
+                                    auto [cSec, cOff] = fixups[ttArrSec][curTTOff + curveOff + 16];
+                                    if (cSec < ctx->sections.size() && cOff + ctrlCount * 4 <= ctx->sections[cSec].size()) {
+                                        ctx->curveControls.emplace_back(ctrlCount);
+                                        std::memcpy(ctx->curveControls.back().data(), &ctx->sections[cSec][cOff], ctrlCount * 4);
+                                        curve.Controls = ctx->curveControls.back().data();
+                                    }
+                                }
+                            };
+
+                            parseCurve(4, ttracks[t].PositionCurve);
+                            parseCurve(24, ttracks[t].OrientationCurve);
+                            parseCurve(44, ttracks[t].ScaleShearCurve);
+                        }
+
+                        trackGroup->TransformTrackCount = static_cast<granny_int32>(ttracks.size());
+                        trackGroup->TransformTracks = ttracks.data();
+                    }
+
+                    ctx->tgPtrs.push_back(trackGroup.get());
+                    ctx->trackGroups.push_back(std::move(trackGroup));
+                }
+
+                if (ctx->tgPtrs.size() > tgStartIdx) {
+                    anim->TrackGroupCount = static_cast<granny_int32>(ctx->tgPtrs.size() - tgStartIdx);
+                    anim->TrackGroups = &ctx->tgPtrs[tgStartIdx];
+                }
+            }
 
             ctx->animPtrs.push_back(anim.get());
             ctx->animations.push_back(std::move(anim));
         }
-        ctx->fileInfo.Animations = ctx->animPtrs.data();
+        ctx->fileInfo.Animations = ctx->animPtrs.empty() ? nullptr : ctx->animPtrs.data();
+        ctx->fileInfo.AnimationCount = static_cast<granny_int32>(ctx->animPtrs.size());
     }
 
     ctx->file.FileInfo     = &ctx->fileInfo;
