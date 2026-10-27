@@ -3,15 +3,6 @@
 #include "Model.h"
 #include "Material.h"
 
-granny_data_type_definition GrannyPNT3322VertexType[5] =
-{
-	{GrannyReal32Member, GrannyVertexPositionName, 0, 3},
-	{GrannyReal32Member, GrannyVertexNormalName, 0, 3},
-	{GrannyReal32Member, GrannyVertexTextureCoordinatesName"0", 0, 2},
-	{GrannyReal32Member, GrannyVertexTextureCoordinatesName"1", 0, 2},
-	{GrannyEndMember}
-};
-
 void CGrannyMesh::LoadIndices(void * dstBaseIndices)
 {
 	const granny_mesh * pgrnMesh = GetGrannyMeshPointer();

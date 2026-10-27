@@ -90,7 +90,8 @@ bool CGrannyMaterial::IsIn(const char* c_szImageName, int* piStage)
 	{
 		std::string strDiffuseFileName = pgrnDiffuseTexture->FromFileName;
 		CFileNameHelper::StringPath(strDiffuseFileName);
-		if (strDiffuseFileName == strImageName)
+		if (strDiffuseFileName == strImageName ||
+		    CFileNameHelper::NoPath(strDiffuseFileName) == CFileNameHelper::NoPath(strImageName))
 		{
 			*piStage=0;
 			return true;
@@ -102,7 +103,8 @@ bool CGrannyMaterial::IsIn(const char* c_szImageName, int* piStage)
 	{
 		std::string strOpacityFileName = pgrnOpacityTexture->FromFileName;
 		CFileNameHelper::StringPath(strOpacityFileName);
-		if (strOpacityFileName == strImageName)
+		if (strOpacityFileName == strImageName ||
+		    CFileNameHelper::NoPath(strOpacityFileName) == CFileNameHelper::NoPath(strImageName))
 		{
 			*piStage=1;
 			return true;
@@ -418,8 +420,6 @@ void CGrannyMaterialPalette::SetMaterialImagePointer(const char* c_szImageName, 
 			pkNewMtrl->Copy(*roMtrl.GetPointer());
 			pkNewMtrl->SetImagePointer(iStage, pImage);
 			roMtrl=pkNewMtrl;
-
-			return;
 		}
 	}
 }
@@ -441,8 +441,6 @@ void CGrannyMaterialPalette::SetMaterialData(const char* c_szMtrlName, const SMa
 				pkNewMtrl->SetImagePointer(iStage, c_rkMaterialData.pImage);
 				pkNewMtrl->SetSpecularInfo(c_rkMaterialData.isSpecularEnable, c_rkMaterialData.fSpecularPower, c_rkMaterialData.bSphereMapIndex);
 				roMtrl=pkNewMtrl;
-
-				return;
 			}
 		}
 	}

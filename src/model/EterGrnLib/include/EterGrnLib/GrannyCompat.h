@@ -122,6 +122,15 @@ inline granny_data_type_definition GrannyPNT332VertexType[4] =
     {GrannyEndMember, nullptr, nullptr, 0, {0, 0, 0}, 0}
 };
 
+inline granny_data_type_definition GrannyPNT3322VertexType[5] =
+{
+    {GrannyReal32Member, GrannyVertexPositionName, nullptr, 3, {0, 0, 0}, 0},
+    {GrannyReal32Member, GrannyVertexNormalName, nullptr, 3, {0, 0, 0}, 0},
+    {GrannyReal32Member, GrannyVertexTextureCoordinatesName "0", nullptr, 2, {0, 0, 0}, 0},
+    {GrannyReal32Member, GrannyVertexTextureCoordinatesName "1", nullptr, 2, {0, 0, 0}, 0},
+    {GrannyEndMember, nullptr, nullptr, 0, {0, 0, 0}, 0}
+};
+
 inline granny_data_type_definition GrannyPWNT3432VertexType[6] =
 {
     {GrannyReal32Member, GrannyVertexPositionName, nullptr, 3, {0, 0, 0}, 0},
@@ -848,6 +857,30 @@ inline void GrannyCopyMeshVertices(
     if (srcStride == dstStride)
     {
         std::memcpy(DestVertices, Mesh->PrimaryVertexData->Vertices, static_cast<size_t>(count) * static_cast<size_t>(dstStride));
+    }
+    else if (srcStride == sizeof(granny_pwnt3432_vertex) && dstStride == sizeof(granny_pnt332_vertex))
+    {
+        const granny_pwnt3432_vertex* src = reinterpret_cast<const granny_pwnt3432_vertex*>(Mesh->PrimaryVertexData->Vertices);
+        granny_pnt332_vertex* dst = reinterpret_cast<granny_pnt332_vertex*>(DestVertices);
+        for (int i = 0; i < count; ++i)
+        {
+            std::memcpy(dst[i].Position, src[i].Position, sizeof(float) * 3);
+            std::memcpy(dst[i].Normal, src[i].Normal, sizeof(float) * 3);
+            std::memcpy(dst[i].UV, src[i].UV, sizeof(float) * 2);
+        }
+    }
+    else if (srcStride == sizeof(granny_pnt332_vertex) && dstStride == sizeof(granny_pwnt3432_vertex))
+    {
+        const granny_pnt332_vertex* src = reinterpret_cast<const granny_pnt332_vertex*>(Mesh->PrimaryVertexData->Vertices);
+        granny_pwnt3432_vertex* dst = reinterpret_cast<granny_pwnt3432_vertex*>(DestVertices);
+        for (int i = 0; i < count; ++i)
+        {
+            std::memcpy(dst[i].Position, src[i].Position, sizeof(float) * 3);
+            dst[i].BoneWeights[0] = 255; dst[i].BoneWeights[1] = 0; dst[i].BoneWeights[2] = 0; dst[i].BoneWeights[3] = 0;
+            dst[i].BoneIndices[0] = 0;   dst[i].BoneIndices[1] = 0; dst[i].BoneIndices[2] = 0; dst[i].BoneIndices[3] = 0;
+            std::memcpy(dst[i].Normal, src[i].Normal, sizeof(float) * 3);
+            std::memcpy(dst[i].UV, src[i].UV, sizeof(float) * 2);
+        }
     }
     else
     {
