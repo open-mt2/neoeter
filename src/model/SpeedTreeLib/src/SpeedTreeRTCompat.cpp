@@ -1094,7 +1094,7 @@ bool CSpeedTreeRT::LoadBakedGeometry(unsigned int nHash)
             m_vLeafHalfW[i] = fW * 0.5f;
             m_vLeafHalfH[i] = fH * 0.5f;
             m_vLeafSize[i] = std::max(fW, fH);
-            m_vLeafAngle[i] = std::atan2(dy, dx);
+            m_vLeafAngle[i] = std::atan2(dz, dx);
         }
         m_fLeafAlpha = fAlpha;
     }
@@ -1155,14 +1155,12 @@ void CSpeedTreeRT::UpdateLeafBillboardsAt(const float* pTreePos)
         const float hh = (i < m_vLeafHalfH.size()) ? m_vLeafHalfH[i] : (m_vLeafSize[i] * 0.5f);
 
         std::array<float, 16>& c = m_vLeafCoords[i];
-        // corner 0: -r -u
-        c[0] = -rx * hw - ux * hh; c[1] = -ry * hw - uy * hh; c[2] = -rz * hw - uz * hh; c[3] = 0.0f;
-        // corner 1: +r -u
-        c[4] =  rx * hw - ux * hh; c[5] =  ry * hw - uy * hh; c[6] =  rz * hw - uz * hh; c[7] = 0.0f;
-        // corner 2: +r +u
-        c[8] =  rx * hw + ux * hh; c[9] =  ry * hw + uy * hh; c[10] = rz * hw + uz * hh; c[11] = 0.0f;
-        // corner 3: -r +u
-        c[12] = -rx * hw + ux * hh; c[13] = -ry * hw + uy * hh; c[14] = -rz * hw + uz * hh; c[15] = 0.0f;
+        // Baked corner order: 0 = top-left, 1 = top-right,
+        //                     2 = bottom-right, 3 = bottom-left.
+        c[0] = -rx * hw + ux * hh; c[1] = -ry * hw + uy * hh; c[2] = -rz * hw + uz * hh; c[3] = 0.0f;
+        c[4] =  rx * hw + ux * hh; c[5] =  ry * hw + uy * hh; c[6] =  rz * hw + uz * hh; c[7] = 0.0f;
+        c[8] =  rx * hw - ux * hh; c[9] =  ry * hw - uy * hh; c[10] = rz * hw - uz * hh; c[11] = 0.0f;
+        c[12] = -rx * hw - ux * hh; c[13] = -ry * hw - uy * hh; c[14] = -rz * hw - uz * hh; c[15] = 0.0f;
     }
 }
 
