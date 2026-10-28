@@ -1751,9 +1751,21 @@ inline void GrannyUpdateModelMatrix(
 
     if (hasDelta)
     {
-        float dx = delta[0] * ModelMatrix4x4[0] + delta[1] * ModelMatrix4x4[4] + delta[2] * ModelMatrix4x4[8];
-        float dy = delta[0] * ModelMatrix4x4[1] + delta[1] * ModelMatrix4x4[5] + delta[2] * ModelMatrix4x4[9];
-        float dz = delta[0] * ModelMatrix4x4[2] + delta[1] * ModelMatrix4x4[6] + delta[2] * ModelMatrix4x4[10];
+        // Granny's TrackGroup coordinates exported from 3ds Max:
+        // delta[0] is forward/backward translation (corresponds to Metin2 local Y, where -Y is forward)
+        // delta[1] is left/right translation (corresponds to Metin2 local X)
+        // delta[2] is up/down translation (corresponds to Metin2 local Z)
+        // In ModelMatrix4x4 (row-major D3D):
+        // Row 0 (indices 0, 1, 2) is the local X axis
+        // Row 1 (indices 4, 5, 6) is the local Y axis
+        // Row 2 (indices 8, 9, 10) is the local Z axis
+        float m2_local_x = delta[1];
+        float m2_local_y = delta[0];
+        float m2_local_z = delta[2];
+
+        float dx = m2_local_x * ModelMatrix4x4[0] + m2_local_y * ModelMatrix4x4[4] + m2_local_z * ModelMatrix4x4[8];
+        float dy = m2_local_x * ModelMatrix4x4[1] + m2_local_y * ModelMatrix4x4[5] + m2_local_z * ModelMatrix4x4[9];
+        float dz = m2_local_x * ModelMatrix4x4[2] + m2_local_y * ModelMatrix4x4[6] + m2_local_z * ModelMatrix4x4[10];
         DestMatrix4x4[12] += dx;
         DestMatrix4x4[13] += dy;
         DestMatrix4x4[14] += dz;
