@@ -310,6 +310,8 @@ private:
     // ------------------------------------------------------------------
     void                        GenerateGeometry();
     void                        UpdateLeafBillboards();
+    void                        UpdateLeafBillboardsAt(const float* pTreePos);
+    bool                        LoadBakedGeometry(unsigned int nHash);
 
     enum ETreeShape
     {
@@ -324,6 +326,10 @@ private:
     ETreeShape                  m_eShape;
 
     bool                        m_bGeometryGenerated;
+    bool                        m_bBakedGeometry;
+    float                       m_fBranchAlpha;
+    float                       m_fFrondAlpha;
+    float                       m_fLeafAlpha;
     std::vector<float>          m_vBranchCoords;
     std::vector<unsigned long>  m_vBranchColors;
     std::vector<float>          m_vBranchTexCoords0;
@@ -332,7 +338,17 @@ private:
     unsigned short              m_usBranchStripLength;
     std::vector<const unsigned short*> m_vpBranchStrips;
 
+    std::vector<float>          m_vFrondCoords;
+    std::vector<unsigned long>  m_vFrondColors;
+    std::vector<float>          m_vFrondTexCoords0;
+    std::vector<float>          m_vFrondTexCoords1;
+    std::vector<unsigned short> m_vFrondStrip;
+    unsigned short              m_usFrondStripLength;
+    std::vector<const unsigned short*> m_vpFrondStrips;
+
     std::vector<float>          m_vLeafCenters;
+    std::vector<float>          m_vLeafHalfW;
+    std::vector<float>          m_vLeafHalfH;
     std::vector<unsigned long>  m_vLeafColors;
     std::vector<float>          m_vLeafSize;
     std::vector<float>          m_vLeafAngle;

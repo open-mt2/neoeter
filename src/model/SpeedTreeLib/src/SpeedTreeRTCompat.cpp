@@ -1,7 +1,12 @@
 #include <SpeedTreeLib/SpeedTreeRTCompat.h>
 #include <cstdio>
 #include <cctype>
+#include <cstdlib>
+#include <cstdint>
+#include <fstream>
 #include <algorithm>
+
+static uint32_t Fnv1a32(const unsigned char* pData, size_t nSize);
 
 // Static member definitions
 std::string   CSpeedTreeRT::ms_strError;
@@ -111,7 +116,12 @@ CSpeedTreeRT::CSpeedTreeRT()
       m_pInstanceOf(nullptr),
       m_eShape(SHAPE_BROADLEAF),
       m_bGeometryGenerated(false),
-      m_usBranchStripLength(0)
+      m_bBakedGeometry(false),
+      m_fBranchAlpha(1.0f),
+      m_fFrondAlpha(0.0f),
+      m_fLeafAlpha(128.0f),
+      m_usBranchStripLength(0),
+      m_usFrondStripLength(0)
 {
     m_afPos[0] = m_afPos[1] = m_afPos[2] = 0.0f;
     m_afBoundingBox[0] = -100.0f;
@@ -154,6 +164,8 @@ bool CSpeedTreeRT::Compute(const float* pTransform, unsigned int nSeed, bool bCo
     (void)pTransform;
     (void)bCompositeStrips;
     m_nSeed = nSeed;
+    if (m_bBakedGeometry)
+        return true;
     m_bGeometryGenerated = false;
     GenerateGeometry();
     return true;
@@ -310,6 +322,10 @@ bool CSpeedTreeRT::LoadTree(const unsigned char* pBlock, unsigned int nNumBytes)
             m_eShape = SHAPE_BROADLEAF;
     }
 
+    // Try the baked geometry cache produced from the original SpeedTreeRT SDK.
+    if (LoadBakedGeometry(Fnv1a32(pBlock, nNumBytes)))
+        return true;
+
     // Read the tree height from the parameter stream (property 2001 is the
     // overall tree size in world units, stored as a little-endian float).
     for (unsigned int i = 0; i + 8 <= nNumBytes; ++i)
@@ -378,7 +394,8 @@ void CSpeedTreeRT::SetTreeSize(float fNewSize, float fNewVariance)
 {
     m_fSize = fNewSize;
     m_fSizeVariance = fNewVariance;
-    m_bGeometryGenerated = false;
+    if (!m_bBakedGeometry)
+        m_bGeometryGenerated = false;
     if (fNewSize > 0.0f)
     {
         m_afBoundingBox[0] = -fNewSize * 0.25f;
@@ -532,6 +549,8 @@ void CSpeedTreeRT::GenerateGeometry()
     m_vLeafCenters.clear();
     m_vLeafColors.clear();
     m_vLeafSize.clear();
+    m_vLeafHalfW.clear();
+    m_vLeafHalfH.clear();
     m_vLeafAngle.clear();
     m_vLeafCoords.clear();
     m_vLeafTexCoords.clear();
@@ -645,6 +664,8 @@ void CSpeedTreeRT::GenerateGeometry()
         m_vLeafCenters.push_back(cz);
         m_vLeafColors.push_back(0xFFFFFFFFul);
         m_vLeafSize.push_back(size);
+        m_vLeafHalfW.push_back(size * 0.5f);
+        m_vLeafHalfH.push_back(size * 0.5f);
         m_vLeafAngle.push_back(rnd() * 6.2831853f);
 
         std::array<float, 16> coords{};
@@ -873,16 +894,238 @@ void CSpeedTreeRT::GenerateGeometry()
     m_vCollisions.push_back(obj);
 }
 
+static uint32_t Fnv1a32(const unsigned char* pData, size_t nSize)
+{
+    uint32_t h = 2166136261u;
+    for (size_t i = 0; i < nSize; ++i) {
+        h ^= pData[i];
+        h *= 16777619u;
+    }
+    return h;
+}
+
+namespace {
+
+struct SBakedReader
+{
+    const unsigned char* m_pData;
+    size_t m_nSize;
+    size_t m_nPos;
+
+    SBakedReader(const unsigned char* p, size_t n) : m_pData(p), m_nSize(n), m_nPos(0) {}
+
+    bool Valid(size_t n) const { return m_nPos + n <= m_nSize; }
+    unsigned char U8() { unsigned char v = Valid(1) ? m_pData[m_nPos] : 0; m_nPos += 1; return v; }
+    unsigned short U16() { unsigned short v = 0; if (Valid(2)) std::memcpy(&v, m_pData + m_nPos, 2); m_nPos += 2; return v; }
+    uint32_t U32() { uint32_t v = 0; if (Valid(4)) std::memcpy(&v, m_pData + m_nPos, 4); m_nPos += 4; return v; }
+    int32_t I32() { int32_t v = 0; if (Valid(4)) std::memcpy(&v, m_pData + m_nPos, 4); m_nPos += 4; return v; }
+    float F32() { float v = 0.0f; if (Valid(4)) std::memcpy(&v, m_pData + m_nPos, 4); m_nPos += 4; return v; }
+    void Pluck(const unsigned char*& p, size_t n) { p = Valid(n) ? m_pData + m_nPos : nullptr; m_nPos += n; }
+};
+
+} // namespace
+
+bool CSpeedTreeRT::LoadBakedGeometry(unsigned int nHash)
+{
+    char szPath[512];
+    static const char* s_aszDirs[] = { "treecache/", "../treecache/", "dist/treecache/" };
+
+    std::ifstream file;
+    for (size_t i = 0; i < sizeof(s_aszDirs) / sizeof(s_aszDirs[0]) && !file.is_open(); ++i) {
+        std::snprintf(szPath, sizeof(szPath), "%s%08x.tree", s_aszDirs[i], nHash);
+        file.open(szPath, std::ios::binary);
+    }
+    if (!file.is_open()) {
+        const char* pEnv = std::getenv("MT2_TREECACHE");
+        if (pEnv && pEnv[0]) {
+            std::snprintf(szPath, sizeof(szPath), "%s/%08x.tree", pEnv, nHash);
+            file.open(szPath, std::ios::binary);
+        }
+    }
+    if (!file.is_open())
+        return false;
+
+    file.seekg(0, std::ios::end);
+    const std::streamoff nSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+    if (nSize <= 0) return false;
+
+    std::vector<unsigned char> data(static_cast<size_t>(nSize));
+    file.read(reinterpret_cast<char*>(data.data()), nSize);
+    file.close();
+
+    SBakedReader r(data.data(), data.size());
+    if (r.U32() != 0x4D543254u || r.U32() != nHash)
+        return false;
+
+    float fBBox[6];
+    for (int i = 0; i < 6; ++i) fBBox[i] = r.F32();
+    std::memcpy(m_afBoundingBox, fBBox, sizeof(m_afBoundingBox));
+
+    m_vCollisions.clear();
+    const uint32_t nColl = r.U32();
+    for (uint32_t i = 0; i < nColl; ++i) {
+        SCollisionObj obj;
+        obj.m_eType = (ECollisionObjectType)r.I32();
+        obj.m_afPos[0] = r.F32(); obj.m_afPos[1] = r.F32(); obj.m_afPos[2] = r.F32();
+        obj.m_afDims[0] = r.F32(); obj.m_afDims[1] = r.F32(); obj.m_afDims[2] = r.F32();
+        m_vCollisions.push_back(obj);
+    }
+
+    m_vBranchCoords.clear(); m_vBranchColors.clear();
+    m_vBranchTexCoords0.clear(); m_vBranchTexCoords1.clear();
+    m_vBranchStrip.clear(); m_vpBranchStrips.clear();
+    m_usBranchStripLength = 0;
+
+    m_vFrondCoords.clear(); m_vFrondColors.clear();
+    m_vFrondTexCoords0.clear(); m_vFrondTexCoords1.clear();
+    m_vFrondStrip.clear(); m_vpFrondStrips.clear();
+    m_usFrondStripLength = 0;
+
+    m_vLeafCenters.clear(); m_vLeafColors.clear();
+    m_vLeafSize.clear(); m_vLeafHalfW.clear(); m_vLeafHalfH.clear();
+    m_vLeafAngle.clear(); m_vLeafCoords.clear(); m_vLeafTexCoords.clear();
+    m_vLeafMapIndices.clear(); m_vLeafClusterIndices.clear();
+
+    for (int nPart = 0; nPart < 2; ++nPart) {
+        const unsigned short nVertexCount = (unsigned short)r.U32();
+        const uint32_t nNumStrips = r.U32();
+        r.U16(); // lod
+        const float fAlpha = r.F32();
+        const uint32_t nIndexCount = r.U32();
+
+        // Read the strips. The library composites branch geometry into a
+        // single strip (Compute(..., bCompositeStrips=true)); fronds may have
+        // more than one, so stitch them with degenerate indices.
+        std::vector<unsigned short> indices;
+        indices.reserve(nIndexCount + 8);
+        const uint32_t nPerStrip = (nNumStrips > 0) ? (nIndexCount / nNumStrips) : 0;
+        for (uint32_t s = 0; s < nNumStrips; ++s) {
+            const uint32_t nCount = (s + 1 == nNumStrips) ? (nIndexCount - s * nPerStrip) : nPerStrip;
+            std::vector<unsigned short> stripIndices(nCount);
+            for (uint32_t k = 0; k < nCount; ++k) stripIndices[k] = r.U16();
+            if (nCount == 0) continue;
+            if (indices.empty()) {
+                indices = stripIndices;
+            } else {
+                indices.push_back(indices.back());
+                indices.push_back(stripIndices[0]);
+                indices.push_back(stripIndices[0]);
+                indices.insert(indices.end(), stripIndices.begin() + 1, stripIndices.end());
+            }
+        }
+
+        std::vector<float> coords(nVertexCount * 3);
+        for (size_t i = 0; i < coords.size(); ++i) coords[i] = r.F32();
+        std::vector<unsigned long> colors(nVertexCount);
+        for (unsigned short i = 0; i < nVertexCount; ++i) colors[i] = r.U32();
+        std::vector<float> tex0(nVertexCount * 2);
+        for (size_t i = 0; i < tex0.size(); ++i) tex0[i] = r.F32();
+        std::vector<float> tex1(nVertexCount * 2);
+        for (size_t i = 0; i < tex1.size(); ++i) tex1[i] = r.F32();
+        for (unsigned short i = 0; i < nVertexCount * 3; ++i) (void)r.F32(); // normals
+
+        if (nVertexCount == 0)
+            continue;
+
+        if (nPart == 0) {
+            m_vBranchCoords.swap(coords);
+            m_vBranchColors.swap(colors);
+            m_vBranchTexCoords0.swap(tex0);
+            m_vBranchTexCoords1.swap(tex1);
+            m_vBranchStrip.swap(indices);
+            m_fBranchAlpha = fAlpha;
+        } else {
+            m_vFrondCoords.swap(coords);
+            m_vFrondColors.swap(colors);
+            m_vFrondTexCoords0.swap(tex0);
+            m_vFrondTexCoords1.swap(tex1);
+            m_vFrondStrip.swap(indices);
+            m_fFrondAlpha = fAlpha;
+        }
+    }
+
+    m_vpBranchStrips.push_back(m_vBranchStrip.data());
+    m_usBranchStripLength = (unsigned short)m_vBranchStrip.size();
+    m_vpFrondStrips.push_back(m_vFrondStrip.data());
+    m_usFrondStripLength = (unsigned short)m_vFrondStrip.size();
+
+    for (int nLeafSet = 0; nLeafSet < 2; ++nLeafSet) {
+        const bool bActive = r.U8() != 0;
+        r.I32(); // lod
+        const float fAlpha = r.F32();
+        const uint32_t nCount = r.U32();
+
+        std::vector<float> centers(nCount * 3);
+        std::vector<unsigned long> colors(nCount);
+        for (uint32_t i = 0; i < nCount * 3; ++i) centers[i] = r.F32();
+        for (uint32_t i = 0; i < nCount; ++i) colors[i] = r.U32();
+
+        std::vector<std::array<float, 16> > coords(nCount);
+        std::vector<std::array<float, 8> > texCoords(nCount);
+        std::vector<unsigned char> mapIdx(nCount), clusterIdx(nCount);
+        for (uint32_t i = 0; i < nCount; ++i) {
+            for (int k = 0; k < 16; ++k) coords[i][k] = r.F32();
+            for (int k = 0; k < 8; ++k) texCoords[i][k] = r.F32();
+            mapIdx[i] = r.U8();
+            clusterIdx[i] = r.U8();
+        }
+
+        if (nLeafSet != 0 || !bActive || nCount == 0)
+            continue;
+
+        m_vLeafCenters = centers;
+        m_vLeafColors = colors;
+        m_vLeafCoords = coords;
+        m_vLeafTexCoords = texCoords;
+        m_vLeafMapIndices = mapIdx;
+        m_vLeafClusterIndices = clusterIdx;
+        m_vLeafHalfW.resize(nCount);
+        m_vLeafHalfH.resize(nCount);
+        m_vLeafSize.resize(nCount);
+        m_vLeafAngle.resize(nCount);
+
+        for (uint32_t i = 0; i < nCount; ++i) {
+            const std::array<float, 16>& c = coords[i];
+            const float dx = c[4] - c[0], dy = c[5] - c[1], dz = c[6] - c[2];
+            const float ux = c[12] - c[0], uy = c[13] - c[1], uz = c[14] - c[2];
+            const float fW = std::sqrt(dx * dx + dy * dy + dz * dz);
+            const float fH = std::sqrt(ux * ux + uy * uy + uz * uz);
+            m_vLeafHalfW[i] = fW * 0.5f;
+            m_vLeafHalfH[i] = fH * 0.5f;
+            m_vLeafSize[i] = std::max(fW, fH);
+            m_vLeafAngle[i] = std::atan2(dy, dx);
+        }
+        m_fLeafAlpha = fAlpha;
+    }
+
+    m_vpLeafCoords.clear();
+    m_vpLeafTexCoords.clear();
+    for (size_t i = 0; i < m_vLeafCoords.size(); ++i) {
+        m_vpLeafCoords.push_back(m_vLeafCoords[i].data());
+        m_vpLeafTexCoords.push_back(m_vLeafTexCoords[i].data());
+    }
+
+    m_bBakedGeometry = true;
+    m_bGeometryGenerated = true;
+    return true;
+}
+
 void CSpeedTreeRT::UpdateLeafBillboards()
+{
+    UpdateLeafBillboardsAt(m_afPos);
+}
+
+void CSpeedTreeRT::UpdateLeafBillboardsAt(const float* pTreePos)
 {
     const size_t nLeafCount = m_vLeafCenters.size() / 3;
     if (nLeafCount == 0 || m_vLeafCoords.size() != nLeafCount)
         return;
 
     // Camera facing basis around the tree position.
-    float vx = m_afPos[0] - ms_afCameraPos[0];
-    float vy = m_afPos[1] - ms_afCameraPos[1];
-    float vz = m_afPos[2] - ms_afCameraPos[2];
+    float vx = pTreePos[0] - ms_afCameraPos[0];
+    float vy = pTreePos[1] - ms_afCameraPos[1];
+    float vz = pTreePos[2] - ms_afCameraPos[2];
     float vl = std::sqrt(vx * vx + vy * vy + vz * vz);
     if (vl < 1e-4f) { vx = 0.0f; vy = 1.0f; vz = 0.0f; }
     else { vx /= vl; vy /= vl; vz /= vl; }
@@ -908,8 +1151,8 @@ void CSpeedTreeRT::UpdateLeafBillboards()
         const float uy = up[1] * ca - rght[1] * sa;
         const float uz = up[2] * ca - rght[2] * sa;
 
-        const float hw = m_vLeafSize[i] * 0.5f;
-        const float hh = m_vLeafSize[i] * 0.5f;
+        const float hw = (i < m_vLeafHalfW.size()) ? m_vLeafHalfW[i] : (m_vLeafSize[i] * 0.5f);
+        const float hh = (i < m_vLeafHalfH.size()) ? m_vLeafHalfH[i] : (m_vLeafSize[i] * 0.5f);
 
         std::array<float, 16>& c = m_vLeafCoords[i];
         // corner 0: -r -u
@@ -929,6 +1172,17 @@ void CSpeedTreeRT::GetGeometry(SGeometry& sGeometry, unsigned long ulBitVector, 
     (void)sOverrideFrondLodValue;
     (void)sOverrideLeafLodValue;
 
+    // Instances share the geometry of their parent tree; only the leaf cards
+    // are re-oriented for the instance position.
+    if (m_pInstanceOf)
+    {
+        CSpeedTreeRT* pParent = const_cast<CSpeedTreeRT*>(m_pInstanceOf);
+        pParent->GetGeometry(sGeometry, ulBitVector);
+        if (ulBitVector & SpeedTree_LeafGeometry)
+            pParent->UpdateLeafBillboardsAt(m_afPos);
+        return;
+    }
+
     if (!m_bGeometryGenerated)
         GenerateGeometry();
 
@@ -936,7 +1190,7 @@ void CSpeedTreeRT::GetGeometry(SGeometry& sGeometry, unsigned long ulBitVector, 
     {
         sGeometry.m_sBranches.m_usVertexCount = static_cast<unsigned short>(m_vBranchCoords.size() / 3);
         sGeometry.m_sBranches.m_nDiscreteLodLevel = 0;
-        sGeometry.m_sBranches.m_usNumStrips = 1;
+        sGeometry.m_sBranches.m_usNumStrips = m_vBranchStrip.empty() ? 0 : 1;
         sGeometry.m_sBranches.m_pStripLengths = &m_usBranchStripLength;
         sGeometry.m_sBranches.m_pStrips = m_vpBranchStrips.data();
         sGeometry.m_sBranches.m_pColors = m_vBranchColors.data();
@@ -948,23 +1202,44 @@ void CSpeedTreeRT::GetGeometry(SGeometry& sGeometry, unsigned long ulBitVector, 
         sGeometry.m_sBranches.m_pTangents = nullptr;
         sGeometry.m_sBranches.m_pWindWeights = nullptr;
         sGeometry.m_sBranches.m_pWindMatrixIndices = nullptr;
-        sGeometry.m_fBranchAlphaTestValue = 1.0f;
+        sGeometry.m_fBranchAlphaTestValue = m_fBranchAlpha;
     }
 
     if (ulBitVector & SpeedTree_FrondGeometry)
     {
-        sGeometry.m_sFronds.m_usVertexCount = 0;
-        sGeometry.m_sFronds.m_nDiscreteLodLevel = -1;
-        sGeometry.m_sFronds.m_usNumStrips = 0;
-        sGeometry.m_fFrondAlphaTestValue = 0.0f;
+        if (m_vFrondCoords.empty())
+        {
+            sGeometry.m_sFronds.m_usVertexCount = 0;
+            sGeometry.m_sFronds.m_nDiscreteLodLevel = -1;
+            sGeometry.m_sFronds.m_usNumStrips = 0;
+            sGeometry.m_fFrondAlphaTestValue = 0.0f;
+        }
+        else
+        {
+            sGeometry.m_sFronds.m_usVertexCount = static_cast<unsigned short>(m_vFrondCoords.size() / 3);
+            sGeometry.m_sFronds.m_nDiscreteLodLevel = 0;
+            sGeometry.m_sFronds.m_usNumStrips = 1;
+            sGeometry.m_sFronds.m_pStripLengths = &m_usFrondStripLength;
+            sGeometry.m_sFronds.m_pStrips = m_vpFrondStrips.data();
+            sGeometry.m_sFronds.m_pColors = m_vFrondColors.data();
+            sGeometry.m_sFronds.m_pCoords = m_vFrondCoords.data();
+            sGeometry.m_sFronds.m_pTexCoords0 = m_vFrondTexCoords0.data();
+            sGeometry.m_sFronds.m_pTexCoords1 = m_vFrondTexCoords1.data();
+            sGeometry.m_sFronds.m_pNormals = nullptr;
+            sGeometry.m_sFronds.m_pBinormals = nullptr;
+            sGeometry.m_sFronds.m_pTangents = nullptr;
+            sGeometry.m_sFronds.m_pWindWeights = nullptr;
+            sGeometry.m_sFronds.m_pWindMatrixIndices = nullptr;
+            sGeometry.m_fFrondAlphaTestValue = m_fFrondAlpha;
+        }
     }
 
     if (ulBitVector & SpeedTree_LeafGeometry)
     {
         UpdateLeafBillboards();
 
-        sGeometry.m_sLeaves0.m_bIsActive = true;
-        sGeometry.m_sLeaves0.m_fAlphaTestValue = 128.0f;
+        sGeometry.m_sLeaves0.m_bIsActive = !m_vLeafCenters.empty();
+        sGeometry.m_sLeaves0.m_fAlphaTestValue = m_fLeafAlpha;
         sGeometry.m_sLeaves0.m_nDiscreteLodLevel = 0;
         sGeometry.m_sLeaves0.m_usLeafCount = static_cast<unsigned short>(m_vLeafCenters.size() / 3);
         sGeometry.m_sLeaves0.m_pLeafMapIndices = m_vLeafMapIndices.data();
