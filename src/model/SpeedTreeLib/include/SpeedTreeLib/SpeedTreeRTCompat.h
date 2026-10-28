@@ -3,6 +3,7 @@
 #include <Platform/Platform.h>
 #include <string>
 #include <vector>
+#include <array>
 #include <cstring>
 #include <cmath>
 
@@ -298,6 +299,37 @@ private:
 
     // Collisions
     std::vector<SCollisionObj>  m_vCollisions;
+
+    // ------------------------------------------------------------------
+    // Procedurally generated geometry.
+    // The .spt files shipped with Metin2 only contain generation parameters
+    // (Bezier splines, sizes, texture names); the geometry itself was produced
+    // by the proprietary SpeedTreeRT generator. This clean-room replacement
+    // builds a deterministic tree (tapered trunk/limbs + leaf cards) so the
+    // existing SpeedTreeLib renderer has geometry to draw.
+    // ------------------------------------------------------------------
+    void                        GenerateGeometry();
+    void                        UpdateLeafBillboards();
+
+    bool                        m_bGeometryGenerated;
+    std::vector<float>          m_vBranchCoords;
+    std::vector<unsigned long>  m_vBranchColors;
+    std::vector<float>          m_vBranchTexCoords0;
+    std::vector<float>          m_vBranchTexCoords1;
+    std::vector<unsigned short> m_vBranchStrip;
+    unsigned short              m_usBranchStripLength;
+    std::vector<const unsigned short*> m_vpBranchStrips;
+
+    std::vector<float>          m_vLeafCenters;
+    std::vector<unsigned long>  m_vLeafColors;
+    std::vector<float>          m_vLeafSize;
+    std::vector<float>          m_vLeafAngle;
+    std::vector<std::array<float, 16> > m_vLeafCoords;
+    std::vector<std::array<float, 8> >  m_vLeafTexCoords;
+    std::vector<const float*>   m_vpLeafCoords;
+    std::vector<const float*>   m_vpLeafTexCoords;
+    std::vector<unsigned char>  m_vLeafMapIndices;
+    std::vector<unsigned char>  m_vLeafClusterIndices;
 
     // Instancing
     const CSpeedTreeRT*         m_pInstanceOf;
