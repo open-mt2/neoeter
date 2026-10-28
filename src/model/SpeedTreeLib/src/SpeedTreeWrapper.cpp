@@ -99,12 +99,14 @@ void CSpeedTreeWrapper::OnRenderPCBlocker() {
   // choose fixed function pipeline or custom shader for fronds and branches
   STATEMANAGER.SetVertexShader(ms_lpBranchVertexShader);
   {
-    LPDIRECT3DTEXTURE9 lpd3dTexture;
-    if ((lpd3dTexture =
-             m_BranchImageInstance.GetTextureReference().GetD3DTexture()))
+    LPDIRECT3DTEXTURE9 lpd3dTexture = NULL;
+    if (!m_BranchImageInstance.IsEmpty())
+      lpd3dTexture = m_BranchImageInstance.GetTextureReference().GetD3DTexture();
+    if (lpd3dTexture)
       STATEMANAGER.SetTexture(0, lpd3dTexture);
 
-    if (m_pGeometryCache->m_sBranches.m_usVertexCount > 0) {
+    if (m_pGeometryCache->m_sBranches.m_usVertexCount > 0 &&
+        m_pBranchVertexBuffer && m_pBranchIndexBuffer) {
       STATEMANAGER.SetStreamSource(0, m_pBranchVertexBuffer,
                                    sizeof(SFVFBranchVertex));
       STATEMANAGER.SetIndices(m_pBranchIndexBuffer, 0);
@@ -112,8 +114,9 @@ void CSpeedTreeWrapper::OnRenderPCBlocker() {
     }
   }
 
-  STATEMANAGER.SetTexture(
-      0, m_CompositeImageInstance.GetTextureReference().GetD3DTexture());
+  if (!m_CompositeImageInstance.IsEmpty())
+    STATEMANAGER.SetTexture(
+        0, m_CompositeImageInstance.GetTextureReference().GetD3DTexture());
   STATEMANAGER.SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
   {
     if (m_pGeometryCache->m_sFronds.m_usVertexCount > 0 &&
@@ -189,8 +192,9 @@ void CSpeedTreeWrapper::OnRender() {
   SetupBranchForTreeType();
   RenderBranches();
 
-  STATEMANAGER.SetTexture(
-      0, m_CompositeImageInstance.GetTextureReference().GetD3DTexture());
+  if (!m_CompositeImageInstance.IsEmpty())
+    STATEMANAGER.SetTexture(
+        0, m_CompositeImageInstance.GetTextureReference().GetD3DTexture());
   STATEMANAGER.SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
   SetupFrondForTreeType();
@@ -797,17 +801,21 @@ void CSpeedTreeWrapper::DeleteInstance(CSpeedTreeWrapper *pInstance) {
 //	CSpeedTreeWrapper::SetupBranchForTreeType
 
 void CSpeedTreeWrapper::SetupBranchForTreeType(void) const {
-  LPDIRECT3DTEXTURE9 lpd3dTexture;
+  LPDIRECT3DTEXTURE9 lpd3dTexture = NULL;
 
   // set texture map
-  if ((lpd3dTexture =
-           m_BranchImageInstance.GetTextureReference().GetD3DTexture()))
+  if (!m_BranchImageInstance.IsEmpty())
+    lpd3dTexture = m_BranchImageInstance.GetTextureReference().GetD3DTexture();
+  if (lpd3dTexture)
     STATEMANAGER.SetTexture(0, lpd3dTexture);
 
   // bind shadow texture
-  if (ms_bSelfShadowOn &&
-      (lpd3dTexture =
-           m_ShadowImageInstance.GetTextureReference().GetD3DTexture()))
+  if (ms_bSelfShadowOn && !m_ShadowImageInstance.IsEmpty())
+    lpd3dTexture = m_ShadowImageInstance.GetTextureReference().GetD3DTexture();
+  else
+    lpd3dTexture = NULL;
+
+  if (lpd3dTexture)
     STATEMANAGER.SetTexture(1, lpd3dTexture);
   else
     STATEMANAGER.SetTexture(1, NULL);
@@ -857,14 +865,17 @@ void CSpeedTreeWrapper::RenderBranches(void) const {
 
 void CSpeedTreeWrapper::SetupFrondForTreeType(void) const {
   // bind shadow texture
-  LPDIRECT3DTEXTURE9 lpd3dTexture;
+  LPDIRECT3DTEXTURE9 lpd3dTexture = NULL;
 
-  if ((lpd3dTexture =
-           m_CompositeImageInstance.GetTextureReference().GetD3DTexture()))
+  if (!m_CompositeImageInstance.IsEmpty())
+    lpd3dTexture = m_CompositeImageInstance.GetTextureReference().GetD3DTexture();
+  if (lpd3dTexture)
     STATEMANAGER.SetTexture(0, lpd3dTexture);
 
-  if ((lpd3dTexture =
-           m_ShadowImageInstance.GetTextureReference().GetD3DTexture()))
+  lpd3dTexture = NULL;
+  if (!m_ShadowImageInstance.IsEmpty())
+    lpd3dTexture = m_ShadowImageInstance.GetTextureReference().GetD3DTexture();
+  if (lpd3dTexture)
     STATEMANAGER.SetTexture(1, lpd3dTexture);
 
   if (m_pGeometryCache->m_sFronds.m_usVertexCount > 0) {

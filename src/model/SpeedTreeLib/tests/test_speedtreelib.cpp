@@ -6,6 +6,7 @@
 #include <SpeedTreeLib/BoundaryShapeManager.h>
 
 #undef NDEBUG
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstdio>
@@ -98,6 +99,150 @@ void test_speedtree_wrapper_and_spt_loading()
     std::printf("[PASS] test_speedtree_wrapper_and_spt_loading\n");
 }
 
+
+// Build a minimal IdvSpt parameter block: texture strings + the size property
+// (id 2001 followed by a float) that the loader reads.
+static std::vector<unsigned char> MakeSyntheticSpt(float fSize)
+{
+    std::vector<unsigned char> buf;
+    auto append = [&buf](const void* p, size_t n) {
+        const unsigned char* b = static_cast<const unsigned char*>(p);
+        buf.insert(buf.end(), b, b + n);
+    };
+
+    const char header[] = "__IdvSpt_02_";
+    append(header, sizeof(header) - 1);
+    const char bark[] = "BeechBark.tga";
+    append(bark, sizeof(bark));
+    const char composite[] = "CompositeMap.tga";
+    append(composite, sizeof(composite));
+
+    const unsigned int sizePropertyId = 2001;
+    append(&sizePropertyId, sizeof(sizePropertyId));
+    append(&fSize, sizeof(fSize));
+
+    return buf;
+}
+
+void test_speedtree_generated_geometry()
+{
+    const float kSize = 500.0f;
+    std::vector<unsigned char> spt = MakeSyntheticSpt(kSize);
+
+    CSpeedTreeRT rt;
+    assert(rt.LoadTree(spt.data(), static_cast<unsigned int>(spt.size())));
+
+    float size = 0.0f, variance = 0.0f;
+    rt.GetTreeSize(size, variance);
+    assert(std::fabs(size - kSize) < 1.0f);
+
+    assert(rt.Compute(nullptr, 7));
+
+    float bbox[6] = {0};
+    rt.GetBoundingBox(bbox);
+    assert(std::fabs(bbox[5] - kSize) < 1.0f);
+
+    CSpeedTreeRT::SGeometry g;
+    rt.GetGeometry(g);
+
+    // Branches: one contiguous strip, valid indices, non-null arrays.
+    assert(g.m_sBranches.m_usVertexCount > 8);
+    assert(g.m_sBranches.m_usNumStrips == 1);
+    assert(g.m_sBranches.m_pStripLengths != nullptr);
+    assert(g.m_sBranches.m_pStripLengths[0] > 3);
+    assert(g.m_sBranches.m_pStrips != nullptr);
+    assert(g.m_sBranches.m_pStrips[0] != nullptr);
+    assert(g.m_sBranches.m_pCoords != nullptr);
+    assert(g.m_sBranches.m_pColors != nullptr);
+    assert(g.m_sBranches.m_pTexCoords0 != nullptr);
+    assert(g.m_sBranches.m_pTexCoords1 != nullptr);
+    assert(g.m_sBranches.m_nDiscreteLodLevel == 0);
+    assert(g.m_fBranchAlphaTestValue > 0.0f);
+    assert(rt.GetBranchTriangleCount() > 0);
+
+    for (unsigned short i = 0; i < g.m_sBranches.m_pStripLengths[0]; ++i)
+        assert(g.m_sBranches.m_pStrips[0][i] < g.m_sBranches.m_usVertexCount);
+
+    // Concave silhouette: the trunk starts at the origin and the crown is above it.
+    float fMinZ = 1e9f, fMaxZ = -1e9f;
+    for (unsigned int i = 0; i < g.m_sBranches.m_usVertexCount; ++i) {
+        fMinZ = std::min(fMinZ, g.m_sBranches.m_pCoords[i * 3 + 2]);
+        fMaxZ = std::max(fMaxZ, g.m_sBranches.m_pCoords[i * 3 + 2]);
+    }
+    assert(fMinZ >= 0.0f && fMinZ < 1.0f);
+    assert(fMaxZ > kSize * 0.4f);
+
+    // Leaves: active, valid per-leaf pointers, normalised UVs.
+    assert(g.m_sLeaves0.m_bIsActive);
+    assert(g.m_sLeaves0.m_usLeafCount > 0);
+    assert(g.m_sLeaves0.m_fAlphaTestValue > 0.0f);
+    assert(g.m_sLeaves0.m_nDiscreteLodLevel == 0);
+    assert(g.m_sLeaves0.m_pCenterCoords != nullptr);
+    assert(g.m_sLeaves0.m_pColors != nullptr);
+    assert(g.m_sLeaves0.m_pLeafMapCoords != nullptr);
+    assert(g.m_sLeaves0.m_pLeafMapTexCoords != nullptr);
+    assert(rt.GetLeafTriangleCount() == g.m_sLeaves0.m_usLeafCount * 2);
+
+    bool bAnyCornerOffset = false;
+    for (unsigned short l = 0; l < g.m_sLeaves0.m_usLeafCount; ++l) {
+        assert(g.m_sLeaves0.m_pLeafMapCoords[l] != nullptr);
+        assert(g.m_sLeaves0.m_pLeafMapTexCoords[l] != nullptr);
+        for (int c = 0; c < 4; ++c) {
+            const float* uv = g.m_sLeaves0.m_pLeafMapTexCoords[l] + c * 2;
+            assert(uv[0] >= 0.0f && uv[0] <= 1.0f);
+            assert(uv[1] >= 0.0f && uv[1] <= 1.0f);
+            const float* off = g.m_sLeaves0.m_pLeafMapCoords[l] + c * 4;
+            if (std::fabs(off[0]) + std::fabs(off[1]) + std::fabs(off[2]) > 1e-3f)
+                bAnyCornerOffset = true;
+        }
+    }
+    assert(bAnyCornerOffset);
+
+    // Billboards/fronds are intentionally inactive.
+    assert(!g.m_sBillboard0.m_bIsActive);
+    assert(!g.m_sLeaves1.m_bIsActive);
+    assert(g.m_sFronds.m_usVertexCount == 0);
+
+    // Camera-facing leaf cards: changing the camera must update the corners
+    // without changing the leaf count.
+    const float camA[3] = {0.0f, -400.0f, 200.0f};
+    const float camB[3] = {400.0f, 0.0f, 200.0f};
+    const float dir[3] = {0.0f, 1.0f, 0.0f};
+    CSpeedTreeRT::SetCamera(camA, dir);
+    rt.GetGeometry(g, SpeedTree_LeafGeometry);
+    float savedCorner[3] = {g.m_sLeaves0.m_pLeafMapCoords[0][0],
+                            g.m_sLeaves0.m_pLeafMapCoords[0][1],
+                            g.m_sLeaves0.m_pLeafMapCoords[0][2]};
+    const unsigned short savedCount = g.m_sLeaves0.m_usLeafCount;
+
+    CSpeedTreeRT::SetCamera(camB, dir);
+    rt.GetGeometry(g, SpeedTree_LeafGeometry);
+    assert(g.m_sLeaves0.m_usLeafCount == savedCount);
+    const float dx = g.m_sLeaves0.m_pLeafMapCoords[0][0] - savedCorner[0];
+    const float dy = g.m_sLeaves0.m_pLeafMapCoords[0][1] - savedCorner[1];
+    assert(std::fabs(dx) + std::fabs(dy) > 1e-3f);
+
+    // Instances must produce the same topology (shared vertex buffers).
+    CSpeedTreeRT* pInstance = rt.MakeInstance();
+    assert(pInstance != nullptr);
+    pInstance->SetTreePosition(100.0f, 50.0f, 0.0f);
+    CSpeedTreeRT::SGeometry gi;
+    pInstance->GetGeometry(gi);
+    assert(gi.m_sBranches.m_usVertexCount == g.m_sBranches.m_usVertexCount);
+    assert(gi.m_sLeaves0.m_usLeafCount == g.m_sLeaves0.m_usLeafCount);
+    delete pInstance;
+
+    // Tree height drives the collision cylinder.
+    CSpeedTreeRT::ECollisionObjectType colType;
+    float colPos[3] = {0}, colDims[3] = {0};
+    rt.GetCollisionObject(0, colType, colPos, colDims);
+    assert(colType == CSpeedTreeRT::CO_CYLINDER);
+    assert(colDims[0] > 0.0f && colDims[1] > 0.0f);
+    assert(std::fabs(colDims[1] - kSize * 0.60f) < 1.0f);
+
+    std::printf("[PASS] test_speedtree_generated_geometry\n");
+}
+
 void test_speedtree_forest()
 {
     CSpeedTreeDirectX directxForest;
@@ -136,6 +281,7 @@ int main()
 {
     test_speedtreert_compat();
     test_speedtree_wrapper_and_spt_loading();
+    test_speedtree_generated_geometry();
     test_speedtree_forest();
     test_boundary_shape_manager();
 
