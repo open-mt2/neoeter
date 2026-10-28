@@ -109,6 +109,7 @@ CSpeedTreeRT::CSpeedTreeRT()
       m_eLeafWind(WIND_NONE),
       m_eFrondWind(WIND_NONE),
       m_pInstanceOf(nullptr),
+      m_eShape(SHAPE_BROADLEAF),
       m_bGeometryGenerated(false),
       m_usBranchStripLength(0)
 {
@@ -177,6 +178,7 @@ CSpeedTreeRT* CSpeedTreeRT::MakeInstance(void)
     pInstance->m_pInstanceOf = this;
     pInstance->m_fSize = m_fSize;
     pInstance->m_fSizeVariance = m_fSizeVariance;
+    pInstance->m_eShape = m_eShape;
     pInstance->m_nSeed = m_nSeed;
     pInstance->m_fWindStrength = m_fWindStrength;
     pInstance->m_fLeafLightingAdjustment = m_fLeafLightingAdjustment;
@@ -276,6 +278,36 @@ bool CSpeedTreeRT::LoadTree(const unsigned char* pBlock, unsigned int nNumBytes)
         {
             m_vFrondTextures.push_back(tok);
         }
+    }
+
+    // Classify the species from the bark texture name. The SPT geometry
+    // generator is proprietary, so the clean-room generator picks an
+    // archetype (broadleaf, birch, conifer, palm, baobab, small plant).
+    {
+        std::string lower;
+        for (char ch : m_strBranchTexture)
+            lower += static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+
+        if (lower.find("palm") != std::string::npos ||
+            lower.find("banana") != std::string::npos ||
+            lower.find("palmetto") != std::string::npos)
+            m_eShape = SHAPE_PALM;
+        else if (lower.find("spruce") != std::string::npos ||
+                 lower.find("cypress") != std::string::npos ||
+                 lower.find("pine") != std::string::npos ||
+                 lower.find("cedar") != std::string::npos ||
+                 lower.find("juniper") != std::string::npos ||
+                 lower.find("christmas") != std::string::npos)
+            m_eShape = SHAPE_CONIFER;
+        else if (lower.find("baobab") != std::string::npos)
+            m_eShape = SHAPE_BAOBAB;
+        else if (lower.find("fern") != std::string::npos ||
+                 lower.find("aloe") != std::string::npos)
+            m_eShape = SHAPE_SMALL;
+        else if (lower.find("birch") != std::string::npos)
+            m_eShape = SHAPE_BIRCH;
+        else
+            m_eShape = SHAPE_BROADLEAF;
     }
 
     // Read the tree height from the parameter stream (property 2001 is the
@@ -508,6 +540,7 @@ void CSpeedTreeRT::GenerateGeometry()
 
     // ------------------------------------------------------------------
     // Branches: tapered tubes stitched into a single triangle strip.
+    // u wraps once around the tube, v tiles along its length.
     // ------------------------------------------------------------------
     auto addTube = [&](float sx, float sy, float sz,
                        float ex, float ey, float ez,
@@ -522,13 +555,11 @@ void CSpeedTreeRT::GenerateGeometry()
         float rx = 0.0f, ry = 0.0f, rz = 1.0f;
         if (std::fabs(dz) > 0.9f) { rx = 1.0f; rz = 0.0f; }
 
-        // right = normalize(cross(ref, dir))
         float rght[3] = { ry * dz - rz * dy, rz * dx - rx * dz, rx * dy - ry * dx };
         float rl = std::sqrt(rght[0] * rght[0] + rght[1] * rght[1] + rght[2] * rght[2]);
         if (rl < 1e-6f) return;
         rght[0] /= rl; rght[1] /= rl; rght[2] /= rl;
 
-        // up = cross(dir, right)
         float up[3] = { dy * rght[2] - dz * rght[1],
                         dz * rght[0] - dx * rght[2],
                         dx * rght[1] - dy * rght[0] };
@@ -543,7 +574,7 @@ void CSpeedTreeRT::GenerateGeometry()
             const float ox = rght[0] * ca + up[0] * sa;
             const float oy = rght[1] * ca + up[1] * sa;
             const float oz = rght[2] * ca + up[2] * sa;
-            const float u = 2.0f * static_cast<float>(i) / static_cast<float>(sides);
+            const float u = static_cast<float>(i) / static_cast<float>(sides);
 
             m_vBranchCoords.push_back(sx + ox * r0);
             m_vBranchCoords.push_back(sy + oy * r0);
@@ -587,51 +618,7 @@ void CSpeedTreeRT::GenerateGeometry()
         addTube(sx, sy, sz, ex, ey, ez, r0, r1, vTile, true);
     };
 
-    // Trunk
-    addTaperedTube(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.52f * H,
-                   0.040f * H, 0.020f * H, 0.75f * H / 100.0f);
-
-    // Primary limbs
-    for (int i = 0; i < 4; ++i) {
-        const float ang = static_cast<float>(i) * 1.5707963f + 0.35f;
-        const float h0 = (0.40f + 0.04f * static_cast<float>(i)) * H;
-        float dirx = std::cos(ang) * 0.62f;
-        float diry = std::sin(ang) * 0.62f;
-        float dirz = 0.78f;
-        const float dl = std::sqrt(dirx * dirx + diry * diry + dirz * dirz);
-        dirx /= dl; diry /= dl; dirz /= dl;
-        const float l = 0.30f * H;
-        const float ex = dirx * l;
-        const float ey = diry * l;
-        const float ez = h0 + dirz * l;
-        addTaperedTube(0.0f, 0.0f, h0, ex, ey, ez, 0.014f * H, 0.005f * H, 0.35f * H / 100.0f);
-    }
-
-    // Secondary twigs
-    for (int i = 0; i < 8; ++i) {
-        const float ang = static_cast<float>(i) * 0.7853982f + 0.7f;
-        const float h0 = (0.52f + 0.02f * static_cast<float>(i % 3)) * H;
-        float dirx = std::cos(ang) * 0.80f;
-        float diry = std::sin(ang) * 0.80f;
-        float dirz = 0.60f;
-        const float dl = std::sqrt(dirx * dirx + diry * diry + dirz * dirz);
-        dirx /= dl; diry /= dl; dirz /= dl;
-        const float l = 0.16f * H;
-        addTaperedTube(std::cos(ang) * 0.10f * H, std::sin(ang) * 0.10f * H, h0,
-                       std::cos(ang) * 0.10f * H + dirx * l,
-                       std::sin(ang) * 0.10f * H + diry * l,
-                       h0 + dirz * l,
-                       0.006f * H, 0.002f * H, 0.20f * H / 100.0f);
-    }
-
-    m_usBranchStripLength = static_cast<unsigned short>(m_vBranchStrip.size());
-    m_vpBranchStrips.clear();
-    m_vpBranchStrips.push_back(m_vBranchStrip.data());
-
-    // ------------------------------------------------------------------
-    // Leaves: camera facing cards distributed in an ellipsoidal crown.
-    // ------------------------------------------------------------------
-    const int nLeafCount = 96;
+    // Deterministic pseudo-random generator (same topology for every instance).
     unsigned int seed = 0x9E3779B9u ^ m_nSeed ^
                         (static_cast<unsigned int>(m_afPos[0] * 13.0f) * 2654435761u) ^
                         (static_cast<unsigned int>(m_afPos[1] * 7.0f) * 40503u);
@@ -640,48 +627,222 @@ void CSpeedTreeRT::GenerateGeometry()
         return static_cast<float>((seed >> 8) & 0xFFFFFF) / 16777216.0f;
     };
 
-    const float crownZ = 0.70f * H;
-    const float crownRxy = 0.32f * H;
-    const float crownRz = 0.24f * H;
+    // Leaf-cluster cells of the composite atlas (left half of every shipped
+    // atlas, rows 2-4 contain leaf clusters).
+    static const float kUvRects[6][4] = {
+        { 0.00f, 0.25f, 0.25f, 0.50f },
+        { 0.25f, 0.25f, 0.50f, 0.50f },
+        { 0.00f, 0.50f, 0.25f, 0.75f },
+        { 0.25f, 0.50f, 0.50f, 0.75f },
+        { 0.00f, 0.75f, 0.25f, 1.00f },
+        { 0.25f, 0.75f, 0.50f, 1.00f },
+    };
 
-    for (int i = 0; i < nLeafCount; ++i) {
-        const float theta = rnd() * 6.2831853f;
-        const float zc = rnd() * 2.0f - 1.0f;
-        const float rr = std::sqrt(std::max(0.0f, 1.0f - zc * zc));
-        const float cx = crownRxy * rr * std::cos(theta);
-        const float cy = crownRxy * rr * std::sin(theta);
-        const float cz = crownZ + crownRz * zc;
-
+    int nLeafIndex = 0;
+    auto addLeaf = [&](float cx, float cy, float cz, float size) {
         m_vLeafCenters.push_back(cx);
         m_vLeafCenters.push_back(cy);
         m_vLeafCenters.push_back(cz);
         m_vLeafColors.push_back(0xFFFFFFFFul);
-        m_vLeafSize.push_back((0.15f + 0.09f * rnd()) * H);
+        m_vLeafSize.push_back(size);
         m_vLeafAngle.push_back(rnd() * 6.2831853f);
 
         std::array<float, 16> coords{};
         coords[3] = coords[7] = coords[11] = coords[15] = 0.0f;
         m_vLeafCoords.push_back(coords);
 
-        static const float kUvRects[6][4] = {
-            { 0.00f, 0.25f, 0.25f, 0.50f },
-            { 0.25f, 0.25f, 0.50f, 0.50f },
-            { 0.00f, 0.50f, 0.25f, 0.75f },
-            { 0.25f, 0.50f, 0.50f, 0.75f },
-            { 0.00f, 0.75f, 0.25f, 1.00f },
-            { 0.25f, 0.75f, 0.50f, 1.00f },
-        };
-        const float* uv = kUvRects[i % 6];
+        const float* uv = kUvRects[nLeafIndex % 6];
         std::array<float, 8> tex{};
-        tex[0] = uv[0]; tex[1] = uv[3]; // bottom left  (v=1 is bottom of the atlas)
+        tex[0] = uv[0]; tex[1] = uv[3]; // bottom left
         tex[2] = uv[2]; tex[3] = uv[3]; // bottom right
         tex[4] = uv[2]; tex[5] = uv[1]; // top right
         tex[6] = uv[0]; tex[7] = uv[1]; // top left
         m_vLeafTexCoords.push_back(tex);
 
         m_vLeafMapIndices.push_back(0);
-        m_vLeafClusterIndices.push_back(static_cast<unsigned char>(i % 4));
+        m_vLeafClusterIndices.push_back(static_cast<unsigned char>(nLeafIndex % 4));
+        ++nLeafIndex;
+    };
+
+    switch (m_eShape)
+    {
+    case SHAPE_CONIFER:
+    {
+        addTaperedTube(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.94f * H,
+                       0.030f * H, 0.004f * H, 0.94f * H / 250.0f);
+
+        // Branch whorls, longer at the bottom.
+        const int nTiers = 8;
+        for (int t = 0; t < nTiers; ++t) {
+            const float z = (0.22f + 0.09f * static_cast<float>(t)) * H;
+            const float f = 1.0f - 0.72f * (z / H);
+            const float len = 0.30f * H * f;
+            const int nPerTier = 5;
+            for (int b = 0; b < nPerTier; ++b) {
+                const float a = 2.0f * 3.14159265358979f * static_cast<float>(b) / static_cast<float>(nPerTier)
+                              + 0.7f * static_cast<float>(t);
+                float dx = std::cos(a), dy = std::sin(a), dz = -0.40f;
+                const float dl = std::sqrt(dx * dx + dy * dy + dz * dz);
+                dx /= dl; dy /= dl; dz /= dl;
+                addTaperedTube(0.0f, 0.0f, z, dx * len, dy * len, z + dz * len,
+                               0.006f * H, 0.0015f * H, 0.22f * H / 250.0f);
+            }
+        }
+
+        // Cone of needle cards.
+        for (int i = 0; i < 150; ++i) {
+            const float t = rnd();
+            const float z = (0.24f + 0.72f * t) * H;
+            const float rad = 0.32f * H * (1.0f - t) * (0.70f + 0.55f * rnd());
+            const float a = rnd() * 6.2831853f;
+            addLeaf(std::cos(a) * rad, std::sin(a) * rad, z, (0.09f + 0.05f * rnd()) * H);
+        }
+        break;
     }
+
+    case SHAPE_PALM:
+    {
+        addTaperedTube(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.86f * H,
+                       0.034f * H, 0.018f * H, 0.86f * H / 250.0f);
+
+        // Crown of drooping fronds made of leaf cards along arcs.
+        const int nFronds = 9;
+        for (int f = 0; f < nFronds; ++f) {
+            const float a = 2.0f * 3.14159265358979f * static_cast<float>(f) / static_cast<float>(nFronds) + 0.3f;
+            for (int k = 0; k < 4; ++k) {
+                const float t = 0.18f + 0.24f * static_cast<float>(k);
+                const float rad = t * 0.46f * H;
+                const float z = 0.86f * H + 0.10f * H * (1.0f - t) - 0.22f * H * t * t;
+                addLeaf(std::cos(a) * rad, std::sin(a) * rad, z, (0.22f - 0.03f * static_cast<float>(k)) * H);
+            }
+        }
+        for (int i = 0; i < 8; ++i)
+            addLeaf((rnd() - 0.5f) * 0.14f * H, (rnd() - 0.5f) * 0.14f * H,
+                    0.86f * H + 0.05f * H * rnd(), 0.16f * H);
+        break;
+    }
+
+    case SHAPE_BAOBAB:
+    {
+        addTaperedTube(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.34f * H,
+                       0.11f * H, 0.05f * H, 0.60f * H / 250.0f);
+
+        for (int i = 0; i < 5; ++i) {
+            const float a = 2.0f * 3.14159265358979f * static_cast<float>(i) / 5.0f + 0.4f;
+            const float h0 = (0.28f + 0.02f * static_cast<float>(i)) * H;
+            float dx = std::cos(a) * 0.80f, dy = std::sin(a) * 0.80f, dz = 0.60f;
+            const float dl = std::sqrt(dx * dx + dy * dy + dz * dz);
+            dx /= dl; dy /= dl; dz /= dl;
+            const float len = 0.32f * H;
+            addTaperedTube(0.0f, 0.0f, h0, dx * len, dy * len, h0 + dz * len,
+                           0.030f * H, 0.008f * H, 0.30f * H / 250.0f);
+        }
+
+        for (int i = 0; i < 70; ++i) {
+            const float a = rnd() * 6.2831853f;
+            const float zc = rnd() * 2.0f - 1.0f;
+            const float rr = std::sqrt(std::max(0.0f, 1.0f - zc * zc));
+            addLeaf(0.38f * H * rr * std::cos(a),
+                    0.38f * H * rr * std::sin(a),
+                    0.62f * H + 0.22f * H * zc,
+                    (0.18f + 0.08f * rnd()) * H);
+        }
+        break;
+    }
+
+    case SHAPE_SMALL:
+    {
+        addTaperedTube(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.10f * H,
+                       0.012f * H, 0.006f * H, 0.10f * H / 250.0f);
+
+        for (int i = 0; i < 30; ++i) {
+            const float a = 2.0f * 3.14159265358979f * static_cast<float>(i) / 30.0f + rnd() * 0.25f;
+            const float rad = (0.10f + 0.24f * rnd()) * H;
+            const float z = (0.08f + 0.38f * rnd()) * H;
+            addLeaf(std::cos(a) * rad, std::sin(a) * rad, z, (0.18f + 0.12f * rnd()) * H);
+        }
+        break;
+    }
+
+    case SHAPE_BIRCH:
+    {
+        addTaperedTube(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.60f * H,
+                       0.026f * H, 0.010f * H, 0.60f * H / 250.0f);
+
+        for (int i = 0; i < 4; ++i) {
+            const float a = 1.5707963f * static_cast<float>(i) + 0.5f;
+            const float h0 = (0.42f + 0.04f * static_cast<float>(i)) * H;
+            float dx = std::cos(a) * 0.55f, dy = std::sin(a) * 0.55f, dz = 0.85f;
+            const float dl = std::sqrt(dx * dx + dy * dy + dz * dz);
+            dx /= dl; dy /= dl; dz /= dl;
+            const float len = 0.24f * H;
+            addTaperedTube(0.0f, 0.0f, h0, dx * len, dy * len, h0 + dz * len,
+                           0.010f * H, 0.004f * H, 0.24f * H / 250.0f);
+        }
+
+        for (int i = 0; i < 84; ++i) {
+            const float a = rnd() * 6.2831853f;
+            const float zc = rnd() * 2.0f - 1.0f;
+            const float rr = std::sqrt(std::max(0.0f, 1.0f - zc * zc));
+            addLeaf(0.25f * H * rr * std::cos(a),
+                    0.25f * H * rr * std::sin(a),
+                    0.72f * H + 0.26f * H * zc,
+                    (0.12f + 0.06f * rnd()) * H);
+        }
+        break;
+    }
+
+    case SHAPE_BROADLEAF:
+    default:
+    {
+        addTaperedTube(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.52f * H,
+                       0.040f * H, 0.020f * H, 0.52f * H / 250.0f);
+
+        float limbTips[5][3];
+        for (int i = 0; i < 5; ++i) {
+            const float a = 2.0f * 3.14159265358979f * static_cast<float>(i) / 5.0f + 0.35f;
+            const float h0 = (0.36f + 0.035f * static_cast<float>(i)) * H;
+            float dx = std::cos(a) * 0.62f, dy = std::sin(a) * 0.62f, dz = 0.78f;
+            const float dl = std::sqrt(dx * dx + dy * dy + dz * dz);
+            dx /= dl; dy /= dl; dz /= dl;
+            const float len = 0.32f * H;
+            limbTips[i][0] = dx * len;
+            limbTips[i][1] = dy * len;
+            limbTips[i][2] = h0 + dz * len;
+            addTaperedTube(0.0f, 0.0f, h0, limbTips[i][0], limbTips[i][1], limbTips[i][2],
+                           0.016f * H, 0.005f * H, 0.32f * H / 250.0f);
+        }
+
+        for (int i = 0; i < 10; ++i) {
+            const int li = i % 5;
+            const float sx = limbTips[li][0] * 0.6f;
+            const float sy = limbTips[li][1] * 0.6f;
+            const float sz = limbTips[li][2] - 0.04f * H;
+            const float a = 1.2566371f * static_cast<float>(i) + 0.9f;
+            float dx = std::cos(a) * 0.9f, dy = std::sin(a) * 0.9f, dz = 0.5f;
+            const float dl = std::sqrt(dx * dx + dy * dy + dz * dz);
+            dx /= dl; dy /= dl; dz /= dl;
+            const float len = 0.18f * H;
+            addTaperedTube(sx, sy, sz, sx + dx * len, sy + dy * len, sz + dz * len,
+                           0.006f * H, 0.002f * H, 0.18f * H / 250.0f);
+        }
+
+        for (int i = 0; i < 96; ++i) {
+            const float a = rnd() * 6.2831853f;
+            const float zc = rnd() * 2.0f - 1.0f;
+            const float rr = std::sqrt(std::max(0.0f, 1.0f - zc * zc));
+            addLeaf(0.32f * H * rr * std::cos(a),
+                    0.32f * H * rr * std::sin(a),
+                    0.70f * H + 0.24f * H * zc,
+                    (0.15f + 0.09f * rnd()) * H);
+        }
+        break;
+    }
+    }
+
+    m_usBranchStripLength = static_cast<unsigned short>(m_vBranchStrip.size());
+    m_vpBranchStrips.clear();
+    m_vpBranchStrips.push_back(m_vBranchStrip.data());
 
     m_vpLeafCoords.clear();
     m_vpLeafTexCoords.clear();
@@ -693,11 +854,11 @@ void CSpeedTreeRT::GenerateGeometry()
     UpdateLeafBillboards();
 
     // bounds + trunk collision
-    m_afBoundingBox[0] = -0.35f * H;
-    m_afBoundingBox[1] = -0.35f * H;
+    m_afBoundingBox[0] = -0.40f * H;
+    m_afBoundingBox[1] = -0.40f * H;
     m_afBoundingBox[2] = 0.0f;
-    m_afBoundingBox[3] = 0.35f * H;
-    m_afBoundingBox[4] = 0.35f * H;
+    m_afBoundingBox[3] = 0.40f * H;
+    m_afBoundingBox[4] = 0.40f * H;
     m_afBoundingBox[5] = 1.0f * H;
 
     m_vCollisions.clear();
@@ -706,8 +867,8 @@ void CSpeedTreeRT::GenerateGeometry()
     obj.m_afPos[0] = 0.0f;
     obj.m_afPos[1] = 0.0f;
     obj.m_afPos[2] = 0.0f;
-    obj.m_afDims[0] = 0.045f * H;  // radius
-    obj.m_afDims[1] = 0.60f * H;   // height
+    obj.m_afDims[0] = (m_eShape == SHAPE_BAOBAB) ? 0.10f * H : 0.045f * H;
+    obj.m_afDims[1] = 0.60f * H;
     obj.m_afDims[2] = 0.0f;
     m_vCollisions.push_back(obj);
 }

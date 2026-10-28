@@ -311,6 +311,18 @@ private:
     void                        GenerateGeometry();
     void                        UpdateLeafBillboards();
 
+    enum ETreeShape
+    {
+        SHAPE_BROADLEAF,
+        SHAPE_BIRCH,
+        SHAPE_CONIFER,
+        SHAPE_PALM,
+        SHAPE_BAOBAB,
+        SHAPE_SMALL
+    };
+
+    ETreeShape                  m_eShape;
+
     bool                        m_bGeometryGenerated;
     std::vector<float>          m_vBranchCoords;
     std::vector<unsigned long>  m_vBranchColors;
