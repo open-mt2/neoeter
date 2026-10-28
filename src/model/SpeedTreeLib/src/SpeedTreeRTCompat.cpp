@@ -237,6 +237,19 @@ bool CSpeedTreeRT::LoadTree(const unsigned char* pBlock, unsigned int nNumBytes)
     for (const auto& rawTok : tokens)
     {
         std::string tok = ExtractBaseName(rawTok);
+
+        // SpeedTree appends a texture-set suffix ("CompositeMapB1#N.tga").
+        // The shipped DDS files do not contain it, so drop '#'..'extension'.
+        const std::string::size_type hashPos = tok.find('#');
+        if (hashPos != std::string::npos)
+        {
+            const std::string::size_type dotPos = tok.find_last_of('.');
+            if (dotPos != std::string::npos && dotPos > hashPos)
+                tok = tok.substr(0, hashPos) + tok.substr(dotPos);
+            else
+                tok = tok.substr(0, hashPos);
+        }
+
         std::string lower;
         for (char ch : tok) lower += static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
 
@@ -618,7 +631,7 @@ void CSpeedTreeRT::GenerateGeometry()
     // ------------------------------------------------------------------
     // Leaves: camera facing cards distributed in an ellipsoidal crown.
     // ------------------------------------------------------------------
-    const int nLeafCount = 44;
+    const int nLeafCount = 96;
     unsigned int seed = 0x9E3779B9u ^ m_nSeed ^
                         (static_cast<unsigned int>(m_afPos[0] * 13.0f) * 2654435761u) ^
                         (static_cast<unsigned int>(m_afPos[1] * 7.0f) * 40503u);
@@ -628,8 +641,8 @@ void CSpeedTreeRT::GenerateGeometry()
     };
 
     const float crownZ = 0.70f * H;
-    const float crownRxy = 0.30f * H;
-    const float crownRz = 0.22f * H;
+    const float crownRxy = 0.32f * H;
+    const float crownRz = 0.24f * H;
 
     for (int i = 0; i < nLeafCount; ++i) {
         const float theta = rnd() * 6.2831853f;
@@ -643,7 +656,7 @@ void CSpeedTreeRT::GenerateGeometry()
         m_vLeafCenters.push_back(cy);
         m_vLeafCenters.push_back(cz);
         m_vLeafColors.push_back(0xFFFFFFFFul);
-        m_vLeafSize.push_back((0.26f + 0.10f * rnd()) * H);
+        m_vLeafSize.push_back((0.15f + 0.09f * rnd()) * H);
         m_vLeafAngle.push_back(rnd() * 6.2831853f);
 
         std::array<float, 16> coords{};
