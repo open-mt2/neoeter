@@ -1,12 +1,11 @@
 #include <SpeedTreeLib/SpeedTreeRTCompat.h>
+#include <SpeedTreeLib/TreeCacheFormat.h>
 #include <cstdio>
 #include <cctype>
 #include <cstdlib>
 #include <cstdint>
 #include <fstream>
 #include <algorithm>
-
-static uint32_t Fnv1a32(const unsigned char* pData, size_t nSize);
 
 // Static member definitions
 std::string   CSpeedTreeRT::ms_strError;
@@ -323,7 +322,7 @@ bool CSpeedTreeRT::LoadTree(const unsigned char* pBlock, unsigned int nNumBytes)
     }
 
     // Try the baked geometry cache produced from the original SpeedTreeRT SDK.
-    if (LoadBakedGeometry(Fnv1a32(pBlock, nNumBytes)))
+    if (LoadBakedGeometry(TreeCache::Fnv1a32(pBlock, nNumBytes)))
         return true;
 
     // Read the tree height from the parameter stream (property 2001 is the
@@ -894,16 +893,6 @@ void CSpeedTreeRT::GenerateGeometry()
     m_vCollisions.push_back(obj);
 }
 
-static uint32_t Fnv1a32(const unsigned char* pData, size_t nSize)
-{
-    uint32_t h = 2166136261u;
-    for (size_t i = 0; i < nSize; ++i) {
-        h ^= pData[i];
-        h *= 16777619u;
-    }
-    return h;
-}
-
 namespace {
 
 struct SBakedReader
@@ -955,7 +944,7 @@ bool CSpeedTreeRT::LoadBakedGeometry(unsigned int nHash)
     file.close();
 
     SBakedReader r(data.data(), data.size());
-    if (r.U32() != 0x4D543254u || r.U32() != nHash)
+    if (r.U32() != TreeCache::kMagic || r.U32() != nHash)
         return false;
 
     float fBBox[6];
