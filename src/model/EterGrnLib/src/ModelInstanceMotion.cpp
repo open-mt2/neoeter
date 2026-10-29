@@ -73,7 +73,15 @@ void CGrannyModelInstance::SetMotionPointer(const CGrannyMotion * pMotion, float
 		GrannyCompleteControlAt(m_pgrnCtrl, localTime + blendTime);
 		//GrannyCompleteControlAt(m_pgrnCtrl, oldCtrlFinishTime);
 		//GrannyCompleteControlAt(m_pgrnCtrl, localTime);
-		GrannyFreeControlIfComplete(m_pgrnCtrl);
+
+		// A one-shot motion that just reached its end already reports
+		// "complete" by clock, even though it still has to fade out.  Freeing
+		// it here would leave only the incoming control, whose ease-in weight
+		// is still zero on this frame, so the model would snap to its rest
+		// pose (T-pose) for a single frame.  The completion time set above
+		// retires the control after the blend instead.
+		if (blendTime <= 0.0f)
+			GrannyFreeControlIfComplete(m_pgrnCtrl);
 	}
 	else
 	{

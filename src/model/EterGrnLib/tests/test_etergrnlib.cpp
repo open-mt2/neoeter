@@ -727,6 +727,174 @@ void test_root_motion_is_not_accumulated_during_transitions()
     std::printf("[PASS] test_root_motion_is_not_accumulated_during_transitions\n");
 }
 
+void test_finished_one_shot_motion_keeps_final_pose_during_blend()
+{
+    struct D3DContext : public CGraphicBase
+    {
+        D3DContext()
+        {
+            ms_lpd3dDevice = new IDirect3DDevice9();
+            D3DXCreateMatrixStack(0, &ms_lpd3dMatStack);
+            D3DXMatrixIdentity(&ms_matIdentity);
+        }
+        ~D3DContext()
+        {
+            if (ms_lpd3dMatStack)
+            {
+                ms_lpd3dMatStack->Release();
+                ms_lpd3dMatStack = nullptr;
+            }
+            if (ms_lpd3dDevice)
+            {
+                ms_lpd3dDevice->Release();
+                ms_lpd3dDevice = nullptr;
+            }
+        }
+    } d3dCtx;
+
+    class TestGraphicThing : public CGraphicThing
+    {
+    public:
+        explicit TestGraphicThing(const char* name) : CGraphicThing(name) {}
+        bool LoadMemory(int size, const void* buf) { return OnLoad(size, buf); }
+    };
+
+    granny_bone rootBone;
+    std::memset(&rootBone, 0, sizeof(rootBone));
+    rootBone.Name = "Bip01";
+    rootBone.ParentIndex = GrannyNoParentBone;
+    init_test_transform(rootBone.LocalTransform, 0.0f, 0.0f, 0.0f);
+    GrannyMathInternal::LoadIdentity4x4(rootBone.InverseWorld4x4);
+
+    granny_skeleton skeleton = {"TestSkel", 1, &rootBone};
+
+    granny_pnt332_vertex triVerts[3] = {
+        {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{10.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
+        {{0.0f, 10.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}}
+    };
+    granny_vertex_data vtxData;
+    std::memset(&vtxData, 0, sizeof(vtxData));
+    vtxData.VertexType = GrannyPNT332VertexType;
+    vtxData.VertexCount = 3;
+    vtxData.Vertices = reinterpret_cast<granny_uint8*>(triVerts);
+
+    granny_uint16 triIndices[3] = {0, 1, 2};
+    granny_tri_material_group triGroup = {0, 0, 1};
+    granny_tri_topology topo;
+    std::memset(&topo, 0, sizeof(topo));
+    topo.GroupCount = 1;
+    topo.Groups = &triGroup;
+    topo.IndexCount16 = 3;
+    topo.Indices16 = triIndices;
+
+    granny_bone_binding boneBinding = {"Bip01", {-5.0f, -5.0f, -5.0f}, {15.0f, 15.0f, 5.0f}, 0, nullptr};
+
+    granny_mesh mesh;
+    std::memset(&mesh, 0, sizeof(mesh));
+    mesh.Name = "TestMesh";
+    mesh.PrimaryVertexData = &vtxData;
+    mesh.PrimaryTopology = &topo;
+    mesh.BoneBindingCount = 1;
+    mesh.BoneBindings = &boneBinding;
+
+    granny_model_mesh_binding meshBinding = {&mesh};
+    granny_model model;
+    std::memset(&model, 0, sizeof(model));
+    model.Name = "TestModel";
+    model.Skeleton = &skeleton;
+    model.MeshBindingCount = 1;
+    model.MeshBindings = &meshBinding;
+
+    granny_curve emptyCurve;
+    std::memset(&emptyCurve, 0, sizeof(emptyCurve));
+
+    // The attack clip ends at z = 10, while the skeleton rest pose is at z = 0.
+    granny_real32 attackPosition[3] = {0.0f, 0.0f, 10.0f};
+    granny_curve attackCurve = make_constant_curve(attackPosition, 3);
+    granny_transform_track attackTrack = {"Bip01", attackCurve, emptyCurve, emptyCurve};
+    granny_track_group attackGroup;
+    std::memset(&attackGroup, 0, sizeof(attackGroup));
+    attackGroup.Name = "Bip01";
+    attackGroup.TransformTrackCount = 1;
+    attackGroup.TransformTracks = &attackTrack;
+    granny_track_group* attackGroups[1] = {&attackGroup};
+
+    granny_animation attackAnimation;
+    std::memset(&attackAnimation, 0, sizeof(attackAnimation));
+    attackAnimation.Name = "normal_attack";
+    attackAnimation.Duration = 0.4f;
+    attackAnimation.TrackGroupCount = 1;
+    attackAnimation.TrackGroups = attackGroups;
+
+    granny_real32 waitPosition[3] = {0.0f, 0.0f, -10.0f};
+    granny_curve waitCurve = make_constant_curve(waitPosition, 3);
+    granny_transform_track waitTrack = {"Bip01", waitCurve, emptyCurve, emptyCurve};
+    granny_track_group waitGroup;
+    std::memset(&waitGroup, 0, sizeof(waitGroup));
+    waitGroup.Name = "Bip01";
+    waitGroup.TransformTrackCount = 1;
+    waitGroup.TransformTracks = &waitTrack;
+    granny_track_group* waitGroups[1] = {&waitGroup};
+
+    granny_animation waitAnimation;
+    std::memset(&waitAnimation, 0, sizeof(waitAnimation));
+    waitAnimation.Name = "wait";
+    waitAnimation.Duration = 1.0f;
+    waitAnimation.TrackGroupCount = 1;
+    waitAnimation.TrackGroups = waitGroups;
+
+    granny_model* models[1] = {&model};
+    granny_animation* animations[1] = {&attackAnimation};
+
+    granny_file_info fileInfo;
+    std::memset(&fileInfo, 0, sizeof(fileInfo));
+    fileInfo.ModelCount = 1;
+    fileInfo.Models = models;
+    fileInfo.AnimationCount = 1;
+    fileInfo.Animations = animations;
+
+    OpenGrannyMemoryEnvelope env = {OPEN_GRANNY_MEM_MAGIC, 1, &fileInfo};
+
+    TestGraphicThing thing("synthetic_attack.gr2");
+    assert(thing.LoadMemory(sizeof(env), &env));
+
+    CGrannyMotion attackMotion;
+    assert(attackMotion.BindGrannyAnimation(&attackAnimation));
+    CGrannyMotion waitMotion;
+    assert(waitMotion.BindGrannyAnimation(&waitAnimation));
+
+    CGrannyModelInstance* instance = CGrannyModelInstance::New();
+    assert(instance != nullptr);
+    instance->SetMainModelPointer(thing.GetModelPointer(0), nullptr);
+
+    // Start the one-shot attack and advance past the end of the clip, so the
+    // control reports complete by clock before the transition is requested.
+    instance->SetMotionPointer(&attackMotion, 0.0f, 1, 1.0f);
+    assert(instance->IsMotionPlaying());
+    instance->UpdateLocalTime(0.5f);
+    instance->Update(CGrannyModelInstance::ANIFPS_MAX);
+
+    // Transition to WAIT exactly like CActorInstance::CurrentMotionProcess does.
+    instance->SetMotionPointer(&waitMotion, 0.1f, 0, 1.0f);
+
+    D3DXMATRIX worldMatrix;
+    D3DXMatrixIdentity(&worldMatrix);
+    instance->DeformNoSkin(&worldMatrix);
+
+    const float* rootMatrix = instance->GetBoneMatrixPointer(0);
+    assert(rootMatrix != nullptr);
+    // The finishing attack pose must be held while it fades out.  Falling back
+    // to the rest pose here is the one-frame T-pose at the end of an attack.
+    assert(std::fabs(rootMatrix[14] - 10.0f) < 1e-3f);
+
+    CGrannyModelInstance::Delete(instance);
+    thing.DestroyDeviceObjects();
+    CGrannyModelInstance::DestroySystem();
+
+    std::printf("[PASS] test_finished_one_shot_motion_keeps_final_pose_during_blend\n");
+}
+
 } // namespace
 
 int main()
@@ -737,6 +905,7 @@ int main()
     test_native_gr2_parsing_and_model_loading();
     test_animation_track_group_selection_and_blending();
     test_root_motion_is_not_accumulated_during_transitions();
+    test_finished_one_shot_motion_keeps_final_pose_during_blend();
 
     std::printf("All EterGrnLib smoke tests passed!\n");
     return 0;
