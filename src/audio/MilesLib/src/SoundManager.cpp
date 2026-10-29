@@ -440,6 +440,21 @@ void CSoundManager::SetSoundVolume3D(int iIndex, float fVolume)
 	pInstance->SetVolume(fVolume);
 }
 
+void CSoundManager::UpdateAmbienceSound3D(int iIndex, float fx, float fy, float fz)
+{
+	ISoundInstance * pInstance = ms_SoundManager3D.GetInstance(iIndex);
+
+	if (!pInstance)
+		return;
+
+	// Keep looping ambience emitters attached to their world position as the
+	// listener moves. Positions are expressed relative to the camera in the
+	// same audio-unit space used by PlayAmbienceSound3D.
+	pInstance->SetPosition((fx - m_fxPosition) / m_fAmbienceSoundScale,
+						   (fy - m_fyPosition) / m_fAmbienceSoundScale,
+						   (fz - m_fzPosition) / m_fAmbienceSoundScale);
+}
+
 void CSoundManager::StopAllSound3D()
 {
 	for (int i = 0; i < CSoundManager3D::INSTANCE_MAX_COUNT; ++i)

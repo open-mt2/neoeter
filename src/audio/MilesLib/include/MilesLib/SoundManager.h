@@ -41,6 +41,7 @@ public:
 	int  PlayAmbienceSound3D(float fx, float fy, float fz, const char * c_szFileName, int iPlayCount = 1);
 	void PlayCharacterSound3D(float fx, float fy, float fz, const char * c_szFileName, BOOL bCheckFrequency = FALSE);
 	void SetSoundVolume3D(int iIndex, float fVolume);
+	void UpdateAmbienceSound3D(int iIndex, float fx, float fy, float fz);
 	void StopAllSound3D();
 
 	// Music

@@ -113,7 +113,10 @@ void CSoundInstance3D::SetVolume(float volume) const
 
 void CSoundInstance3D::SetPosition(float x, float y, float z) const
 {
-	AIL_set_3D_position(m_sample, x, y, -z);
+	// Metin2 uses Z-up world coordinates (x = right, y = forward, z = up).
+	// miniaudio's spatializer is Y-up with -Z as forward, so rotate the
+	// vector into that basis: (x, y, z) -> (x, z, -y).
+	AIL_set_3D_position(m_sample, x, z, -y);
 }
 
 void CSoundInstance3D::SetOrientation(float x_face, float y_face, float z_face, 
@@ -127,7 +130,7 @@ void CSoundInstance3D::SetOrientation(float x_face, float y_face, float z_face,
 
 void CSoundInstance3D::SetVelocity(float fDistanceX, float fDistanceY, float fDistanceZ, float fNagnitude) const
 {
-	AIL_set_3D_velocity(m_sample, fDistanceX, fDistanceY, fDistanceZ, fNagnitude);
+	AIL_set_3D_velocity(m_sample, fDistanceX, fDistanceZ, -fDistanceY, fNagnitude);
 	AIL_auto_update_3D_position(m_sample, 1);
 }
 

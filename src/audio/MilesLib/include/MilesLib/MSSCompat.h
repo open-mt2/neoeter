@@ -117,6 +117,15 @@ namespace MilesCompatInternal {
         static EngineHolder s_holder;
         return s_holder.initialized ? &s_holder.engine : nullptr;
     }
+
+    // Positional audio is fed in "audio units". The client divides world
+    // distances by CSoundManager::m_fSoundScale (200 by default), so one unit
+    // is roughly one character height. Attenuation is therefore computed with
+    // a 1-unit minimum distance so nearby sounds stay at full volume while
+    // distant sounds fade out with the inverse-distance model.
+    static constexpr float kMin3DDistance = 1.0f;
+    static constexpr float kMax3DDistance = 100.0f;
+    static constexpr float k3DRolloff = 1.0f;
 }
 
 struct AIL_Sample2D {
@@ -152,6 +161,7 @@ typedef AIL_Sample2D* HSAMPLE;
 
 struct AIL_Object3D {
     HPROVIDER provider = 0;
+    bool is_listener = false;
     const void* data = nullptr;
     S32 size = 0;
     U32 loop_count = 1;
@@ -522,6 +532,7 @@ inline void AIL_close_3D_provider(HPROVIDER /*lib*/) {
 inline H3DPOBJECT AIL_open_3D_listener(HPROVIDER lib) {
     H3DPOBJECT listener = new AIL_Object3D();
     listener->provider = lib;
+    listener->is_listener = true;
     return listener;
 }
 
@@ -560,15 +571,19 @@ inline S32 AIL_set_3D_sample_file(H3DSAMPLE s, const void* file_image) {
 
     ma_engine* engine = MilesCompatInternal::GetEngine();
     if (engine && s->size > 0) {
-        ma_decoder_config dcfg = ma_decoder_config_init(ma_format_f32, 2, 44100);
+        // 3D sounds must be mono so the spatializer can pan them. Keep the
+        // native sample rate and let miniaudio resample to the engine rate.
+        ma_decoder_config dcfg = ma_decoder_config_init(ma_format_f32, 1, 0);
         if (ma_decoder_init_memory(s->data, s->size, &dcfg, &s->decoder) == MA_SUCCESS) {
             s->decoder_initialized = true;
             if (ma_sound_init_from_data_source(engine, &s->decoder, 0, NULL, &s->sound) == MA_SUCCESS) {
                 s->sound_initialized = true;
                 ma_sound_set_spatialization_enabled(&s->sound, MA_TRUE);
                 ma_sound_set_position(&s->sound, s->x, s->y, s->z);
-                ma_sound_set_min_distance(&s->sound, 200.0f);
-                ma_sound_set_max_distance(&s->sound, 5000.0f);
+                ma_sound_set_attenuation_model(&s->sound, ma_attenuation_model_inverse);
+                ma_sound_set_rolloff(&s->sound, MilesCompatInternal::k3DRolloff);
+                ma_sound_set_min_distance(&s->sound, MilesCompatInternal::kMin3DDistance);
+                ma_sound_set_max_distance(&s->sound, MilesCompatInternal::kMax3DDistance);
                 ma_sound_set_volume(&s->sound, s->volume);
                 ma_sound_set_looping(&s->sound, s->loop_count == 0 ? MA_TRUE : MA_FALSE);
             }
@@ -652,6 +667,13 @@ inline void AIL_set_3D_position(H3DPOBJECT obj, float x, float y, float z) {
     obj->x = x;
     obj->y = y;
     obj->z = z;
+    if (obj->is_listener) {
+        ma_engine* engine = MilesCompatInternal::GetEngine();
+        if (engine) {
+            ma_engine_listener_set_position(engine, 0, x, y, z);
+        }
+        return;
+    }
     if (obj->sound_initialized) {
         ma_sound_set_position(&obj->sound, x, y, z);
     }
@@ -665,6 +687,14 @@ inline void AIL_set_3D_orientation(H3DPOBJECT obj, float fx, float fy, float fz,
     obj->ux = ux;
     obj->uy = uy;
     obj->uz = uz;
+    if (obj->is_listener) {
+        ma_engine* engine = MilesCompatInternal::GetEngine();
+        if (engine) {
+            ma_engine_listener_set_direction(engine, 0, fx, fy, fz);
+            ma_engine_listener_set_world_up(engine, 0, ux, uy, uz);
+        }
+        return;
+    }
     if (obj->sound_initialized) {
         ma_sound_set_direction(&obj->sound, fx, fy, fz);
     }
@@ -676,6 +706,13 @@ inline void AIL_set_3D_velocity(H3DPOBJECT obj, float dx, float dy, float dz, fl
     obj->vy = dy;
     obj->vz = dz;
     obj->vmag = mag;
+    if (obj->is_listener) {
+        ma_engine* engine = MilesCompatInternal::GetEngine();
+        if (engine) {
+            ma_engine_listener_set_velocity(engine, 0, dx, dy, dz);
+        }
+        return;
+    }
     if (obj->sound_initialized) {
         ma_sound_set_velocity(&obj->sound, dx, dy, dz);
     }

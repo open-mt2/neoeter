@@ -103,7 +103,9 @@ void CSoundManager3D::SetListenerDirection(float fxDir, float fyDir, float fzDir
 {
 	if (NULL == m_pListener)
 		return;
-	AIL_set_3D_orientation(m_pListener, fxDir, fyDir, -fzDir, fxUp, fyUp, -fzUp);
+	// Coordinate conversion matches CSoundInstance3D::SetPosition:
+	// Metin2 Z-up (x, y, z) -> miniaudio Y-up (x, z, -y).
+	AIL_set_3D_orientation(m_pListener, fxDir, fzDir, -fyDir, fxUp, fzUp, -fyUp);
 }
 
 void CSoundManager3D::SetListenerPosition(float fX, float fY, float fZ)
@@ -111,7 +113,7 @@ void CSoundManager3D::SetListenerPosition(float fX, float fY, float fZ)
 // 	assert(m_pListener != NULL);
 	if (NULL == m_pListener)
 		return;
-	AIL_set_3D_position(m_pListener, fX, fY, -fZ);
+	AIL_set_3D_position(m_pListener, fX, fZ, -fY);
 }
 
 void CSoundManager3D::SetListenerVelocity(float fDistanceX, float fDistanceY, float fDistanceZ, float fNagnitude)
@@ -119,7 +121,7 @@ void CSoundManager3D::SetListenerVelocity(float fDistanceX, float fDistanceY, fl
 // 	assert(m_pListener != NULL);
 	if (NULL == m_pListener)
 		return;
-	AIL_set_3D_velocity(m_pListener, fDistanceX, fDistanceY, -fDistanceZ, fNagnitude);
+	AIL_set_3D_velocity(m_pListener, fDistanceX, fDistanceZ, -fDistanceY, fNagnitude);
 }
 
 int CSoundManager3D::SetInstance(const char * c_pszFileName)
