@@ -562,6 +562,16 @@ struct granny_control
     granny_real32 CompleteTime    = 0.0f;
     bool          FreeOnceUnused  = false;
     bool          IsCompleted     = false;
+
+    // Cached binding between the animation track group and the skeleton this
+    // control is playing on.  GR2 animations may contain several track groups
+    // (for example a helper "Box01" group followed by the real "Bip01" group),
+    // so the correct group has to be resolved per skeleton.
+    bool                        TrackGroupResolved = false;
+    const granny_skeleton*      CachedSkeleton     = nullptr;
+    const granny_track_group*   CachedTrackGroup   = nullptr;
+    // Bone index -> index in CachedTrackGroup->TransformTracks (-1 if absent).
+    std::vector<granny_int32>   BoneTrackIndices;
 };
 
 struct granny_model_instance
@@ -1097,6 +1107,48 @@ namespace GrannyMathInternal
             out[3][2] = t.Position[2];
         }
     }
+
+    // Blends Src into Dst.  T is the weight of Src in the resulting transform.
+    inline void BlendTransform(granny_transform& Dst, const granny_transform& Src, granny_real32 T)
+    {
+        if (T <= 0.0f)
+            return;
+        if (T >= 1.0f)
+        {
+            Dst = Src;
+            return;
+        }
+
+        Dst.Position[0] += (Src.Position[0] - Dst.Position[0]) * T;
+        Dst.Position[1] += (Src.Position[1] - Dst.Position[1]) * T;
+        Dst.Position[2] += (Src.Position[2] - Dst.Position[2]) * T;
+
+        const bool dstHasOrientation = (Dst.Flags & GrannyHasOrientation) != 0;
+        const bool srcHasOrientation = (Src.Flags & GrannyHasOrientation) != 0;
+        if (dstHasOrientation || srcHasOrientation)
+        {
+            D3DXQUATERNION q0 = dstHasOrientation
+                ? D3DXQUATERNION(Dst.Orientation[0], Dst.Orientation[1], Dst.Orientation[2], Dst.Orientation[3])
+                : D3DXQUATERNION(0.0f, 0.0f, 0.0f, 1.0f);
+            D3DXQUATERNION q1 = srcHasOrientation
+                ? D3DXQUATERNION(Src.Orientation[0], Src.Orientation[1], Src.Orientation[2], Src.Orientation[3])
+                : D3DXQUATERNION(0.0f, 0.0f, 0.0f, 1.0f);
+            D3DXQUATERNION outQ;
+            D3DXQuaternionSlerp(&outQ, &q0, &q1, T);
+            Dst.Orientation[0] = outQ.x;
+            Dst.Orientation[1] = outQ.y;
+            Dst.Orientation[2] = outQ.z;
+            Dst.Orientation[3] = outQ.w;
+        }
+
+        for (int r = 0; r < 3; ++r)
+        {
+            for (int c = 0; c < 3; ++c)
+                Dst.ScaleShear[r][c] += (Src.ScaleShear[r][c] - Dst.ScaleShear[r][c]) * T;
+        }
+
+        Dst.Flags |= Src.Flags;
+    }
 } // namespace GrannyMathInternal
 
 inline granny_local_pose* GrannyNewLocalPose(granny_int32x BoneCount)
@@ -1464,6 +1516,153 @@ inline void GrannySetControlEaseOutCurve(
     }
 }
 
+// Returns the blend weight of a control at the given model-local time.
+// Controls that are eased in/out simultaneously overlap, which is what makes
+// animation transitions smooth instead of snapping to the newest control.
+inline granny_real32 GrannyGetControlWeight(const granny_control* Control, granny_real32 CurrentTime)
+{
+    if (!Control || Control->IsCompleted)
+        return 0.0f;
+
+    granny_real32 Weight = 1.0f;
+
+    if (Control->EaseIn && Control->EaseInEnd > Control->EaseInStart)
+    {
+        granny_real32 u = (CurrentTime - Control->EaseInStart) /
+                          (Control->EaseInEnd - Control->EaseInStart);
+        if (u <= 0.0f)
+            Weight = 0.0f;
+        else if (u < 1.0f)
+            Weight *= u * u * (3.0f - 2.0f * u); // smoothstep
+    }
+
+    if (Control->EaseOut && Control->EaseOutEnd > Control->EaseOutStart)
+    {
+        granny_real32 u = (CurrentTime - Control->EaseOutStart) /
+                          (Control->EaseOutEnd - Control->EaseOutStart);
+        if (u >= 1.0f)
+            Weight = 0.0f;
+        else if (u > 0.0f)
+            Weight *= 1.0f - u * u * (3.0f - 2.0f * u);
+    }
+
+    return Weight > 0.0f ? Weight : 0.0f;
+}
+
+// Selects the track group of an animation that belongs to the given skeleton.
+// Older Metin2 animations often contain extra helper groups ("Box01",
+// "Plane01", ...) before the actual biped group, so using TrackGroups[0]
+// blindly leaves those models stuck in their rest/T-pose.
+inline const granny_track_group* GrannyFindAnimationTrackGroupForSkeleton(
+    const granny_animation* Animation,
+    const granny_skeleton* Skeleton)
+{
+    if (!Animation || Animation->TrackGroupCount <= 0 || !Animation->TrackGroups)
+        return nullptr;
+
+    if (Animation->TrackGroupCount == 1)
+        return Animation->TrackGroups[0];
+
+    if (Skeleton && Skeleton->Name && *Skeleton->Name)
+    {
+        for (int i = 0; i < Animation->TrackGroupCount; ++i)
+        {
+            const granny_track_group* tg = Animation->TrackGroups[i];
+            if (!tg || !tg->Name || _stricmp(tg->Name, Skeleton->Name) != 0)
+                continue;
+
+            if (tg->TransformTrackCount <= 0 || !tg->TransformTracks)
+                continue;
+
+            // Make sure the tracks actually target bones of this skeleton.
+            for (int t = 0; t < tg->TransformTrackCount; ++t)
+            {
+                granny_int32x BoneIndex = -1;
+                if (tg->TransformTracks[t].Name &&
+                    GrannyFindBoneByName(Skeleton, tg->TransformTracks[t].Name, &BoneIndex))
+                {
+                    return tg;
+                }
+            }
+        }
+    }
+
+    // No name match: pick the group sharing the most bone names with the
+    // skeleton.  This covers exported track groups whose name differs from
+    // the skeleton name.
+    const granny_track_group* BestGroup = nullptr;
+    int BestScore = 0;
+    for (int i = 0; i < Animation->TrackGroupCount; ++i)
+    {
+        const granny_track_group* tg = Animation->TrackGroups[i];
+        if (!tg || tg->TransformTrackCount <= 0 || !tg->TransformTracks)
+            continue;
+
+        int Score = 0;
+        for (int t = 0; t < tg->TransformTrackCount; ++t)
+        {
+            granny_int32x BoneIndex = -1;
+            if (tg->TransformTracks[t].Name &&
+                GrannyFindBoneByName(Skeleton, tg->TransformTracks[t].Name, &BoneIndex))
+            {
+                ++Score;
+            }
+        }
+
+        if (Score > BestScore)
+        {
+            BestScore = Score;
+            BestGroup = tg;
+        }
+    }
+
+    if (BestGroup)
+        return BestGroup;
+
+    return Animation->TrackGroups[0];
+}
+
+// Resolves (and caches) the track group and bone->track mapping used by a
+// control for a specific skeleton.
+inline const granny_track_group* GrannyGetControlTrackGroup(
+    granny_control* Control,
+    const granny_skeleton* Skeleton)
+{
+    if (!Control)
+        return nullptr;
+
+    if (Control->TrackGroupResolved && Control->CachedSkeleton == Skeleton)
+        return Control->CachedTrackGroup;
+
+    Control->TrackGroupResolved = true;
+    Control->CachedSkeleton = Skeleton;
+    Control->CachedTrackGroup =
+        GrannyFindAnimationTrackGroupForSkeleton(Control->Animation, Skeleton);
+
+    Control->BoneTrackIndices.clear();
+    if (!Skeleton)
+        return Control->CachedTrackGroup;
+
+    Control->BoneTrackIndices.assign(static_cast<size_t>(Skeleton->BoneCount), -1);
+
+    const granny_track_group* tg = Control->CachedTrackGroup;
+    if (tg && tg->TransformTrackCount > 0 && tg->TransformTracks)
+    {
+        for (int t = 0; t < tg->TransformTrackCount; ++t)
+        {
+            granny_int32x BoneIndex = -1;
+            if (tg->TransformTracks[t].Name &&
+                GrannyFindBoneByName(Skeleton, tg->TransformTracks[t].Name, &BoneIndex) &&
+                BoneIndex >= 0 && BoneIndex < Skeleton->BoneCount)
+            {
+                Control->BoneTrackIndices[static_cast<size_t>(BoneIndex)] = t;
+            }
+        }
+    }
+
+    return Control->CachedTrackGroup;
+}
+
 inline granny_real32 GrannyEaseControlIn(granny_control* Control, granny_real32 Duration, bool /*FromCurrent*/)
 {
     if (Control)
@@ -1631,33 +1830,44 @@ inline void GrannySampleModelAnimations(
         return;
 
     const granny_skeleton* skel = ModelInstance->SourceModel->Skeleton;
+
+    if (FirstBone < 0)
+        FirstBone = 0;
     int endBone = FirstBone + BoneCount;
     if (endBone > skel->BoneCount)
         endBone = skel->BoneCount;
     if (endBone > Result->BoneCount)
         endBone = Result->BoneCount;
+    if (FirstBone >= endBone)
+        return;
 
-    // 1. Base rest pose transforms
-    for (int i = FirstBone; i < endBone; ++i)
+    struct TControlSample
     {
-        Result->Transforms[static_cast<size_t>(i)] = skel->Bones[i].LocalTransform;
-    }
+        granny_control* Control;
+        granny_real32   Weight;
+        granny_real32   AnimationTime;
+    };
 
-    // 2. Sample active controls
-    for (const granny_control* ctrl : ModelInstance->Controls)
+    static thread_local std::vector<TControlSample> samples;
+    samples.clear();
+
+    for (granny_control* ctrl : ModelInstance->Controls)
     {
         if (!ctrl || ctrl->IsCompleted || !ctrl->Animation)
             continue;
 
-        const granny_animation* anim = ctrl->Animation;
-        if (anim->TrackGroupCount <= 0 || !anim->TrackGroups)
-            continue;
-
-        const granny_track_group* tg = anim->TrackGroups[0];
+        // Resolve the track group that belongs to this model's skeleton instead
+        // of assuming TrackGroups[0] (helper/box groups are often first).
+        const granny_track_group* tg = GrannyGetControlTrackGroup(ctrl, skel);
         if (!tg || tg->TransformTrackCount <= 0 || !tg->TransformTracks)
             continue;
 
-        float animTime = ctrl->RawLocalClock;
+        const granny_real32 weight = GrannyGetControlWeight(ctrl, ModelInstance->ModelClock);
+        if (weight <= 0.0f)
+            continue;
+
+        const granny_animation* anim = ctrl->Animation;
+        granny_real32 animTime = ctrl->RawLocalClock;
         if (anim->Duration > 0.0f)
         {
             if (ctrl->LoopCount == 0)
@@ -1666,36 +1876,76 @@ inline void GrannySampleModelAnimations(
                 animTime = anim->Duration;
         }
 
-        for (int t = 0; t < tg->TransformTrackCount; ++t)
-        {
-            const granny_transform_track& track = tg->TransformTracks[t];
-            if (!track.Name || !*track.Name)
-                continue;
+        samples.push_back({ctrl, weight, animTime});
+    }
 
-            for (int b = FirstBone; b < endBone; ++b)
+    if (samples.empty())
+    {
+        for (int i = FirstBone; i < endBone; ++i)
+            Result->Transforms[static_cast<size_t>(i)] = skel->Bones[i].LocalTransform;
+        return;
+    }
+
+    // Blend every active control together.  During a transition the outgoing
+    // control is eased out while the incoming one is eased in, so both must
+    // contribute to the pose with their respective weights.
+    for (int i = FirstBone; i < endBone; ++i)
+    {
+        const granny_transform& rest = skel->Bones[i].LocalTransform;
+
+        granny_transform blended = rest;
+        granny_real32 accumulatedWeight = 0.0f;
+
+        for (const TControlSample& sample : samples)
+        {
+            granny_transform sampled = rest;
+
+            const granny_track_group* tg = sample.Control->CachedTrackGroup;
+            const granny_int32 trackIndex =
+                (static_cast<size_t>(i) < sample.Control->BoneTrackIndices.size())
+                    ? sample.Control->BoneTrackIndices[static_cast<size_t>(i)]
+                    : -1;
+
+            if (tg && trackIndex >= 0 && trackIndex < tg->TransformTrackCount)
             {
-                if (skel->Bones[b].Name && std::strcmp(track.Name, skel->Bones[b].Name) == 0)
+                const granny_transform_track& track =
+                    tg->TransformTracks[static_cast<size_t>(trackIndex)];
+
+                if (track.PositionCurve.ControlCount >= 3)
                 {
-                    granny_transform& tr = Result->Transforms[static_cast<size_t>(b)];
-                    if (track.PositionCurve.ControlCount >= 3)
-                    {
-                        GrannySampleCurveVec3(track.PositionCurve, animTime, tr.Position);
-                        tr.Flags |= GrannyHasPosition;
-                    }
-                    if (track.OrientationCurve.ControlCount >= 4)
-                    {
-                        GrannySampleCurveQuat(track.OrientationCurve, animTime, tr.Orientation);
-                        tr.Flags |= GrannyHasOrientation;
-                    }
-                    if (track.ScaleShearCurve.ControlCount >= 9)
-                    {
-                        GrannySampleCurveScaleShear(track.ScaleShearCurve, animTime, reinterpret_cast<float*>(tr.ScaleShear));
-                        tr.Flags |= GrannyHasScaleShear;
-                    }
-                    break;
+                    GrannySampleCurveVec3(track.PositionCurve, sample.AnimationTime, sampled.Position);
+                    sampled.Flags |= GrannyHasPosition;
+                }
+                if (track.OrientationCurve.ControlCount >= 4)
+                {
+                    GrannySampleCurveQuat(track.OrientationCurve, sample.AnimationTime, sampled.Orientation);
+                    sampled.Flags |= GrannyHasOrientation;
+                }
+                if (track.ScaleShearCurve.ControlCount >= 9)
+                {
+                    GrannySampleCurveScaleShear(
+                        track.ScaleShearCurve,
+                        sample.AnimationTime,
+                        reinterpret_cast<float*>(sampled.ScaleShear));
+                    sampled.Flags |= GrannyHasScaleShear;
                 }
             }
+
+            if (accumulatedWeight <= 0.0f)
+            {
+                blended = sampled;
+                accumulatedWeight = sample.Weight;
+            }
+            else
+            {
+                const granny_real32 blend =
+                    sample.Weight / (accumulatedWeight + sample.Weight);
+                GrannyMathInternal::BlendTransform(blended, sampled, blend);
+                accumulatedWeight += sample.Weight;
+            }
         }
+
+        Result->Transforms[static_cast<size_t>(i)] = blended;
     }
 }
 
@@ -1727,30 +1977,89 @@ inline void GrannyUpdateModelMatrix(
     if (!ModelInstance || !DestMatrix4x4 || SecondsElapsed <= 0.0f)
         return;
 
+    const granny_skeleton* skel =
+        (ModelInstance->SourceModel ? ModelInstance->SourceModel->Skeleton : nullptr);
+
+    auto hasLoopTranslation = [](const granny_track_group* tg) {
+        return tg && (tg->LoopTranslation[0] != 0.0f ||
+                      tg->LoopTranslation[1] != 0.0f ||
+                      tg->LoopTranslation[2] != 0.0f);
+    };
+
+    // The newest active control drives the current motion.  Whether it carries
+    // root motion decides how the translation blend has to be normalized.
+    granny_control* newestActive = nullptr;
+    for (granny_control* ctrl : ModelInstance->Controls)
+    {
+        if (ctrl && !ctrl->IsCompleted && ctrl->Animation)
+            newestActive = ctrl;
+    }
+
+    const granny_track_group* newestTrackGroup = nullptr;
+    if (newestActive && newestActive->Animation->Duration > 0.0f)
+        newestTrackGroup = GrannyGetControlTrackGroup(newestActive, skel);
+    const bool newestHasRootMotion = hasLoopTranslation(newestTrackGroup);
+
     granny_triple delta = {0.0f, 0.0f, 0.0f};
+    granny_real32 allWeight = 0.0f;
+    granny_real32 rootWeight = 0.0f;
     bool hasDelta = false;
 
-    for (const auto* ctrl : ModelInstance->Controls)
+    // Blend root motion with the control weights.
+    for (granny_control* ctrl : ModelInstance->Controls)
     {
         if (!ctrl || !ctrl->Animation || ctrl->IsCompleted) continue;
         if (ctrl->Animation->Duration <= 0.0f) continue;
-        for (int i = 0; i < ctrl->Animation->TrackGroupCount; ++i)
-        {
-            const auto* tg = ctrl->Animation->TrackGroups[i];
-            if (!tg) continue;
-            if (tg->LoopTranslation[0] != 0.0f || tg->LoopTranslation[1] != 0.0f || tg->LoopTranslation[2] != 0.0f)
-            {
-                float factor = (SecondsElapsed * ctrl->Speed) / ctrl->Animation->Duration;
-                delta[0] += tg->LoopTranslation[0] * factor;
-                delta[1] += tg->LoopTranslation[1] * factor;
-                delta[2] += tg->LoopTranslation[2] * factor;
-                hasDelta = true;
-            }
-        }
+
+        const granny_real32 weight = GrannyGetControlWeight(ctrl, ModelInstance->ModelClock);
+        if (weight <= 0.0f) continue;
+
+        allWeight += weight;
+
+        const granny_track_group* tg = GrannyGetControlTrackGroup(ctrl, skel);
+        if (!hasLoopTranslation(tg)) continue;
+
+        rootWeight += weight;
+
+        const float factor =
+            (SecondsElapsed * ctrl->Speed * weight) / ctrl->Animation->Duration;
+        delta[0] += tg->LoopTranslation[0] * factor;
+        delta[1] += tg->LoopTranslation[1] * factor;
+        delta[2] += tg->LoopTranslation[2] * factor;
+        hasDelta = true;
+    }
+
+    if (!hasDelta && newestHasRootMotion && newestActive &&
+        newestActive->Animation->Duration > 0.0f)
+    {
+        // The incoming locomotion control is still at weight zero (typically
+        // the first frame of an idle -> run/walk transition).  Use its full
+        // translation immediately so movement does not wait for the pose
+        // cross-fade to complete.
+        const float factor =
+            (SecondsElapsed * newestActive->Speed) / newestActive->Animation->Duration;
+        delta[0] = newestTrackGroup->LoopTranslation[0] * factor;
+        delta[1] = newestTrackGroup->LoopTranslation[1] * factor;
+        delta[2] = newestTrackGroup->LoopTranslation[2] * factor;
+        rootWeight = 1.0f;
+        hasDelta = true;
     }
 
     if (hasDelta)
     {
+        // If the current motion provides root motion, only movement controls
+        // participate in the blend.  This makes starting to walk/run instant
+        // and keeps run <-> walk transitions smooth.  When the current motion
+        // has no root motion (stopping, idle, attacks), all controls are used
+        // so the outgoing movement fades out naturally.
+        granny_real32 denominator = newestHasRootMotion ? rootWeight : allWeight;
+        if (denominator <= 1e-6f)
+            denominator = 1.0f;
+
+        delta[0] /= denominator;
+        delta[1] /= denominator;
+        delta[2] /= denominator;
+
         // Granny's TrackGroup coordinates exported from 3ds Max:
         // delta[0] is forward/backward translation (corresponds to Metin2 local Y, where -Y is forward)
         // delta[1] is left/right translation (corresponds to Metin2 local X)

@@ -403,6 +403,330 @@ void test_native_gr2_parsing_and_model_loading()
     CGrannyModelInstance::DestroySystem();
 }
 
+void init_test_transform(granny_transform& transform, float x, float y, float z)
+{
+    std::memset(&transform, 0, sizeof(transform));
+    transform.Flags = GrannyHasPosition | GrannyHasOrientation | GrannyHasScaleShear;
+    transform.Position[0] = x;
+    transform.Position[1] = y;
+    transform.Position[2] = z;
+    transform.Orientation[3] = 1.0f;
+    transform.ScaleShear[0][0] = 1.0f;
+    transform.ScaleShear[1][1] = 1.0f;
+    transform.ScaleShear[2][2] = 1.0f;
+}
+
+granny_curve make_constant_curve(granny_real32* controls, granny_int32 controlCount)
+{
+    granny_curve curve;
+    std::memset(&curve, 0, sizeof(curve));
+    curve.Degree = 0;
+    curve.KnotCount = 1;
+    curve.Knots = nullptr;
+    curve.ControlCount = controlCount;
+    curve.Controls = controls;
+    return curve;
+}
+
+void test_animation_track_group_selection_and_blending()
+{
+    auto make_skeleton = []() -> granny_skeleton {
+        static granny_bone bones[2];
+        std::memset(bones, 0, sizeof(bones));
+
+        bones[0].Name = "Bip01";
+        bones[0].ParentIndex = GrannyNoParentBone;
+        init_test_transform(bones[0].LocalTransform, 0.0f, 0.0f, 0.0f);
+
+        bones[1].Name = "Bip01 Arm";
+        bones[1].ParentIndex = 0;
+        init_test_transform(bones[1].LocalTransform, 0.0f, 0.0f, 10.0f);
+
+        granny_skeleton skeleton;
+        std::memset(&skeleton, 0, sizeof(skeleton));
+        skeleton.Name = "Bip01";
+        skeleton.BoneCount = 2;
+        skeleton.Bones = bones;
+        return skeleton;
+    };
+
+    granny_skeleton skeleton = make_skeleton();
+    granny_curve emptyCurve;
+    std::memset(&emptyCurve, 0, sizeof(emptyCurve));
+
+    // A helper track group that appears first in the animation, like the
+    // "Box01" group found in older NPC motion files.
+    granny_real32 helperPosition[3] = {99.0f, 0.0f, 0.0f};
+    granny_curve helperPositionCurve = make_constant_curve(helperPosition, 3);
+    granny_transform_track helperTrack = {"Box01", helperPositionCurve, emptyCurve, emptyCurve};
+    granny_track_group helperGroup;
+    std::memset(&helperGroup, 0, sizeof(helperGroup));
+    helperGroup.Name = "Box01";
+    helperGroup.TransformTrackCount = 1;
+    helperGroup.TransformTracks = &helperTrack;
+
+    // The real biped track group.
+    granny_real32 rootPosition[3] = {7.0f, 0.0f, 0.0f};
+    granny_real32 armRotation[4] = {0.0f, 0.0f, 0.70710678f, 0.70710678f};
+    granny_curve rootPositionCurve = make_constant_curve(rootPosition, 3);
+    granny_curve armRotationCurve = make_constant_curve(armRotation, 4);
+
+    granny_transform_track bipedTracks[2] = {
+        {"Bip01", rootPositionCurve, emptyCurve, emptyCurve},
+        {"Bip01 Arm", emptyCurve, armRotationCurve, emptyCurve}
+    };
+    granny_track_group bipedGroup;
+    std::memset(&bipedGroup, 0, sizeof(bipedGroup));
+    bipedGroup.Name = "Bip01";
+    bipedGroup.TransformTrackCount = 2;
+    bipedGroup.TransformTracks = bipedTracks;
+
+    granny_track_group* trackGroups[2] = {&helperGroup, &bipedGroup};
+    granny_animation animation;
+    std::memset(&animation, 0, sizeof(animation));
+    animation.Name = "wait";
+    animation.Duration = 1.0f;
+    animation.TrackGroupCount = 2;
+    animation.TrackGroups = trackGroups;
+
+    granny_model model;
+    std::memset(&model, 0, sizeof(model));
+    model.Name = "TestNpc";
+    model.Skeleton = &skeleton;
+
+    granny_model_instance* instance = GrannyInstantiateModel(&model);
+    assert(instance != nullptr);
+
+    granny_control* control = GrannyPlayControlledAnimation(0.0f, &animation, instance);
+    assert(control != nullptr);
+    GrannySetControlLoopCount(control, 0);
+    GrannySetModelClock(instance, 0.5f);
+
+    granny_local_pose* pose = GrannyNewLocalPose(2);
+    GrannySampleModelAnimations(instance, 0, 2, pose);
+
+    // The biped group must be selected instead of the first (helper) group.
+    assert(std::fabs(pose->Transforms[0].Position[0] - 7.0f) < 1e-4f);
+    assert(std::fabs(pose->Transforms[1].Orientation[2] - 0.70710678f) < 1e-4f);
+    assert(std::fabs(pose->Transforms[1].Orientation[3] - 0.70710678f) < 1e-4f);
+
+    GrannyFreeLocalPose(pose);
+    GrannyFreeModelInstance(instance);
+
+    // Blending test: animation A at x=0 fading out while B at x=10 fades in.
+    granny_real32 posA[3] = {0.0f, 0.0f, 0.0f};
+    granny_real32 posB[3] = {10.0f, 0.0f, 0.0f};
+
+    granny_curve curveA = make_constant_curve(posA, 3);
+    granny_curve curveB = make_constant_curve(posB, 3);
+
+    granny_transform_track trackA = {"Bip01", curveA, emptyCurve, emptyCurve};
+    granny_transform_track trackB = {"Bip01", curveB, emptyCurve, emptyCurve};
+
+    granny_track_group groupA;
+    std::memset(&groupA, 0, sizeof(groupA));
+    groupA.Name = "Bip01";
+    groupA.TransformTrackCount = 1;
+    groupA.TransformTracks = &trackA;
+
+    granny_track_group groupB;
+    std::memset(&groupB, 0, sizeof(groupB));
+    groupB.Name = "Bip01";
+    groupB.TransformTrackCount = 1;
+    groupB.TransformTracks = &trackB;
+
+    granny_track_group* groupsA[1] = {&groupA};
+    granny_track_group* groupsB[1] = {&groupB};
+
+    granny_animation animA;
+    std::memset(&animA, 0, sizeof(animA));
+    animA.Name = "A";
+    animA.Duration = 1.0f;
+    animA.TrackGroupCount = 1;
+    animA.TrackGroups = groupsA;
+
+    granny_animation animB;
+    std::memset(&animB, 0, sizeof(animB));
+    animB.Name = "B";
+    animB.Duration = 1.0f;
+    animB.TrackGroupCount = 1;
+    animB.TrackGroups = groupsB;
+
+    instance = GrannyInstantiateModel(&model);
+    assert(instance != nullptr);
+
+    granny_control* controlA = GrannyPlayControlledAnimation(0.0f, &animA, instance);
+    assert(controlA != nullptr);
+    GrannySetControlLoopCount(controlA, 0);
+
+    GrannySetControlEaseOut(controlA, true);
+    GrannySetControlEaseOutCurve(controlA, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
+    GrannyCompleteControlAt(controlA, 1.0f);
+
+    granny_control* controlB = GrannyPlayControlledAnimation(0.0f, &animB, instance);
+    assert(controlB != nullptr);
+    GrannySetControlLoopCount(controlB, 0);
+    GrannySetControlEaseIn(controlB, true);
+    GrannySetControlEaseInCurve(controlB, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+
+    GrannySetModelClock(instance, 0.5f);
+
+    pose = GrannyNewLocalPose(2);
+    GrannySampleModelAnimations(instance, 0, 2, pose);
+
+    // Halfway through the cross-fade the pose sits halfway between both clips.
+    assert(std::fabs(pose->Transforms[0].Position[0] - 5.0f) < 1e-3f);
+
+    GrannyFreeLocalPose(pose);
+    GrannyFreeModelInstance(instance);
+
+    std::printf("[PASS] test_animation_track_group_selection_and_blending\n");
+}
+
+void test_root_motion_is_not_accumulated_during_transitions()
+{
+    granny_bone bone;
+    std::memset(&bone, 0, sizeof(bone));
+    bone.Name = "Bip01";
+    bone.ParentIndex = GrannyNoParentBone;
+    init_test_transform(bone.LocalTransform, 0.0f, 0.0f, 0.0f);
+
+    granny_skeleton skeleton;
+    std::memset(&skeleton, 0, sizeof(skeleton));
+    skeleton.Name = "Bip01";
+    skeleton.BoneCount = 1;
+    skeleton.Bones = &bone;
+
+    granny_track_group group;
+    std::memset(&group, 0, sizeof(group));
+    group.Name = "Bip01";
+    group.LoopTranslation[0] = -100.0f;
+
+    granny_track_group* groups[1] = {&group};
+
+    granny_animation animation;
+    std::memset(&animation, 0, sizeof(animation));
+    animation.Name = "run";
+    animation.Duration = 1.0f;
+    animation.TrackGroupCount = 1;
+    animation.TrackGroups = groups;
+
+    granny_model model;
+    std::memset(&model, 0, sizeof(model));
+    model.Name = "TestPlayer";
+    model.Skeleton = &skeleton;
+
+    granny_model_instance* instance = GrannyInstantiateModel(&model);
+    assert(instance != nullptr);
+
+    granny_control* controlA = GrannyPlayControlledAnimation(0.0f, &animation, instance);
+    assert(controlA != nullptr);
+    GrannySetControlLoopCount(controlA, 0);
+    GrannySetControlEaseOut(controlA, true);
+    GrannySetControlEaseOutCurve(controlA, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
+    GrannyCompleteControlAt(controlA, 1.0f);
+
+    granny_control* controlB = GrannyPlayControlledAnimation(0.0f, &animation, instance);
+    assert(controlB != nullptr);
+    GrannySetControlLoopCount(controlB, 0);
+    GrannySetControlEaseIn(controlB, true);
+    GrannySetControlEaseInCurve(controlB, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+
+    GrannySetModelClock(instance, 0.5f);
+
+    granny_real32 matrix[16] = {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    GrannyUpdateModelMatrix(instance, 1.0f, matrix, matrix);
+
+    // Both controls carry the same -100 loop translation.  With weights
+    // blended and normalized the character moves -100 on local Y, not -200.
+    assert(std::fabs(matrix[13] + 100.0f) < 1e-3f);
+
+    GrannyFreeModelInstance(instance);
+
+    // Idle -> run: the incoming run control has zero weight on the first
+    // frame, but root motion must already use its full translation.
+    granny_track_group idleGroup;
+    std::memset(&idleGroup, 0, sizeof(idleGroup));
+    idleGroup.Name = "Bip01";
+
+    granny_track_group* idleGroups[1] = {&idleGroup};
+
+    granny_animation idleAnimation;
+    std::memset(&idleAnimation, 0, sizeof(idleAnimation));
+    idleAnimation.Name = "wait";
+    idleAnimation.Duration = 1.0f;
+    idleAnimation.TrackGroupCount = 1;
+    idleAnimation.TrackGroups = idleGroups;
+
+    instance = GrannyInstantiateModel(&model);
+    assert(instance != nullptr);
+
+    granny_control* idleControl = GrannyPlayControlledAnimation(0.0f, &idleAnimation, instance);
+    assert(idleControl != nullptr);
+    GrannySetControlLoopCount(idleControl, 0);
+
+    granny_control* startControl = GrannyPlayControlledAnimation(0.0f, &animation, instance);
+    assert(startControl != nullptr);
+    GrannySetControlLoopCount(startControl, 0);
+    GrannySetControlEaseIn(startControl, true);
+    GrannySetControlEaseInCurve(startControl, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+
+    GrannySetModelClock(instance, 0.0f);
+
+    granny_real32 startMatrix[16] = {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    GrannyUpdateModelMatrix(instance, 1.0f, startMatrix, startMatrix);
+    assert(std::fabs(startMatrix[13] + 100.0f) < 1e-3f);
+
+    GrannyFreeModelInstance(instance);
+
+    // Run -> idle: the outgoing run control fades out across the pose blend,
+    // so movement should decelerate instead of stopping abruptly.
+    instance = GrannyInstantiateModel(&model);
+    assert(instance != nullptr);
+
+    granny_control* runControl = GrannyPlayControlledAnimation(0.0f, &animation, instance);
+    assert(runControl != nullptr);
+    GrannySetControlLoopCount(runControl, 0);
+
+    GrannySetControlEaseOut(runControl, true);
+    GrannySetControlEaseOutCurve(runControl, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
+    GrannyCompleteControlAt(runControl, 1.0f);
+
+    granny_control* stopControl = GrannyPlayControlledAnimation(0.0f, &idleAnimation, instance);
+    assert(stopControl != nullptr);
+    GrannySetControlLoopCount(stopControl, 0);
+    GrannySetControlEaseIn(stopControl, true);
+    GrannySetControlEaseInCurve(stopControl, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+
+    GrannySetModelClock(instance, 0.5f);
+
+    granny_real32 stopMatrix[16] = {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    GrannyUpdateModelMatrix(instance, 1.0f, stopMatrix, stopMatrix);
+    assert(std::fabs(stopMatrix[13] + 50.0f) < 1e-3f);
+
+    GrannyFreeModelInstance(instance);
+
+    std::printf("[PASS] test_root_motion_is_not_accumulated_during_transitions\n");
+}
+
 } // namespace
 
 int main()
@@ -411,6 +735,8 @@ int main()
     test_granny_vertex_deformer_skinning();
     test_motion_and_thing_loading();
     test_native_gr2_parsing_and_model_loading();
+    test_animation_track_group_selection_and_blending();
+    test_root_motion_is_not_accumulated_during_transitions();
 
     std::printf("All EterGrnLib smoke tests passed!\n");
     return 0;
