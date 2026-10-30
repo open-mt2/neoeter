@@ -904,6 +904,8 @@ struct SBakedReader
     SBakedReader(const unsigned char* p, size_t n) : m_pData(p), m_nSize(n), m_nPos(0) {}
 
     bool Valid(size_t n) const { return m_nPos + n <= m_nSize; }
+    size_t Remaining() const { return m_nPos <= m_nSize ? m_nSize - m_nPos : 0; }
+    bool Skip(size_t n) { if (!Valid(n)) return false; m_nPos += n; return true; }
     unsigned char U8() { unsigned char v = Valid(1) ? m_pData[m_nPos] : 0; m_nPos += 1; return v; }
     unsigned short U16() { unsigned short v = 0; if (Valid(2)) std::memcpy(&v, m_pData + m_nPos, 2); m_nPos += 2; return v; }
     uint32_t U32() { uint32_t v = 0; if (Valid(4)) std::memcpy(&v, m_pData + m_nPos, 4); m_nPos += 4; return v; }
@@ -911,6 +913,57 @@ struct SBakedReader
     float F32() { float v = 0.0f; if (Valid(4)) std::memcpy(&v, m_pData + m_nPos, 4); m_nPos += 4; return v; }
     void Pluck(const unsigned char*& p, size_t n) { p = Valid(n) ? m_pData + m_nPos : nullptr; m_nPos += n; }
 };
+
+// Walks the same layout as LoadBakedGeometry without touching any member state.
+// Rejecting a malformed cache here is important: a failed load must not leave a
+// partially parsed bounding box or collision list behind, because the caller
+// falls back to generated geometry.
+static bool ValidateBakedGeometry(SBakedReader & r, unsigned int nHash)
+{
+    if (r.U32() != TreeCache::kMagic || r.U32() != nHash)
+        return false;
+    if (r.Remaining() < 28)
+        return false;
+
+    r.Skip(24); // bbox
+
+    const uint32_t nColl = r.U32();
+    if (nColl > r.Remaining() / 28)
+        return false;
+    if (!r.Skip(static_cast<size_t>(nColl) * 28))
+        return false;
+
+    for (int nPart = 0; nPart < 2; ++nPart) {
+        const uint32_t nVertexCount = r.U32();
+        const uint32_t nNumStrips = r.U32();
+        r.U16(); // lod
+        r.F32(); // alpha test
+        const uint32_t nIndexCount = r.U32();
+
+        if (nVertexCount > 0xFFFF || nNumStrips > 0xFFFF)
+            return false;
+        if (nIndexCount > 0 && nNumStrips == 0)
+            return false;
+
+        const size_t nBytes = static_cast<size_t>(nIndexCount) * 2 +
+                              static_cast<size_t>(nVertexCount) * 44;
+        if (!r.Skip(nBytes))
+            return false;
+    }
+
+    for (int nLeafSet = 0; nLeafSet < 2; ++nLeafSet) {
+        r.U8();     // active
+        r.I32();    // lod
+        r.F32();    // alpha test
+        const uint32_t nCount = r.U32();
+        if (nCount > 0xFFFF)
+            return false;
+        if (!r.Skip(static_cast<size_t>(nCount) * 114))
+            return false;
+    }
+
+    return true;
+}
 
 } // namespace
 
@@ -943,6 +996,10 @@ bool CSpeedTreeRT::LoadBakedGeometry(unsigned int nHash)
     file.read(reinterpret_cast<char*>(data.data()), nSize);
     file.close();
 
+    SBakedReader validator(data.data(), data.size());
+    if (!ValidateBakedGeometry(validator, nHash))
+        return false;
+
     SBakedReader r(data.data(), data.size());
     if (r.U32() != TreeCache::kMagic || r.U32() != nHash)
         return false;
@@ -953,6 +1010,10 @@ bool CSpeedTreeRT::LoadBakedGeometry(unsigned int nHash)
 
     m_vCollisions.clear();
     const uint32_t nColl = r.U32();
+    // Every collision record is i32 + 6 floats. Reject a count the file cannot
+    // possibly contain before allocating or looping.
+    if (nColl > r.Remaining() / 28)
+        return false;
     for (uint32_t i = 0; i < nColl; ++i) {
         SCollisionObj obj;
         obj.m_eType = (ECollisionObjectType)r.I32();
@@ -977,11 +1038,25 @@ bool CSpeedTreeRT::LoadBakedGeometry(unsigned int nHash)
     m_vLeafMapIndices.clear(); m_vLeafClusterIndices.clear();
 
     for (int nPart = 0; nPart < 2; ++nPart) {
-        const unsigned short nVertexCount = (unsigned short)r.U32();
+        const uint32_t nVertexRaw = r.U32();
         const uint32_t nNumStrips = r.U32();
         r.U16(); // lod
         const float fAlpha = r.F32();
         const uint32_t nIndexCount = r.U32();
+
+        if (nVertexRaw > 0xFFFF)
+            return false;
+        if (nNumStrips > 0xFFFF || (nIndexCount > 0 && nNumStrips == 0))
+            return false;
+
+        // u16 indices plus 44 bytes per vertex (12 coords + 4 colour + 16 UV +
+        // 12 normals).
+        const size_t nVertexBytes = static_cast<size_t>(nVertexRaw) * 44;
+        const size_t nIndexBytes = static_cast<size_t>(nIndexCount) * 2;
+        if (nIndexBytes + nVertexBytes > r.Remaining())
+            return false;
+
+        const unsigned short nVertexCount = static_cast<unsigned short>(nVertexRaw);
 
         // Read the strips. The library composites branch geometry into a
         // single strip (Compute(..., bCompositeStrips=true)); fronds may have
@@ -1044,6 +1119,11 @@ bool CSpeedTreeRT::LoadBakedGeometry(unsigned int nHash)
         r.I32(); // lod
         const float fAlpha = r.F32();
         const uint32_t nCount = r.U32();
+
+        // 114 bytes per leaf: 3 centre floats, colour, 16 corner floats,
+        // 8 UV floats and the two one-byte indices.
+        if (nCount > 0xFFFF || static_cast<size_t>(nCount) * 114 > r.Remaining())
+            return false;
 
         std::vector<float> centers(nCount * 3);
         std::vector<unsigned long> colors(nCount);
