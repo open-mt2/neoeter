@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build liblzo2-dev libzip-dev libjpeg-dev
+          sudo apt-get install -y cmake ninja-build liblzo2-dev libzip-dev libjpeg-dev libgl1-mesa-dev libglu1-mesa-dev libsdl2-dev libfreetype-dev
 
       - name: Configure CMake
         env:
