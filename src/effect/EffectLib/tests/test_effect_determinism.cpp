@@ -283,6 +283,9 @@ int main()
     CParticleSystemInstance::DestroySystem();
     CParticleSystemData::DestroySystem();
     CParticleInstance::DestroySystem();
+    // Particle textures allocate from this pool; returning them to the free
+    // list is not enough, the pool itself must be destroyed before exit.
+    CGraphicImageInstance::DestroySystem();
 
     std::printf("All EffectLib determinism tests passed!\n");
     return 0;
