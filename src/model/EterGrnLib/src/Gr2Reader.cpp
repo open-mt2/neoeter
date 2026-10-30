@@ -48,28 +48,29 @@ struct GR2ParsedContext
     }
 };
 
-static const void* ResolveRef(
-    const std::vector<std::vector<uint8_t>>& sections,
-    const std::vector<std::map<uint32_t, std::pair<uint32_t, uint32_t>>>& fixups,
-    uint32_t secIdx, uint32_t offset)
-{
-    if (secIdx >= fixups.size()) return nullptr;
-    auto it = fixups[secIdx].find(offset);
-    if (it == fixups[secIdx].end()) return nullptr;
-    uint32_t toSec = it->second.first;
-    uint32_t toOff = it->second.second;
-    if (toSec >= sections.size() || toOff >= sections[toSec].size()) return nullptr;
-    return &sections[toSec][toOff];
-}
-
 static const char* ResolveString(
     const std::vector<std::vector<uint8_t>>& sections,
     const std::vector<std::map<uint32_t, std::pair<uint32_t, uint32_t>>>& fixups,
     uint32_t secIdx, uint32_t offset)
 {
-    const void* ptr = ResolveRef(sections, fixups, secIdx, offset);
-    return ptr ? (const char*)ptr : "";
+    if (secIdx >= fixups.size()) return "";
+    auto it = fixups[secIdx].find(offset);
+    if (it == fixups[secIdx].end()) return "";
+    uint32_t toSec = it->second.first;
+    uint32_t toOff = it->second.second;
+    if (toSec >= sections.size() || toOff >= sections[toSec].size()) return "";
+
+    const uint8_t* p = sections[toSec].data() + toOff;
+    const size_t remaining = sections[toSec].size() - toOff;
+    if (std::memchr(p, 0, remaining) == nullptr) return "";
+    return reinterpret_cast<const char*>(p);
 }
+
+// Hard limits that keep a hostile file from turning a count into an oversized
+// allocation. Real Metin2 assets are far below every one of these.
+constexpr uint32_t kMaxSections = 4096;
+constexpr uint32_t kMaxSectionBytes = 256u * 1024u * 1024u;
+constexpr int32_t kMaxRecords = 200000;
 
 } // namespace
 
@@ -96,7 +97,15 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
     uint32_t rootNodeSec = *reinterpret_cast<const uint32_t*>(&buf[32 + 28]);
     uint32_t rootNodeOff = *reinterpret_cast<const uint32_t*>(&buf[32 + 32]);
 
-    if (32 + secOffset + numSec * 44 > static_cast<size_t>(size))
+    if (numSec == 0 || numSec > kMaxSections)
+        return nullptr;
+    if (secOffset > static_cast<uint32_t>(size))
+        return nullptr;
+
+    const size_t sectionTable = 32u + static_cast<size_t>(secOffset);
+    const size_t sectionTableBytes = static_cast<size_t>(numSec) * 44u;
+    if (sectionTable > static_cast<size_t>(size) ||
+        sectionTableBytes > static_cast<size_t>(size) - sectionTable)
         return nullptr;
 
     auto ctx = std::make_unique<GR2ParsedContext>();
@@ -114,16 +123,31 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
         uint32_t relocOff = *reinterpret_cast<const uint32_t*>(pSec + 28);
         uint32_t numReloc = *reinterpret_cast<const uint32_t*>(pSec + 32);
 
+        if (uncompSz > kMaxSectionBytes)
+            return nullptr;
+        if (fmt != 0 && fmt != 2)
+            return nullptr;
+        if (compSz > 0) {
+            if (off > static_cast<uint32_t>(size) ||
+                compSz > static_cast<uint32_t>(size) - off)
+                return nullptr;
+        }
+
         ctx->sections[i].resize(uncompSz);
-        if (compSz > 0 && uncompSz > 0 && off + compSz <= static_cast<size_t>(size)) {
+        if (compSz > 0 && uncompSz > 0) {
             if (fmt == 0) {
                 std::memcpy(ctx->sections[i].data(), &buf[off], std::min(compSz, uncompSz));
-            } else if (fmt == 2) {
-                gr2_decompress(compSz, &buf[off], f16, f8, uncompSz, ctx->sections[i].data());
+            } else if (!gr2_decompress(compSz, &buf[off], f16, f8, uncompSz,
+                                       ctx->sections[i].data())) {
+                return nullptr;
             }
         }
 
-        if (numReloc > 0 && relocOff + numReloc * 12 <= static_cast<size_t>(size)) {
+        if (numReloc > 0) {
+            if (relocOff > static_cast<uint32_t>(size) ||
+                static_cast<size_t>(numReloc) > (static_cast<size_t>(size) - relocOff) / 12)
+                return nullptr;
+
             for (uint32_t r = 0; r < numReloc; ++r) {
                 const uint8_t* pReloc = &buf[relocOff + r * 12];
                 uint32_t fromOff = *reinterpret_cast<const uint32_t*>(pReloc + 0);
@@ -226,6 +250,7 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
                     std::memset(skel.get(), 0, sizeof(granny_skeleton));
                     skel->Name = ctx->StoreString(ResolveString(ctx->sections, fixups, skSec, skOff + 0));
                     int32_t boneCount = *reinterpret_cast<const int32_t*>(pSkel + 4);
+                    if (boneCount > kMaxRecords) return nullptr;
                     skel->BoneCount = std::max(0, boneCount);
 
                     if (boneCount > 0 && fixups[skSec].count(skOff + 8)) {
@@ -251,6 +276,7 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
 
             // Mesh Bindings
             int32_t mbCount = *reinterpret_cast<const int32_t*>(pModel + 76);
+            if (mbCount > kMaxRecords) return nullptr;
             model->MeshBindingCount = std::max(0, mbCount);
             if (mbCount > 0 && fixups[mSec].count(mOff + 80)) {
                 auto [mbSec, mbOff] = fixups[mSec][mOff + 80];
@@ -296,16 +322,24 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
                             int32_t grpCount   = *reinterpret_cast<const int32_t*>(pTopo + 0);
                             int32_t idxCount   = *reinterpret_cast<const int32_t*>(pTopo + 8);
                             int32_t idxCount16 = *reinterpret_cast<const int32_t*>(pTopo + 16);
+                            if (grpCount > kMaxRecords || idxCount > kMaxRecords || idxCount16 > kMaxRecords)
+                                return nullptr;
 
                             if (idxCount16 > 0 && fixups[topoSec].count(topoOff + 20)) {
                                 auto [iSec, iOff] = fixups[topoSec][topoOff + 20];
-                                if (iSec < ctx->sections.size() && iOff < ctx->sections[iSec].size()) {
+                                if (iSec < ctx->sections.size() &&
+                                    iOff <= ctx->sections[iSec].size() &&
+                                    static_cast<size_t>(idxCount16) <=
+                                        (ctx->sections[iSec].size() - iOff) / sizeof(uint16_t)) {
                                     topo->Indices16 = reinterpret_cast<uint16_t*>(&ctx->sections[iSec][iOff]);
                                     topo->IndexCount = idxCount16;
                                 }
                             } else if (idxCount > 0 && fixups[topoSec].count(topoOff + 12)) {
                                 auto [iSec, iOff] = fixups[topoSec][topoOff + 12];
-                                if (iSec < ctx->sections.size() && iOff < ctx->sections[iSec].size()) {
+                                if (iSec < ctx->sections.size() &&
+                                    iOff <= ctx->sections[iSec].size() &&
+                                    static_cast<size_t>(idxCount) <=
+                                        (ctx->sections[iSec].size() - iOff) / sizeof(int32_t)) {
                                     topo->Indices = reinterpret_cast<int32_t*>(&ctx->sections[iSec][iOff]);
                                     topo->IndexCount = idxCount;
                                 }
@@ -328,6 +362,7 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
 
                     // Materials
                     int32_t matCount = *reinterpret_cast<const int32_t*>(pMesh + 20);
+                    if (matCount > kMaxRecords) return nullptr;
                     mesh->MaterialBindingCount = std::max(0, matCount);
                     if (matCount > 0 && fixups[meshSec].count(meshOff + 24)) {
                         auto [matArrSec, matArrOff] = fixups[meshSec][meshOff + 24];
@@ -344,6 +379,7 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
                             std::memset(mat.get(), 0, sizeof(granny_material));
                             mat->Name = ctx->StoreString(ResolveString(ctx->sections, fixups, matSec, matOff + 0));
                             int32_t mapCount = *reinterpret_cast<const int32_t*>(pMat + 4);
+                            if (mapCount > kMaxRecords) return nullptr;
                             mat->MapCount = std::max(0, mapCount);
 
                             if (mapCount > 0 && fixups[matSec].count(matOff + 8)) {
@@ -379,6 +415,7 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
 
                     // Bone Bindings
                     int32_t bbCount = *reinterpret_cast<const int32_t*>(pMesh + 28);
+                    if (bbCount > kMaxRecords) return nullptr;
                     mesh->BoneBindingCount = std::max(0, bbCount);
                     if (bbCount > 0 && fixups[meshSec].count(meshOff + 32)) {
                         auto [bbArrSec, bbArrOff] = fixups[meshSec][meshOff + 32];
@@ -437,6 +474,7 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
             anim->Oversampling = 0.0f;
 
             int32_t tgCount = *reinterpret_cast<const int32_t*>(pAnim + 12);
+            if (tgCount > kMaxRecords) return nullptr;
             anim->TrackGroupCount = 0;
             anim->TrackGroups = nullptr;
 
@@ -462,8 +500,13 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
                     }
 
                     int32_t ttCount = *reinterpret_cast<const int32_t*>(pTG + 12);
+                    if (ttCount > kMaxRecords) return nullptr;
                     if (ttCount > 0 && fixups[tgSec].count(tgOff + 16)) {
-                        auto [ttArrSec, ttArrOff] = fixups[tgSec][tgOff + 16];
+                        // Plain variables, not a structured binding: C++17
+                        // lambdas cannot capture structured bindings.
+                        const auto ttArr = fixups[tgSec][tgOff + 16];
+                        const uint32_t ttArrSec = ttArr.first;
+                        const uint32_t ttArrOff = ttArr.second;
                         ctx->tgTransformTracks.emplace_back();
                         auto& ttracks = ctx->tgTransformTracks.back();
                         ttracks.resize(ttCount);
@@ -478,6 +521,8 @@ extern "C" granny_file* GrannyParseGR2FromMemory(int size, const void* memory)
                                 curve.Degree = *reinterpret_cast<const int32_t*>(pTT + curveOff + 0);
                                 int32_t knotCount = *reinterpret_cast<const int32_t*>(pTT + curveOff + 4);
                                 int32_t ctrlCount = *reinterpret_cast<const int32_t*>(pTT + curveOff + 12);
+                                if (knotCount > kMaxRecords) knotCount = 0;
+                                if (ctrlCount > kMaxRecords) ctrlCount = 0;
 
                                 curve.KnotCount = std::max(0, knotCount);
                                 curve.ControlCount = std::max(0, ctrlCount);

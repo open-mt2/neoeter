@@ -28,6 +28,8 @@ typedef struct {
     uint32_t denom;
     uint32_t next_denom;
     uint8_t* stream;
+    const uint8_t* stream_end;
+    int error;
 } TDecoder;
 
 typedef struct {
@@ -73,7 +75,7 @@ typedef struct {
     uint16_t value;
 } IndexValuePair;
 
-static void Decoder_Init(TDecoder *decoder, uint8_t* stream);
+static void Decoder_Init(TDecoder *decoder, uint8_t* stream, const uint8_t* stream_end);
 static uint16_t Decode(TDecoder *decoder, uint16_t max);
 static uint16_t Commit(TDecoder *decoder, uint16_t max, uint16_t val, uint16_t err);
 static uint16_t Decode_Commit(TDecoder *decoder, uint16_t max);
@@ -85,7 +87,7 @@ static void WeightWindow_Rebuild_Ranges(TWeighWindow *weighWindow);
 static IndexValuePair WeightWindow_Try_Decode(TWeighWindow *weighWindow, TDecoder *decoder);
 
 static void Dictionary_Init(TDictionary *dictionary, TParameter *parameter);
-static uint32_t Dictionary_Decompress_Block(TDictionary *dictionary, TDecoder *decoder, uint8_t *decompressedData);
+static uint32_t Dictionary_Decompress_Block(TDictionary *dictionary, TDecoder *decoder, uint8_t *decompressedData, uint8_t *decompressedEnd);
 static void Dictionary_Free(TDictionary *dictionary);
 
 #include <memory.h>
@@ -104,21 +106,46 @@ static void Dictionary_Free(TDictionary *dictionary);
 #define max(x, y) ((x) > (y)) ? (x) : (y)
 #endif
 
-void Decoder_Init(TDecoder *decoder, uint8_t* stream) {
-    decoder->numer = stream[0] >> 1;
+void Decoder_Init(TDecoder *decoder, uint8_t* stream, const uint8_t* stream_end) {
     decoder->denom = 0x80;
+    decoder->next_denom = 0;
     decoder->stream = stream;
+    decoder->stream_end = stream_end;
+    decoder->error = 0;
+
+    if (!stream || !stream_end || stream >= stream_end) {
+        decoder->numer = 0;
+        decoder->error = 1;
+        return;
+    }
+    decoder->numer = stream[0] >> 1;
 }
 
 uint16_t Decode(TDecoder *decoder, uint16_t max) {
+    if (decoder->error)
+        return 0;
+
     for(; decoder->denom <= 0x800000; decoder->denom <<= 8) {
+        if (!decoder->stream || !decoder->stream_end ||
+            decoder->stream_end - decoder->stream < 2) {
+            decoder->error = 1;
+            return 0;
+        }
         decoder->numer <<= 8;
         decoder->numer |= (decoder->stream[0] << 7) & 0x80;
         decoder->numer |= (decoder->stream[1] >> 1) & 0x7f;
         decoder->stream++;
     }
 
+    if (max == 0) {
+        decoder->error = 1;
+        return 0;
+    }
     decoder->next_denom = decoder->denom / max;
+    if (decoder->next_denom == 0) {
+        decoder->error = 1;
+        return 0;
+    }
     return min(decoder->numer / decoder->next_denom, max - 1);
 }
 
@@ -282,10 +309,8 @@ IndexValuePair WeightWindow_Try_Decode(TWeighWindow *weighWindow, TDecoder *deco
             break;
         }
     }
-    if(rangeit == 0) {
-        rangeit = 0;
-    }
-    rangeit--;
+    if (rangeit > 0)
+        rangeit--;
     //printf("%i %i %i ", value, weighWindow->ranges[rangeit], weighWindow->ranges[rangeit + 1]);
 
     Commit(decoder, 0x4000, weighWindow->ranges[rangeit], weighWindow->ranges[rangeit + 1] - weighWindow->ranges[rangeit]);
@@ -308,6 +333,15 @@ IndexValuePair WeightWindow_Try_Decode(TWeighWindow *weighWindow, TDecoder *deco
         && (Decode_Commit(decoder, 2) == 1)) {
         //printf("*%i %i ", weighWindow->rangesLength, weighWindow->weightsLength);
         size_t index = weighWindow->rangesLength + Decode_Commit(decoder, weighWindow->weightsLength - weighWindow->rangesLength + 1) - 1;
+        if (index >= weighWindow->weightsLength)
+            index = weighWindow->weightsLength - 1;
+        if (index >= weighWindow->weightsLength || index >= weighWindow->valuesLength) {
+            decoder->error = 1;
+            IndexValuePair ret;
+            ret.index = 0xFFFF;
+            ret.value = 0;
+            return ret;
+        }
         //printf("%i ", index);
 
         weighWindow->weights[index] += 2;
@@ -417,8 +451,11 @@ void Dictionary_Init(TDictionary *dictionary, TParameter *parameter) {
     WeighWindow_Init(&dictionary->size_windows[index++], 64, parameter->sizes_count[0]);
 }
 
-uint32_t Dictionary_Decompress_Block(TDictionary *dictionary, TDecoder *decoder, uint8_t *decompressedData) {
+uint32_t Dictionary_Decompress_Block(TDictionary *dictionary, TDecoder *decoder, uint8_t *decompressedData, uint8_t *decompressedEnd) {
     //printf("%i %i %i %i\n", dictionary->backref_size, dictionary->backref_value_max, dictionary->decoded_size, dictionary->lowbit_value_max);
+
+    if (decoder->error)
+        return 0;
 
     IndexValuePair d1 = WeightWindow_Try_Decode(&dictionary->size_windows[dictionary->backref_size], decoder);
 
@@ -428,11 +465,19 @@ uint32_t Dictionary_Decompress_Block(TDictionary *dictionary, TDecoder *decoder,
     //printf("d1 %i\n", d1.value);
     dictionary->backref_size = d1.value;
 
+    if (decoder->error)
+        return 0;
+
     if (dictionary->backref_size > 0) {
         static uint32_t const sizes[] = { 128u, 192u, 256u, 512u };
 
+        if (dictionary->backref_size > 64u)
+            return 0;
+
         uint32_t backref_size = dictionary->backref_size < 61u ? dictionary->backref_size + 1 : sizes[dictionary->backref_size - 61u];
         uint32_t backref_range = min(dictionary->backref_value_max, dictionary->decoded_size);
+        if (backref_range == 0)
+            return 0;
 
         IndexValuePair d3 = WeightWindow_Try_Decode(&dictionary->lowbit_window, decoder);
         if (d3.index != 0xFFFF) {
@@ -444,12 +489,23 @@ uint32_t Dictionary_Decompress_Block(TDictionary *dictionary, TDecoder *decoder,
             d4.value = (dictionary->highbit_window.values[d4.index] = Decode_Commit(decoder, backref_range / 1024u + 1));
         }
 
+        if (decoder->error || d4.value >= dictionary->highbit_value_max)
+            return 0;
+
         IndexValuePair d5 = WeightWindow_Try_Decode(&dictionary->midbit_windows[d4.value], decoder);
         if (d5.index != 0xFFFF) {
             d5.value = (dictionary->midbit_windows[d4.value].values[d5.index] = Decode_Commit(decoder, min(backref_range / 4 + 1, 256)));
         }
 
+        if (decoder->error)
+            return 0;
+
         uint32_t backref_offset = (d4.value << 10) + (d5.value << 2) + d3.value + 1u;
+
+        if (backref_offset == 0 || backref_offset > dictionary->decoded_size)
+            return 0;
+        if ((size_t)(decompressedEnd - decompressedData) < backref_size)
+            return 0;
 
         dictionary->decoded_size += backref_size;
 
@@ -472,6 +528,9 @@ uint32_t Dictionary_Decompress_Block(TDictionary *dictionary, TDecoder *decoder,
             d2.value = (dictionary->decoded_windows[i].values[d2.index] = Decode_Commit(decoder, dictionary->decoded_value_max));
         }
 
+        if (decoder->error || decompressedData >= decompressedEnd)
+            return 0;
+
         decompressedData[0] = d2.value & 0xff;
         dictionary->decoded_size++;
 
@@ -480,25 +539,28 @@ uint32_t Dictionary_Decompress_Block(TDictionary *dictionary, TDecoder *decoder,
     }
 }
 
-void gr2_decompress(
+int gr2_decompress(
     uint32_t compressed_size, const uint8_t* compressed_buffer,
     uint32_t step1, uint32_t step2,
     uint32_t decompressed_size, uint8_t* decompressed_buffer)
 {
     if (compressed_size == 0 || decompressed_size == 0 || !compressed_buffer || !decompressed_buffer)
-        return;
+        return 0;
+    if (compressed_size < sizeof(TParameter) * 3)
+        return 0;
+    if (step1 > step2 || step2 > decompressed_size)
+        return 0;
 
     TParameter params[3];
-    if (compressed_size < sizeof(params))
-        return;
-
     memcpy(params, compressed_buffer, sizeof(params));
 
     TDecoder dec;
-    Decoder_Init(&dec, (uint8_t*)compressed_buffer + sizeof(params));
+    Decoder_Init(&dec, (uint8_t*)compressed_buffer + sizeof(params),
+                 compressed_buffer + compressed_size);
 
     uint32_t steps[] = { step1, step2, decompressed_size };
     uint8_t* dptr = decompressed_buffer;
+    uint8_t* const end = decompressed_buffer + decompressed_size;
 
     for (int i = 0; i < 3; ++i) {
         if (dptr >= decompressed_buffer + steps[i])
@@ -508,11 +570,16 @@ void gr2_decompress(
         Dictionary_Init(&dic, &params[i]);
 
         while (dptr < decompressed_buffer + steps[i]) {
-            uint32_t written = Dictionary_Decompress_Block(&dic, &dec, dptr);
-            if (written == 0) break;
+            uint32_t written = Dictionary_Decompress_Block(&dic, &dec, dptr, end);
+            if (written == 0 || dec.error) {
+                Dictionary_Free(&dic);
+                return 0;
+            }
             dptr += written;
         }
 
         Dictionary_Free(&dic);
     }
+
+    return dptr == end ? 1 : 0;
 }
