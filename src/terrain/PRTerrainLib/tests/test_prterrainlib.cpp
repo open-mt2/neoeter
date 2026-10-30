@@ -194,7 +194,7 @@ void test_terrain_impl_file_loaders()
 
     std::vector<BYTE> mockWaterGrid(CTerrainImpl::WATERMAP_XSIZE * CTerrainImpl::WATERMAP_YSIZE, 0);
     mockWaterGrid[25] = 1;
-    long mockHeights[2] = { 500, 1200 };
+    int32_t mockHeights[2] = { 500, 1200 };  // on-disk type is LONG (32-bit), not long
 
     {
         std::ofstream out(watermapPath, std::ios::binary);
