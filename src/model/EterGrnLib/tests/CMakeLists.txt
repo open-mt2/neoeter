@@ -11,8 +11,13 @@ add_executable(test_gr2_reader test_gr2_reader.cpp)
 target_link_libraries(test_gr2_reader PRIVATE EterGrnLib)
 add_test(NAME test_gr2_reader COMMAND test_gr2_reader)
 
+# TA.5: CPU-only reference values for world poses, skinning and curves.
+add_executable(test_grn_reference test_grn_reference.cpp)
+target_link_libraries(test_grn_reference PRIVATE EterGrnLib)
+add_test(NAME test_grn_reference COMMAND test_grn_reference)
+
 # TA.1: shared test helpers and always-on asserts (tests/support/TestAssert.h)
-foreach(_test_target test_etergrnlib test_gr2_reader)
+foreach(_test_target test_etergrnlib test_gr2_reader test_grn_reference)
     target_include_directories(${_test_target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     target_compile_options(${_test_target} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
 endforeach()
