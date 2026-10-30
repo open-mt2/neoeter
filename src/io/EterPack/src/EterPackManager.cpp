@@ -48,11 +48,7 @@ static std::string FindCaseInsensitiveFile(const std::string& path)
 #else
     #define TraceError(...) do { fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); } while(0)
     #define Tracef(...) do { fprintf(stdout, __VA_ARGS__); } while(0)
-    inline DWORD timeGetTime()
-    {
-        using namespace std::chrono;
-        return static_cast<DWORD>(duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count());
-    }
+    // Platform.h (pulled in by StdAfx.h) already provides timeGetTime().
 #endif
 
 #include "Folder.h"
