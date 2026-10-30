@@ -92,7 +92,18 @@ namespace MilesCompatInternal {
         return s_cb;
     }
 
+    // Headless runs (CI, unit tests, dedicated servers) must not depend on a
+    // sound card. Setting OPENMT2_AUDIO_BACKEND=null before the first engine
+    // access pins miniaudio to ma_backend_null instead of probing the host
+    // device list. The value is read once, when the singleton is created.
+    inline bool UseNullAudioBackend() {
+        const char* backend = std::getenv("OPENMT2_AUDIO_BACKEND");
+        return backend != nullptr && std::strcmp(backend, "null") == 0;
+    }
+
     struct EngineHolder {
+        ma_context context;
+        bool contextInitialized = false;
         ma_engine engine;
         bool initialized = false;
 
@@ -100,6 +111,16 @@ namespace MilesCompatInternal {
             ma_engine_config config = ma_engine_config_init();
             config.sampleRate = 44100;
             config.channels = 2;
+
+            if (UseNullAudioBackend()) {
+                ma_backend backends[1] = { ma_backend_null };
+                ma_context_config contextConfig = ma_context_config_init();
+                if (ma_context_init(backends, 1, &contextConfig, &context) == MA_SUCCESS) {
+                    contextInitialized = true;
+                    config.pContext = &context;
+                }
+            }
+
             if (ma_engine_init(&config, &engine) == MA_SUCCESS) {
                 initialized = true;
             }
@@ -109,6 +130,10 @@ namespace MilesCompatInternal {
             if (initialized) {
                 ma_engine_uninit(&engine);
                 initialized = false;
+            }
+            if (contextInitialized) {
+                ma_context_uninit(&context);
+                contextInitialized = false;
             }
         }
     };
