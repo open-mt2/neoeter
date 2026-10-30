@@ -21,6 +21,12 @@ class CParticleInstance
 		~CParticleInstance();
 
 		float GetRadiusApproximation();
+
+		// Read-only state accessors (used by deterministic effect tests and
+		// debug tooling; the simulation still owns the data).
+		const D3DXVECTOR3& GetPosition() const { return m_v3Position; }
+		const D3DXVECTOR3& GetVelocity() const { return m_v3Velocity; }
+		float GetLifeTime() const { return m_fLastLifeTime; }
 		
 		BOOL Update(float fElapsedTime, float fAngle);
 		//virtual void Transform(const D3DXMATRIX * c_matLocal, const float c_fZRotation)=0;
