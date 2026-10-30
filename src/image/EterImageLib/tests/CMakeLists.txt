@@ -1,11 +1,16 @@
 # src/EterImageLib/tests/CMakeLists.txt
 
-add_executable(test_image test_image.cpp)
-target_link_libraries(test_image PRIVATE EterImageLib)
-add_test(NAME test_image COMMAND test_image)
+set(TEST_TARGETS
+    test_image
+    test_dxt_invariants
+)
 
-# TA.1: shared test helpers and always-on asserts (tests/support/TestAssert.h)
-foreach(_test_target test_image)
-    target_include_directories(${_test_target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-    target_compile_options(${_test_target} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+foreach(TEST_NAME ${TEST_TARGETS})
+    add_executable(${TEST_NAME} ${TEST_NAME}.cpp)
+    target_link_libraries(${TEST_NAME} PRIVATE EterImageLib)
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+
+    # TA.1: shared test helpers and always-on asserts (tests/support/TestAssert.h)
+    target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_compile_options(${TEST_NAME} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
 endforeach()
