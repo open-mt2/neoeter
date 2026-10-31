@@ -329,7 +329,7 @@ void CStateManager::SetDefaultState()
 	for (j = 0; j < STATEMANAGER_MAX_STAGES; ++j)
 		for (i = 0; i < STATEMANAGER_MAX_SAMPLERSTATES; ++i)
 			m_bSamplerStateSavingFlag[j][i] = FALSE;
-#endif _DEBUG
+#endif // _DEBUG
 }
 
 // Material
@@ -377,7 +377,7 @@ void CStateManager::SaveRenderState(D3DRENDERSTATETYPE Type, DWORD dwValue)
 		StateManager_Assert(!" This render state is already saved!");
 	}
 	m_bRenderStateSavingFlag[Type] = TRUE;
-#endif _DEBUG
+#endif // _DEBUG
 
 	// Check that we have set this up before, if not, the default is this.
 	m_CopyState.m_RenderStates[Type] = m_CurrentState.m_RenderStates[Type];
@@ -393,7 +393,7 @@ void CStateManager::RestoreRenderState(D3DRENDERSTATETYPE Type)
 		StateManager_Assert(!" This render state was not saved!");
 	}
 	m_bRenderStateSavingFlag[Type] = FALSE;
-#endif _DEBUG
+#endif // _DEBUG
 
 	SetRenderState(Type, m_CopyState.m_RenderStates[Type]);
 }
@@ -450,7 +450,7 @@ void CStateManager::SaveTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYP
 		StateManager_Assert(!" This texture stage state is already saved!");
 	}
 	m_bTextureStageStateSavingFlag[dwStage][Type] = TRUE;
-#endif _DEBUG
+#endif // _DEBUG
 	m_CopyState.m_TextureStates[dwStage][Type] = m_CurrentState.m_TextureStates[dwStage][Type];
 	SetTextureStageState(dwStage, Type, dwValue);
 }
@@ -464,7 +464,7 @@ void CStateManager::RestoreTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATE
 		StateManager_Assert(!" This texture stage state was not saved!");
 	}
 	m_bTextureStageStateSavingFlag[dwStage][Type] = FALSE;
-#endif _DEBUG
+#endif // _DEBUG
 	SetTextureStageState(dwStage, Type, m_CopyState.m_TextureStates[dwStage][Type]);
 }
 
@@ -493,7 +493,7 @@ void CStateManager::SaveSamplerState(DWORD dwStage, D3DSAMPLERSTATETYPE Type, DW
 		StateManager_Assert(!" This sampler state is already saved!");
 	}
 	m_bSamplerStateSavingFlag[dwStage][Type] = TRUE;
-#endif _DEBUG
+#endif // _DEBUG
 	m_CopyState.m_SamplerStates[dwStage][Type] = m_CurrentState.m_SamplerStates[dwStage][Type];
 	SetSamplerState(dwStage, Type, dwValue);
 }
@@ -507,7 +507,7 @@ void CStateManager::RestoreSamplerState(DWORD dwStage, D3DSAMPLERSTATETYPE Type)
 		StateManager_Assert(!" This sampler state was not saved!");
 	}
 	m_bSamplerStateSavingFlag[dwStage][Type] = FALSE;
-#endif _DEBUG
+#endif // _DEBUG
 	SetSamplerState(dwStage, Type, m_CopyState.m_SamplerStates[dwStage][Type]);
 }
 
@@ -650,7 +650,7 @@ void CStateManager::SaveTransform(D3DTRANSFORMSTATETYPE Type, const D3DMATRIX* p
 		StateManager_Assert(!" This trasform is already saved!");
 	}
 	m_bTransformSavingFlag[Type] = TRUE;
-#endif _DEBUG
+#endif // _DEBUG
 
 	m_CopyState.m_Matrices[Type] = m_CurrentState.m_Matrices[Type];
 	SetTransform(Type, (D3DXMATRIX *)pMatrix);
@@ -665,7 +665,7 @@ void CStateManager::RestoreTransform(D3DTRANSFORMSTATETYPE Type)
 		StateManager_Assert(!" This render state was not saved!");
 	}
 	m_bTransformSavingFlag[Type] = FALSE;
-#endif _DEBUG
+#endif // _DEBUG
 
 	SetTransform(Type, &m_CopyState.m_Matrices[Type]);
 }

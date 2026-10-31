@@ -115,7 +115,7 @@ void CResourceManager::PushBackgroundLoadingSet(std::set<std::string> & LoadingS
 	{
 		DWORD dwFileCRC = __GetFileCRC(itor->c_str());
 
-		if (NULL != isResourcePointerData(dwFileCRC))
+		if (isResourcePointerData(dwFileCRC))
 		{
 			++itor;
 			continue;
