@@ -210,6 +210,9 @@ public:
 	// SDL text input buffer (T1.6): UTF-8 text and the current composition.
 	static std::string		m_stText;
 	static std::string		m_stComposition;
+	// Live IME object, so the static SDL callbacks can honour number mode,
+	// except keys and the length limit like WMChar does on Windows.
+	static CIME*			ms_pSdlInstance;
 
 	static int				ms_compLen;
 	static int				ms_curpos;

@@ -67,6 +67,38 @@ UINT CIME::ms_uInputCodePage = 65001;
 
 std::string CIME::m_stText;
 std::string CIME::m_stComposition;
+CIME* CIME::ms_pSdlInstance = nullptr;
+
+// m_stText holds UTF-8 and ms_curpos / ms_lastpos are byte offsets; these keep
+// the cursor on code point boundaries.
+static bool IsUtf8Continuation(unsigned char c) { return (c & 0xC0) == 0x80; }
+
+static size_t Utf8Length(const std::string& s)
+{
+	size_t n = 0;
+	for (unsigned char c : s)
+		if (!IsUtf8Continuation(c))
+			++n;
+	return n;
+}
+
+// Decodes one code point at s[i], advancing i. Invalid bytes map to U+FFFD.
+static wchar_t DecodeUtf8(const std::string& s, size_t& i)
+{
+	const unsigned char c = (unsigned char)s[i++];
+	int extra = 0;
+	unsigned int cp = c;
+	if (c >= 0xF0) { extra = 3; cp = c & 0x07; }
+	else if (c >= 0xE0) { extra = 2; cp = c & 0x0F; }
+	else if (c >= 0xC0) { extra = 1; cp = c & 0x1F; }
+	else if (c >= 0x80) return 0xFFFD;
+	for (; extra > 0; --extra) {
+		if (i >= s.size() || !IsUtf8Continuation((unsigned char)s[i]))
+			return 0xFFFD;
+		cp = (cp << 6) | ((unsigned char)s[i++] & 0x3F);
+	}
+	return (wchar_t)cp;
+}
 
 CIME::CIME()
 	: m_hOrgIMC(nullptr)
@@ -76,9 +108,14 @@ CIME::CIME()
 	, m_bEnablePaste(true)
 	, m_bUseDefaultIME(false)
 {
+	ms_pSdlInstance = this;
 }
 
-CIME::~CIME() = default;
+CIME::~CIME()
+{
+	if (ms_pSdlInstance == this)
+		ms_pSdlInstance = nullptr;
+}
 
 bool CIME::Initialize(HWND hWnd)
 {
@@ -243,16 +280,49 @@ LRESULT CIME::WMChar(HWND, UINT, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void CIME::IncCurPos() { if (ms_curpos < ms_lastpos) ++ms_curpos; }
-void CIME::DecCurPos() { if (ms_curpos > 0) --ms_curpos; }
-void CIME::SetCurPos(int offset) { ms_curpos = offset < 0 ? 0 : (offset > ms_lastpos ? ms_lastpos : offset); }
+void CIME::IncCurPos()
+{
+	if (ms_curpos < ms_lastpos)
+		++ms_curpos;
+	while (ms_curpos < ms_lastpos && IsUtf8Continuation((unsigned char)m_stText[ms_curpos]))
+		++ms_curpos;
+}
+void CIME::DecCurPos()
+{
+	if (ms_curpos > 0)
+		--ms_curpos;
+	while (ms_curpos > 0 && IsUtf8Continuation((unsigned char)m_stText[ms_curpos]))
+		--ms_curpos;
+}
+void CIME::SetCurPos(int offset)
+{
+	// As on Windows: out of range (EditLine passes -1 on focus) means the end.
+	// In range, offset is a rendered character index, not a byte offset.
+	ms_lastpos = (int)m_stText.size();
+	if (offset < 0)
+	{
+		ms_curpos = ms_lastpos;
+		return;
+	}
+	size_t pos = 0;
+	for (int n = 0; n < offset && pos < m_stText.size(); ++n)
+	{
+		++pos;
+		while (pos < m_stText.size() && IsUtf8Continuation((unsigned char)m_stText[pos]))
+			++pos;
+	}
+	ms_curpos = (int)pos;
+}
 void CIME::DelCurPos()
 {
 	// Delete key semantics: remove the character at the cursor, not before it.
 	if (ms_curpos < ms_lastpos)
 	{
-		m_stText.erase(ms_curpos, 1);
-		--ms_lastpos;
+		size_t end = (size_t)ms_curpos + 1;
+		while (end < m_stText.size() && IsUtf8Continuation((unsigned char)m_stText[end]))
+			++end;
+		m_stText.erase(ms_curpos, end - ms_curpos);
+		ms_lastpos = (int)m_stText.size();
 	}
 }
 
@@ -301,17 +371,41 @@ void CIME::OnSDLTextInput(const char* utf8)
 	m_stComposition.clear();
 	ms_compLen = 0;
 
-	std::string commit = utf8;
-	if (m_stText.size() >= IMESTR_MAXLEN)
-		return;
-	const size_t room = (size_t)IMESTR_MAXLEN - m_stText.size();
-	if (commit.size() > room)
-		commit.resize(room);
-	if (commit.empty())
+	// Same gate as WMChar on Windows: with no focused edit line, keys are
+	// hotkeys and must not pile up in the hidden text buffer.
+	if (!ms_bCaptureInput)
 		return;
 
-	m_stText.append(commit);
-	ms_curpos = ms_lastpos = (int)m_stText.size();
+	CIME* ime = ms_pSdlInstance;
+	size_t maxChars = IMESTR_MAXLEN;
+	if (ime && ime->m_max > 0 && (size_t)ime->m_max < maxChars)
+		maxChars = (size_t)ime->m_max;
+
+	const std::string text = utf8;
+	std::string insert;
+	size_t length = Utf8Length(m_stText);
+	for (size_t i = 0; i < text.size();)
+	{
+		const size_t begin = i;
+		const wchar_t c = DecodeUtf8(text, i);
+		if (ime && ime->m_bOnlyNumberMode && !iswdigit(c))
+			continue;
+		if (ime && !ime->__IsWritable(c))
+			continue;
+
+		// '|' starts a colour/hyperlink tag, so a literal one is doubled.
+		const int copies = (c == L'|') ? 2 : 1;
+		for (int n = 0; n < copies && length < maxChars; ++n, ++length)
+			insert.append(text, begin, i - begin);
+	}
+	if (insert.empty())
+		return;
+
+	if (ms_curpos < 0 || ms_curpos > (int)m_stText.size())
+		ms_curpos = (int)m_stText.size();
+	m_stText.insert((size_t)ms_curpos, insert);
+	ms_curpos += (int)insert.size();
+	ms_lastpos = (int)m_stText.size();
 	if (ms_pEvent)
 		ms_pEvent->OnUpdate();
 }

@@ -242,6 +242,21 @@ bool CMSApplication::MessageProcess()
 			{
 				WindowProcedure(m_hWnd, WM_CHAR, 127, 0);
 			}
+			// Windows also sends WM_CHAR for these, and the IME relies on it:
+			// Enter opens/sends chat and confirms dialogs, Tab moves focus.
+			// SDL_TEXTINPUT never carries them.
+			else if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_KP_ENTER)
+			{
+				WindowProcedure(m_hWnd, WM_CHAR, VK_RETURN, 0);
+			}
+			else if (event.key.keysym.sym == SDLK_TAB)
+			{
+				WindowProcedure(m_hWnd, WM_CHAR, VK_TAB, 0);
+			}
+			else if (event.key.keysym.sym == SDLK_ESCAPE)
+			{
+				WindowProcedure(m_hWnd, WM_CHAR, VK_ESCAPE, 0);
+			}
 		}
 		else if (event.type == SDL_KEYUP)
 		{
