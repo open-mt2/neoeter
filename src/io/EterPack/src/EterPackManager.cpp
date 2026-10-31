@@ -8,6 +8,10 @@
 #include <filesystem>
 #include <algorithm>
 
+#if defined(_WIN32)
+#include <io.h>   // _access
+#endif
+
 namespace fs = std::filesystem;
 
 static std::string FindCaseInsensitiveFile(const std::string& path)
