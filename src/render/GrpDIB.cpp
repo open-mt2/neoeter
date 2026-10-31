@@ -77,7 +77,7 @@ void CGraphicDib::SetBkMode(int iBkMode)
 #if defined(OPENMT2_PLATFORM_LINUX)
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include <unistd.h>
+#include <Neoeter/Render/FontLocator.h>
 
 static FT_Library s_dibFtLib = nullptr;
 static FT_Face s_dibFtFace = nullptr;
@@ -88,21 +88,9 @@ static void EnsureDIBFT()
 		FT_Init_FreeType(&s_dibFtLib);
 	}
 	if (!s_dibFtFace && s_dibFtLib) {
-		static const char* s_paths[] = {
-			"/usr/share/fonts/TTF/DejaVuSans.ttf",
-			"/usr/share/fonts/noto/NotoSans-Regular.ttf",
-			"/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-			"/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
-			nullptr
-		};
-		for (int i = 0; s_paths[i]; ++i) {
-			if (access(s_paths[i], R_OK) == 0) {
-				if (FT_New_Face(s_dibFtLib, s_paths[i], 0, &s_dibFtFace) == 0) {
-					FT_Set_Pixel_Sizes(s_dibFtFace, 0, 12);
-					break;
-				}
-			}
-		}
+		std::string path = FontLocator_FindFontFile("sans-serif");
+		if (!path.empty() && FT_New_Face(s_dibFtLib, path.c_str(), 0, &s_dibFtFace) == 0)
+			FT_Set_Pixel_Sizes(s_dibFtFace, 0, 12);
 	}
 }
 #endif

@@ -89,6 +89,18 @@ target_link_libraries(neoeter_render
         $<$<PLATFORM_ID:Linux>:Freetype::Freetype>
 )
 
+# Optional: resolve font face names to files (FontLocator.cpp). Without it the
+# lookup falls back to fixed FHS paths, which don't exist on NixOS.
+if(UNIX)
+    find_package(Fontconfig QUIET)
+    if(Fontconfig_FOUND)
+        target_link_libraries(neoeter_render PRIVATE Fontconfig::Fontconfig)
+        target_compile_definitions(neoeter_render PRIVATE OPENMT2_HAVE_FONTCONFIG=1)
+    else()
+        message(STATUS "neoeter_render: fontconfig not found, using fixed font paths")
+    endif()
+endif()
+
 # Unit Tests
 if((CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND BUILD_TESTING) OR BUILD_TESTS)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
