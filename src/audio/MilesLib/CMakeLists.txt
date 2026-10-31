@@ -103,8 +103,8 @@ target_link_libraries(MilesLib
         EterLib
         Threads::Threads
         ${MINIAUDIO_LIBRARIES}
-        dl
-        m
+        $<$<PLATFORM_ID:Linux>:dl>
+        $<$<PLATFORM_ID:Linux>:m>
 )
 
 # Unit Tests
