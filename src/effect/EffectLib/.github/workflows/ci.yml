@@ -24,7 +24,32 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build liblzo2-dev libzip-dev libjpeg-dev
+          sudo apt-get install -y build-essential cmake ninja-build liblzo2-dev libzip-dev libjpeg-dev libgl1-mesa-dev libglu1-mesa-dev libegl-dev libgl1-mesa-dri libsdl2-dev libfreetype-dev zlib1g-dev
+
+      - name: Install miniaudio
+        run: |
+          MINIAUDIO_VERSION=0.11.25
+          sudo mkdir -p /usr/local/include/miniaudio /usr/local/lib/pkgconfig
+          sudo curl -fsSL "https://raw.githubusercontent.com/mackron/miniaudio/${MINIAUDIO_VERSION}/miniaudio.h" \
+            -o /usr/local/include/miniaudio/miniaudio.h
+          printf '#define MINIAUDIO_IMPLEMENTATION\n#include <miniaudio/miniaudio.h>\n' > /tmp/miniaudio.c
+          cc -O2 -fPIC -I/usr/local/include -c /tmp/miniaudio.c -o /tmp/miniaudio.o
+          sudo ar rcs /usr/local/lib/libminiaudio.a /tmp/miniaudio.o
+          printf '%s\n' \
+            'prefix=/usr/local' \
+            'exec_prefix=${prefix}' \
+            'libdir=${exec_prefix}/lib' \
+            'includedir=${prefix}/include' \
+            '' \
+            'Name: miniaudio' \
+            'Description: Single-file audio playback and capture library' \
+            "Version: ${MINIAUDIO_VERSION}" \
+            'Cflags: -I${includedir}' \
+            'Libs: -L${libdir} -lminiaudio' \
+            'Libs.private: -lpthread -ldl -lm' \
+            | sudo tee /usr/local/lib/pkgconfig/miniaudio.pc > /dev/null
+          sudo ldconfig
+          pkg-config --modversion miniaudio
 
       - name: Configure CMake
         env:
