@@ -85,6 +85,9 @@ target_link_libraries(EterPack
     PUBLIC
         ${LIBZIP_LIBRARIES}
         Threads::Threads
+    # libzip is static here and its zlib dependency is in Libs.private (T1.9).
+    $<$<PLATFORM_ID:Windows>:z>
+    $<$<PLATFORM_ID:Windows>:bcrypt>
 )
 
 # In monorepo, link with EterBase
