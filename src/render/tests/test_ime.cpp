@@ -16,6 +16,7 @@ public:
 	using CIME::DecCurPos;
 	using CIME::DelCurPos;
 	using CIME::OnChar;
+	using CIME::WMChar;
 };
 
 static std::string CurrentText()
@@ -67,6 +68,18 @@ int main()
 	ime.OnChar(L'x');
 	TEST_ASSERT(CurrentText() == "7");
 	ime.SetStringMode();
+
+	// Editing keys still arrive as WM_CHAR on the SDL path.
+	CIME::Clear();
+	TestIME edit;
+	edit.EnableCaptureInput();
+	edit.SetText("abc", 3);
+	edit.WMChar(nullptr, 0x0102, 8, 0);
+	TEST_ASSERT_MSG(CurrentText() == "ab", "backspace deletes before the cursor");
+	edit.DecCurPos();
+	edit.WMChar(nullptr, 0x0102, 127, 0);
+	TEST_ASSERT_MSG(CurrentText() == "a", "delete removes at the cursor");
+	edit.DisableCaptureInput();
 
 	// Candidate/reading APIs are empty but safe (SDL has no candidate window).
 	std::string candidate;

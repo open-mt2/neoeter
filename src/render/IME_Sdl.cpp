@@ -146,9 +146,11 @@ bool CIME::IsIMEEnabled() { return ms_bImeEnabled; }
 
 void CIME::EnableIME(bool bEnable)
 {
+	// IME enablement controls composition/candidates, not SDL's text events.
+	// Stopping text input here made fields with enable_ime=0 (login id/password)
+	// receive no SDL_TEXTINPUT at all, so typing produced nothing. Text input
+	// stays active for the lifetime of the IME host; Uninitialize stops it.
 	ms_bImeEnabled = bEnable;
-	if (bEnable) SDL_StartTextInput();
-	else SDL_StopTextInput();
 }
 
 void CIME::DisableIME() { EnableIME(false); }
@@ -210,7 +212,36 @@ LRESULT CIME::WMStartComposition(HWND, UINT, WPARAM, LPARAM) { return 0; }
 LRESULT CIME::WMComposition(HWND, UINT, WPARAM, LPARAM) { return 0; }
 LRESULT CIME::WMEndComposition(HWND, UINT, WPARAM, LPARAM) { return 0; }
 LRESULT CIME::WMNotify(HWND, UINT, WPARAM, LPARAM) { return 0; }
-LRESULT CIME::WMChar(HWND, UINT, WPARAM, LPARAM) { return 0; }
+LRESULT CIME::WMChar(HWND, UINT, WPARAM wParam, LPARAM lParam)
+{
+	// Printable characters arrive as committed UTF-8 through SDL_TEXTINPUT
+	// (OnSDLTextInput). WM_CHAR is still used for editing keys and the
+	// OnWM_CHAR control path (return/tab/escape).
+	const unsigned char c = (unsigned char)(wParam & 0xff);
+	if (c == 8 || c == 127)
+	{
+		if (!ms_bCaptureInput)
+			return 0;
+		if (c == 8)
+		{
+			if (ms_curpos > 0)
+			{
+				DecCurPos();
+				DelCurPos();
+			}
+		}
+		else
+		{
+			DelCurPos();
+		}
+		if (ms_pEvent)
+			ms_pEvent->OnUpdate();
+		return 0;
+	}
+	if (ms_pEvent && ms_pEvent->OnWM_CHAR(wParam, lParam))
+		return 0;
+	return 0;
+}
 
 void CIME::IncCurPos() { if (ms_curpos < ms_lastpos) ++ms_curpos; }
 void CIME::DecCurPos() { if (ms_curpos > 0) --ms_curpos; }
@@ -266,9 +297,20 @@ void CIME::OnSDLTextInput(const char* utf8)
 {
 	if (!utf8)
 		return;
+
 	m_stComposition.clear();
 	ms_compLen = 0;
-	m_stText.append(utf8);
+
+	std::string commit = utf8;
+	if (m_stText.size() >= IMESTR_MAXLEN)
+		return;
+	const size_t room = (size_t)IMESTR_MAXLEN - m_stText.size();
+	if (commit.size() > room)
+		commit.resize(room);
+	if (commit.empty())
+		return;
+
+	m_stText.append(commit);
 	ms_curpos = ms_lastpos = (int)m_stText.size();
 	if (ms_pEvent)
 		ms_pEvent->OnUpdate();
