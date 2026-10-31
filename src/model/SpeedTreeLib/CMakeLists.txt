@@ -63,7 +63,12 @@ target_link_libraries(SpeedTreeLib
 )
 
 if(UNIX)
-    target_compile_definitions(SpeedTreeLib PUBLIC __LINUX__ _GNU_SOURCE)
+    target_compile_definitions(SpeedTreeLib PUBLIC
+        OPENMT2_PLATFORM_LINUX=1
+        OPENMT2_RENDERER_GL=1
+        OPENMT2_SDL_WINDOW=1
+        _GNU_SOURCE
+    )
 endif()
 
 if((SPEEDTREELIB_STANDALONE AND BUILD_TESTING) OR (NOT SPEEDTREELIB_STANDALONE AND BUILD_TESTS))
