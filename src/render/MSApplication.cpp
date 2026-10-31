@@ -238,18 +238,15 @@ bool CMSApplication::MessageProcess()
 			{
 				WindowProcedure(m_hWnd, WM_CHAR, 8, 0);
 			}
+			else if (event.key.keysym.scancode == SDL_SCANCODE_DELETE || event.key.keysym.sym == SDLK_DELETE)
+			{
+				WindowProcedure(m_hWnd, WM_CHAR, 127, 0);
+			}
 		}
 		else if (event.type == SDL_KEYUP)
 		{
 			WPARAM vKey = SDLKeycodeToVK(event.key.keysym.sym, event.key.keysym.scancode);
 			WindowProcedure(m_hWnd, WM_KEYUP, vKey, 0);
-		}
-		else if (event.type == SDL_TEXTINPUT)
-		{
-			for (size_t i = 0; event.text.text[i] != '\0'; ++i)
-			{
-				WindowProcedure(m_hWnd, WM_CHAR, (unsigned char)event.text.text[i], 0);
-			}
 		}
 
 		if (Platform_IsQuitRequested())
