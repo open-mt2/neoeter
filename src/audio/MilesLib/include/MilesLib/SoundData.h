@@ -2,11 +2,8 @@
 #define __MILESLIB_CSOUNDDATA_H__
 
 #include <sstream>
-#ifdef _WIN32
-#include <miles/MSS.H>
-#else
+// T4.1: Miles is gone on every target; MSSCompat is the miniaudio shim.
 #include "MSSCompat.h"
-#endif
 #include <EterBase/MappedFile.h>
 
 class CSoundData
