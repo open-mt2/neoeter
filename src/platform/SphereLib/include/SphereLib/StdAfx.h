@@ -1,14 +1,9 @@
 #pragma once
 
-#if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
-#define WIN32_LEAN_AND_MEAN
-#include <d3d9.h>
-#include <directxsdk/d3dx9.h>
-#include "../eterBase/StdAfx.h"
-#else
+// T4.1: the DirectX SDK is gone; the platform headers carry the D3D9 vocabulary
+// on every target (USE_PLATFORM_D3D_COMPAT on Windows).
 #include <Platform/Platform.h>
 #include <Platform/DirectXMathCompat.h>
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
