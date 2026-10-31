@@ -68,6 +68,12 @@ target_include_directories(neoeter_platform_locale
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+# StringCodec uses iconv: part of glibc, a separate libiconv on macOS.
+if(NOT WIN32)
+    find_package(Iconv REQUIRED)
+    target_link_libraries(neoeter_platform_locale PRIVATE Iconv::Iconv)
+endif()
+
 # In monorepo, link with neoeter_platform_base
 if(TARGET neoeter_platform_base)
     target_link_libraries(neoeter_platform_locale PUBLIC neoeter_platform_base)

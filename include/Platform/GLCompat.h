@@ -78,6 +78,21 @@ extern PFNGLCLIPCONTROLPROC glClipControl;
 // should log the failure and fall back (T1.5 decides what the fallback is).
 bool Platform_LoadGLFunctions(void* (*getProcAddress)(const char*));
 
+#elif defined(__APPLE__)
+
+// macOS ships the legacy (compatibility) profile in OpenGL.framework, with
+// every prototype declared; it is deprecated but still functional.
+#ifndef GL_SILENCE_DEPRECATION
+#define GL_SILENCE_DEPRECATION 1
+#endif
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES 1
+#endif
+#include <OpenGL/gl.h>
+#include <OpenGL/glext.h>
+
+inline bool Platform_LoadGLFunctions(void* (*)(const char*)) { return true; }
+
 #else
 
 #ifndef GL_GLEXT_PROTOTYPES

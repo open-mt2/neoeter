@@ -85,8 +85,8 @@ target_link_libraries(neoeter_render
         neoeter_platform_math
         Threads::Threads
         SDL2::SDL2
-        $<$<PLATFORM_ID:Linux>:OpenGL::GL>
-        $<$<PLATFORM_ID:Linux>:Freetype::Freetype>
+        $<$<PLATFORM_ID:Linux,Darwin>:OpenGL::GL>
+        $<$<PLATFORM_ID:Linux,Darwin>:Freetype::Freetype>
 )
 
 # Unit Tests
