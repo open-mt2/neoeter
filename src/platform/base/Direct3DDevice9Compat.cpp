@@ -8,9 +8,7 @@
 #include <Platform/DirectXMathCompat.h>
 
 // Force link ImageLoaderCompat.cpp from static libEterBase.a
-extern bool Platform_GetImageInfo(const void* data, size_t size, uint32_t* outW, uint32_t* outH, uint32_t* outFormat);
-extern bool Platform_DecodeImage(const void* data, size_t size, uint32_t* outW, uint32_t* outH, std::vector<uint8_t>& outPixels);
-void* g_pfnForceLinkImageLoader[] = {
+void*g_pfnForceLinkImageLoader[] = {
     (void*)&Platform_GetImageInfo,
     (void*)&Platform_DecodeImage
 };

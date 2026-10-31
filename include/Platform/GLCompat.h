@@ -25,9 +25,6 @@
 #define GL_TEXTURE6 0x84C6
 #define GL_TEXTURE7 0x84C7
 #endif
-#ifndef GL_CLAMP_TO_EDGE
-#define GL_CLAMP_TO_EDGE 0x812F
-#endif
 #ifndef GL_TEXTURE_MAX_LEVEL
 #define GL_TEXTURE_MAX_LEVEL 0x813D
 #endif

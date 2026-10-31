@@ -20,8 +20,7 @@
 
 // Image decoding behind the D3DX shim (ImageLoaderCompat.cpp, stb_image). It is
 // platform neutral: every target that takes this branch decodes non-DDS images.
-bool Platform_GetImageInfo(const void* data, size_t size, uint32_t* outW, uint32_t* outH, uint32_t* outFormat);
-bool Platform_DecodeImage(const void* data, size_t size, uint32_t* outW, uint32_t* outH, std::vector<uint8_t>& outPixels);
+#include <Neoeter/Platform/Base/ImageLoaderCompat.h>
 
 // d3d9.h defines this; <windows.h> alone does not. The compat vocabulary needs
 // it for the DXT formats (T1.5 drops the DirectX SDK headers).
@@ -2137,7 +2136,7 @@ inline HRESULT D3DXCreateTextureFromFileInMemoryEx(
     D3DLOCKED_RECT lr;
     if (SUCCEEDED(pTex->LockRect(0, &lr, nullptr, 0))) {
         if (lr.pBits && !pixels.empty()) {
-            std::memcpy(lr.pBits, pixels.data(), std::min(pixels.size(), (size_t)(w * h * 4)));
+            std::memcpy(lr.pBits, pixels.data(), std::min(pixels.size(), (size_t)w * h * 4));
         }
         pTex->UnlockRect(0);
     }
