@@ -148,7 +148,7 @@ target_include_directories(neoeter_platform_base
 target_link_libraries(neoeter_platform_base
     PUBLIC
         ${LZO_LIBRARY}
-        $<$<PLATFORM_ID:Linux>:OpenGL::GL>
+        $<$<PLATFORM_ID:Linux,Darwin>:OpenGL::GL>
         # Windows has only GL 1.1 in opengl32.dll; the entry points above it are
         # loaded at runtime (Platform_LoadGLFunctions, T1.4).
         $<$<PLATFORM_ID:Windows>:opengl32>
