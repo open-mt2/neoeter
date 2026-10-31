@@ -1,4 +1,4 @@
-# The Neoeter C ABI (`include/neoeter/`)
+# The Neoeter C ABI (`include/Neoeter/`)
 
 The C ABI is the only supported boundary for code that is not compiled as part
 of the engine. It is what makes a second script host (`neoeter-csharp`) possible

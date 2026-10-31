@@ -1,9 +1,8 @@
 # Role-level namespaces for the consolidated engine.
 #
-# Target names do NOT change in TB.1: EterBase, EterLib, … stay, and the
-# existing Foo::Foo aliases keep working. These INTERFACE targets are the names
-# consumers should use from now on (TB.3 shim) and the only names the script
-# bridges and the game layer may link against.
+# Every package defines its own namespaced target (Neoeter::Platform::Base,
+# Neoeter::IO, ...). This file adds the grouping target for the multi-package
+# role only; Neoeter::Platform links base + locale + math.
 
 function(_neoeter_role _name)
     if(TARGET Neoeter::${_name})
@@ -18,11 +17,4 @@ function(_neoeter_role _name)
     endforeach()
 endfunction()
 
-_neoeter_role(Platform EterBase EterLocale SphereLib)
-_neoeter_role(IO       EterPack)
-_neoeter_role(Image    EterImageLib)
-_neoeter_role(Render   EterLib)
-_neoeter_role(Audio    MilesLib)
-_neoeter_role(Model    EterGrnLib SpeedTreeLib)
-_neoeter_role(Terrain  PRTerrainLib)
-_neoeter_role(Effect   EffectLib)
+_neoeter_role(Platform neoeter_platform_base neoeter_platform_locale neoeter_platform_math)

@@ -8,56 +8,49 @@ effect ── terrain ── model ── audio ── render ── image ─�
                                                     nothing below this line
 ```
 
-The arrows are dependencies: a package may use anything to its right, never to
-its left. The split is the one already encoded in the `pkg_*`
-`target_link_libraries`; `D14` only changes where the code lives.
+A directory may depend only on directories to its right. `platform` depends on
+nothing. The game and the script bridges depend on the engine, never the other
+way round.
 
-| Role | Packages | Role target | Why grouped |
-|---|---|---|---|
-| platform | `EterBase`, `EterLocale`, `SphereLib` | `Neoeter::Platform` | OS/alloc/compression, locale tables, math/geometry |
-| io | `EterPack` | `Neoeter::IO` | `EIX`/`EPK`/zip archive and file provider layer |
-| image | `EterImageLib` | `Neoeter::Image` | DXT codecs, texture/image conversion (no device) |
-| render | `EterLib` | `Neoeter::Render` | device, fixed-function state, scene graph, `IRenderBackend` |
-| audio | `MilesLib` | `Neoeter::Audio` | Miles façade over miniaudio |
-| model | `EterGrnLib`, `SpeedTreeLib` | `Neoeter::Model` | `.gr2`, SpeedTree `.spt`/treecache |
-| terrain | `PRTerrainLib` | `Neoeter::Terrain` | terrain heightfield/quadtree |
-| effect | `EffectLib` | `Neoeter::Effect` | particle/effect runtime |
+## Tree
 
-## Two invariants the move must not break
+| Directory | Contents | Target |
+|---|---|---|
+| `src/platform/base` | OS abstraction, memory, LZO/TEA/CRC, file/mmap I/O, timers, D3D9/GL compat device | `Neoeter::Platform::Base` |
+| `src/platform/locale` | locale tables and codecs | `Neoeter::Platform::Locale` |
+| `src/platform/math` | `GrpMath`, ray/OBB | `Neoeter::Platform::Math` |
+| `src/io` | `EIX`/`EPK`/zip providers, path normalisation | `Neoeter::IO` |
+| `src/image` | DXT codecs, stb image integration | `Neoeter::Image` |
+| `src/render` | device, fixed-function state, scene graph, `IRenderBackend` | `Neoeter::Render` |
+| `src/audio` | Miles façade over miniaudio, null backend | `Neoeter::Audio` |
+| `src/model/grn` | `.gr2` reader, skinning/animation | `Neoeter::Model::Grn` |
+| `src/model/speedtree` | `.spt` and the `treecache` reader | `Neoeter::Model::SpeedTree` |
+| `src/terrain` | heightfield, patches, collision | `Neoeter::Terrain` |
+| `src/effect` | particle/effect runtime | `Neoeter::Effect` |
 
-1. **Include roots.** Every package keeps its `include/<Package>/…` directory,
-   so `#include <EterBase/Singleton.h>` still resolves. Only the CMake include
-   directories move one level down; no include line changes.
-2. **Build paths.** The root `CMakeLists.txt` passes an explicit binary
-   directory: `add_subdirectory(src/render/EterLib build/src/EterLib)`. The
-   binaries therefore stay at `build/src/EterLib/tests/test_render_golden`, etc.
-   `build.sh`, `golden-check.sh`, `dist` assembly and CI keep working with a
-   path prefix change only in the *source* paths.
+There is a single header root, `include/`: public headers live in
+`include/Neoeter/<Role>/…` and are included as `<Neoeter/<Role>/…>`. The
+D3D9-compatibility vocabulary shared by all packages is the one top-level
+`include/Platform/` shim.
 
-Target names are frozen: `EterBase`, `EterLib`, …, plus their existing
-`Foo::Foo` aliases. `Neoeter::*` role targets are additive (`cmake/NeoeterAliases.cmake`);
-they exist so new code can depend on a role instead of a package.
+`platform` and `model` have subpackages because they contain more than one
+library; the other roles contain their code directly.
 
-## What is deliberately *not* in this repository
+## Build paths
 
-- **Python.** `ScriptLib` (CPython 2.7 host) and `EterPythonLib` (window/graphic
-  bindings) live in `neoeter-python`. The engine must not include `Python.h`.
-- **The game.** `GameLib`, `UserInterface`, `CWebBrowser` and the `metin2client`
-  executable live in `client`.
-- **Assets.** `bin/` (packs, root Python scripts) stays a devkit-owned asset
-  tree; it is not source.
+The root `CMakeLists.txt` pins one binary directory per role/subpackage
+(`build/src/render`, `build/src/platform/base`, …). Consumers therefore never
+see a historic package name, and the devkit's test/golden paths are role-based.
+
+## Boundaries
+
+- **Python** lives in `neoeter-python` (`ScriptLib` host, `EterPythonLib`
+  bindings). The engine must never include `Python.h`.
+- **The game** lives in `client` (`GameLib`, `UserInterface`, `CWebBrowser`).
+- **Assets** (`bin/`) stay a devkit-owned tree.
 
 ## Script hosts and the ABI boundary
 
-Today the engine exposes C++ only; the Python bridge links against the same
-static libraries and calls C++ directly. That is fine for the one bridge that
-exists, but it is not a boundary another language can target.
-
-`include/neoeter/` is reserved for a **stable C ABI** (`docs/abi.md`): opaque
-handles, POD structs, UTF-8 strings, no C++ types or exceptions across the
-line. It is the prerequisite for `neoeter-csharp` (and for any future host:
-Lua, Rust, mods). The ABI is additive — the C++ targets keep their current
-interfaces.
-
-`docs/scripting-hosts.md` describes the host contract, the Python bridge as it
-exists today, and how a C# bridge plugs in without touching the engine.
+The engine exposes C++ today; the C ABI in `include/Neoeter/` (`docs/abi.md`)
+is the language-neutral boundary that a future `neoeter-csharp` host will use.
+`docs/scripting-hosts.md` describes the host contract and the C# plan.

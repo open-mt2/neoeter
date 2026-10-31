@@ -1,36 +1,35 @@
 cmake_minimum_required(VERSION 3.20)
 project(Neoeter VERSION 0.1.0 LANGUAGES C CXX)
 
-# Engine (L0–L3) of the OpenMT2 client. See docs/architecture.md.
+# Engine (L0-L3) of the OpenMT2 client. See docs/architecture.md.
 #
-# The directory list below is the single source of truth for the build order.
-# Until TB.1 imports the histories, missing packages are reported and skipped so
-# the scaffold configures on its own.
+# One directory per role; a role with more than one package has subpackages.
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(NeoeterOptions)
 
+set(NEOETER_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+include_directories("${NEOETER_INCLUDE_DIR}")
+
 set(NEOETER_PACKAGES
-    platform/EterBase
-    platform/EterLocale
-    platform/SphereLib
-    io/EterPack
-    image/EterImageLib
-    render/EterLib
-    audio/MilesLib
-    model/EterGrnLib
-    model/SpeedTreeLib
-    terrain/PRTerrainLib
-    effect/EffectLib
+    platform/base
+    platform/locale
+    platform/math
+    io
+    image
+    render
+    audio
+    model/grn
+    model/speedtree
+    terrain
+    effect
 )
 
 foreach(_package IN LISTS NEOETER_PACKAGES)
-    get_filename_component(_name "${_package}" NAME)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/${_package}/CMakeLists.txt")
-        # Pin the binary directory to the historic build/src/<Package> path.
-        # Debian packaging, CTest fixtures, golden-check.sh and the devkit's
-        # build.sh all resolve binaries through it; the move must not change it.
-        add_subdirectory("src/${_package}" "${CMAKE_BINARY_DIR}/src/${_name}")
+        # One binary directory per role/subpackage; keeps the build tree free of
+        # the historic package names.
+        add_subdirectory("src/${_package}" "${CMAKE_BINARY_DIR}/src/${_package}")
     else()
         message(STATUS "Neoeter: src/${_package} not imported yet")
     endif()
