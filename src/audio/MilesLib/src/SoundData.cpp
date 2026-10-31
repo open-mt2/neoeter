@@ -90,14 +90,14 @@ bool CSoundData::ReadFromDisk()
 		case AILFILETYPE_ADPCM_WAV:	// 3D 사운드는 decompress 해야 함.
 			{
 				AIL_WAV_info(s + 1, &info);
-				AIL_decompress_ADPCM(&info, &m_data, &m_size);
+				AIL_decompress_ADPCM(&info, &m_data, (U32*)&m_size);  // ULONG == U32 width on LLP64
 				AIL_mem_free_lock(s);
 			}
 			break;
 
 		case AILFILETYPE_MPEG_L3_AUDIO:
 			{
-				AIL_decompress_ASI(s + 1, *((S32 *) s), m_filename, &m_data, &m_size, 0);
+				AIL_decompress_ASI(s + 1, *((S32 *) s), m_filename, &m_data, (U32*)&m_size, 0);  // LLP64: ULONG vs U32
 				AIL_mem_free_lock(s);
 			}
 			break;
