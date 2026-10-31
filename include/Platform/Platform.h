@@ -1579,7 +1579,22 @@
     #endif
 
     inline BOOL DestroyCursor(HCURSOR) { return TRUE; }
-    inline int ShowCursor(BOOL) { return 0; }
+    // Windows keeps a display-counter whose sign reports visibility. The
+    // client hides the cursor with
+    //     do { i = ShowCursor(FALSE); } while (i >= 0);
+    // so a constant 0 spins forever (the logo-close path hangs before the
+    // login window opens). Track the counter with the same sign convention.
+    inline int ShowCursor(BOOL bShow) {
+        static int s_iShowCount = 0;
+        if (bShow) {
+            if (s_iShowCount < 0)
+                ++s_iShowCount;
+        } else {
+            if (s_iShowCount > -1)
+                --s_iShowCount;
+        }
+        return s_iShowCount;
+    }
     inline HCURSOR SetCursor(HCURSOR) { return nullptr; }
     inline BOOL SetCursorPos(int x, int y) {
         Platform_WarpMouse(x, y);

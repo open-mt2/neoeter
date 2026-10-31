@@ -106,8 +106,8 @@ add_library(neoeter_platform_base STATIC
 )
 add_library(Neoeter::Platform::Base ALIAS neoeter_platform_base)
 
-# Platform macros must be PUBLIC: consumers (standalone neoeter_render, ScriptLib,
-# neoeter_model_grn, neoeter_model_speedtree, neoeter_terrain, EterPythonLib) include the Platform
+# Platform macros must be PUBLIC: consumers (standalone neoeter_render, neoeter_python_host,
+# neoeter_model_grn, neoeter_model_speedtree, neoeter_terrain, neoeter_python_bindings) include the Platform
 # headers and only see definitions carried by the target they link (issue #79).
 if(WIN32)
     # T1.5: the Windows build uses the same GL compatibility renderer as Linux.

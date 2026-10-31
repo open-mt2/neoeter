@@ -14,7 +14,7 @@ endif()
 if(EFFECTLIB_STANDALONE)
     include(FetchContent)
 
-    foreach(dep neoeter_platform_base:pkg_eterbase neoeter_platform_locale:pkg_eterlocale neoeter_io:pkg_eterpack neoeter_image:pkg_eterimagelib neoeter_platform_math:pkg_spherelib CWebBrowser:pkg_cwebbrowser neoeter_render:pkg_eterlib neoeter_audio:pkg_mileslib)
+    foreach(dep neoeter_platform_base:pkg_eterbase neoeter_platform_locale:pkg_eterlocale neoeter_io:pkg_eterpack neoeter_image:pkg_eterimagelib neoeter_platform_math:pkg_spherelib client_webbrowser:pkg_cwebbrowser neoeter_render:pkg_eterlib neoeter_audio:pkg_mileslib)
         string(REPLACE ":" ";" dep_list ${dep})
         list(GET dep_list 0 dep_name)
         list(GET dep_list 1 dep_repo)
