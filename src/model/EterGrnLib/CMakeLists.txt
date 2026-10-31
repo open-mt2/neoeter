@@ -64,7 +64,12 @@ target_link_libraries(EterGrnLib
 )
 
 if(UNIX)
-    target_compile_definitions(EterGrnLib PUBLIC __LINUX__ _GNU_SOURCE)
+    target_compile_definitions(EterGrnLib PUBLIC
+        OPENMT2_PLATFORM_LINUX=1
+        OPENMT2_RENDERER_GL=1
+        OPENMT2_SDL_WINDOW=1
+        _GNU_SOURCE
+    )
 endif()
 
 if((ETERGRNLIB_STANDALONE AND BUILD_TESTING) OR (NOT ETERGRNLIB_STANDALONE AND BUILD_TESTS))
