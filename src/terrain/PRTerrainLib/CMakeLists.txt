@@ -64,7 +64,12 @@ target_link_libraries(PRTerrainLib
 )
 
 if(UNIX)
-    target_compile_definitions(PRTerrainLib PUBLIC __LINUX__ _GNU_SOURCE)
+    target_compile_definitions(PRTerrainLib PUBLIC
+        OPENMT2_PLATFORM_LINUX=1
+        OPENMT2_RENDERER_GL=1
+        OPENMT2_SDL_WINDOW=1
+        _GNU_SOURCE
+    )
 endif()
 
 if((PRTERRAINLIB_STANDALONE AND BUILD_TESTING) OR (NOT PRTERRAINLIB_STANDALONE AND BUILD_TESTS))
