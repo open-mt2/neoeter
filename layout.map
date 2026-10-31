@@ -1,0 +1,19 @@
+# <github-repository>=<source-directory>=<path in neoeter>
+#
+# Pure moves. The source directory name is kept on purpose: it preserves the
+# include roots (<EterBase/...>), the CMake project/target names and the test
+# fixtures without a single edit.
+#
+# Order is dependency order (see README) and is also the merge order.
+
+pkg_eterbase=EterBase=src/platform/EterBase
+pkg_eterlocale=EterLocale=src/platform/EterLocale
+pkg_spherelib=SphereLib=src/platform/SphereLib
+pkg_eterpack=EterPack=src/io/EterPack
+pkg_eterimagelib=EterImageLib=src/image/EterImageLib
+pkg_eterlib=EterLib=src/render/EterLib
+pkg_mileslib=MilesLib=src/audio/MilesLib
+pkg_etergrnlib=EterGrnLib=src/model/EterGrnLib
+pkg_speedtreelib=SpeedTreeLib=src/model/SpeedTreeLib
+pkg_prterrainlib=PRTerrainLib=src/terrain/PRTerrainLib
+pkg_effectlib=EffectLib=src/effect/EffectLib
