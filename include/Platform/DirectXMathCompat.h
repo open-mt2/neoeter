@@ -7,16 +7,6 @@
 #include <cstring>
 #include <algorithm>
 
-#if defined(OPENMT2_PLATFORM_LINUX)
-#if defined(__GNUC__) || defined(__clang__)
-bool Platform_GetImageInfo(const void* data, size_t size, uint32_t* outW, uint32_t* outH, uint32_t* outFormat);
-bool Platform_DecodeImage(const void* data, size_t size, uint32_t* outW, uint32_t* outH, std::vector<uint8_t>& outPixels);
-#else
-bool Platform_GetImageInfo(const void* data, size_t size, uint32_t* outW, uint32_t* outH, uint32_t* outFormat);
-bool Platform_DecodeImage(const void* data, size_t size, uint32_t* outW, uint32_t* outH, std::vector<uint8_t>& outPixels);
-#endif
-#endif
-
 #if defined(_WIN32) && !defined(USE_PLATFORM_D3D_COMPAT)
     // Legacy Windows branch (D1/D2 retired the native path). The DirectX SDK
     // headers are gone: the compat vocabulary below is the only contract, so a
@@ -27,6 +17,10 @@ bool Platform_DecodeImage(const void* data, size_t size, uint32_t* outW, uint32_
 // Renderer seam contract (T1.7): resources are named by opaque handles so no
 // GL type leaks above the backend (invariant R2).
 #include "RenderBackend.h"
+
+// Image decoding behind the D3DX shim (ImageLoaderCompat.cpp, stb_image). It is
+// platform neutral: every target that takes this branch decodes non-DDS images.
+#include <Neoeter/Platform/Base/ImageLoaderCompat.h>
 
 // d3d9.h defines this; <windows.h> alone does not. The compat vocabulary needs
 // it for the DXT formats (T1.5 drops the DirectX SDK headers).
@@ -2114,48 +2108,39 @@ inline HRESULT D3DXGetImageInfoFromFileInMemory(LPCVOID pSrcData, UINT SrcDataSi
     pSrcInfo->Format = D3DFMT_A8R8G8B8;
     pSrcInfo->ResourceType = D3DRTYPE_TEXTURE;
 
-#if defined(OPENMT2_PLATFORM_LINUX)
-    if (Platform_GetImageInfo) {
-        uint32_t w = 0, h = 0, fmt = 21;
-        if (Platform_GetImageInfo(pSrcData, SrcDataSize, &w, &h, &fmt)) {
-            pSrcInfo->Width = w;
-            pSrcInfo->Height = h;
-            pSrcInfo->Format = (D3DFORMAT)fmt;
-        }
+    uint32_t w = 0, h = 0, fmt = 21;
+    if (Platform_GetImageInfo(pSrcData, SrcDataSize, &w, &h, &fmt)) {
+        pSrcInfo->Width = w;
+        pSrcInfo->Height = h;
+        pSrcInfo->Format = (D3DFORMAT)fmt;
     }
-#endif
     return S_OK;
 }
 
 inline HRESULT D3DXCreateTextureFromFileInMemoryEx(
     LPDIRECT3DDEVICE9, LPCVOID pSrcData, UINT SrcDataSize,
-    UINT Width, UINT Height, UINT /*MipLevels*/, DWORD /*Usage*/,
-    D3DFORMAT Format, D3DPOOL /*Pool*/, DWORD /*Filter*/, DWORD /*MipFilter*/,
+    UINT /*Width*/, UINT /*Height*/, UINT /*MipLevels*/, DWORD /*Usage*/,
+    D3DFORMAT /*Format*/, D3DPOOL /*Pool*/, DWORD /*Filter*/, DWORD /*MipFilter*/,
     D3DCOLOR /*ColorKey*/, D3DXIMAGE_INFO* /*pSrcInfo*/, void* /*pPalette*/,
     LPDIRECT3DTEXTURE9* ppTexture)
 {
     if (!pSrcData || SrcDataSize == 0 || !ppTexture) return E_FAIL;
 
-#if defined(OPENMT2_PLATFORM_LINUX)
-    if (Platform_DecodeImage) {
-        uint32_t w = 0, h = 0;
-        std::vector<uint8_t> pixels;
-        if (Platform_DecodeImage(pSrcData, SrcDataSize, &w, &h, pixels)) {
-            IDirect3DTexture9* pTex = new IDirect3DTexture9(w, h, D3DFMT_A8R8G8B8);
-            D3DLOCKED_RECT lr;
-            if (SUCCEEDED(pTex->LockRect(0, &lr, nullptr, 0))) {
-                if (lr.pBits && !pixels.empty()) {
-                    std::memcpy(lr.pBits, pixels.data(), std::min(pixels.size(), (size_t)(w * h * 4)));
-                }
-                pTex->UnlockRect(0);
-            }
-            *ppTexture = pTex;
-            return S_OK;
-        }
-    }
-#endif
+    // An image that cannot be decoded fails, so the caller reports it instead of
+    // drawing an empty texture (open-mt2/devkit#136).
+    uint32_t w = 0, h = 0;
+    std::vector<uint8_t> pixels;
+    if (!Platform_DecodeImage(pSrcData, SrcDataSize, &w, &h, pixels)) return E_FAIL;
 
-    *ppTexture = new IDirect3DTexture9(Width == D3DX_DEFAULT ? 64 : Width, Height == D3DX_DEFAULT ? 64 : Height, Format);
+    IDirect3DTexture9* pTex = new IDirect3DTexture9(w, h, D3DFMT_A8R8G8B8);
+    D3DLOCKED_RECT lr;
+    if (SUCCEEDED(pTex->LockRect(0, &lr, nullptr, 0))) {
+        if (lr.pBits && !pixels.empty()) {
+            std::memcpy(lr.pBits, pixels.data(), std::min(pixels.size(), (size_t)w * h * 4));
+        }
+        pTex->UnlockRect(0);
+    }
+    *ppTexture = pTex;
     return S_OK;
 }
 
