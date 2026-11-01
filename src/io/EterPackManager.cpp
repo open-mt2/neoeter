@@ -40,6 +40,38 @@ static std::string FindCaseInsensitiveFile(const std::string& path)
 	return "";
 }
 
+// Every sibling directory whose name matches `path` ignoring case. Assets
+// extracted from Windows packs can end up split across e.g. ETC/ and etc/,
+// which Windows treats as one folder.
+static std::vector<std::string> FindCaseInsensitiveDirs(const std::string& path)
+{
+	std::vector<std::string> result;
+
+	std::error_code ec;
+	fs::path p(path);
+	fs::path parent = p.parent_path();
+	if (parent.empty()) parent = ".";
+	std::string lowerFilename = p.filename().string();
+	std::transform(lowerFilename.begin(), lowerFilename.end(), lowerFilename.begin(), ::tolower);
+
+	if (fs::is_directory(parent, ec)) {
+		for (const auto& entry : fs::directory_iterator(parent, ec)) {
+			if (!entry.is_directory(ec))
+				continue;
+			std::string entryName = entry.path().filename().string();
+			std::string entryLower = entryName;
+			std::transform(entryLower.begin(), entryLower.end(), entryLower.begin(), ::tolower);
+			if (entryLower == lowerFilename)
+				result.push_back((parent / entryName).string());
+		}
+	}
+
+	// Register the exact-case folder last so its files win on conflicts.
+	std::stable_partition(result.begin(), result.end(),
+		[&](const std::string& dir) { return fs::path(dir).filename() != p.filename(); });
+	return result;
+}
+
 #include <Neoeter/IO/EterPackManager.h>
 
 #if __has_include(<Neoeter/Platform/Base/Debug.h>)
@@ -275,9 +307,17 @@ bool CEterPackManager::RegisterPack(const std::string& name, const std::string& 
 
 		// Determine requested container type
 		if (container == "FOLDER") {
-			std::string realFolder = FindCaseInsensitiveFile(normName);
-			if (realFolder.empty()) realFolder = normName;
-			pack = std::make_shared<Folder>(realFolder);
+			std::vector<std::string> realFolders = FindCaseInsensitiveDirs(normName);
+			if (realFolders.empty()) realFolders.push_back(normName);
+
+			for (auto const& realFolder : realFolders) {
+				pack = std::make_shared<Folder>(realFolder);
+				for (auto const& fileName : pack->listFiles())
+					m_FileMap[fileName] = pack;
+			}
+
+			m_PackMap.insert({ name, pack });
+			return true;
 		}
 		else if (container == "ZIP") {
 			std::string realZip = FindCaseInsensitiveFile(normName + ".zip");

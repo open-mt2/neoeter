@@ -7,7 +7,7 @@
 #if defined(OPENMT2_PLATFORM_LINUX)
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include <unistd.h>
+#include <Neoeter/Render/FontLocator.h>
 
 static FT_Library s_ftLibrary = nullptr;
 
@@ -25,42 +25,17 @@ static FT_Face GetFTFace(const char* fontName, int fontSize)
 	if (it != s_faceCache.end())
 		return it->second;
 
-	static const char* s_fontPaths[] = {
-		"/usr/share/fonts/TTF/DejaVuSans.ttf",
-		"/usr/share/fonts/noto/NotoSans-Regular.ttf",
-		"/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-		"/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
-		"/usr/share/fonts/liberation-sans/LiberationSans-Regular.ttf",
-		"/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-		"/usr/share/fonts/truetype/freefont/FreeSans.ttf",
-		nullptr
-	};
+	std::string path = FontLocator_FindFontFile(fontName);
+	if (path.empty())
+		return nullptr;
 
 	FT_Face face = nullptr;
-	if (fontName && fontName[0] && access(fontName, R_OK) == 0)
-	{
-		if (FT_New_Face(s_ftLibrary, fontName, 0, &face) == 0)
-		{
-			FT_Set_Pixel_Sizes(face, 0, fontSize > 0 ? fontSize : 12);
-			s_faceCache[key] = face;
-			return face;
-		}
-	}
+	if (FT_New_Face(s_ftLibrary, path.c_str(), 0, &face) != 0)
+		return nullptr;
 
-	for (int i = 0; s_fontPaths[i] != nullptr; ++i)
-	{
-		if (access(s_fontPaths[i], R_OK) == 0)
-		{
-			if (FT_New_Face(s_ftLibrary, s_fontPaths[i], 0, &face) == 0)
-			{
-				FT_Set_Pixel_Sizes(face, 0, fontSize > 0 ? fontSize : 12);
-				s_faceCache[key] = face;
-				return face;
-			}
-		}
-	}
-
-	return nullptr;
+	FT_Set_Pixel_Sizes(face, 0, fontSize > 0 ? fontSize : 12);
+	s_faceCache[key] = face;
+	return face;
 }
 #endif
 
