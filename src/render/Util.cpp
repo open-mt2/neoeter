@@ -313,7 +313,7 @@ void __strcat1(char * str,int i)
 {
 	char result[2];
 	result[0] = i;
-	result[1] = NULL;
+	result[1] = '\0';
 	strcat(str,result);
 }
 

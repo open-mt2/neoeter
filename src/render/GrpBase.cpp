@@ -33,7 +33,7 @@ ID3DXMatrixStack *		CGraphicBase::ms_lpd3dMatStack = NULL;
 D3DPRESENT_PARAMETERS	CGraphicBase::ms_d3dPresentParameter;
 D3DVIEWPORT9			CGraphicBase::ms_Viewport;
 
-HRESULT					CGraphicBase::ms_hLastResult = NULL;
+HRESULT					CGraphicBase::ms_hLastResult = S_OK;
 
 int						CGraphicBase::ms_iWidth;
 int						CGraphicBase::ms_iHeight;

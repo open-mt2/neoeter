@@ -357,7 +357,7 @@ class CStateManager : public CSingleton<CStateManager>
 		BOOL				m_bTextureStageStateSavingFlag[STATEMANAGER_MAX_STAGES][STATEMANAGER_MAX_TEXTURESTATES];
 		BOOL				m_bSamplerStateSavingFlag[STATEMANAGER_MAX_STAGES][STATEMANAGER_MAX_SAMPLERSTATES];
 		BOOL				m_bTransformSavingFlag[STATEMANAGER_MAX_TRANSFORMSTATES];
-#endif _DEBUG
+#endif // _DEBUG
 };
 
 #define STATEMANAGER (CStateManager::Instance())
