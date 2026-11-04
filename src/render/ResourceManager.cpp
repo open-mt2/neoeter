@@ -334,7 +334,7 @@ bool CResourceManager::isResourcePointerData(DWORD dwFileCRC)
 	TResourcePointerMap::iterator itor = m_pResMap.find(dwFileCRC);
 
 	if (m_pResMap.end() == itor)
-		return NULL;
+		return false;
 
 	return (itor->second)->IsData();
 }

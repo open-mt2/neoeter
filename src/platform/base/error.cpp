@@ -146,7 +146,9 @@ void SetEterExceptionHandler()
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
+#if defined(__GLIBC__)
 #include <execinfo.h>
+#endif
 
 static void PosixSignalHandler(int sig)
 {
@@ -154,6 +156,7 @@ static void PosixSignalHandler(int sig)
 	if (f)
 	{
 		fprintf(f, "Fatal Signal: %d\n", sig);
+#if defined(__GLIBC__)
 		void* buffer[64];
 		int nptrs = backtrace(buffer, 64);
 		char** strings = backtrace_symbols(buffer, nptrs);
@@ -163,6 +166,7 @@ static void PosixSignalHandler(int sig)
 				fprintf(f, "%s\n", strings[i]);
 			free(strings);
 		}
+#endif
 		fclose(f);
 	}
 	_exit(1);
