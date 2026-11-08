@@ -11,10 +11,21 @@ bin/
 
 # IDE and editor
 .vscode/
+.clangd
 .clangd/
 .cache/
 compile_commands.json
+compile_flags.txt
 CMakeUserPresets.json
+
+# CMake in-source artifacts
+Makefile
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+_deps/
 
 # OS
 .DS_Store

@@ -1,0 +1,86 @@
+name: library
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: library-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    name: Build library
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            cmake \
+            ninja-build \
+            pkg-config \
+            libsdl2-dev \
+            libfreetype-dev \
+            libfontconfig1-dev \
+            liblzo2-dev \
+            libzip-dev \
+            zlib1g-dev \
+            libgl-dev \
+            libegl-dev \
+            libjpeg-dev
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" -DBUILD_TESTS=OFF
+
+      - name: Build
+        run: cmake --build build --parallel "$(nproc)"
+
+      - name: Package
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="0.0.0-${GITHUB_SHA::12}"
+          fi
+          out="neoeter-${version}-linux-x86_64"
+          cmake --install build --prefix "dist/${out}"
+          printf '%s\n' "${version}" > "dist/${out}/VERSION"
+          tar -C dist -czf "dist/${out}.tar.gz" "${out}"
+          echo "PACKAGE_DIR=dist/${out}" >> "$GITHUB_ENV"
+
+      - name: Verify package
+        run: |
+          test -f "${PACKAGE_DIR}/lib/cmake/Neoeter/NeoeterConfig.cmake"
+          test -f "${PACKAGE_DIR}/lib/cmake/Neoeter/NeoeterConfigVersion.cmake"
+          test -f "${PACKAGE_DIR}/lib/cmake/Neoeter/NeoeterTargets.cmake"
+          test -f "${PACKAGE_DIR}/lib/libneoeter_render.a"
+          test -f "${PACKAGE_DIR}/lib/libminiaudio.a"
+          test -f "${PACKAGE_DIR}/include/Neoeter/Render/Camera.h"
+          test -f "${PACKAGE_DIR}/include/miniaudio/miniaudio.h"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neoeter-library
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
+      - name: Publish release asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.tar.gz

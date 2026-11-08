@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(Neoeter VERSION 0.1.0 LANGUAGES C CXX)
 
-# Engine (L0-L3) of the OpenMT2 client. See docs/architecture.md.
+# Engine of the OpenMT2 client. See https://open-mt2.github.io/docs/neoeter/architecture
 #
 # One directory per role; a role with more than one package has subpackages.
 
@@ -10,6 +10,8 @@ include(NeoeterOptions)
 
 set(NEOETER_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${NEOETER_INCLUDE_DIR}")
+
+add_subdirectory("external/miniaudio" "${CMAKE_BINARY_DIR}/external/miniaudio")
 
 set(NEOETER_PACKAGES
     platform/base
@@ -36,6 +38,7 @@ foreach(_package IN LISTS NEOETER_PACKAGES)
 endforeach()
 
 include(NeoeterAliases)
+include(NeoeterInstall)
 
 if(BUILD_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
     enable_testing()
