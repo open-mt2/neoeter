@@ -16,6 +16,9 @@
 // Windows ships an OpenGL 1.1 header: the enums introduced by GL 1.2/1.3 and by
 // EXT_framebuffer_object are missing even though the driver exposes the entry
 // points (loaded below). Values are the canonical ones.
+#ifndef GL_TEXTURE0
+#define GL_TEXTURE0 0x84C0
+#endif
 #ifndef GL_TEXTURE1
 #define GL_TEXTURE1 0x84C1
 #define GL_TEXTURE2 0x84C2
@@ -24,6 +27,12 @@
 #define GL_TEXTURE5 0x84C5
 #define GL_TEXTURE6 0x84C6
 #define GL_TEXTURE7 0x84C7
+#endif
+#ifndef GL_ACTIVE_TEXTURE
+#define GL_ACTIVE_TEXTURE 0x84E0
+#endif
+#ifndef GL_MAX_TEXTURE_UNITS
+#define GL_MAX_TEXTURE_UNITS 0x84E2
 #endif
 #ifndef GL_TEXTURE_MAX_LEVEL
 #define GL_TEXTURE_MAX_LEVEL 0x813D
