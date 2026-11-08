@@ -47,8 +47,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 endif()
 
 find_package(Threads REQUIRED)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(MINIAUDIO REQUIRED miniaudio)
+
+if(NOT TARGET miniaudio)
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../external/miniaudio" "${CMAKE_BINARY_DIR}/external/miniaudio")
+endif()
 
 set(MILESLIB_SOURCES
     SoundBase.cpp
@@ -90,8 +92,6 @@ target_include_directories(neoeter_audio
         $<BUILD_INTERFACE:${NEOETER_INCLUDE_DIR}>
         $<BUILD_INTERFACE:${NEOETER_INCLUDE_DIR}>
         $<INSTALL_INTERFACE:include>
-        ${MINIAUDIO_INCLUDE_DIRS}
-        /usr/include/miniaudio
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
@@ -102,7 +102,7 @@ target_link_libraries(neoeter_audio
         neoeter_io
         neoeter_render
         Threads::Threads
-        ${MINIAUDIO_LIBRARIES}
+        miniaudio
         $<$<PLATFORM_ID:Linux>:dl>
         $<$<PLATFORM_ID:Linux>:m>
 )

@@ -1,0 +1,36 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Threads)
+find_dependency(SDL2)
+
+if(NOT WIN32)
+    find_dependency(OpenGL COMPONENTS GL)
+    find_dependency(Freetype)
+    find_dependency(Iconv)
+    find_dependency(Fontconfig)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/NeoeterTargets.cmake")
+
+function(_neoeter_compat _old _new)
+    if(NOT TARGET ${_old})
+        add_library(${_old} INTERFACE)
+        target_link_libraries(${_old} INTERFACE ${_new})
+    endif()
+endfunction()
+
+_neoeter_compat(neoeter_platform_base Neoeter::Platform::Base)
+_neoeter_compat(neoeter_platform_locale Neoeter::Platform::Locale)
+_neoeter_compat(neoeter_platform_math Neoeter::Platform::Math)
+_neoeter_compat(neoeter_io Neoeter::IO)
+_neoeter_compat(neoeter_image Neoeter::Image)
+_neoeter_compat(neoeter_render Neoeter::Render)
+_neoeter_compat(neoeter_audio Neoeter::Audio)
+_neoeter_compat(neoeter_model_grn Neoeter::Model::Grn)
+_neoeter_compat(neoeter_model_speedtree Neoeter::Model::SpeedTree)
+_neoeter_compat(neoeter_terrain Neoeter::Terrain)
+_neoeter_compat(neoeter_effect Neoeter::Effect)
+_neoeter_compat(miniaudio Neoeter::Miniaudio)
+
+check_required_components(Neoeter)
