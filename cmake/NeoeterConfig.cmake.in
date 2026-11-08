@@ -5,7 +5,7 @@ find_dependency(Threads)
 find_dependency(SDL2)
 
 if(NOT WIN32)
-    find_dependency(OpenGL COMPONENTS GL)
+    find_dependency(OpenGL)
     find_dependency(Freetype)
     find_dependency(Iconv)
     find_dependency(Fontconfig)

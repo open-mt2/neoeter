@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
-project(Neoeter VERSION 0.1.0 LANGUAGES C CXX)
-
-# Engine of the OpenMT2 client. See https://open-mt2.github.io/docs/neoeter/architecture
-#
-# One directory per role; a role with more than one package has subpackages.
+set(NEOETER_VERSION "0.1.5" CACHE STRING "Neoeter release version")
+project(Neoeter VERSION 0.1.5 LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(NeoeterOptions)
@@ -38,7 +35,6 @@ foreach(_package IN LISTS NEOETER_PACKAGES)
 endforeach()
 
 include(NeoeterAliases)
-include(NeoeterInstall)
 
 if(BUILD_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
     enable_testing()

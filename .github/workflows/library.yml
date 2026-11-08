@@ -52,23 +52,32 @@ jobs:
             libegl-dev \
             libjpeg-dev
 
+      - name: Version
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            label="${version}"
+          else
+            version="0.0.0"
+            label="0.0.0-${GITHUB_SHA::12}"
+          fi
+          echo "PACKAGE_VERSION=${version}" >> "$GITHUB_ENV"
+          echo "PACKAGE_LABEL=${label}" >> "$GITHUB_ENV"
+
       - name: Configure
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" -DBUILD_TESTS=OFF
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" -DBUILD_TESTS=OFF -DNEOETER_VERSION="${PACKAGE_VERSION}"
 
       - name: Build
         run: cmake --build build --parallel "$(nproc)"
 
       - name: Package
         run: |
-          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
-            version="${GITHUB_REF_NAME#v}"
-          else
-            version="0.0.0-${GITHUB_SHA::12}"
-          fi
+          version="${PACKAGE_LABEL}"
           out="neoeter-${version}-linux-x86_64"
           cmake --install build --prefix "dist/${out}"
           printf '%s\n' "${version}" > "dist/${out}/VERSION"
           tar -C dist -czf "dist/${out}.tar.gz" "${out}"
+          sha256sum "dist/${out}.tar.gz" | awk '{print $1}' > "dist/${out}.tar.gz.sha256"
           echo "PACKAGE_DIR=dist/${out}" >> "$GITHUB_ENV"
 
       - name: Verify package
@@ -84,7 +93,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: neoeter-library
-          path: dist/*.tar.gz
+          path: |
+            dist/*.tar.gz
+            dist/*.sha256
           if-no-files-found: error
 
       - name: Publish release
@@ -95,4 +106,6 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: true
           prerelease: ${{ contains(github.ref_name, '-') }}
-          files: dist/*.tar.gz
+          files: |
+            dist/*.tar.gz
+            dist/*.sha256

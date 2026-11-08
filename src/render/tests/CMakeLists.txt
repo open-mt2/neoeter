@@ -29,7 +29,7 @@ endforeach()
 # The test is Linux-only: the EGL/GLX compatibility path does not exist on the
 # Windows target yet.
 if(UNIX)
-    find_package(OpenGL QUIET COMPONENTS GL EGL)
+    find_package(OpenGL QUIET COMPONENTS OpenGL EGL)
     find_package(ZLIB QUIET)
 
     if(TARGET OpenGL::GL AND TARGET OpenGL::EGL AND ZLIB_FOUND)
