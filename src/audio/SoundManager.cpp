@@ -25,6 +25,11 @@ CSoundManager::CSoundManager()
 	m_fBackupMusicVolume	= 0.0f;
 	m_fBackupSoundVolume	= 0.0f;
 
+	m_bStartupMusicFade		= FALSE;
+	m_bStartupMusicFadeJustFinished	= FALSE;
+	m_dwStartupMusicFadeStart	= 0;
+	m_fStartupMusicFadeSeconds	= 0.0f;
+
 	for (int i = 0; i < CSoundManagerStream::MUSIC_INSTANCE_MAX_NUM; ++i)
 	{
 		TMusicInstance & rInstance = m_MusicInstances[i];
@@ -85,6 +90,8 @@ void CSoundManager::Update()
 	// Update Information about 3D Sound
 	ms_SoundManager3D.SetListenerPosition(0.0f, 0.0f, 0.0f);
 
+	float fStartupMusicFade = __GetStartupMusicFadeFactor();
+
 	for (int i = 0; i < CSoundManagerStream::MUSIC_INSTANCE_MAX_NUM; ++i)
 	{
 		TMusicInstance & rMusicInstance = m_MusicInstances[i];
@@ -93,6 +100,15 @@ void CSoundManager::Update()
 
 		switch (rMusicInstance.MusicState)
 		{
+			case MUSIC_STATE_PLAY:
+				if (fStartupMusicFade < 1.0f)
+				{
+					CSoundInstanceStream * pInstance = ms_SoundManagerStream.GetInstance(i);
+					if (pInstance)
+						pInstance->SetVolume(rMusicInstance.fVolume * fStartupMusicFade);
+				}
+				break;
+
 			case MUSIC_STATE_FADE_IN:
 				rMusicInstance.fVolume += rMusicInstance.fVolumeSpeed;
 
@@ -106,7 +122,7 @@ void CSoundManager::Update()
 				{
 					CSoundInstanceStream * pInstance = ms_SoundManagerStream.GetInstance(i);
 					if (pInstance)
-						pInstance->SetVolume(rMusicInstance.fVolume);
+						pInstance->SetVolume(rMusicInstance.fVolume * fStartupMusicFade);
 				}
 				break;
 				
@@ -121,7 +137,7 @@ void CSoundManager::Update()
 				{
 					CSoundInstanceStream * pInstance = ms_SoundManagerStream.GetInstance(i);
 					if (pInstance)
-						pInstance->SetVolume(rMusicInstance.fVolume);
+						pInstance->SetVolume(rMusicInstance.fVolume * fStartupMusicFade);
 				}
 				break;
 			case MUSIC_STATE_FADE_OUT:
@@ -137,9 +153,25 @@ void CSoundManager::Update()
 				{
 					CSoundInstanceStream * pInstance = ms_SoundManagerStream.GetInstance(i);
 					if (pInstance)
-						pInstance->SetVolume(rMusicInstance.fVolume);
+						pInstance->SetVolume(rMusicInstance.fVolume * fStartupMusicFade);
 				}
 				break;
+		}
+	}
+
+	if (m_bStartupMusicFadeJustFinished)
+	{
+		m_bStartupMusicFadeJustFinished = FALSE;
+
+		for (int i = 0; i < CSoundManagerStream::MUSIC_INSTANCE_MAX_NUM; ++i)
+		{
+			TMusicInstance & rMusicInstance = m_MusicInstances[i];
+			if (MUSIC_STATE_OFF == rMusicInstance.MusicState)
+				continue;
+
+			CSoundInstanceStream * pInstance = ms_SoundManagerStream.GetInstance(i);
+			if (pInstance)
+				pInstance->SetVolume(rMusicInstance.fVolume);
 		}
 	}
 }
@@ -470,6 +502,8 @@ void CSoundManager::PlayMusic(const char * c_szFileName)
 
 void CSoundManager::FadeInMusic(const char * c_szFileName, float fVolumeSpeed)
 {
+	Tracef("[Audio] FadeInMusic %s speed %.3f\n", c_szFileName, fVolumeSpeed);
+
 	DWORD dwIndex;
 	if (GetMusicIndex(c_szFileName, &dwIndex))
 	{
@@ -655,4 +689,51 @@ BOOL CSoundManager::GetMusicIndex(const char * c_szFileName, DWORD * pdwIndex)
 void CSoundManager::FadeAll()
 {
 	FadeOutAllMusic();
+}
+
+void CSoundManager::BeginStartupMusicFadeIn(float seconds)
+{
+	m_bStartupMusicFade = seconds > 0.0f ? TRUE : FALSE;
+	m_dwStartupMusicFadeStart = 0;
+	m_fStartupMusicFadeSeconds = seconds;
+	Tracef("[Audio] BeginStartupMusicFadeIn %.2fs\n", seconds);
+}
+
+float CSoundManager::__GetStartupMusicFadeFactor()
+{
+	if (FALSE == m_bStartupMusicFade)
+		return 1.0f;
+
+	DWORD dwNow = ELTimer_GetMSec();
+	if (0 == m_dwStartupMusicFadeStart)
+	{
+		BOOL bMusicActive = FALSE;
+		for (int i = 0; i < CSoundManagerStream::MUSIC_INSTANCE_MAX_NUM; ++i)
+		{
+			if (MUSIC_STATE_OFF != m_MusicInstances[i].MusicState)
+			{
+				bMusicActive = TRUE;
+				break;
+			}
+		}
+
+		if (!bMusicActive)
+			return 1.0f;
+
+		m_dwStartupMusicFadeStart = dwNow;
+		Tracef("[Audio] Startup music fade started\n");
+	}
+
+	float fElapsed = static_cast<float>(dwNow - m_dwStartupMusicFadeStart);
+	float fDuration = m_fStartupMusicFadeSeconds * 1000.0f;
+	if (fDuration <= 0.0f || fElapsed >= fDuration)
+	{
+		m_bStartupMusicFade = FALSE;
+		m_bStartupMusicFadeJustFinished = TRUE;
+		Tracef("[Audio] Startup music fade finished\n");
+		return 1.0f;
+	}
+
+	float t = fElapsed / fDuration;
+	return t * t * (3.0f - 2.0f * t);
 }

@@ -101,6 +101,8 @@ namespace MilesCompatInternal {
         return backend != nullptr && std::strcmp(backend, "null") == 0;
     }
 
+    static constexpr float kMasterVolume = 0.1f;
+
     struct EngineHolder {
         ma_context context;
         bool contextInitialized = false;
@@ -123,6 +125,7 @@ namespace MilesCompatInternal {
 
             if (ma_engine_init(&config, &engine) == MA_SUCCESS) {
                 initialized = true;
+                ma_engine_set_volume(&engine, kMasterVolume);
             }
         }
 

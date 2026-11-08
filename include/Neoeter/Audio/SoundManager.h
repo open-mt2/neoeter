@@ -51,6 +51,7 @@ public:
 	void FadeLimitOutMusic(const char * c_szFileName, float fLimitVolume, float fVolumeSpeed = 0.016f);
 	void FadeOutAllMusic();
 	void FadeAll();
+	void BeginStartupMusicFadeIn(float seconds);
 
 	// Sound Node
 	void UpdateSoundData(DWORD dwcurFrame, const NSound::TSoundDataVector * c_pSoundDataVector);
@@ -84,6 +85,7 @@ protected:
 	float __ConvertGradeVolumeToApplyVolume(int nVolumeGrade);
 	float __ConvertRatioVolumeToApplyVolume(float fVolumeRatio);
 	void __SetMusicVolume(float fVolume);
+	float __GetStartupMusicFadeFactor();
 	BOOL GetSoundInstance2D(const char * c_szSoundFileName, ISoundInstance ** ppInstance);
 	BOOL GetSoundInstance3D(const char * c_szFileName, ISoundInstance ** ppInstance);
 
@@ -102,6 +104,11 @@ protected:
 
 	float							m_fBackupMusicVolume;
 	float							m_fBackupSoundVolume;
+
+	BOOL							m_bStartupMusicFade;
+	BOOL							m_bStartupMusicFadeJustFinished;
+	DWORD							m_dwStartupMusicFadeStart;
+	float							m_fStartupMusicFadeSeconds;
 
 	TMusicInstance					m_MusicInstances[CSoundManagerStream::MUSIC_INSTANCE_MAX_NUM];
 	std::map<std::string, float>	m_PlaySoundHistoryMap;
