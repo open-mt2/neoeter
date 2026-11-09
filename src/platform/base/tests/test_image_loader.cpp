@@ -31,6 +31,35 @@ static std::vector<unsigned char> MakeDdsHeader(uint32_t width, uint32_t height,
     return dds;
 }
 
+static std::vector<unsigned char> MakeUncompressedDds(
+        uint32_t width, uint32_t height, uint32_t bitCount, uint32_t rMask,
+        uint32_t gMask, uint32_t bMask, uint32_t aMask,
+        const std::vector<unsigned char>& pixels) {
+    std::vector<unsigned char> dds(128, 0);
+    std::memcpy(dds.data(), "DDS ", 4);
+    const uint32_t headerSize = 124;
+    std::memcpy(dds.data() + 4, &headerSize, 4);
+    const uint32_t flags = 0x1u | 0x2u | 0x4u | 0x1000u | 0x80000u;
+    std::memcpy(dds.data() + 8, &flags, 4);
+    std::memcpy(dds.data() + 12, &height, 4);
+    std::memcpy(dds.data() + 16, &width, 4);
+    const uint32_t linearSize = width * height * (bitCount / 8);
+    std::memcpy(dds.data() + 20, &linearSize, 4);
+    const uint32_t pixelFormatSize = 32;
+    std::memcpy(dds.data() + 76, &pixelFormatSize, 4);
+    const uint32_t pixelFlags = 0x40u | 0x1u;
+    std::memcpy(dds.data() + 80, &pixelFlags, 4);
+    const uint32_t fourCC = 0;
+    std::memcpy(dds.data() + 84, &fourCC, 4);
+    std::memcpy(dds.data() + 88, &bitCount, 4);
+    std::memcpy(dds.data() + 92, &rMask, 4);
+    std::memcpy(dds.data() + 96, &gMask, 4);
+    std::memcpy(dds.data() + 100, &bMask, 4);
+    std::memcpy(dds.data() + 104, &aMask, 4);
+    dds.insert(dds.end(), pixels.begin(), pixels.end());
+    return dds;
+}
+
 int main() {
     TEST_SECTION("Platform_GetImageInfo / Platform_DecodeImage");
 
@@ -62,6 +91,42 @@ int main() {
         TEST_ASSERT(w == 64);
         TEST_ASSERT(h == 32);
         TEST_ASSERT(format == 0x35545844u); // D3DFMT_DXT5
+    }
+
+    {
+        const uint16_t pixels[4] = {0xFC00, 0x83E0, 0x801F, 0xFFFF};
+        std::vector<unsigned char> raw(sizeof(pixels));
+        std::memcpy(raw.data(), pixels, sizeof(pixels));
+        const std::vector<unsigned char> dds = MakeUncompressedDds(
+            2, 2, 16, 0x7C00, 0x03E0, 0x001F, 0x8000, raw);
+
+        uint32_t w = 0, h = 0;
+        std::vector<uint8_t> decoded;
+        TEST_ASSERT(Platform_DecodeImage(dds.data(), dds.size(), &w, &h, decoded));
+        TEST_ASSERT(w == 2);
+        TEST_ASSERT(h == 2);
+        TEST_ASSERT(decoded.size() == 2u * 2u * 4u);
+        TEST_ASSERT(decoded[0] == 0 && decoded[1] == 0 && decoded[2] == 255 && decoded[3] == 255);
+        TEST_ASSERT(decoded[4] == 0 && decoded[5] == 255 && decoded[6] == 0 && decoded[7] == 255);
+        TEST_ASSERT(decoded[8] == 255 && decoded[9] == 0 && decoded[10] == 0 && decoded[11] == 255);
+        TEST_ASSERT(decoded[12] == 255 && decoded[13] == 255 && decoded[14] == 255 && decoded[15] == 255);
+    }
+
+    {
+        const uint32_t pixels[2] = {0xFF112233u, 0x80445566u};
+        std::vector<unsigned char> raw(sizeof(pixels));
+        std::memcpy(raw.data(), pixels, sizeof(pixels));
+        const std::vector<unsigned char> dds = MakeUncompressedDds(
+            2, 1, 32, 0x00FF0000u, 0x0000FF00u, 0x000000FFu, 0xFF000000u, raw);
+
+        uint32_t w = 0, h = 0;
+        std::vector<uint8_t> decoded;
+        TEST_ASSERT(Platform_DecodeImage(dds.data(), dds.size(), &w, &h, decoded));
+        TEST_ASSERT(w == 2);
+        TEST_ASSERT(h == 1);
+        TEST_ASSERT(decoded.size() == 2u * 4u);
+        TEST_ASSERT(decoded[0] == 0x33 && decoded[1] == 0x22 && decoded[2] == 0x11 && decoded[3] == 0xFF);
+        TEST_ASSERT(decoded[4] == 0x66 && decoded[5] == 0x55 && decoded[6] == 0x44 && decoded[7] == 0x80);
     }
 
     // Garbage must be rejected instead of returning stale dimensions.
