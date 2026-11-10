@@ -19,12 +19,12 @@ namespace Neoeter::Debug
 	void ProcessEvent(const SDL_Event& event);
 	void Draw();
 
-	void AddRow(const char* label, const RowList::ValueProvider& value);
+	void AddRowImpl(const char* label, RowList::ValueProvider value);
 
 	template <typename Provider>
 	void AddRow(const char* label, Provider&& provider)
 	{
-		AddRow(label, RowList::ValueProvider(std::forward<Provider>(provider)));
+		AddRowImpl(label, RowList::ValueProvider(std::forward<Provider>(provider)));
 	}
 #else
 	inline void Initialize() {}

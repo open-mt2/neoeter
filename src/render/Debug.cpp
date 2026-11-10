@@ -83,9 +83,9 @@ namespace Neoeter::Debug
 			ImGui_ImplSDL2_ProcessEvent(&event);
 	}
 
-	void AddRow(const char* label, const RowList::ValueProvider& value)
+	void AddRowImpl(const char* label, RowList::ValueProvider value)
 	{
-		gs_rows.Add(label, value);
+		gs_rows.Add(label, std::move(value));
 	}
 
 	void Draw()

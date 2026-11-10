@@ -1,5 +1,6 @@
 #include <support/TestAssert.h>
 
+#include <Neoeter/Debug/Debug.h>
 #include <Neoeter/Debug/RowList.h>
 
 #include <string>
@@ -39,6 +40,12 @@ int main()
 	anonymous.Add(nullptr, [] { return std::string("value"); });
 	TEST_ASSERT(anonymous.Label(0).empty());
 	TEST_ASSERT(anonymous.Value(0) == "value");
+
+#if defined(NEOETER_DEBUG_UI)
+	int calls = 0;
+	Neoeter::Debug::AddRow("Registered", [] { return std::string("value"); });
+	Neoeter::Debug::AddRow("Counted", [&calls] { return std::to_string(++calls); });
+#endif
 
 	return 0;
 }
