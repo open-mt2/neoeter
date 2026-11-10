@@ -112,25 +112,30 @@ bool CGraphicDevice::ResizeBackBuffer(UINT uWidth, UINT uHeight)
 	if (!ms_lpd3dDevice)
 		return false;
 
+	if (uWidth == 0 || uHeight == 0)
+		return false;
+
 	D3DPRESENT_PARAMETERS& rkD3DPP=ms_d3dPresentParameter;
-	if (rkD3DPP.Windowed)
+	if (rkD3DPP.BackBufferWidth!=uWidth || rkD3DPP.BackBufferHeight!=uHeight)
 	{
-		if (rkD3DPP.BackBufferWidth!=uWidth || rkD3DPP.BackBufferHeight!=uHeight)
+		rkD3DPP.BackBufferWidth=uWidth;
+		rkD3DPP.BackBufferHeight=uHeight;
+
+		IDirect3DDevice9& rkD3DDev=*ms_lpd3dDevice;
+
+		HRESULT hr=rkD3DDev.Reset(&rkD3DPP);
+		if (FAILED(hr))
 		{
-			rkD3DPP.BackBufferWidth=uWidth;
-			rkD3DPP.BackBufferHeight=uHeight;
-
-			IDirect3DDevice9& rkD3DDev=*ms_lpd3dDevice;
-
-			HRESULT hr=rkD3DDev.Reset(&rkD3DPP);
-			if (FAILED(hr))
-			{
-				return false;
-			}
-
-			STATEMANAGER.SetDefaultState();
+			return false;
 		}
+
+		STATEMANAGER.SetDefaultState();
 	}
+
+	ms_iWidth = static_cast<int>(uWidth);
+	ms_iHeight = static_cast<int>(uHeight);
+	SetViewport(0, 0, uWidth, uHeight, 0.0f, 1.0f);
+	ms_lpd3dDevice->SetViewport(&ms_Viewport);
 
 	return true;
 }
@@ -440,12 +445,10 @@ RETRY:
 		return CREATE_GET_DEVICE_CAPS2;
 	}
 
-	if (!Windowed)
-		SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, iHres, iVres, SWP_SHOWWINDOW);
-
 	//Tracef("vertex shader version : %X\n",(DWORD)ms_d3dCaps.VertexShaderVersion);
 
-	ms_lpd3dDevice->GetViewport(&ms_Viewport);
+	SetViewport(0, 0, static_cast<DWORD>(iHres), static_cast<DWORD>(iVres), 0.0f, 1.0f);
+	ms_lpd3dDevice->SetViewport(&ms_Viewport);
 
 	m_pStateManager = new CStateManager(ms_lpd3dDevice);
 	m_pStateManager->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, TRUE);

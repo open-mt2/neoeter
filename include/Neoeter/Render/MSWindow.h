@@ -17,6 +17,9 @@ class CMSWindow
 		void Show();
 		void Hide();
 
+		bool SetFullscreen(bool enabled, int width, int height);
+		void Minimize();
+
 		void SetVisibleMode(bool isVisible);
 
 		void SetPosition(int x, int y);

@@ -181,6 +181,77 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, DWORD /*cs*/, DWORD 
 	return true;
 }
 
+bool CMSWindow::SetFullscreen(bool enabled, int width, int height)
+{
+	if (!ms_pSDLWindow)
+		return false;
+
+	if (enabled)
+	{
+		SDL_RestoreWindow(ms_pSDLWindow);
+		SDL_ShowWindow(ms_pSDLWindow);
+
+		int display = SDL_GetWindowDisplayIndex(ms_pSDLWindow);
+		if (display < 0)
+			display = 0;
+
+		SDL_SetWindowMinimumSize(ms_pSDLWindow, 0, 0);
+		SDL_SetWindowMaximumSize(ms_pSDLWindow, 0, 0);
+
+		if (width > 0 && height > 0)
+		{
+			SDL_DisplayMode desired = {};
+			desired.w = width;
+			desired.h = height;
+
+			SDL_DisplayMode closest = {};
+			if (SDL_GetClosestDisplayMode(display, &desired, &closest))
+				SDL_SetWindowDisplayMode(ms_pSDLWindow, &closest);
+		}
+
+		if (SDL_SetWindowFullscreen(ms_pSDLWindow, SDL_WINDOW_FULLSCREEN) != 0)
+		{
+			if (SDL_SetWindowFullscreen(ms_pSDLWindow, SDL_WINDOW_FULLSCREEN_DESKTOP) != 0)
+			{
+				SDL_SetWindowFullscreen(ms_pSDLWindow, 0);
+				return false;
+			}
+		}
+	}
+	else
+	{
+		SDL_SetWindowFullscreen(ms_pSDLWindow, 0);
+
+		if (width > 0 && height > 0)
+		{
+			SDL_SetWindowResizable(ms_pSDLWindow, SDL_FALSE);
+			SDL_SetWindowMinimumSize(ms_pSDLWindow, width, height);
+			SDL_SetWindowMaximumSize(ms_pSDLWindow, width, height);
+			SDL_SetWindowSize(ms_pSDLWindow, width, height);
+			SDL_SetWindowPosition(ms_pSDLWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+		}
+	}
+
+#if defined(OPENMT2_RENDERER_GL)
+	if (ms_pGLContext)
+		SDL_GL_MakeCurrent(ms_pSDLWindow, ms_pGLContext);
+#endif
+
+	int actualWidth = width;
+	int actualHeight = height;
+	SDL_GetWindowSize(ms_pSDLWindow, &actualWidth, &actualHeight);
+	if (actualWidth > 0 && actualHeight > 0)
+		Platform_SetWindowResolution(actualWidth, actualHeight);
+
+	return true;
+}
+
+void CMSWindow::Minimize()
+{
+	if (ms_pSDLWindow)
+		SDL_MinimizeWindow(ms_pSDLWindow);
+}
+
 void CMSWindow::SetVisibleMode(bool isVisible)
 {
 	m_isVisible = isVisible;
