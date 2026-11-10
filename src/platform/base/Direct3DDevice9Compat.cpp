@@ -242,8 +242,6 @@ IDirect3DDevice9::IDirect3DDevice9()
       m_inRenderTarget(false)
 {
     std::memset(&m_viewport, 0, sizeof(m_viewport));
-    m_viewport.Width = 1024;
-    m_viewport.Height = 768;
     m_viewport.MaxZ = 1.0f;
     std::memset(&m_material, 0, sizeof(m_material));
     m_material.Diffuse.r = m_material.Diffuse.g = m_material.Diffuse.b = m_material.Diffuse.a = 1.0f;

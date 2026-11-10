@@ -83,6 +83,29 @@ int main()
                                               D3DFMT_INDEX16, nullptr, 0) == S_OK);
     TEST_PASS("draws without vertex data return S_OK");
 
+    TEST_SECTION("device viewport comes from the presentation parameters");
+
+    {
+        IDirect3D9 d3d;
+        D3DPRESENT_PARAMETERS present;
+        std::memset(&present, 0, sizeof(present));
+        present.BackBufferWidth = 1920;
+        present.BackBufferHeight = 1080;
+
+        IDirect3DDevice9* created = nullptr;
+        TEST_ASSERT(d3d.CreateDevice(0, D3DDEVTYPE_HAL, nullptr, 0, &present, &created) == S_OK);
+        TEST_ASSERT(created != nullptr);
+
+        D3DVIEWPORT9 viewport;
+        std::memset(&viewport, 0, sizeof(viewport));
+        TEST_ASSERT(created->GetViewport(&viewport) == S_OK);
+        TEST_ASSERT(viewport.Width == 1920);
+        TEST_ASSERT(viewport.Height == 1080);
+
+        delete created;
+        TEST_PASS("viewport starts at the requested back-buffer size");
+    }
+
     TEST_SECTION("textures keep their D3D9 description");
 
     {

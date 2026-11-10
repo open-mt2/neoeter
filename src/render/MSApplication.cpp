@@ -156,7 +156,9 @@ bool CMSApplication::MessageProcess()
 			}
 			else if (event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
 			{
-				if (ms_pSDLWindow)
+				bool isFullscreen = ms_pSDLWindow &&
+					(SDL_GetWindowFlags(ms_pSDLWindow) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP));
+				if (ms_pSDLWindow && !isFullscreen)
 				{
 					SDL_RestoreWindow(ms_pSDLWindow);
 					int targetW = 1024, targetH = 768;
@@ -167,9 +169,11 @@ bool CMSApplication::MessageProcess()
 			}
 			else if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED || event.window.event == SDL_WINDOWEVENT_RESIZED)
 			{
+				bool isFullscreen = ms_pSDLWindow &&
+					(SDL_GetWindowFlags(ms_pSDLWindow) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP));
 				int targetW = 1024, targetH = 768;
 				Platform_GetWindowResolution(&targetW, &targetH);
-				if (targetW > 0 && targetH > 0 && (event.window.data1 != targetW || event.window.data2 != targetH))
+				if (!isFullscreen && targetW > 0 && targetH > 0 && (event.window.data1 != targetW || event.window.data2 != targetH))
 				{
 					if (ms_pSDLWindow)
 					{

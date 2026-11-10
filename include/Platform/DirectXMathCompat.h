@@ -1870,6 +1870,10 @@ public:
         if (pMatrix && (unsigned)State < 512) *pMatrix = m_transforms[State];
         return S_OK;
     }
+    void SetViewportSize(UINT width, UINT height) {
+        m_viewport.Width = width;
+        m_viewport.Height = height;
+    }
     HRESULT SetViewport(const D3DVIEWPORT9* pViewport);
     HRESULT GetViewport(D3DVIEWPORT9* pViewport) {
         if (pViewport) *pViewport = m_viewport;
@@ -2067,9 +2071,12 @@ public:
         IDirect3DDevice9 dummy;
         return dummy.GetDeviceCaps(pCaps);
     }
-    HRESULT CreateDevice(UINT, D3DDEVTYPE, HWND, DWORD, D3DPRESENT_PARAMETERS*, IDirect3DDevice9** ppReturnedDeviceInterface) {
+    HRESULT CreateDevice(UINT, D3DDEVTYPE, HWND, DWORD, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface) {
         if (!ppReturnedDeviceInterface) return E_INVALIDARG;
-        *ppReturnedDeviceInterface = new IDirect3DDevice9();
+        IDirect3DDevice9* device = new IDirect3DDevice9();
+        if (pPresentationParameters && pPresentationParameters->BackBufferWidth > 0 && pPresentationParameters->BackBufferHeight > 0)
+            device->SetViewportSize(pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight);
+        *ppReturnedDeviceInterface = device;
         return S_OK;
     }
 };
