@@ -15,6 +15,7 @@ namespace Neoeter::Debug
 	void Toggle();
 	bool IsVisible();
 	bool WantsMouse();
+	bool WantsMouseAt(int x, int y);
 	bool WantsKeyboard();
 	void ProcessEvent(const SDL_Event& event);
 	void Draw();
@@ -32,6 +33,7 @@ namespace Neoeter::Debug
 	inline void Toggle() {}
 	inline bool IsVisible() { return false; }
 	inline bool WantsMouse() { return false; }
+	inline bool WantsMouseAt(int, int) { return false; }
 	inline bool WantsKeyboard() { return false; }
 	inline void ProcessEvent(const SDL_Event&) {}
 	inline void Draw() {}

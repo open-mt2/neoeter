@@ -15,6 +15,10 @@ namespace Neoeter::Debug
 		bool gs_visible = false;
 		bool gs_initialized = false;
 		bool gs_hovered = false;
+		float gs_rectMinX = 0.0f;
+		float gs_rectMinY = 0.0f;
+		float gs_rectMaxX = 0.0f;
+		float gs_rectMaxY = 0.0f;
 	}
 
 	void Initialize()
@@ -72,6 +76,21 @@ namespace Neoeter::Debug
 		return gs_visible && gs_initialized && ImGui::GetIO().WantCaptureMouse;
 	}
 
+	bool WantsMouseAt(int x, int y)
+	{
+		if (!gs_visible || !gs_initialized)
+			return false;
+
+		if (ImGui::GetIO().WantCaptureMouse)
+			return true;
+
+		const float positionX = static_cast<float>(x);
+		const float positionY = static_cast<float>(y);
+
+		return positionX >= gs_rectMinX && positionX < gs_rectMaxX
+			&& positionY >= gs_rectMinY && positionY < gs_rectMaxY;
+	}
+
 	bool WantsKeyboard()
 	{
 		return gs_visible && gs_initialized && (gs_hovered || ImGui::GetIO().WantCaptureKeyboard);
@@ -99,6 +118,14 @@ namespace Neoeter::Debug
 
 		ImGui::Begin("Debug", &gs_visible);
 		gs_hovered = ImGui::IsWindowHovered();
+
+		const ImVec2 position = ImGui::GetWindowPos();
+		const ImVec2 size = ImGui::GetWindowSize();
+		gs_rectMinX = position.x;
+		gs_rectMinY = position.y;
+		gs_rectMaxX = position.x + size.x;
+		gs_rectMaxY = position.y + size.y;
+
 		for (std::size_t index = 0; index < gs_rows.Size(); ++index)
 			ImGui::Text("%s: %s", gs_rows.Label(index).c_str(), gs_rows.Value(index).c_str());
 		ImGui::End();
