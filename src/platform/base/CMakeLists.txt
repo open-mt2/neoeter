@@ -37,6 +37,11 @@ if(NOT WIN32)
     find_package(OpenGL REQUIRED)
 endif()
 
+set(_NEOETER_BASE_VERSION "${NEOETER_VERSION}")
+if(NOT _NEOETER_BASE_VERSION)
+    set(_NEOETER_BASE_VERSION "0.0.0-dev")
+endif()
+
 # Source files
 set(ETERBASE_SOURCES
     CPostIt.cpp
@@ -59,6 +64,7 @@ set(ETERBASE_SOURCES
     TempFile.cpp
     Timer.cpp
     Utils.cpp
+    Version.cpp
     backends/gl/GLCompat.cpp
     backends/gl/GLRenderBackend.cpp
     Poly/Base.cpp
@@ -88,6 +94,7 @@ set(ETERBASE_HEADERS
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/TempFile.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/Timer.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/Utils.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/Version.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/vk.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/Poly/Base.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/Poly/Poly.h
@@ -105,6 +112,10 @@ add_library(neoeter_platform_base STATIC
     ${ETERBASE_HEADERS}
 )
 add_library(Neoeter::Platform::Base ALIAS neoeter_platform_base)
+
+target_compile_definitions(neoeter_platform_base PRIVATE
+    NEOETER_VERSION_STRING="${_NEOETER_BASE_VERSION}"
+)
 
 # Platform macros must be PUBLIC: consumers (standalone neoeter_render, neoeter_python_host,
 # neoeter_model_grn, neoeter_model_speedtree, neoeter_terrain, neoeter_python_bindings) include the Platform

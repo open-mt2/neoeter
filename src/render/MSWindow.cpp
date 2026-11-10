@@ -1,6 +1,7 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/MSWindow.h>
 #include <Neoeter/Render/SdlPlatform.h>
+#include <Neoeter/Debug/Debug.h>
 
 #include <SDL2/SDL.h>
 #include <Platform/GLCompat.h>
@@ -60,6 +61,8 @@ void CMSWindow::OnSize(WPARAM wParam, LPARAM /*lParam*/)
 
 void CMSWindow::Destroy()
 {
+	Neoeter::Debug::Shutdown();
+
 	if (ms_pGLContext)
 	{
 		SDL_GL_DeleteContext(ms_pGLContext);
@@ -164,6 +167,8 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, DWORD /*cs*/, DWORD 
 		Tracef("[SDL2] Initialized OpenGL context for window %p\n", ms_pSDLWindow);
 	}
 #endif
+
+	Neoeter::Debug::Initialize();
 
 	m_hWnd = (HWND)ms_pSDLWindow;
 	m_isActive = true;

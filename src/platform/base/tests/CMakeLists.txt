@@ -14,6 +14,7 @@ set(TEST_TARGETS
     test_image_loader
     test_render_seam
     test_compat_image_decode
+    test_version
 )
 
 foreach(TEST_NAME ${TEST_TARGETS})
@@ -24,3 +25,5 @@ foreach(TEST_NAME ${TEST_TARGETS})
     target_compile_options(${TEST_NAME} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endforeach()
+
+target_compile_definitions(test_version PRIVATE NEOETER_VERSION_STRING="${_NEOETER_BASE_VERSION}")

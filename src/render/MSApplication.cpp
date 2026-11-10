@@ -1,6 +1,7 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/MSApplication.h>
 #include <Neoeter/Render/SdlPlatform.h>
+#include <Neoeter/Debug/Debug.h>
 #include <Neoeter/Render/IME.h>
 
 #include <SDL2/SDL.h>
@@ -139,6 +140,8 @@ bool CMSApplication::MessageProcess()
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
+		Neoeter::Debug::ProcessEvent(event);
+
 		if (Platform_IsQuitRequested() || event.type == SDL_QUIT)
 		{
 			Tracef("[SDL2] Received SDL_QUIT event or quit requested. Exiting MessageProcess.\n");
