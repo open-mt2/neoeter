@@ -15,6 +15,10 @@ set(NEOETER_INSTALL_TARGETS
     miniaudio
 )
 
+if(TARGET imgui)
+    list(APPEND NEOETER_INSTALL_TARGETS imgui)
+endif()
+
 set_target_properties(neoeter_platform_base PROPERTIES EXPORT_NAME "Platform::Base")
 set_target_properties(neoeter_platform_locale PROPERTIES EXPORT_NAME "Platform::Locale")
 set_target_properties(neoeter_platform_math PROPERTIES EXPORT_NAME "Platform::Math")
@@ -28,6 +32,10 @@ set_target_properties(neoeter_terrain PROPERTIES EXPORT_NAME "Terrain")
 set_target_properties(neoeter_effect PROPERTIES EXPORT_NAME "Effect")
 set_target_properties(miniaudio PROPERTIES EXPORT_NAME "Miniaudio")
 
+if(TARGET imgui)
+    set_target_properties(imgui PROPERTIES EXPORT_NAME "ImGui")
+endif()
+
 install(TARGETS ${NEOETER_INSTALL_TARGETS}
     EXPORT NeoeterTargets
     ARCHIVE DESTINATION lib
@@ -38,6 +46,12 @@ install(TARGETS ${NEOETER_INSTALL_TARGETS}
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/external/miniaudio/miniaudio.h"
     DESTINATION include/miniaudio)
+
+if(TARGET imgui)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/"
+        DESTINATION include/imgui
+        FILES_MATCHING PATTERN "*.h")
+endif()
 
 install(EXPORT NeoeterTargets
     FILE NeoeterTargets.cmake

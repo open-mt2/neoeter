@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 
+if(NOT DEFINED NEOETER_DEBUG_UI)
+    option(NEOETER_DEBUG_UI "Build the in-game ImGui debug panel" ON)
+endif()
+
 # Standalone configuration when built directly
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     project(neoeter_render LANGUAGES C CXX VERSION 1.0.0)
@@ -56,6 +60,9 @@ if(UNIX)
 endif()
 
 file(GLOB ETERLIB_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+if(NOT NEOETER_DEBUG_UI)
+    list(FILTER ETERLIB_SOURCES EXCLUDE REGEX "/Debug\\.cpp$")
+endif()
 file(GLOB ETERLIB_HEADERS CONFIGURE_DEPENDS
     "${NEOETER_INCLUDE_DIR}/Neoeter/Render/*.h"
     "${NEOETER_INCLUDE_DIR}/Platform/*.h"
@@ -88,6 +95,15 @@ target_link_libraries(neoeter_render
         $<$<PLATFORM_ID:Linux,Darwin>:OpenGL::GL>
         $<$<PLATFORM_ID:Linux,Darwin>:Freetype::Freetype>
 )
+
+if(NEOETER_DEBUG_UI)
+    if(NOT TARGET imgui)
+        add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../external/imgui" "${CMAKE_BINARY_DIR}/external/imgui" EXCLUDE_FROM_ALL)
+    endif()
+
+    target_link_libraries(neoeter_render PRIVATE imgui)
+    target_compile_definitions(neoeter_render PUBLIC NEOETER_DEBUG_UI=1)
+endif()
 
 # Optional: resolve font face names to files (FontLocator.cpp). Without it the
 # lookup falls back to fixed FHS paths, which don't exist on NixOS.

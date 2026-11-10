@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 set(NEOETER_VERSION "0.1.5" CACHE STRING "Neoeter release version")
 project(Neoeter VERSION ${NEOETER_VERSION} LANGUAGES C CXX)
 
+option(NEOETER_DEBUG_UI "Build the in-game ImGui debug panel" ON)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(NeoeterOptions)
 
