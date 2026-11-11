@@ -194,7 +194,6 @@ void CSpeedTreeForest::SetupWindMatrices(float fTimeInSecs)
 		// adjust time to prevent "jumping"
 		if (m_fWindStrength != 0.0f)
 			afMatrixTimes[j] = (afMatrixTimes[j] * fOldStrength) / m_fWindStrength;
-
 	}
 
 	// track wind strength
