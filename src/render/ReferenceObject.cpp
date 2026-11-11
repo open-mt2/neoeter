@@ -13,7 +13,7 @@ void CReferenceObject::AddReference()
 {
 	if (m_refCount == 0)
 		OnConstruct();
-	
+
 	++m_refCount;
 }
 

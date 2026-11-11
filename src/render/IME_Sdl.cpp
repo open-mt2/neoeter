@@ -88,11 +88,25 @@ static wchar_t DecodeUtf8(const std::string& s, size_t& i)
 	const unsigned char c = (unsigned char)s[i++];
 	int extra = 0;
 	unsigned int cp = c;
-	if (c >= 0xF0) { extra = 3; cp = c & 0x07; }
-	else if (c >= 0xE0) { extra = 2; cp = c & 0x0F; }
-	else if (c >= 0xC0) { extra = 1; cp = c & 0x1F; }
-	else if (c >= 0x80) return 0xFFFD;
-	for (; extra > 0; --extra) {
+	if (c >= 0xF0)
+	{
+		extra = 3;
+		cp = c & 0x07;
+	}
+	else if (c >= 0xE0)
+	{
+		extra = 2;
+		cp = c & 0x0F;
+	}
+	else if (c >= 0xC0)
+	{
+		extra = 1;
+		cp = c & 0x1F;
+	}
+	else if (c >= 0x80)
+		return 0xFFFD;
+	for (; extra > 0; --extra)
+	{
 		if (i >= s.size() || !IsUtf8Continuation((unsigned char)s[i]))
 			return 0xFFFD;
 		cp = (cp << 6) | ((unsigned char)s[i++] & 0x3F);
@@ -101,12 +115,7 @@ static wchar_t DecodeUtf8(const std::string& s, size_t& i)
 }
 
 CIME::CIME()
-	: m_hOrgIMC(nullptr)
-	, m_max(IMESTR_MAXLEN)
-	, m_userMax(IMESTR_MAXLEN)
-	, m_bOnlyNumberMode(false)
-	, m_bEnablePaste(true)
-	, m_bUseDefaultIME(false)
+	: m_hOrgIMC(nullptr), m_max(IMESTR_MAXLEN), m_userMax(IMESTR_MAXLEN), m_bOnlyNumberMode(false), m_bEnablePaste(true), m_bUseDefaultIME(false)
 {
 	ms_pSdlInstance = this;
 }
@@ -239,7 +248,11 @@ int CIME::GetCompLen() { return ms_compLen; }
 int CIME::GetULBegin() { return ms_ulbegin; }
 int CIME::GetULEnd() { return ms_ulend; }
 
-void CIME::CloseCandidateList() { ms_bCandidateList = false; ms_dwCandidateCount = 0; }
+void CIME::CloseCandidateList()
+{
+	ms_bCandidateList = false;
+	ms_dwCandidateCount = 0;
+}
 void CIME::CloseReadingInformation() { ms_bReadingInformation = false; }
 void CIME::ChangeInputLanguage() {}
 void CIME::ChangeInputLanguageWorker() {}

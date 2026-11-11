@@ -80,7 +80,7 @@ void CGraphicFontTexture::Destroy()
 	{
 		TFontMap::iterator i = m_fontMap.begin();
 
-		while(i != m_fontMap.end())
+		while (i != m_fontMap.end())
 		{
 			DeleteObject((HGDIOBJ)i->second);
 			++i;
@@ -88,7 +88,7 @@ void CGraphicFontTexture::Destroy()
 
 		m_fontMap.clear();
 	}
-	
+
 	Initialize();
 }
 
@@ -104,21 +104,21 @@ void CGraphicFontTexture::DestroyDeviceObjects()
 bool CGraphicFontTexture::Create(const char* c_szFontName, int fontSize, bool bItalic)
 {
 	Destroy();
-	
-	strncpy(m_fontName, c_szFontName, sizeof(m_fontName)-1);
-	m_fontSize	= fontSize;
-	m_bItalic	= bItalic;
+
+	strncpy(m_fontName, c_szFontName, sizeof(m_fontName) - 1);
+	m_fontSize = fontSize;
+	m_bItalic = bItalic;
 
 	m_x = 0;
 	m_y = 0;
 	m_step = 0;
 
-	DWORD width = 256,height = 256;
+	DWORD width = 256, height = 256;
 	if (GetMaxTextureWidth() > 512)
 		width = 512;
 	if (GetMaxTextureHeight() > 512)
 		height = 512;
-	
+
 	if (!m_dib.Create(ms_hDC, width, height))
 		return false;
 
@@ -126,24 +126,22 @@ bool CGraphicFontTexture::Create(const char* c_szFontName, int fontSize, bool bI
 
 	m_hFont = GetFont(GetDefaultCodePage());
 
-	m_hFontOld=(HFONT)SelectObject(hDC, m_hFont);
+	m_hFontOld = (HFONT)SelectObject(hDC, m_hFont);
 	SetTextColor(hDC, RGB(255, 255, 255));
-	SetBkColor(hDC,	0);
+	SetBkColor(hDC, 0);
 
 	if (!AppendTexture())
 		return false;
-	
+
 	return true;
 }
-
-
 
 HFONT CGraphicFontTexture::GetFont(WORD codePage)
 {
 	HFONT hFont = NULL;
 	TFontMap::iterator i = m_fontMap.find(codePage);
 
-	if(i != m_fontMap.end())
+	if (i != m_fontMap.end())
 	{
 		hFont = i->second;
 	}
@@ -153,21 +151,21 @@ HFONT CGraphicFontTexture::GetFont(WORD codePage)
 
 		memset(&logFont, 0, sizeof(LOGFONT));
 
-		logFont.lfHeight			= m_fontSize;
-		logFont.lfEscapement		= 0;
-		logFont.lfOrientation		= 0;
-		logFont.lfWeight			= FW_NORMAL;
-		logFont.lfItalic			= (BYTE) m_bItalic;
-		logFont.lfUnderline			= FALSE;
-		logFont.lfStrikeOut			= FALSE;
-		logFont.lfCharSet			= GetCharsetFromCodePage(codePage);
-		logFont.lfOutPrecision		= OUT_DEFAULT_PRECIS;
-		logFont.lfClipPrecision		= CLIP_DEFAULT_PRECIS;
-		logFont.lfQuality			= ANTIALIASED_QUALITY;
-		logFont.lfPitchAndFamily	= DEFAULT_PITCH;
-		//Tracenf("font: %s", GetFontFaceFromCodePage(codePage));
-		strcpy(logFont.lfFaceName, m_fontName); //GetFontFaceFromCodePage(codePage));
-		//strcpy(logFont.lfFaceName, GetFontFaceFromCodePage(codePage));
+		logFont.lfHeight = m_fontSize;
+		logFont.lfEscapement = 0;
+		logFont.lfOrientation = 0;
+		logFont.lfWeight = FW_NORMAL;
+		logFont.lfItalic = (BYTE)m_bItalic;
+		logFont.lfUnderline = FALSE;
+		logFont.lfStrikeOut = FALSE;
+		logFont.lfCharSet = GetCharsetFromCodePage(codePage);
+		logFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
+		logFont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+		logFont.lfQuality = ANTIALIASED_QUALITY;
+		logFont.lfPitchAndFamily = DEFAULT_PITCH;
+		// Tracenf("font: %s", GetFontFaceFromCodePage(codePage));
+		strcpy(logFont.lfFaceName, m_fontName); // GetFontFaceFromCodePage(codePage));
+		// strcpy(logFont.lfFaceName, GetFontFaceFromCodePage(codePage));
 
 		hFont = CreateFontIndirect(&logFont);
 
@@ -179,7 +177,7 @@ HFONT CGraphicFontTexture::GetFont(WORD codePage)
 
 bool CGraphicFontTexture::AppendTexture()
 {
-	CGraphicImageTexture * pNewTexture = new CGraphicImageTexture;
+	CGraphicImageTexture* pNewTexture = new CGraphicImageTexture;
 
 	if (!pNewTexture->Create(m_dib.GetWidth(), m_dib.GetHeight(), D3DFMT_A4R4G4B4))
 	{
@@ -193,12 +191,12 @@ bool CGraphicFontTexture::AppendTexture()
 
 bool CGraphicFontTexture::UpdateTexture()
 {
-	if(!m_isDirty)
+	if (!m_isDirty)
 		return true;
 
 	m_isDirty = false;
 
-	CGraphicImageTexture * pFontTexture = m_pFontTextureVector.back();
+	CGraphicImageTexture* pFontTexture = m_pFontTextureVector.back();
 
 	if (!pFontTexture)
 		return false;
@@ -214,12 +212,12 @@ bool CGraphicFontTexture::UpdateTexture()
 	int width = m_dib.GetWidth();
 	int height = m_dib.GetHeight();
 
-	DWORD * pdwSrc = (DWORD*)m_dib.GetPointer();
+	DWORD* pdwSrc = (DWORD*)m_dib.GetPointer();
 
 	for (int y = 0; y < height; ++y, pwDst += pitch, pdwSrc += width)
 		for (int x = 0; x < width; ++x)
-			pwDst[x]=pdwSrc[x];
-	
+			pwDst[x] = pdwSrc[x];
+
 	pFontTexture->Unlock();
 	return true;
 }
@@ -236,7 +234,7 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::GetCharacterInfo
 	}
 	else
 	{
-		return &f->second;	
+		return &f->second;
 	}
 }
 
@@ -348,20 +346,20 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	HDC hDC = m_dib.GetDCHandle();
 	SelectObject(hDC, GetFont(code.first));
 
-	ABCFLOAT	stABC;
-	SIZE		size;
+	ABCFLOAT stABC;
+	SIZE size;
 
 	if (!GetTextExtentPoint32W(hDC, &keyValue, 1, &size) || !GetCharABCWidthsFloatW(hDC, keyValue, keyValue, &stABC))
 		return NULL;
 
 	size.cx = stABC.abcfB;
-	if( stABC.abcfA > 0.0f )
+	if (stABC.abcfA > 0.0f)
 		size.cx += ceilf(stABC.abcfA);
-	if( stABC.abcfC > 0.0f )
+	if (stABC.abcfC > 0.0f)
 		size.cx += ceilf(stABC.abcfC);
 	size.cx++;
 
-	LONG lAdvance = ceilf( stABC.abcfA + stABC.abcfB + stABC.abcfC );
+	LONG lAdvance = ceilf(stABC.abcfA + stABC.abcfB + stABC.abcfC);
 
 	int width = m_dib.GetWidth();
 	int height = m_dib.GetHeight();
@@ -387,24 +385,23 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	}
 
 	TextOutW(hDC, m_x, m_y, &keyValue, 1);
-		
+
 	int nChrX;
 	int nChrY;
 	int nChrWidth = size.cx;
 	int nChrHeight = size.cy;
 	int nDIBWidth = m_dib.GetWidth();
 
-	
-	DWORD*pdwDIBData=(DWORD*)m_dib.GetPointer();		
-	DWORD*pdwDIBBase=pdwDIBData+nDIBWidth*m_y+m_x;
-	DWORD*pdwDIBRow;
-	
-	pdwDIBRow=pdwDIBBase;
-	for (nChrY=0; nChrY<nChrHeight; ++nChrY, pdwDIBRow+=nDIBWidth)
-	{			
-		for (nChrX=0; nChrX<nChrWidth; ++nChrX)
+	DWORD* pdwDIBData = (DWORD*)m_dib.GetPointer();
+	DWORD* pdwDIBBase = pdwDIBData + nDIBWidth * m_y + m_x;
+	DWORD* pdwDIBRow;
+
+	pdwDIBRow = pdwDIBBase;
+	for (nChrY = 0; nChrY < nChrHeight; ++nChrY, pdwDIBRow += nDIBWidth)
+	{
+		for (nChrX = 0; nChrX < nChrWidth; ++nChrX)
 		{
-			pdwDIBRow[nChrX]=(pdwDIBRow[nChrX]&0xff) ? 0xffff : 0;
+			pdwDIBRow[nChrX] = (pdwDIBRow[nChrX] & 0xff) ? 0xffff : 0;
 		}
 	}
 
@@ -418,14 +415,14 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	rNewCharInfo.height = size.cy;
 	rNewCharInfo.left = float(m_x) * rhwidth;
 	rNewCharInfo.top = float(m_y) * rhheight;
-	rNewCharInfo.right = float(m_x+size.cx) * rhwidth;
-	rNewCharInfo.bottom = float(m_y+size.cy) * rhheight;
-	rNewCharInfo.advance = (float) lAdvance;
+	rNewCharInfo.right = float(m_x + size.cx) * rhwidth;
+	rNewCharInfo.bottom = float(m_y + size.cy) * rhheight;
+	rNewCharInfo.advance = (float)lAdvance;
 
 	m_x += size.cx;
 
 	if (m_step < size.cy)
-		m_step = size.cy;	
+		m_step = size.cy;
 
 	m_isDirty = true;
 

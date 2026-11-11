@@ -14,10 +14,10 @@ class CGraphicTexture : public CGraphicBase
 		LPDIRECT3DTEXTURE9 GetD3DTexture() const;
 
 		void DestroyDeviceObjects();
-		
+
 	protected:
 		CGraphicTexture();
-		virtual	~CGraphicTexture();
+		virtual ~CGraphicTexture();
 
 		void Destroy();
 		void Initialize();

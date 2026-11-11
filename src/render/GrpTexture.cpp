@@ -31,7 +31,7 @@ bool CGraphicTexture::IsEmpty() const
 void CGraphicTexture::SetTextureStage(int stage) const
 {
 	assert(ms_lpd3dDevice != NULL);
-	STATEMANAGER.SetTexture(stage, m_lpd3dTexture);	
+	STATEMANAGER.SetTexture(stage, m_lpd3dTexture);
 }
 
 LPDIRECT3DTEXTURE9 CGraphicTexture::GetD3DTexture() const
@@ -54,6 +54,6 @@ CGraphicTexture::CGraphicTexture()
 	Initialize();
 }
 
-CGraphicTexture::~CGraphicTexture()	
+CGraphicTexture::~CGraphicTexture()
 {
 }

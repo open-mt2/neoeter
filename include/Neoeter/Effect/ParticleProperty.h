@@ -7,8 +7,9 @@
 
 class CParticleProperty
 {
-	friend class CParticleSystemData;
-	friend class CParticleSystemInstance;
+		friend class CParticleSystemData;
+		friend class CParticleSystemInstance;
+
 	public:
 		enum
 		{
@@ -34,8 +35,8 @@ class CParticleProperty
 
 		void Clear();
 
-		void InsertTexture(const char * c_szFileName);
-		bool SetTexture(const char * c_szFileName);
+		void InsertTexture(const char* c_szFileName);
+		bool SetTexture(const char* c_szFileName);
 
 		__forceinline BYTE GetTextureAnimationType()
 		{
@@ -51,7 +52,6 @@ class CParticleProperty
 		{
 			return m_fTexAniDelay;
 		}
-
 
 		BYTE m_byTexAniType;
 		float m_fTexAniDelay;
@@ -80,7 +80,7 @@ class CParticleProperty
 		TTimeEventTableFloat m_TimeEventColorGreen;
 		TTimeEventTableFloat m_TimeEventColorBlue;
 		TTimeEventTableFloat m_TimeEventAlpha;
-		
+
 		std::vector<std::string> m_TextureNameVector;
 #else
 		TTimeEventTableColor m_TimeEventColor;
@@ -88,9 +88,9 @@ class CParticleProperty
 		TTimeEventTableFloat m_TimeEventRotation;
 
 		std::vector<CGraphicImage*> m_ImageVector;
-		
-		CParticleProperty & operator = ( const CParticleProperty& c_ParticleProperty );
-		
+
+		CParticleProperty& operator=(const CParticleProperty& c_ParticleProperty);
+
 		// pre-transformed variables
 		D3DXVECTOR3 m_v3ZAxis;
 };

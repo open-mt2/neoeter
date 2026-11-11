@@ -36,55 +36,53 @@ class CGrannyMaterial : public CReferenceObject
 		CGrannyMaterial();
 		virtual ~CGrannyMaterial();
 
-		void					Destroy();
-		void					Copy(CGrannyMaterial& rkMtrl);
-		bool					IsEqual(granny_material * pgrnMaterial) const;
-		bool					IsIn(const char* c_szImageName, int* iStage);
-		void					SetSpecularInfo(BOOL bFlag, float fPower, BYTE uSphereMapIndex);
+		void Destroy();
+		void Copy(CGrannyMaterial& rkMtrl);
+		bool IsEqual(granny_material* pgrnMaterial) const;
+		bool IsIn(const char* c_szImageName, int* iStage);
+		void SetSpecularInfo(BOOL bFlag, float fPower, BYTE uSphereMapIndex);
 
-		void					ApplyRenderState();
-		void					RestoreRenderState();
+		void ApplyRenderState();
+		void RestoreRenderState();
 
 	protected:
-		void					Initialize();
+		void Initialize();
 
 	public:
-		bool					CreateFromGrannyMaterialPointer(granny_material* pgrnMaterial);
-		void					SetImagePointer(int iStage, CGraphicImage* pImage);
+		bool CreateFromGrannyMaterialPointer(granny_material* pgrnMaterial);
+		void SetImagePointer(int iStage, CGraphicImage* pImage);
 
-		CGrannyMaterial::EType	GetType() const;		
-		CGraphicImage *			GetImagePointer(int iStage) const;
+		CGrannyMaterial::EType GetType() const;
+		CGraphicImage* GetImagePointer(int iStage) const;
 
-		const CGraphicTexture * GetDiffuseTexture() const;
-		const CGraphicTexture * GetOpacityTexture() const;
+		const CGraphicTexture* GetDiffuseTexture() const;
+		const CGraphicTexture* GetOpacityTexture() const;
 
-		LPDIRECT3DTEXTURE9		GetD3DTexture(int iStage) const;
+		LPDIRECT3DTEXTURE9 GetD3DTexture(int iStage) const;
 
-		bool					IsTwoSided() const		{ return m_bTwoSideRender; }
-
-		
-	protected:
-		CGraphicImage *			__GetImagePointer(const char * c_szFileName);
-
-		BOOL					__IsSpecularEnable() const;
-		float					__GetSpecularPower() const;		
-
-		void					__ApplyDiffuseRenderState();
-		void					__RestoreDiffuseRenderState();
-		void					__ApplySpecularRenderState();
-		void					__RestoreSpecularRenderState();
+		bool IsTwoSided() const { return m_bTwoSideRender; }
 
 	protected:
-		granny_material *		m_pgrnMaterial;
-		CGraphicImage::TRef		m_roImage[2];
-		EType					m_eType;
+		CGraphicImage* __GetImagePointer(const char* c_szFileName);
 
-		float					m_fSpecularPower;
-		BOOL					m_bSpecularEnable;
-		bool					m_bTwoSideRender;
-		DWORD					m_dwLastCullRenderStateForTwoSideRendering;
-		BYTE					m_bSphereMapIndex;
-		
+		BOOL __IsSpecularEnable() const;
+		float __GetSpecularPower() const;
+
+		void __ApplyDiffuseRenderState();
+		void __RestoreDiffuseRenderState();
+		void __ApplySpecularRenderState();
+		void __RestoreSpecularRenderState();
+
+	protected:
+		granny_material* m_pgrnMaterial;
+		CGraphicImage::TRef m_roImage[2];
+		EType m_eType;
+
+		float m_fSpecularPower;
+		BOOL m_bSpecularEnable;
+		bool m_bTwoSideRender;
+		DWORD m_dwLastCullRenderStateForTwoSideRendering;
+		BYTE m_bSphereMapIndex;
 
 		void (CGrannyMaterial::*m_pfnApplyRenderState)();
 		void (CGrannyMaterial::*m_pfnRestoreRenderState)();
@@ -103,17 +101,17 @@ class CGrannyMaterialPalette
 		CGrannyMaterialPalette();
 		virtual ~CGrannyMaterialPalette();
 
-		void	Clear();
-		void	Copy(const CGrannyMaterialPalette& rkMtrlPalSrc);
+		void Clear();
+		void Copy(const CGrannyMaterialPalette& rkMtrlPalSrc);
 
-		DWORD	RegisterMaterial(granny_material* pgrnMaterial);
-		void	SetMaterialImagePointer(const char* c_szMtrlName, CGraphicImage* pImage);
-		void	SetMaterialData(const char* c_szMtrlName, const SMaterialData& c_rkMaterialData);
-		void	SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower);
+		DWORD RegisterMaterial(granny_material* pgrnMaterial);
+		void SetMaterialImagePointer(const char* c_szMtrlName, CGraphicImage* pImage);
+		void SetMaterialData(const char* c_szMtrlName, const SMaterialData& c_rkMaterialData);
+		void SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower);
 
 		CGrannyMaterial& GetMaterialRef(DWORD mtrlIndex);
 
-		DWORD	GetMaterialCount() const;
+		DWORD GetMaterialCount() const;
 
 	protected:
 		std::vector<CGrannyMaterial::TRef> m_mtrlVector;

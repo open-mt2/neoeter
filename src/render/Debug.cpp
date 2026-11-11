@@ -87,8 +87,7 @@ namespace Neoeter::Debug
 		const float positionX = static_cast<float>(x);
 		const float positionY = static_cast<float>(y);
 
-		return positionX >= gs_rectMinX && positionX < gs_rectMaxX
-			&& positionY >= gs_rectMinY && positionY < gs_rectMaxY;
+		return positionX >= gs_rectMinX && positionX < gs_rectMaxX && positionY >= gs_rectMinY && positionY < gs_rectMaxY;
 	}
 
 	bool WantsKeyboard()

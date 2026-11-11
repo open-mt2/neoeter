@@ -10,14 +10,14 @@
 void Granny_RenderBoxBones(const granny_skeleton* pkGrnSkeleton, const granny_world_pose* pkGrnWorldPose, const D3DXMATRIX& matBase)
 {
 	D3DXMATRIX matWorld;
-	CScreen screen;	
+	CScreen screen;
 	for (int iBone = 0; iBone != pkGrnSkeleton->BoneCount; ++iBone)
 	{
-		const granny_bone& rkGrnBone = pkGrnSkeleton->Bones[iBone];				
-		const D3DXMATRIX* c_matBone=(const D3DXMATRIX*)GrannyGetWorldPose4x4(pkGrnWorldPose, iBone);
-		
+		const granny_bone& rkGrnBone = pkGrnSkeleton->Bones[iBone];
+		const D3DXMATRIX* c_matBone = (const D3DXMATRIX*)GrannyGetWorldPose4x4(pkGrnWorldPose, iBone);
+
 		D3DXMatrixMultiply(&matWorld, c_matBone, &matBase);
-		
+
 		STATEMANAGER.SetTransform(D3DTS_WORLD, &matWorld);
 		screen.RenderBox3d(-5.0f, -5.0f, -5.0f, 5.0f, 5.0f, 5.0f);
 	}
@@ -25,16 +25,15 @@ void Granny_RenderBoxBones(const granny_skeleton* pkGrnSkeleton, const granny_wo
 
 #endif
 
-
-void CGrannyModelInstance::DeformNoSkin(const D3DXMATRIX * c_pWorldMatrix)
+void CGrannyModelInstance::DeformNoSkin(const D3DXMATRIX* c_pWorldMatrix)
 {
 	if (IsEmpty())
 		return;
 
 	// DELETED
-	//m_pgrnWorldPose = m_pgrnWorldPoseReal;
+	// m_pgrnWorldPose = m_pgrnWorldPoseReal;
 	///////////////////////////////
-	
+
 	UpdateWorldPose();
 	UpdateWorldMatrices(c_pWorldMatrix);
 }
@@ -54,7 +53,7 @@ void CGrannyModelInstance::RenderWithOneTexture()
 #ifdef _TEST
 	Granny_RenderBoxBones(GrannyGetSourceSkeleton(m_pgrnModelInstance), m_pgrnWorldPose, TEST_matWorld);
 	if (GetAsyncKeyState('P'))
-		Tracef("render %x", m_pgrnModelInstance);	
+		Tracef("render %x", m_pgrnModelInstance);
 	return;
 #endif
 
@@ -168,7 +167,6 @@ void CGrannyModelInstance::RenderWithoutTexture()
 	}
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //// Render Mesh List
@@ -183,11 +181,11 @@ void CGrannyModelInstance::RenderMeshNodeListWithOneTexture(CGrannyMesh::EType e
 	LPDIRECT3DINDEXBUFFER9 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
 	assert(lpd3dIdxBuf != NULL);
 
-	const CGrannyModel::TMeshNode * pMeshNode = m_pModel->GetMeshNodeList(eMeshType, eMtrlType);
+	const CGrannyModel::TMeshNode* pMeshNode = m_pModel->GetMeshNodeList(eMeshType, eMtrlType);
 
 	while (pMeshNode)
 	{
-		const CGrannyMesh * pMesh = pMeshNode->pMesh;
+		const CGrannyMesh* pMesh = pMeshNode->pMesh;
 		int vtxMeshBasePos = pMesh->GetVertexBasePosition();
 
 		STATEMANAGER.SetIndices(lpd3dIdxBuf, vtxMeshBasePos);
@@ -200,11 +198,11 @@ void CGrannyModelInstance::RenderMeshNodeListWithOneTexture(CGrannyMesh::EType e
 		{
 			ms_faceCount += pTriGroupNode->triCount;
 
-			CGrannyMaterial& rkMtrl=m_kMtrlPal.GetMaterialRef(pTriGroupNode->mtrlIndex);
+			CGrannyMaterial& rkMtrl = m_kMtrlPal.GetMaterialRef(pTriGroupNode->mtrlIndex);
 			rkMtrl.ApplyRenderState();
 			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, vtxCount, pTriGroupNode->idxPos, pTriGroupNode->triCount, vtxMeshBasePos);
 			rkMtrl.RestoreRenderState();
-			
+
 			pTriGroupNode = pTriGroupNode->pNextTriGroupNode;
 		}
 		/////
@@ -221,11 +219,11 @@ void CGrannyModelInstance::RenderMeshNodeListWithTwoTexture(CGrannyMesh::EType e
 	LPDIRECT3DINDEXBUFFER9 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
 	assert(lpd3dIdxBuf != NULL);
 
-	const CGrannyModel::TMeshNode * pMeshNode = m_pModel->GetMeshNodeList(eMeshType, eMtrlType);
+	const CGrannyModel::TMeshNode* pMeshNode = m_pModel->GetMeshNodeList(eMeshType, eMtrlType);
 
 	while (pMeshNode)
 	{
-		const CGrannyMesh * pMesh = pMeshNode->pMesh;
+		const CGrannyMesh* pMesh = pMeshNode->pMesh;
 		int vtxMeshBasePos = pMesh->GetVertexBasePosition();
 
 		STATEMANAGER.SetIndices(lpd3dIdxBuf, vtxMeshBasePos);
@@ -238,7 +236,7 @@ void CGrannyModelInstance::RenderMeshNodeListWithTwoTexture(CGrannyMesh::EType e
 		{
 			ms_faceCount += pTriGroupNode->triCount;
 
-			const CGrannyMaterial& rkMtrl=m_kMtrlPal.GetMaterialRef(pTriGroupNode->mtrlIndex);
+			const CGrannyMaterial& rkMtrl = m_kMtrlPal.GetMaterialRef(pTriGroupNode->mtrlIndex);
 			STATEMANAGER.SetTexture(0, rkMtrl.GetD3DTexture(0));
 			STATEMANAGER.SetTexture(1, rkMtrl.GetD3DTexture(1));
 			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, vtxCount, pTriGroupNode->idxPos, pTriGroupNode->triCount, vtxMeshBasePos);
@@ -258,11 +256,11 @@ void CGrannyModelInstance::RenderMeshNodeListWithoutTexture(CGrannyMesh::EType e
 	LPDIRECT3DINDEXBUFFER9 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
 	assert(lpd3dIdxBuf != NULL);
 
-	const CGrannyModel::TMeshNode * pMeshNode = m_pModel->GetMeshNodeList(eMeshType, eMtrlType);
+	const CGrannyModel::TMeshNode* pMeshNode = m_pModel->GetMeshNodeList(eMeshType, eMtrlType);
 
 	while (pMeshNode)
 	{
-		const CGrannyMesh * pMesh = pMeshNode->pMesh;
+		const CGrannyMesh* pMesh = pMeshNode->pMesh;
 		int vtxMeshBasePos = pMesh->GetVertexBasePosition();
 
 		STATEMANAGER.SetIndices(lpd3dIdxBuf, vtxMeshBasePos);

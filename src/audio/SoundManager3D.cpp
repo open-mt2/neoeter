@@ -18,29 +18,30 @@ bool CSoundManager3D::Initialize()
 		return true;
 
 	ms_ProviderVector.resize(MAX_PROVIDERS);
-	
+
 	HPROENUM enum3D = HPROENUM_FIRST;
 	int i = 0;
 
 	while (AIL_enumerate_3D_providers(&enum3D,
 									  &ms_ProviderVector[i].hProvider,
-									  &ms_ProviderVector[i].name) && (i < MAX_PROVIDERS))
-	{  
-		TProvider * provider = &ms_ProviderVector[i];
+									  &ms_ProviderVector[i].name) &&
+		   (i < MAX_PROVIDERS))
+	{
+		TProvider* provider = &ms_ProviderVector[i];
 
-		//if (strcmp(provider->name, "DirectSound3D Software Emulation") == 0)
-		//if (strcmp(provider->name, "DirectSound3D Hardware Support") == 0)
-		//if (strcmp(provider->name, "DirectSound3D 7+ Software - Pan and Volume") == 0)
-		//if (strcmp(provider->name, "DirectSound3D 7+ Software - Light HRTF") == 0)
-		//if (strcmp(provider->name, "DirectSound3D 7+ Software - Full HRTF") == 0)
-		//if (strcmp(provider->name, "RAD Game Tools RSX 3D Audio") == 0)
-		//if (strcmp(provider->name, "Dolby Surround") == 0)
+		// if (strcmp(provider->name, "DirectSound3D Software Emulation") == 0)
+		// if (strcmp(provider->name, "DirectSound3D Hardware Support") == 0)
+		// if (strcmp(provider->name, "DirectSound3D 7+ Software - Pan and Volume") == 0)
+		// if (strcmp(provider->name, "DirectSound3D 7+ Software - Light HRTF") == 0)
+		// if (strcmp(provider->name, "DirectSound3D 7+ Software - Full HRTF") == 0)
+		// if (strcmp(provider->name, "RAD Game Tools RSX 3D Audio") == 0)
+		// if (strcmp(provider->name, "Dolby Surround") == 0)
 		if (strcmp(provider->name, "Miles Fast 2D Positional Audio") == 0)
 			ms_pProviderDefault = provider;
 
 		++i;
 	}
-	
+
 	if (!ms_pProviderDefault)
 	{
 		CSoundBase::Destroy();
@@ -51,11 +52,11 @@ bool CSoundManager3D::Initialize()
 
 	if (M3D_NOERR != AIL_open_3D_provider(ms_pProviderDefault->hProvider))
 	{
-//		assert(!"AIL_open_3D_provider error");
-//		char buf[64];
-//		sprintf(buf, "Error AIL_open_3D_provider: %s\n", AIL_last_error());
-//		OutputDebugString(buf);
-		
+		//		assert(!"AIL_open_3D_provider error");
+		//		char buf[64];
+		//		sprintf(buf, "Error AIL_open_3D_provider: %s\n", AIL_last_error());
+		//		OutputDebugString(buf);
+
 		CSoundBase::Destroy();
 		return false;
 	}
@@ -74,12 +75,11 @@ bool CSoundManager3D::Initialize()
 	return true;
 }
 
-
 void CSoundManager3D::Destroy()
-{		
+{
 	if (!m_bInit)
 		return;
-	
+
 	for (int i = 0; i < INSTANCE_MAX_COUNT; ++i)
 		m_Instances[i].Destroy();
 
@@ -110,7 +110,7 @@ void CSoundManager3D::SetListenerDirection(float fxDir, float fyDir, float fzDir
 
 void CSoundManager3D::SetListenerPosition(float fX, float fY, float fZ)
 {
-// 	assert(m_pListener != NULL);
+	// 	assert(m_pListener != NULL);
 	if (NULL == m_pListener)
 		return;
 	AIL_set_3D_position(m_pListener, fX, fZ, -fY);
@@ -118,18 +118,18 @@ void CSoundManager3D::SetListenerPosition(float fX, float fY, float fZ)
 
 void CSoundManager3D::SetListenerVelocity(float fDistanceX, float fDistanceY, float fDistanceZ, float fNagnitude)
 {
-// 	assert(m_pListener != NULL);
+	// 	assert(m_pListener != NULL);
 	if (NULL == m_pListener)
 		return;
 	AIL_set_3D_velocity(m_pListener, fDistanceX, fDistanceZ, -fDistanceY, fNagnitude);
 }
 
-int CSoundManager3D::SetInstance(const char * c_pszFileName)
+int CSoundManager3D::SetInstance(const char* c_pszFileName)
 {
 	DWORD dwFileCRC = GetFileCRC(c_pszFileName);
 	TSoundDataMap::iterator itor = ms_dataMap.find(dwFileCRC);
 
-	CSoundData * pkSoundData;
+	CSoundData* pkSoundData;
 
 	if (itor == ms_dataMap.end())
 		pkSoundData = AddFile(dwFileCRC, c_pszFileName); // CSoundBase::AddFile
@@ -145,7 +145,7 @@ int CSoundManager3D::SetInstance(const char * c_pszFileName)
 
 	while (start < end)
 	{
-		CSoundInstance3D * pkInst = &m_Instances[start % INSTANCE_MAX_COUNT];
+		CSoundInstance3D* pkInst = &m_Instances[start % INSTANCE_MAX_COUNT];
 
 		if (pkInst->IsDone())
 		{
@@ -172,7 +172,7 @@ int CSoundManager3D::SetInstance(const char * c_pszFileName)
 	return -1;
 }
 
-ISoundInstance * CSoundManager3D::GetInstance(DWORD dwIndex)
+ISoundInstance* CSoundManager3D::GetInstance(DWORD dwIndex)
 {
 	if (dwIndex >= INSTANCE_MAX_COUNT)
 	{

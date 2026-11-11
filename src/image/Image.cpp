@@ -3,8 +3,8 @@
 #include <assert.h>
 #include <Neoeter/Image/Image.h>
 
-CImage::CImage(CImage & image)
-{	
+CImage::CImage(CImage& image)
+{
 	Initialize();
 
 	int w = image.GetWidth();
@@ -12,8 +12,8 @@ CImage::CImage(CImage & image)
 
 	Create(w, h);
 
-	DWORD * pdwDest = GetBasePointer();
-	DWORD * pdwSrc = image.GetBasePointer();
+	DWORD* pdwDest = GetBasePointer();
+	DWORD* pdwSrc = image.GetBasePointer();
 
 	memcpy(pdwDest, pdwSrc, w * h * sizeof(DWORD));
 }
@@ -34,10 +34,10 @@ void CImage::PutImage(int x, int y, CImage* pImage)
 	assert(y >= 0 && y + pImage->GetHeight() <= GetHeight());
 
 	int len = pImage->GetWidth() * sizeof(DWORD);
-	
+
 	for (int j = 0; j < pImage->GetHeight(); ++j)
 	{
-		DWORD * pdwDest = GetLinePointer(y + j) + x;
+		DWORD* pdwDest = GetLinePointer(y + j) + x;
 		memcpy(pdwDest, pImage->GetLinePointer(j), len);
 	}
 }
@@ -72,7 +72,7 @@ void CImage::Clear(DWORD color)
 
 	for (int y = 0; y < m_height; ++y)
 	{
-		DWORD * colorLine = &m_pdwColors[y * m_width];
+		DWORD* colorLine = &m_pdwColors[y * m_width];
 
 		for (int x = 0; x < m_width; ++x)
 			colorLine[x] = color;
@@ -82,17 +82,17 @@ void CImage::Clear(DWORD color)
 void CImage::Create(int width, int height)
 {
 	Destroy();
-	
+
 	m_width = width;
 	m_height = height;
-	m_pdwColors = new DWORD[m_width*m_height];
+	m_pdwColors = new DWORD[m_width * m_height];
 }
 
 void CImage::Destroy()
 {
 	if (m_pdwColors)
 	{
-		delete [] m_pdwColors;
+		delete[] m_pdwColors;
 		m_pdwColors = NULL;
 	}
 }
@@ -111,25 +111,25 @@ bool CImage::IsEmpty() const
 
 void CImage::FlipTopToBottom()
 {
-	DWORD * swap = new DWORD[m_width * m_height];
-	
+	DWORD* swap = new DWORD[m_width * m_height];
+
 	int row;
 	UINT width = GetWidth();
 	UINT height = GetHeight();
-	DWORD * end_row;
-	DWORD * start_row;
-	
+	DWORD* end_row;
+	DWORD* start_row;
+
 	for (row = 0; row < GetHeight() / 2; row++)
 	{
-		end_row		= &(m_pdwColors[width * (height - row - 1)]);
-		start_row	= &(m_pdwColors[width * row]);
-		
+		end_row = &(m_pdwColors[width * (height - row - 1)]);
+		start_row = &(m_pdwColors[width * row]);
+
 		memcpy(swap, end_row, width * sizeof(DWORD));
 		memcpy(end_row, start_row, width * sizeof(DWORD));
 		memcpy(start_row, swap, width * sizeof(DWORD));
 	}
 
-	delete [] swap;
+	delete[] swap;
 }
 
 CImage::CImage()

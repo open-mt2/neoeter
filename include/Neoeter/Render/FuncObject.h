@@ -1,6 +1,6 @@
 #pragma once
 
-template<typename T>
+template <typename T>
 class CFuncObject
 {
 	public:
@@ -44,6 +44,6 @@ class CFuncObject
 		}
 
 	protected:
-		T *	m_pSelfObject;
-		void (T::*m_pFuncObject) ();
+		T* m_pSelfObject;
+		void (T::*m_pFuncObject)();
 };

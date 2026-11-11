@@ -12,8 +12,8 @@ class CEffectMeshInstance : public CEffectElementBaseInstance
 		// NOTE : Mesh 단위 텍스춰 데이타의 인스턴스이다.
 		typedef struct STextureInstance
 		{
-			CFrameController							TextureFrameController;
-			std::vector<CGraphicImageInstance*>			TextureInstanceVector;
+				CFrameController TextureFrameController;
+				std::vector<CGraphicImageInstance*> TextureInstanceVector;
 		} TTextureInstance;
 
 	public:
@@ -26,10 +26,10 @@ class CEffectMeshInstance : public CEffectElementBaseInstance
 		static CEffectMeshInstance* New();
 		static void Delete(CEffectMeshInstance* pkMeshInstance);
 
-		static CDynamicPool<CEffectMeshInstance>		ms_kPool;
+		static CDynamicPool<CEffectMeshInstance> ms_kPool;
 
 	protected:
-		void OnSetDataPointer(CEffectElementBase * pElement);
+		void OnSetDataPointer(CEffectElementBase* pElement);
 
 		void OnInitialize();
 		void OnDestroy();
@@ -40,11 +40,11 @@ class CEffectMeshInstance : public CEffectElementBaseInstance
 		BOOL isActive();
 
 	protected:
-		CEffectMeshScript *						m_pMeshScript;
-		CEffectMesh *							m_pEffectMesh;
+		CEffectMeshScript* m_pMeshScript;
+		CEffectMesh* m_pEffectMesh;
 
-		CFrameController						m_MeshFrameController;
-		std::vector<TTextureInstance>			m_TextureInstanceVector;
+		CFrameController m_MeshFrameController;
+		std::vector<TTextureInstance> m_TextureInstanceVector;
 
-		CEffectMesh::TRef						m_roMesh;
+		CEffectMesh::TRef m_roMesh;
 };

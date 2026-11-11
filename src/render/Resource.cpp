@@ -28,7 +28,7 @@ void CResource::OnConstruct()
 }
 
 void CResource::OnSelfDestruct()
-{	
+{
 	if (ms_bDeleteImmediately)
 		Clear();
 	else
@@ -40,17 +40,17 @@ void CResource::Load()
 	if (me_state != STATE_EMPTY)
 		return;
 
-	const char * c_szFileName = GetFileName();
+	const char* c_szFileName = GetFileName();
 
 	DWORD dwStart = ELTimer_GetMSec();
 	CEterPackManager::TPackDataPtr fileData;
 
-	//Tracenf("Load %s", c_szFileName);
+	// Tracenf("Load %s", c_szFileName);
 
 	if (CEterPackManager::Instance().Get(c_szFileName, fileData))
 	{
 		m_dwLoadCostMiliiSecond = ELTimer_GetMSec() - dwStart;
-		//Tracef("CResource::Load %s (%d bytes) in %d ms\n", c_szFileName, file.Size(), m_dwLoadCostMiliiSecond);
+		// Tracef("CResource::Load %s (%d bytes) in %d ms\n", c_szFileName, file.Size(), m_dwLoadCostMiliiSecond);
 
 		if (OnLoad(fileData->size(), fileData->data()))
 		{
@@ -110,9 +110,9 @@ CResource::TType CResource::StringToType(const char* c_szType)
 	return GetCRC32(c_szType, strlen(c_szType));
 }
 
-int CResource::ConvertPathName(const char * c_szPathName, char * pszRetPathName, int retLen)
+int CResource::ConvertPathName(const char* c_szPathName, char* pszRetPathName, int retLen)
 {
-	const char * pc;
+	const char* pc;
 	int len = 0;
 
 	for (pc = c_szPathName; *pc && len < retLen; ++pc, ++len)
@@ -120,7 +120,7 @@ int CResource::ConvertPathName(const char * c_szPathName, char * pszRetPathName,
 		if (*pc == '/')
 			*(pszRetPathName++) = '\\';
 		else
-			*(pszRetPathName++) = (char) korean_tolower(*pc);
+			*(pszRetPathName++) = (char)korean_tolower(*pc);
 	}
 
 	*pszRetPathName = '\0';
@@ -131,7 +131,7 @@ void CResource::SetFileName(const char* c_szFileName)
 {
 	// 2004. 2. 1. myevan. 쓰레드가 사용되는 상황에서 static 변수는 사용하지 않는것이 좋다.
 	// 2004. 2. 1. myevan. 파일 이름 처리를 std::string 사용
-	m_stFileName=c_szFileName;
+	m_stFileName = c_szFileName;
 }
 
 void CResource::Clear()
@@ -155,7 +155,7 @@ bool CResource::OnIsType(TType type)
 {
 	if (CResource::Type() == type)
 		return true;
-	
+
 	return false;
 }
 

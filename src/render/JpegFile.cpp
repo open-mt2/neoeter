@@ -11,7 +11,7 @@ int jpeg_save(unsigned char* data, int width, int height, int quality, const cha
 		return 0;
 
 	// The screenshot path fills the buffer as BGR; stb_image_write expects RGB.
-	const size_t count = (size_t) width * (size_t) height;
+	const size_t count = (size_t)width * (size_t)height;
 	std::vector<unsigned char> rgb(count * 3);
 
 	for (size_t i = 0; i < count; ++i)

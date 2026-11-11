@@ -1,15 +1,14 @@
 #include <Neoeter/Effect/StdAfx.h>
 #include <Neoeter/Effect/EffectElementBase.h>
 
-
-void CEffectElementBase::GetPosition(float fTime, D3DXVECTOR3 & rPosition)
+void CEffectElementBase::GetPosition(float fTime, D3DXVECTOR3& rPosition)
 {
 	if (m_TimeEventTablePosition.empty())
 	{
 		rPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		return;
 	}
-	if (m_TimeEventTablePosition.size()==1)
+	if (m_TimeEventTablePosition.size() == 1)
 	{
 		rPosition = m_TimeEventTablePosition[0].m_vecPosition;
 		return;
@@ -26,27 +25,27 @@ void CEffectElementBase::GetPosition(float fTime, D3DXVECTOR3 & rPosition)
 	}
 
 	typedef TTimeEventTablePosition::iterator iterator;
-	iterator result = std::lower_bound( m_TimeEventTablePosition.begin(), m_TimeEventTablePosition.end(), fTime );
+	iterator result = std::lower_bound(m_TimeEventTablePosition.begin(), m_TimeEventTablePosition.end(), fTime);
 
-	TEffectPosition & rEffectPosition = *result;
+	TEffectPosition& rEffectPosition = *result;
 	iterator rPrev = result;
 	if (m_TimeEventTablePosition.begin() != result)
 	{
-		rPrev = result-1;
+		rPrev = result - 1;
 	}
 	else
 	{
 		rPosition = result->m_vecPosition;
 		return;
 	}
-	TEffectPosition & rPrevEffectPosition = *rPrev;
+	TEffectPosition& rPrevEffectPosition = *rPrev;
 	int iMovingType = rPrevEffectPosition.m_iMovingType;
 
 	if (MOVING_TYPE_DIRECT == iMovingType)
 	{
 		float Head = fabs(rEffectPosition.m_fTime - fTime) / fabs(rEffectPosition.m_fTime - rPrevEffectPosition.m_fTime);
 		float Tail = 1.0f - fabs(rEffectPosition.m_fTime - fTime) / fabs(rEffectPosition.m_fTime - rPrevEffectPosition.m_fTime);
-		rPosition = (rPrevEffectPosition.m_vecPosition*Head) + (rEffectPosition.m_vecPosition*Tail);
+		rPosition = (rPrevEffectPosition.m_vecPosition * Head) + (rEffectPosition.m_vecPosition * Tail);
 	}
 	else if (MOVING_TYPE_BEZIER_CURVE == iMovingType)
 	{
@@ -100,23 +99,23 @@ void CEffectElementBase::Clear()
 	OnClear();
 }
 
-BOOL CEffectElementBase::LoadScript(CTextFileLoader & rTextFileLoader)
+BOOL CEffectElementBase::LoadScript(CTextFileLoader& rTextFileLoader)
 {
-	CTokenVector * pTokenVector;
-	if (!rTextFileLoader.GetTokenFloat("starttime",&m_fStartTime))
+	CTokenVector* pTokenVector;
+	if (!rTextFileLoader.GetTokenFloat("starttime", &m_fStartTime))
 	{
 		m_fStartTime = 0.0f;
 	}
 	if (rTextFileLoader.GetTokenVector("timeeventposition", &pTokenVector))
-	{	
+	{
 		m_TimeEventTablePosition.clear();
-		
+
 		DWORD dwIndex = 0;
 		for (DWORD i = 0; i < pTokenVector->size(); ++dwIndex)
 		{
 			TEffectPosition EffectPosition;
 			EffectPosition.m_fTime = atof(pTokenVector->at(i++).c_str());
-			if (pTokenVector->at(i)=="MOVING_TYPE_BEZIER_CURVE")
+			if (pTokenVector->at(i) == "MOVING_TYPE_BEZIER_CURVE")
 			{
 				i++;
 
@@ -140,7 +139,7 @@ BOOL CEffectElementBase::LoadScript(CTextFileLoader & rTextFileLoader)
 				EffectPosition.m_vecPosition.y = atof(pTokenVector->at(i++).c_str());
 				EffectPosition.m_vecPosition.z = atof(pTokenVector->at(i++).c_str());
 
-				EffectPosition.m_vecControlPoint = D3DXVECTOR3(0.0f,0.0f,0.0f);
+				EffectPosition.m_vecControlPoint = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 			}
 			else
 			{
@@ -149,8 +148,8 @@ BOOL CEffectElementBase::LoadScript(CTextFileLoader & rTextFileLoader)
 
 			m_TimeEventTablePosition.push_back(EffectPosition);
 		}
-	}	
-	
+	}
+
 	return OnLoadScript(rTextFileLoader);
 }
 

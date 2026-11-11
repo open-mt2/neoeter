@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <Neoeter/Platform/Base/FileLoader.h>
 
 #include <map>
@@ -12,7 +11,7 @@
 #include "Platform/DirectXMathCompat.h"
 #endif
 
-template<typename T>
+template <typename T>
 class CTransitor
 {
 	public:
@@ -47,12 +46,12 @@ class CTransitor
 			m_dwID = dwID;
 		}
 
-		void SetSourceValue(const T & c_rSourceValue)
+		void SetSourceValue(const T& c_rSourceValue)
 		{
 			m_SourceValue = c_rSourceValue;
 		}
 
-		void SetTransition(const T & c_rSourceValue, const T & c_rTargetValue, float fStartTime, float fBlendTime)
+		void SetTransition(const T& c_rSourceValue, const T& c_rTargetValue, float fStartTime, float fBlendTime)
 		{
 			m_SourceValue = c_rSourceValue;
 			m_TargetValue = c_rTargetValue;
@@ -60,7 +59,7 @@ class CTransitor
 			m_fEndTime = fStartTime + fBlendTime;
 		}
 
-		BOOL GetValue(float fcurTime, T * pValue)
+		BOOL GetValue(float fcurTime, T* pValue)
 		{
 			if (fcurTime <= m_fStartTime)
 				return FALSE;
@@ -71,32 +70,31 @@ class CTransitor
 		}
 
 	protected:
-		DWORD	m_dwID;			// Public Transitor ID
+		DWORD m_dwID; // Public Transitor ID
 
-		BOOL	m_bActivated;	// Have been started to blend?
-		float	m_fStartTime;
-		float	m_fEndTime;
+		BOOL m_bActivated; // Have been started to blend?
+		float m_fStartTime;
+		float m_fEndTime;
 
-		T		m_SourceValue;
-		T		m_TargetValue;
+		T m_SourceValue;
+		T m_TargetValue;
 };
 
-typedef CTransitor<float>			TTransitorFloat;
-typedef CTransitor<D3DXVECTOR3>		TTransitorVector3;
-typedef CTransitor<D3DXCOLOR>		TTransitorColor;
+typedef CTransitor<float> TTransitorFloat;
+typedef CTransitor<D3DXVECTOR3> TTransitorVector3;
+typedef CTransitor<D3DXCOLOR> TTransitorColor;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void PrintfTabs(FILE * File, int iTabCount, const char * c_szString, ...);
+void PrintfTabs(FILE* File, int iTabCount, const char* c_szString, ...);
 
+// typedef CTokenVector TTokenVector;
 
-//typedef CTokenVector TTokenVector;
+extern bool LoadTextData(const char* c_szFileName, CTokenMap& rstTokenMap);
+extern bool LoadMultipleTextData(const char* c_szFileName, CTokenVectorMap& rstTokenVectorMap);
 
-extern bool	LoadTextData(const char * c_szFileName, CTokenMap & rstTokenMap);
-extern bool	LoadMultipleTextData(const char * c_szFileName, CTokenVectorMap & rstTokenVectorMap);
-
-extern D3DXVECTOR3 TokenToVector(CTokenVector & rVector);
-extern D3DXCOLOR TokenToColor(CTokenVector & rVector);
+extern D3DXVECTOR3 TokenToVector(CTokenVector& rVector);
+extern D3DXCOLOR TokenToColor(CTokenVector& rVector);
 
 #define GOTO_CHILD_NODE(TextFileLoader, Index) CTextFileLoader::CGotoChild Child(TextFileLoader, Index);
 
@@ -107,11 +105,11 @@ extern int GetCharsetFromCodePage(WORD codePage);
 extern const char* GetFontFaceFromCodePageNT(WORD codePage);
 extern const char* GetFontFaceFromCodePage9x(WORD codePage);
 extern DWORD GetDefaultCodePage();
-extern const char * GetDefaultFontFace();
-extern const char*	GetFontFaceFromCodePage(WORD codePage);
+extern const char* GetDefaultFontFace();
+extern const char* GetFontFaceFromCodePage(WORD codePage);
 extern void SetDefaultFontFace(const char* fontFace);
 extern bool SetDefaultCodePage(DWORD codePage);
-extern void base64_decode(const char * str,char * resultStr);
+extern void base64_decode(const char* str, char* resultStr);
 
 extern DWORD GetMaxTextureWidth();
 extern DWORD GetMaxTextureHeight();

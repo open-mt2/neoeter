@@ -7,7 +7,7 @@ bool CDynamicVertexBuffer::Create(int vtxCount, int fvf)
 	{
 		if (m_fvf == fvf)
 		{
-			if (m_vtxCount >= vtxCount) 
+			if (m_vtxCount >= vtxCount)
 				return true;
 		}
 	}

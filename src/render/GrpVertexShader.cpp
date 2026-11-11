@@ -16,7 +16,7 @@ CVertexShader::~CVertexShader()
 
 void CVertexShader::Initialize()
 {
-	m_handle=0;
+	m_handle = 0;
 }
 
 void CVertexShader::Destroy()

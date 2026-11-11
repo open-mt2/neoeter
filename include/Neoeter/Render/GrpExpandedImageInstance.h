@@ -6,7 +6,7 @@ class CGraphicExpandedImageInstance : public CGraphicImageInstance
 {
 	public:
 		static DWORD Type();
-		static void DeleteExpandedImageInstance(CGraphicExpandedImageInstance * pkInstance)
+		static void DeleteExpandedImageInstance(CGraphicExpandedImageInstance* pkInstance)
 		{
 			pkInstance->Destroy();
 			ms_kPool.Free(pkInstance);
@@ -49,7 +49,7 @@ class CGraphicExpandedImageInstance : public CGraphicImageInstance
 		float m_fRotation;
 		RECT m_RenderingRect;
 		int m_iRenderingMode;
-		
+
 	public:
 		static void CreateSystem(UINT uCapacity);
 		static void DestroySystem();
@@ -57,5 +57,5 @@ class CGraphicExpandedImageInstance : public CGraphicImageInstance
 		static CGraphicExpandedImageInstance* New();
 		static void Delete(CGraphicExpandedImageInstance* pkImgInst);
 
-		static CDynamicPool<CGraphicExpandedImageInstance>		ms_kPool;
+		static CDynamicPool<CGraphicExpandedImageInstance> ms_kPool;
 };

@@ -19,8 +19,6 @@ void CLightData::Delete(CLightData* pkData)
 	ms_kPool.Free(pkData);
 }
 
-
-
 void CLightData::OnClear()
 {
 	m_fMaxRange = 300.0f;
@@ -50,14 +48,14 @@ void CLightData::GetRange(float fTime, float& rRange)
 	if (m_TimeEventTableRange.empty())
 	{
 		rRange = 1.0f * m_fMaxRange;
-		if (rRange<0.0f)
+		if (rRange < 0.0f)
 			rRange = 0.0f;
 		return;
 	}
-	
+
 	GetTimeEventBlendValue(fTime, m_TimeEventTableRange, &rRange);
 	rRange *= m_fMaxRange;
-	if (rRange<0.0f)
+	if (rRange < 0.0f)
 		rRange = 0.0f;
 	return;
 	/*
@@ -95,36 +93,36 @@ bool CLightData::OnIsData()
 	return true;
 }
 
-BOOL CLightData::OnLoadScript(CTextFileLoader & rTextFileLoader)
+BOOL CLightData::OnLoadScript(CTextFileLoader& rTextFileLoader)
 {
-	if (!rTextFileLoader.GetTokenFloat("duration",&m_fDuration))
+	if (!rTextFileLoader.GetTokenFloat("duration", &m_fDuration))
 		m_fDuration = 1.0f;
-	
-	if (!rTextFileLoader.GetTokenBoolean("loopflag",&m_bLoopFlag))
+
+	if (!rTextFileLoader.GetTokenBoolean("loopflag", &m_bLoopFlag))
 		m_bLoopFlag = false;
-	
-	if (!rTextFileLoader.GetTokenInteger("loopcount",&m_iLoopCount))
+
+	if (!rTextFileLoader.GetTokenInteger("loopcount", &m_iLoopCount))
 		m_iLoopCount = 0;
-	
-	if (!rTextFileLoader.GetTokenColor("ambientcolor",&m_cAmbient))
-		return FALSE;
-	
-	if (!rTextFileLoader.GetTokenColor("diffusecolor",&m_cDiffuse))
+
+	if (!rTextFileLoader.GetTokenColor("ambientcolor", &m_cAmbient))
 		return FALSE;
 
-	if (!rTextFileLoader.GetTokenFloat("maxrange",&m_fMaxRange))
+	if (!rTextFileLoader.GetTokenColor("diffusecolor", &m_cDiffuse))
 		return FALSE;
 
-	if (!rTextFileLoader.GetTokenFloat("attenuation0",&m_fAttenuation0))
+	if (!rTextFileLoader.GetTokenFloat("maxrange", &m_fMaxRange))
 		return FALSE;
 
-	if (!rTextFileLoader.GetTokenFloat("attenuation1",&m_fAttenuation1))
+	if (!rTextFileLoader.GetTokenFloat("attenuation0", &m_fAttenuation0))
 		return FALSE;
 
-	if (!rTextFileLoader.GetTokenFloat("attenuation2",&m_fAttenuation2))
+	if (!rTextFileLoader.GetTokenFloat("attenuation1", &m_fAttenuation1))
 		return FALSE;
 
-	if (!GetTokenTimeEventFloat(rTextFileLoader,"timeeventrange",&m_TimeEventTableRange))
+	if (!rTextFileLoader.GetTokenFloat("attenuation2", &m_fAttenuation2))
+		return FALSE;
+
+	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventrange", &m_TimeEventTableRange))
 	{
 		m_TimeEventTableRange.clear();
 	}
@@ -148,17 +146,16 @@ float CLightData::GetDuration()
 void CLightData::InitializeLight(D3DLIGHT9& light)
 {
 	light.Type = D3DLIGHT_POINT;
-	
+
 	light.Ambient = m_cAmbient;
 	light.Diffuse = m_cDiffuse;
 	light.Attenuation0 = m_fAttenuation0;
 	light.Attenuation1 = m_fAttenuation1;
 	light.Attenuation2 = m_fAttenuation2;
 
-
 	D3DXVECTOR3 position;
-	GetPosition( 0.0f, position);
+	GetPosition(0.0f, position);
 	light.Position = position;
-	
+
 	GetRange(0.0f, light.Range);
 }

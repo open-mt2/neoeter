@@ -21,16 +21,15 @@ class CNetworkAddress
 		bool SetDNS(const char* c_szDNS);
 
 		void SetPort(int port);
-		
+
 		int GetPort();
 		int GetSize();
 
 		void GetIP(char* szIP, int len);
 
 		DWORD GetIP();
-		
-		operator const SOCKADDR_IN&() const;	
 
+		operator const SOCKADDR_IN&() const;
 
 	private:
 		bool IsIP(const char* c_szAddr);

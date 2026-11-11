@@ -41,13 +41,13 @@ bool CSoundInstance3D::SetSound(CSoundData* pSoundData)
 	// 카운터가 1일 경우, 불필요하게 로드가 일어나므로 미리 레퍼런스
 	// 카운터를 올려놔야 한다.
 	LPVOID lpData = pSoundData->Get();
-	
+
 	if (m_pSoundData != NULL)
 	{
 		m_pSoundData->Release();
 		m_pSoundData = NULL;
 	}
-	
+
 	if (AIL_set_3D_sample_file(m_sample, lpData) == 0)
 	{
 		TraceError("%s: %s", AIL_last_error(), pSoundData->GetFileName());
@@ -96,8 +96,8 @@ void CSoundInstance3D::Resume() const
 void CSoundInstance3D::Stop()
 {
 	AIL_end_3D_sample(m_sample);
-//	m_sample = NULL;
-// NOTE : IsDone을 체크하려면 m_sample이 살아있어야 합니다 - [levites]
+	//	m_sample = NULL;
+	// NOTE : IsDone을 체크하려면 m_sample이 살아있어야 합니다 - [levites]
 }
 
 void CSoundInstance3D::GetVolume(float& rfVolume) const
@@ -119,13 +119,13 @@ void CSoundInstance3D::SetPosition(float x, float y, float z) const
 	AIL_set_3D_position(m_sample, x, z, -y);
 }
 
-void CSoundInstance3D::SetOrientation(float x_face, float y_face, float z_face, 
+void CSoundInstance3D::SetOrientation(float x_face, float y_face, float z_face,
 									  float x_normal, float y_normal, float z_normal) const
 {
 	assert(!" CSoundInstance3D::SetOrientation - \xBB\xE7\xBF\xEB \xC7\xCF\xC1\xF6 \xBE\xCA\xB4\xC2 \xC7\xD4\xBC\xF6");
-//	AIL_set_3D_orientation(m_sample, 
-//						   x_face, y_face, z_face,
-//						   x_normal, y_normal, z_normal);
+	//	AIL_set_3D_orientation(m_sample,
+	//						   x_face, y_face, z_face,
+	//						   x_normal, y_normal, z_normal);
 }
 
 void CSoundInstance3D::SetVelocity(float fDistanceX, float fDistanceY, float fDistanceZ, float fNagnitude) const

@@ -38,62 +38,113 @@ static WPARAM SDLKeycodeToVK(SDL_Keycode key, SDL_Scancode scancode = SDL_SCANCO
 
 	switch (key)
 	{
-		case SDLK_BACKSPACE: return VK_BACK;
-		case SDLK_TAB: return VK_TAB;
-		case SDLK_CLEAR: return VK_CLEAR;
+		case SDLK_BACKSPACE:
+			return VK_BACK;
+		case SDLK_TAB:
+			return VK_TAB;
+		case SDLK_CLEAR:
+			return VK_CLEAR;
 		case SDLK_RETURN:
-		case SDLK_KP_ENTER: return VK_RETURN;
-		case SDLK_PAUSE: return VK_PAUSE;
-		case SDLK_CAPSLOCK: return VK_CAPITAL;
-		case SDLK_ESCAPE: return VK_ESCAPE;
-		case SDLK_SPACE: return VK_SPACE;
-		case SDLK_PAGEUP: return VK_PRIOR;
-		case SDLK_PAGEDOWN: return VK_NEXT;
-		case SDLK_END: return VK_END;
-		case SDLK_HOME: return VK_HOME;
-		case SDLK_LEFT: return VK_LEFT;
-		case SDLK_UP: return VK_UP;
-		case SDLK_RIGHT: return VK_RIGHT;
-		case SDLK_DOWN: return VK_DOWN;
-		case SDLK_PRINTSCREEN: return VK_SNAPSHOT;
-		case SDLK_INSERT: return VK_INSERT;
-		case SDLK_DELETE: return VK_DELETE;
-		case SDLK_HELP: return VK_HELP;
+		case SDLK_KP_ENTER:
+			return VK_RETURN;
+		case SDLK_PAUSE:
+			return VK_PAUSE;
+		case SDLK_CAPSLOCK:
+			return VK_CAPITAL;
+		case SDLK_ESCAPE:
+			return VK_ESCAPE;
+		case SDLK_SPACE:
+			return VK_SPACE;
+		case SDLK_PAGEUP:
+			return VK_PRIOR;
+		case SDLK_PAGEDOWN:
+			return VK_NEXT;
+		case SDLK_END:
+			return VK_END;
+		case SDLK_HOME:
+			return VK_HOME;
+		case SDLK_LEFT:
+			return VK_LEFT;
+		case SDLK_UP:
+			return VK_UP;
+		case SDLK_RIGHT:
+			return VK_RIGHT;
+		case SDLK_DOWN:
+			return VK_DOWN;
+		case SDLK_PRINTSCREEN:
+			return VK_SNAPSHOT;
+		case SDLK_INSERT:
+			return VK_INSERT;
+		case SDLK_DELETE:
+			return VK_DELETE;
+		case SDLK_HELP:
+			return VK_HELP;
 		case SDLK_LSHIFT:
-		case SDLK_RSHIFT: return VK_SHIFT;
+		case SDLK_RSHIFT:
+			return VK_SHIFT;
 		case SDLK_LCTRL:
-		case SDLK_RCTRL: return VK_CONTROL;
+		case SDLK_RCTRL:
+			return VK_CONTROL;
 		case SDLK_LALT:
-		case SDLK_RALT: return VK_MENU;
-		case SDLK_KP_0: return VK_NUMPAD0;
-		case SDLK_KP_1: return VK_NUMPAD1;
-		case SDLK_KP_2: return VK_NUMPAD2;
-		case SDLK_KP_3: return VK_NUMPAD3;
-		case SDLK_KP_4: return VK_NUMPAD4;
-		case SDLK_KP_5: return VK_NUMPAD5;
-		case SDLK_KP_6: return VK_NUMPAD6;
-		case SDLK_KP_7: return VK_NUMPAD7;
-		case SDLK_KP_8: return VK_NUMPAD8;
-		case SDLK_KP_9: return VK_NUMPAD9;
-		case SDLK_KP_MULTIPLY: return VK_MULTIPLY;
-		case SDLK_KP_PLUS: return VK_ADD;
-		case SDLK_KP_MINUS: return VK_SUBTRACT;
+		case SDLK_RALT:
+			return VK_MENU;
+		case SDLK_KP_0:
+			return VK_NUMPAD0;
+		case SDLK_KP_1:
+			return VK_NUMPAD1;
+		case SDLK_KP_2:
+			return VK_NUMPAD2;
+		case SDLK_KP_3:
+			return VK_NUMPAD3;
+		case SDLK_KP_4:
+			return VK_NUMPAD4;
+		case SDLK_KP_5:
+			return VK_NUMPAD5;
+		case SDLK_KP_6:
+			return VK_NUMPAD6;
+		case SDLK_KP_7:
+			return VK_NUMPAD7;
+		case SDLK_KP_8:
+			return VK_NUMPAD8;
+		case SDLK_KP_9:
+			return VK_NUMPAD9;
+		case SDLK_KP_MULTIPLY:
+			return VK_MULTIPLY;
+		case SDLK_KP_PLUS:
+			return VK_ADD;
+		case SDLK_KP_MINUS:
+			return VK_SUBTRACT;
 		case SDLK_KP_DECIMAL:
-		case SDLK_KP_PERIOD: return VK_DECIMAL;
-		case SDLK_KP_DIVIDE: return VK_DIVIDE;
-		case SDLK_F1: return VK_F1;
-		case SDLK_F2: return VK_F2;
-		case SDLK_F3: return VK_F3;
-		case SDLK_F4: return VK_F4;
-		case SDLK_F5: return VK_F5;
-		case SDLK_F6: return VK_F6;
-		case SDLK_F7: return VK_F7;
-		case SDLK_F8: return VK_F8;
-		case SDLK_F9: return VK_F9;
-		case SDLK_F10: return VK_F10;
-		case SDLK_F11: return VK_F11;
-		case SDLK_F12: return VK_F12;
-		case SDLK_SCROLLLOCK: return VK_SCROLL;
+		case SDLK_KP_PERIOD:
+			return VK_DECIMAL;
+		case SDLK_KP_DIVIDE:
+			return VK_DIVIDE;
+		case SDLK_F1:
+			return VK_F1;
+		case SDLK_F2:
+			return VK_F2;
+		case SDLK_F3:
+			return VK_F3;
+		case SDLK_F4:
+			return VK_F4;
+		case SDLK_F5:
+			return VK_F5;
+		case SDLK_F6:
+			return VK_F6;
+		case SDLK_F7:
+			return VK_F7;
+		case SDLK_F8:
+			return VK_F8;
+		case SDLK_F9:
+			return VK_F9;
+		case SDLK_F10:
+			return VK_F10;
+		case SDLK_F11:
+			return VK_F11;
+		case SDLK_F12:
+			return VK_F12;
+		case SDLK_SCROLLLOCK:
+			return VK_SCROLL;
 		default:
 			if (key >= SDLK_a && key <= SDLK_z)
 				return 'A' + (key - SDLK_a);
@@ -110,8 +161,8 @@ CMSApplication::CMSApplication()
 
 CMSApplication::~CMSApplication()
 {
-//	for (TWindowClassSet::iterator i=ms_stWCSet.begin(); i!=ms_stWCSet.end(); ++i)
-//		UnregisterClass(*i, ms_hInstance);
+	//	for (TWindowClassSet::iterator i=ms_stWCSet.begin(); i!=ms_stWCSet.end(); ++i)
+	//		UnregisterClass(*i, ms_hInstance);
 }
 
 void CMSApplication::Initialize(HINSTANCE hInstance)
@@ -160,7 +211,7 @@ bool CMSApplication::MessageProcess()
 			else if (event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
 			{
 				bool isFullscreen = ms_pSDLWindow &&
-					(SDL_GetWindowFlags(ms_pSDLWindow) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP));
+									(SDL_GetWindowFlags(ms_pSDLWindow) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP));
 				if (ms_pSDLWindow && !isFullscreen)
 				{
 					SDL_RestoreWindow(ms_pSDLWindow);
@@ -173,7 +224,7 @@ bool CMSApplication::MessageProcess()
 			else if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED || event.window.event == SDL_WINDOWEVENT_RESIZED)
 			{
 				bool isFullscreen = ms_pSDLWindow &&
-					(SDL_GetWindowFlags(ms_pSDLWindow) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP));
+									(SDL_GetWindowFlags(ms_pSDLWindow) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP));
 				int targetW = 1024, targetH = 768;
 				Platform_GetWindowResolution(&targetW, &targetH);
 				if (!isFullscreen && targetW > 0 && targetH > 0 && (event.window.data1 != targetW || event.window.data2 != targetH))
@@ -219,16 +270,20 @@ bool CMSApplication::MessageProcess()
 		{
 			Platform_SetCursorPos(event.button.x, event.button.y);
 			UINT uMsg = WM_LBUTTONDOWN;
-			if (event.button.button == SDL_BUTTON_RIGHT) uMsg = WM_RBUTTONDOWN;
-			else if (event.button.button == SDL_BUTTON_MIDDLE) uMsg = WM_MBUTTONDOWN;
+			if (event.button.button == SDL_BUTTON_RIGHT)
+				uMsg = WM_RBUTTONDOWN;
+			else if (event.button.button == SDL_BUTTON_MIDDLE)
+				uMsg = WM_MBUTTONDOWN;
 			WindowProcedure(m_hWnd, uMsg, 0, MAKELPARAM(event.button.x, event.button.y));
 		}
 		else if (event.type == SDL_MOUSEBUTTONUP)
 		{
 			Platform_SetCursorPos(event.button.x, event.button.y);
 			UINT uMsg = WM_LBUTTONUP;
-			if (event.button.button == SDL_BUTTON_RIGHT) uMsg = WM_RBUTTONUP;
-			else if (event.button.button == SDL_BUTTON_MIDDLE) uMsg = WM_MBUTTONUP;
+			if (event.button.button == SDL_BUTTON_RIGHT)
+				uMsg = WM_RBUTTONUP;
+			else if (event.button.button == SDL_BUTTON_MIDDLE)
+				uMsg = WM_MBUTTONUP;
 			WindowProcedure(m_hWnd, uMsg, 0, MAKELPARAM(event.button.x, event.button.y));
 		}
 		else if (event.type == SDL_MOUSEWHEEL)

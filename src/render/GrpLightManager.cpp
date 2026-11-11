@@ -9,8 +9,8 @@ float CLightBase::ms_fCurTime = 0.0f;
 
 CLightManager::CLightManager()
 {
-	m_v3CenterPosition			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_dwLimitLightCount			= LIGHT_LIMIT_DEFAULT;
+	m_v3CenterPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_dwLimitLightCount = LIGHT_LIMIT_DEFAULT;
 }
 
 CLightManager::~CLightManager()
@@ -25,16 +25,16 @@ void CLightManager::Destroy()
 void CLightManager::Initialize()
 {
 	SetSkipIndex(1);
-	
+
 	m_NonUsingLightIDDeque.clear();
 
 	m_LightMap.clear();
 	m_LightPool.FreeAll();
 }
 
-void CLightManager::RegisterLight(ELightType /*LightType*/, TLightID * poutLightID, D3DLIGHT9& LightData)
+void CLightManager::RegisterLight(ELightType /*LightType*/, TLightID* poutLightID, D3DLIGHT9& LightData)
 {
-	CLight * pLight = m_LightPool.Alloc();
+	CLight* pLight = m_LightPool.Alloc();
 	TLightID ID = NewLightID();
 	pLight->SetParameter(ID, LightData);
 	m_LightMap[ID] = pLight;
@@ -51,7 +51,7 @@ void CLightManager::DeleteLight(TLightID LightID)
 		return;
 	}
 
-	CLight * pLight = itor->second;
+	CLight* pLight = itor->second;
 
 	pLight->Clear();
 	m_LightPool.Free(pLight);
@@ -61,7 +61,7 @@ void CLightManager::DeleteLight(TLightID LightID)
 	ReleaseLightID(LightID);
 }
 
-CLight * CLightManager::GetLight(TLightID LightID)
+CLight* CLightManager::GetLight(TLightID LightID)
 {
 	TLightMap::iterator itor = m_LightMap.find(LightID);
 
@@ -74,7 +74,7 @@ CLight * CLightManager::GetLight(TLightID LightID)
 	return itor->second;
 }
 
-void CLightManager::SetCenterPosition(const D3DXVECTOR3 & c_rv3Position)
+void CLightManager::SetCenterPosition(const D3DXVECTOR3& c_rv3Position)
 {
 	m_v3CenterPosition = c_rv3Position;
 }
@@ -91,10 +91,10 @@ void CLightManager::SetSkipIndex(DWORD dwSkipIndex)
 
 struct LightComp
 {
-	bool operator () (const CLight * l, const CLight * r) const
-	{
-		return l->GetDistance() < r->GetDistance();
-	}
+		bool operator()(const CLight* l, const CLight* r) const
+		{
+			return l->GetDistance() < r->GetDistance();
+		}
 };
 
 // NOTE : FlushLight후 렌더링
@@ -113,7 +113,7 @@ void CLightManager::FlushLight()
 
 	for (; itor != m_LightMap.end(); ++itor)
 	{
-		CLight * pLight = itor->second;
+		CLight* pLight = itor->second;
 
 		D3DXVECTOR3 v3LightPos(pLight->GetPosition());
 		D3DXVECTOR3 v3Distance(v3LightPos - m_v3CenterPosition);
@@ -131,7 +131,6 @@ void CLightManager::FlushLight()
 	{
 		m_LightSortVector[k]->Update();
 		m_LightSortVector[k]->SetDeviceLight(TRUE);
-
 	}
 }
 
@@ -162,8 +161,8 @@ void CLightManager::ReleaseLightID(TLightID LightID)
 
 void CLightManager::Update()
 {
-	//static DWORD s_dwStartTime = ELTimer_GetMSec();
-	//ms_fCurTime = float(ELTimer_GetMSec() - s_dwStartTime) / 1000.0f;
+	// static DWORD s_dwStartTime = ELTimer_GetMSec();
+	// ms_fCurTime = float(ELTimer_GetMSec() - s_dwStartTime) / 1000.0f;
 	ms_fCurTime = CTimer::Instance().GetCurrentSecond();
 }
 
@@ -180,21 +179,21 @@ CLight::~CLight()
 
 void CLight::Initialize()
 {
-	m_LightID	= 0;
-	m_isEdited	= TRUE;
-	m_fDistance	= 0.0f;
+	m_LightID = 0;
+	m_isEdited = TRUE;
+	m_fDistance = 0.0f;
 
 	memset(&m_d3dLight, 0, sizeof(m_d3dLight));
 
-	m_d3dLight.Type			= D3DLIGHT_POINT;
-	m_d3dLight.Attenuation0	= 0.0f;
-	m_d3dLight.Attenuation1	= 1.0f;
-	m_d3dLight.Attenuation2	= 0.0f;
+	m_d3dLight.Type = D3DLIGHT_POINT;
+	m_d3dLight.Attenuation0 = 0.0f;
+	m_d3dLight.Attenuation1 = 1.0f;
+	m_d3dLight.Attenuation2 = 0.0f;
 }
 
 void CLight::Clear()
 {
-	if (m_LightID) 
+	if (m_LightID)
 		SetDeviceLight(FALSE);
 	Initialize();
 }
@@ -212,20 +211,16 @@ void CLight::SetDeviceLight(BOOL bActive)
 	}
 }
 
-void CLight::SetParameter(TLightID id, const D3DLIGHT9 & c_rLight)
+void CLight::SetParameter(TLightID id, const D3DLIGHT9& c_rLight)
 {
-	m_LightID	= id;
-	m_d3dLight	= c_rLight;
+	m_LightID = id;
+	m_d3dLight = c_rLight;
 }
 
 void CLight::SetDiffuseColor(float fr, float fg, float fb, float fa)
 {
-	if (m_d3dLight.Diffuse.r == fr
-		&& m_d3dLight.Diffuse.g == fg
-		&& m_d3dLight.Diffuse.b == fb
-		&& m_d3dLight.Diffuse.a == fa
-		)
-		return;	
+	if (m_d3dLight.Diffuse.r == fr && m_d3dLight.Diffuse.g == fg && m_d3dLight.Diffuse.b == fb && m_d3dLight.Diffuse.a == fa)
+		return;
 	m_d3dLight.Diffuse.r = fr;
 	m_d3dLight.Diffuse.g = fg;
 	m_d3dLight.Diffuse.b = fb;
@@ -235,11 +230,7 @@ void CLight::SetDiffuseColor(float fr, float fg, float fb, float fa)
 
 void CLight::SetAmbientColor(float fr, float fg, float fb, float fa)
 {
-	if (m_d3dLight.Ambient.r == fr
-		&& m_d3dLight.Ambient.g == fg
-		&& m_d3dLight.Ambient.b == fb
-		&& m_d3dLight.Ambient.a == fa
-		)
+	if (m_d3dLight.Ambient.r == fr && m_d3dLight.Ambient.g == fg && m_d3dLight.Ambient.b == fb && m_d3dLight.Ambient.a == fa)
 		return;
 	m_d3dLight.Ambient.r = fr;
 	m_d3dLight.Ambient.g = fg;
@@ -252,12 +243,12 @@ void CLight::SetRange(float fRange)
 {
 	if (m_d3dLight.Range == fRange)
 		return;
-	
+
 	m_d3dLight.Range = fRange;
 	m_isEdited = TRUE;
 }
 
-const D3DVECTOR & CLight::GetPosition() const
+const D3DVECTOR& CLight::GetPosition() const
 {
 	return m_d3dLight.Position;
 }
@@ -278,13 +269,13 @@ void CLight::SetDistance(float fDistance)
 	m_fDistance = fDistance;
 }
 
-void CLight::BlendDiffuseColor(const D3DXCOLOR & c_rColor, float fBlendTime, float fDelayTime)
+void CLight::BlendDiffuseColor(const D3DXCOLOR& c_rColor, float fBlendTime, float fDelayTime)
 {
 	D3DXCOLOR Color(m_d3dLight.Diffuse);
 	m_DiffuseColorTransitor.SetTransition(Color, c_rColor, ms_fCurTime + fDelayTime, fBlendTime);
 }
 
-void CLight::BlendAmbientColor(const D3DXCOLOR & c_rColor, float fBlendTime, float fDelayTime)
+void CLight::BlendAmbientColor(const D3DXCOLOR& c_rColor, float fBlendTime, float fDelayTime)
 {
 	D3DXCOLOR Color(m_d3dLight.Ambient);
 	m_AmbientColorTransitor.SetTransition(Color, c_rColor, ms_fCurTime + fDelayTime, fBlendTime);
@@ -337,7 +328,7 @@ void CLight::Update()
 		}
 		else
 		{
-			float fRange;
+			float fRange = 0.0f;
 			m_RangeTransitor.GetValue(ms_fCurTime, &fRange);
 			SetRange(fRange);
 		}

@@ -19,39 +19,39 @@
 namespace render
 {
 
-struct Image
-{
-    int width = 0;
-    int height = 0;
-    std::vector<std::uint8_t> rgba; // top-down, 4 bytes per pixel
+	struct Image
+	{
+			int width = 0;
+			int height = 0;
+			std::vector<std::uint8_t> rgba; // top-down, 4 bytes per pixel
 
-    bool Valid() const
-    {
-        return width > 0 && height > 0 &&
-               rgba.size() == static_cast<std::size_t>(width) * height * 4;
-    }
-};
+			bool Valid() const
+			{
+				return width > 0 && height > 0 &&
+					   rgba.size() == static_cast<std::size_t>(width) * height * 4;
+			}
+	};
 
-bool WritePng(const std::string& path, const Image& image, std::string* error);
-bool LoadPng(const std::string& path, Image* image, std::string* error);
+	bool WritePng(const std::string& path, const Image& image, std::string* error);
+	bool LoadPng(const std::string& path, Image* image, std::string* error);
 
-struct DiffStats
-{
-    std::size_t totalPixels = 0;
-    std::size_t differingPixels = 0;
-    int maxDelta = 0;
-    double meanAbsError = 0.0;
-    double similarity = 0.0; // fraction of pixels within the tolerance
-};
+	struct DiffStats
+	{
+			std::size_t totalPixels = 0;
+			std::size_t differingPixels = 0;
+			int maxDelta = 0;
+			double meanAbsError = 0.0;
+			double similarity = 0.0; // fraction of pixels within the tolerance
+	};
 
-// A pixel counts as matching when every channel differs by at most
-// `channelTolerance`. Similarity is reported over pixels, not channels, so the
-// numbers line up with what a human sees in the diff.
-DiffStats CompareImages(const Image& expected, const Image& actual, int channelTolerance);
+	// A pixel counts as matching when every channel differs by at most
+	// `channelTolerance`. Similarity is reported over pixels, not channels, so the
+	// numbers line up with what a human sees in the diff.
+	DiffStats CompareImages(const Image& expected, const Image& actual, int channelTolerance);
 
-// FNV-1a over width, height and the raw RGBA bytes. Stable across processes and
-// platforms; used to pin the exact pixels in the golden manifest.
-std::uint64_t PixelHash(const Image& image);
-std::string FormatHash(std::uint64_t hash);
+	// FNV-1a over width, height and the raw RGBA bytes. Stable across processes and
+	// platforms; used to pin the exact pixels in the golden manifest.
+	std::uint64_t PixelHash(const Image& image);
+	std::string FormatHash(std::uint64_t hash);
 
 } // namespace render

@@ -1,6 +1,6 @@
 #pragma once
 
-class CGraphicColor 
+class CGraphicColor
 {
 	public:
 		CGraphicColor(const CGraphicColor& c_rSrcColor);
@@ -9,6 +9,8 @@ class CGraphicColor
 
 		CGraphicColor();
 		~CGraphicColor();
+
+		CGraphicColor& operator=(const CGraphicColor&) = default;
 
 		void Clear();
 

@@ -17,7 +17,7 @@ CFileBase::~CFileBase()
 	Destroy();
 }
 
-char * CFileBase::GetFileName()
+char* CFileBase::GetFileName()
 {
 	return m_filename;
 }
@@ -33,7 +33,7 @@ void CFileBase::Close()
 	if (m_hFile)
 	{
 #if defined(_WIN32)
-		CloseHandle(m_hFile);	
+		CloseHandle(m_hFile);
 #else
 		close((int)(intptr_t)m_hFile);
 #endif
@@ -59,13 +59,13 @@ BOOL CFileBase::Create(const char* filename, EFileMode mode)
 	else
 		dwMode = GENERIC_READ;
 
-	m_hFile = CreateFile(filename,					// name of the file
-						 dwMode,					// desired access
-						 dwShareMode,				// share mode
-						 NULL,						// security attributes
+	m_hFile = CreateFile(filename,											  // name of the file
+						 dwMode,											  // desired access
+						 dwShareMode,										  // share mode
+						 NULL,												  // security attributes
 						 mode == FILEMODE_READ ? OPEN_EXISTING : OPEN_ALWAYS, // creation disposition
-						 FILE_ATTRIBUTE_NORMAL,		// flags and attr
-						 NULL);						// template file
+						 FILE_ATTRIBUTE_NORMAL,								  // flags and attr
+						 NULL);												  // template file
 
 	if (m_hFile != INVALID_HANDLE_VALUE)
 	{
@@ -136,7 +136,7 @@ BOOL CFileBase::Write(const void* src, int bytes)
 #if defined(_WIN32)
 	DWORD dwUseless;
 	BOOL ret = WriteFile(m_hFile, src, bytes, &dwUseless, NULL);
-	
+
 	if (!ret)
 		return false;
 

@@ -5,12 +5,12 @@
 
 CGraphicThing::CGraphicThing(const char* c_szFileName) : CResource(c_szFileName)
 {
-	Initialize();	
+	Initialize();
 }
 
 CGraphicThing::~CGraphicThing()
 {
-	//OnClear();
+	// OnClear();
 	Clear();
 }
 
@@ -27,10 +27,10 @@ void CGraphicThing::Initialize()
 void CGraphicThing::OnClear()
 {
 	if (m_motions)
-		delete [] m_motions;
+		delete[] m_motions;
 
 	if (m_models)
-		delete [] m_models;
+		delete[] m_models;
 
 	if (m_pgrnFile)
 		GrannyFreeFile(m_pgrnFile);
@@ -61,10 +61,10 @@ bool CGraphicThing::CreateDeviceObjects()
 {
 	if (!m_pgrnFileInfo)
 		return true;
-	
+
 	for (int m = 0; m < m_pgrnFileInfo->ModelCount; ++m)
 	{
-		CGrannyModel & rModel = m_models[m];
+		CGrannyModel& rModel = m_models[m];
 		rModel.CreateDeviceObjects();
 	}
 
@@ -78,7 +78,7 @@ void CGraphicThing::DestroyDeviceObjects()
 
 	for (int m = 0; m < m_pgrnFileInfo->ModelCount; ++m)
 	{
-		CGrannyModel & rModel = m_models[m];
+		CGrannyModel& rModel = m_models[m];
 		rModel.DestroyDeviceObjects();
 	}
 }
@@ -113,21 +113,21 @@ bool CGraphicThing::CheckMotionIndex(int iMotion) const
 
 	if (iMotion < 0)
 		return false;
-	
+
 	if (iMotion >= m_pgrnFileInfo->AnimationCount)
 		return false;
 
 	return true;
 }
 
-CGrannyModel * CGraphicThing::GetModelPointer(int iModel)
-{	
+CGrannyModel* CGraphicThing::GetModelPointer(int iModel)
+{
 	assert(CheckModelIndex(iModel));
 	assert(m_models != NULL);
 	return m_models + iModel;
 }
 
-CGrannyMotion * CGraphicThing::GetMotionPointer(int iMotion)
+CGrannyMotion* CGraphicThing::GetMotionPointer(int iMotion)
 {
 	assert(CheckMotionIndex(iMotion));
 
@@ -154,17 +154,17 @@ int CGraphicThing::GetMotionCount() const
 	return (m_pgrnFileInfo->AnimationCount);
 }
 
-bool CGraphicThing::OnLoad(int iSize, const void * c_pvBuf)
+bool CGraphicThing::OnLoad(int iSize, const void* c_pvBuf)
 {
 	if (!c_pvBuf)
 		return false;
 
-	m_pgrnFile = GrannyReadEntireFileFromMemory(iSize, (void *) c_pvBuf);
+	m_pgrnFile = GrannyReadEntireFileFromMemory(iSize, (void*)c_pvBuf);
 
 	if (!m_pgrnFile)
 		return false;
 
-    m_pgrnFileInfo = GrannyGetFileInfo(m_pgrnFile);
+	m_pgrnFileInfo = GrannyGetFileInfo(m_pgrnFile);
 
 	if (!m_pgrnFileInfo)
 		return false;
@@ -187,18 +187,18 @@ bool CGraphicThing::LoadModels()
 {
 	assert(m_pgrnFile != NULL);
 	assert(m_models == NULL);
-	
+
 	if (m_pgrnFileInfo->ModelCount <= 0)
-		return false;	
+		return false;
 
 	// SUPPORT_LOCAL_TEXTURE
 	const std::string& fileName = GetFileNameString();
 
-	//char localPath[256] = "";
+	// char localPath[256] = "";
 	if (fileName.length() > 2 && fileName[1] != ':')
-	{				
+	{
 		int sepPos = fileName.rfind('\\');
-		gs_modelLocalPath.assign(fileName, 0, sepPos+1);
+		gs_modelLocalPath.assign(fileName, 0, sepPos + 1);
 	}
 	// END_OF_SUPPORT_LOCAL_TEXTURE
 
@@ -208,8 +208,8 @@ bool CGraphicThing::LoadModels()
 
 	for (int m = 0; m < modelCount; ++m)
 	{
-		CGrannyModel & rModel = m_models[m];
-		granny_model * pgrnModel = m_pgrnFileInfo->Models[m];
+		CGrannyModel& rModel = m_models[m];
+		granny_model* pgrnModel = m_pgrnFileInfo->Models[m];
 
 		if (!rModel.CreateFromGrannyModelPointer(pgrnModel))
 			return false;
@@ -229,11 +229,11 @@ bool CGraphicThing::LoadMotions()
 
 	if (m_pgrnFileInfo->AnimationCount <= 0)
 		return false;
-	
+
 	int motionCount = m_pgrnFileInfo->AnimationCount;
 
 	m_motions = new CGrannyMotion[motionCount];
-	
+
 	for (int m = 0; m < motionCount; ++m)
 		if (!m_motions[m].BindGrannyAnimation(m_pgrnFileInfo->Animations[m]))
 			return false;

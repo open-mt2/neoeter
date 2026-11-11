@@ -4,7 +4,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 void CGraphicShadowTexture::Destroy()
-{	
+{
 	CGraphicTexture::Destroy();
 
 	if (m_lpd3dShadowSurface)
@@ -95,10 +95,10 @@ void CGraphicShadowTexture::Begin()
 	STATEMANAGER.SetTexture(0, m_lpd3dShadowTexture);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLOROP,   D3DTOP_MODULATE);
+	STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
+	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 
 	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
@@ -109,10 +109,10 @@ void CGraphicShadowTexture::Begin()
 	STATEMANAGER.SetTexture(1, nullptr);
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_COLORARG2, D3DTA_TEXTURE);
-	STATEMANAGER.SaveTextureStageState(1, D3DTSS_COLOROP,   D3DTOP_SELECTARG1);
+	STATEMANAGER.SaveTextureStageState(1, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ALPHAARG1, D3DTA_CURRENT);
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
-	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1);
+	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 
 	STATEMANAGER.SaveSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	STATEMANAGER.SaveSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
@@ -126,14 +126,14 @@ void CGraphicShadowTexture::End()
 	assert(m_lpd3dOldBackBufferSurface != NULL);
 	assert(m_lpd3dOldDepthBufferSurface != NULL);
 
-	ms_lpd3dDevice->EndScene();	
+	ms_lpd3dDevice->EndScene();
 
 	ms_lpd3dDevice->SetRenderTarget(0, m_lpd3dOldBackBufferSurface);
 	ms_lpd3dDevice->SetDepthStencilSurface(m_lpd3dOldDepthBufferSurface);
 	ms_lpd3dDevice->SetViewport(&m_d3dOldViewport);
 
-	m_lpd3dOldBackBufferSurface->Release();		
-	m_lpd3dOldDepthBufferSurface->Release();	
+	m_lpd3dOldBackBufferSurface->Release();
+	m_lpd3dOldDepthBufferSurface->Release();
 
 	m_lpd3dOldBackBufferSurface = NULL;
 	m_lpd3dOldDepthBufferSurface = NULL;
@@ -176,7 +176,7 @@ void CGraphicShadowTexture::Initialize()
 	CGraphicTexture::Initialize();
 
 	m_lpd3dShadowSurface = NULL;
-	m_lpd3dDepthSurface = NULL;	
+	m_lpd3dDepthSurface = NULL;
 	m_lpd3dOldBackBufferSurface = NULL;
 	m_lpd3dOldDepthBufferSurface = NULL;
 	m_lpd3dShadowTexture = NULL;

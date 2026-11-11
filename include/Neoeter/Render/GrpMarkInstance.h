@@ -32,11 +32,11 @@ class CGraphicMarkInstance
 		int GetWidth();
 		int GetHeight();
 
-		CGraphicTexture * GetTexturePointer();
-		const CGraphicTexture &	GetTextureReference() const;
-		CGraphicImage * GetGraphicImagePointer();
+		CGraphicTexture* GetTexturePointer();
+		const CGraphicTexture& GetTextureReference() const;
+		CGraphicImage* GetGraphicImagePointer();
 
-		bool operator == (const CGraphicMarkInstance & rhs) const;
+		bool operator==(const CGraphicMarkInstance& rhs) const;
 
 	protected:
 		enum
@@ -52,14 +52,14 @@ class CGraphicMarkInstance
 
 		virtual BOOL OnIsType(DWORD dwType);
 
-		void SetImagePointer(CGraphicImage * pImage);
+		void SetImagePointer(CGraphicImage* pImage);
 
 	protected:
 		D3DXCOLOR m_DiffuseColor;
 		D3DXVECTOR2 m_v2Position;
 
 		UINT m_uIndex;
-	
+
 		FLOAT m_fScale;
 		FLOAT m_fDepth;
 

@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //  Name: BoundaryShapeManager.cpp
 //
 //  *** INTERACTIVE DATA VISUALIZATION (IDV) PROPRIETARY INFORMATION ***
@@ -14,12 +14,11 @@
 //      Web:   http://www.idvinc.com
 //
 //  This software is supplied under the terms of a license agreement or
-//  nondisclosure agreement with Interactive Data Visualization and may not 
-//  be copied or disclosed except in accordance with the terms of that 
+//  nondisclosure agreement with Interactive Data Visualization and may not
+//  be copied or disclosed except in accordance with the terms of that
 //  agreement.
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Preprocessor
 #include <Neoeter/Model/SpeedTree/StdAfx.h>
 
@@ -29,22 +28,20 @@
 
 using namespace std;
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::CBoundaryShapeManager
 CBoundaryShapeManager::CBoundaryShapeManager()
 {
 }
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::~CBoundaryShapeManager
 
 CBoundaryShapeManager::~CBoundaryShapeManager()
 {
 }
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::LoadBsfFile
 
 bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
@@ -62,7 +59,7 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 				for (unsigned int i = 0; i < nNumBoundaries && bSuccess; ++i)
 				{
 					SBoundaryShape sShape;
-					
+
 					// number of contours for this shape
 					unsigned int nNumContours;
 					if (fread(&nNumContours, sizeof(unsigned int), 1, pFile) == 1)
@@ -107,7 +104,6 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 										m_strCurrentError = "Error in CBoundaryShapeManager::LoadBsfFile(): Failed to read point";
 										bSuccess = false;
 									}
-
 								}
 								sShape.m_vContours.push_back(vPoints);
 							}
@@ -116,7 +112,6 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 								m_strCurrentError = "Error in CBoundaryShapeManager::LoadBsfFile(): Failed to read number of points";
 								bSuccess = false;
 							}
-
 						}
 						m_vBoundaries.push_back(sShape);
 					}
@@ -140,8 +135,8 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 			bSuccess = false;
 		}
 	}
-	
-	catch(...)
+
+	catch (...)
 	{
 		m_strCurrentError = "Error in CBoundaryShapeManager::LoadBsfFile(): Unknown exception";
 	}
@@ -149,8 +144,7 @@ bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 	return bSuccess;
 }
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::PointInside
 
 bool CBoundaryShapeManager::PointInside(float fX, float fY)
@@ -163,8 +157,7 @@ bool CBoundaryShapeManager::PointInside(float fX, float fY)
 	return bInside;
 }
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::PointInShape
 
 bool CBoundaryShapeManager::PointInShape(SBoundaryShape& sShape, float fX, float fY)
@@ -177,7 +170,7 @@ bool CBoundaryShapeManager::PointInShape(SBoundaryShape& sShape, float fX, float
 		{
 			if ((((sShape.m_vContours[k][i][1] <= fY) && (fY < sShape.m_vContours[k][j][1])) ||
 				 ((sShape.m_vContours[k][j][1] <= fY) && (fY < sShape.m_vContours[k][i][1]))) &&
-				  (fX < (sShape.m_vContours[k][i][0] - sShape.m_vContours[k][i][0]) * (fY - sShape.m_vContours[k][i][1]) / (sShape.m_vContours[k][j][1] - sShape.m_vContours[k][i][1]) + sShape.m_vContours[k][i][0]))
+				(fX < (sShape.m_vContours[k][i][0] - sShape.m_vContours[k][i][0]) * (fY - sShape.m_vContours[k][i][1]) / (sShape.m_vContours[k][j][1] - sShape.m_vContours[k][i][1]) + sShape.m_vContours[k][i][0]))
 			{
 				bInside = !bInside;
 			}
@@ -187,8 +180,7 @@ bool CBoundaryShapeManager::PointInShape(SBoundaryShape& sShape, float fX, float
 	return bInside;
 }
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::RandomPoint
 
 bool CBoundaryShapeManager::RandomPoint(float& fX, float& fY)

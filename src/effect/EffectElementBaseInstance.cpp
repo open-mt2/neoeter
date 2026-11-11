@@ -13,7 +13,7 @@ bool CEffectElementBaseInstance::Update(float fElapsedTime)
 	else
 	{
 		m_fRemainingTime -= fElapsedTime;
-		if (m_fRemainingTime<=0.0f)
+		if (m_fRemainingTime <= 0.0f)
 			m_bStart = true;
 		return true;
 	}
@@ -29,22 +29,22 @@ void CEffectElementBaseInstance::Render()
 	OnRender();
 }
 
-void CEffectElementBaseInstance::SetLocalMatrixPointer(const D3DXMATRIX * c_pMatrix)
+void CEffectElementBaseInstance::SetLocalMatrixPointer(const D3DXMATRIX* c_pMatrix)
 {
 	mc_pmatLocal = c_pMatrix;
 }
 
-void CEffectElementBaseInstance::SetDataPointer(CEffectElementBase * pElement)
+void CEffectElementBaseInstance::SetDataPointer(CEffectElementBase* pElement)
 {
 	m_pBase = pElement;
 
 	m_dwStartTime = CTimer::Instance().GetCurrentMillisecond();
 
 	//////////////////////////////////////////////////////////////////////////
-	//add by ipkn, start time management
+	// add by ipkn, start time management
 
 	m_fRemainingTime = pElement->GetStartTime();
-	if (m_fRemainingTime<=0.0f)
+	if (m_fRemainingTime <= 0.0f)
 		m_bStart = true;
 	else
 		m_bStart = false;

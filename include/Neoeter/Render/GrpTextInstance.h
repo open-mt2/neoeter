@@ -12,29 +12,29 @@ class CGraphicTextInstance
 	public:
 		enum EHorizontalAlign
 		{
-			HORIZONTAL_ALIGN_LEFT		= 0x01,
-			HORIZONTAL_ALIGN_CENTER		= 0x02,
-			HORIZONTAL_ALIGN_RIGHT		= 0x03,
+			HORIZONTAL_ALIGN_LEFT = 0x01,
+			HORIZONTAL_ALIGN_CENTER = 0x02,
+			HORIZONTAL_ALIGN_RIGHT = 0x03,
 		};
 		enum EVerticalAlign
 		{
-			VERTICAL_ALIGN_TOP		= 0x10,
-			VERTICAL_ALIGN_CENTER	= 0x20,
-			VERTICAL_ALIGN_BOTTOM	= 0x30
+			VERTICAL_ALIGN_TOP = 0x10,
+			VERTICAL_ALIGN_CENTER = 0x20,
+			VERTICAL_ALIGN_BOTTOM = 0x30
 		};
 
 	public:
 		static void Hyperlink_UpdateMousePos(int x, int y);
-		static int  Hyperlink_GetText(char* buf, int len);
+		static int Hyperlink_GetText(char* buf, int len);
 
 	public:
 		CGraphicTextInstance();
 		virtual ~CGraphicTextInstance();
 
 		void Destroy();
-		
+
 		void Update();
-		void Render(RECT * pClipRect = NULL);
+		void Render(RECT* pClipRect = NULL);
 
 		void ShowCursor();
 		void HideCursor();
@@ -70,18 +70,18 @@ class CGraphicTextInstance
 
 	protected:
 		void __Initialize();
-		int  __DrawCharacter(CGraphicFontTexture * pFontTexture, WORD codePage, wchar_t text, DWORD dwColor);
+		int __DrawCharacter(CGraphicFontTexture* pFontTexture, WORD codePage, wchar_t text, DWORD dwColor);
 		void __GetTextPos(DWORD index, float* x, float* y);
-		int __GetTextTag(const wchar_t * src, int maxLen, int & tagLen, std::wstring & extraInfo);
+		int __GetTextTag(const wchar_t* src, int maxLen, int& tagLen, std::wstring& extraInfo);
 
 	protected:
 		struct SHyperlink
 		{
-			short sx;
-			short ex;
-			std::wstring text;
+				short sx;
+				short ex;
+				std::wstring text;
 
-			SHyperlink() : sx(0), ex(0) { }
+				SHyperlink() : sx(0), ex(0) {}
 		};
 
 	protected:
@@ -112,7 +112,7 @@ class CGraphicTextInstance
 	private:
 		bool m_isUpdate;
 		bool m_isUpdateFontTexture;
-		
+
 		CGraphicText::TRef m_roText;
 		CGraphicFontTexture::TPCharacterInfomationVector m_pCharInfoVector;
 		std::vector<DWORD> m_dwColorInfoVector;
@@ -125,7 +125,7 @@ class CGraphicTextInstance
 		static CGraphicTextInstance* New();
 		static void Delete(CGraphicTextInstance* pkInst);
 
-		static CDynamicPool<CGraphicTextInstance>		ms_kPool;
+		static CDynamicPool<CGraphicTextInstance> ms_kPool;
 };
 
 extern const char* FindToken(const char* begin, const char* end);

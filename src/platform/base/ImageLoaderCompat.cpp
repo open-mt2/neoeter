@@ -10,120 +10,120 @@
 
 namespace
 {
-const size_t DDS_HEADER_SIZE = 128;
+	const size_t DDS_HEADER_SIZE = 128;
 
-uint32_t ReadU32(const uint8_t* p)
-{
-	return (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
-}
-
-unsigned ChannelShift(uint32_t mask)
-{
-	unsigned shift = 0;
-	while (mask && !(mask & 1u))
+	uint32_t ReadU32(const uint8_t* p)
 	{
-		mask >>= 1;
-		++shift;
+		return (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
 	}
-	return shift;
-}
 
-unsigned ChannelBits(uint32_t mask)
-{
-	unsigned bits = 0;
-	while (mask)
+	unsigned ChannelShift(uint32_t mask)
 	{
-		++bits;
-		mask &= mask - 1u;
-	}
-	return bits;
-}
-
-uint8_t ExpandChannel(uint32_t pixel, uint32_t mask, uint8_t fallback)
-{
-	if (!mask)
-		return fallback;
-
-	const unsigned bits = ChannelBits(mask);
-	const uint32_t value = (pixel & mask) >> ChannelShift(mask);
-	if (bits >= 8)
-		return (uint8_t)(value >> (bits - 8));
-
-	return (uint8_t)((value * 255u) / ((1u << bits) - 1u));
-}
-
-bool DecodeDds(const void* data, size_t size, uint32_t* outW, uint32_t* outH, std::vector<uint8_t>& outPixels)
-{
-	if (!data || size < DDS_HEADER_SIZE)
-		return false;
-
-	const uint8_t* bytes = (const uint8_t*)data;
-	if (!(bytes[0] == 'D' && bytes[1] == 'D' && bytes[2] == 'S' && bytes[3] == ' '))
-		return false;
-
-	if (ReadU32(bytes + 4) != 124)
-		return false;
-
-	const uint32_t flags = ReadU32(bytes + 8);
-	const uint32_t height = ReadU32(bytes + 12);
-	const uint32_t width = ReadU32(bytes + 16);
-	const uint32_t pitchOrLinearSize = ReadU32(bytes + 20);
-	const uint32_t pixelFlags = ReadU32(bytes + 80);
-	const uint32_t fourCC = ReadU32(bytes + 84);
-	const uint32_t bitCount = ReadU32(bytes + 88);
-	const uint32_t rMask = ReadU32(bytes + 92);
-	const uint32_t gMask = ReadU32(bytes + 96);
-	const uint32_t bMask = ReadU32(bytes + 100);
-	const uint32_t aMask = ReadU32(bytes + 104);
-
-	if (fourCC != 0 || (pixelFlags & 0x40u) == 0)
-		return false;
-	if (width == 0 || height == 0)
-		return false;
-	if (bitCount != 8 && bitCount != 16 && bitCount != 24 && bitCount != 32)
-		return false;
-	if (rMask == 0 || gMask == 0 || bMask == 0)
-		return false;
-
-	const size_t bytesPerPixel = bitCount / 8;
-	size_t rowPitch = (size_t)width * bytesPerPixel;
-	if ((flags & 0x8u) != 0 && pitchOrLinearSize >= rowPitch)
-		rowPitch = pitchOrLinearSize;
-
-	if ((size - DDS_HEADER_SIZE) / height < rowPitch)
-		return false;
-
-	outPixels.assign((size_t)width * height * 4, 255);
-	const uint8_t* src = bytes + DDS_HEADER_SIZE;
-
-	for (uint32_t y = 0; y < height; ++y)
-	{
-		const uint8_t* row = src + rowPitch * y;
-		for (uint32_t x = 0; x < width; ++x)
+		unsigned shift = 0;
+		while (mask && !(mask & 1u))
 		{
-			const uint8_t* p = row + (size_t)x * bytesPerPixel;
-			uint32_t pixel = p[0];
-			if (bytesPerPixel > 1)
-				pixel |= (uint32_t)p[1] << 8;
-			if (bytesPerPixel > 2)
-				pixel |= (uint32_t)p[2] << 16;
-			if (bytesPerPixel > 3)
-				pixel |= (uint32_t)p[3] << 24;
-
-			uint8_t* dst = outPixels.data() + ((size_t)y * width + x) * 4;
-			dst[0] = ExpandChannel(pixel, bMask, 255);
-			dst[1] = ExpandChannel(pixel, gMask, 255);
-			dst[2] = ExpandChannel(pixel, rMask, 255);
-			dst[3] = ExpandChannel(pixel, aMask, 255);
+			mask >>= 1;
+			++shift;
 		}
+		return shift;
 	}
 
-	if (outW)
-		*outW = width;
-	if (outH)
-		*outH = height;
-	return true;
-}
+	unsigned ChannelBits(uint32_t mask)
+	{
+		unsigned bits = 0;
+		while (mask)
+		{
+			++bits;
+			mask &= mask - 1u;
+		}
+		return bits;
+	}
+
+	uint8_t ExpandChannel(uint32_t pixel, uint32_t mask, uint8_t fallback)
+	{
+		if (!mask)
+			return fallback;
+
+		const unsigned bits = ChannelBits(mask);
+		const uint32_t value = (pixel & mask) >> ChannelShift(mask);
+		if (bits >= 8)
+			return (uint8_t)(value >> (bits - 8));
+
+		return (uint8_t)((value * 255u) / ((1u << bits) - 1u));
+	}
+
+	bool DecodeDds(const void* data, size_t size, uint32_t* outW, uint32_t* outH, std::vector<uint8_t>& outPixels)
+	{
+		if (!data || size < DDS_HEADER_SIZE)
+			return false;
+
+		const uint8_t* bytes = (const uint8_t*)data;
+		if (!(bytes[0] == 'D' && bytes[1] == 'D' && bytes[2] == 'S' && bytes[3] == ' '))
+			return false;
+
+		if (ReadU32(bytes + 4) != 124)
+			return false;
+
+		const uint32_t flags = ReadU32(bytes + 8);
+		const uint32_t height = ReadU32(bytes + 12);
+		const uint32_t width = ReadU32(bytes + 16);
+		const uint32_t pitchOrLinearSize = ReadU32(bytes + 20);
+		const uint32_t pixelFlags = ReadU32(bytes + 80);
+		const uint32_t fourCC = ReadU32(bytes + 84);
+		const uint32_t bitCount = ReadU32(bytes + 88);
+		const uint32_t rMask = ReadU32(bytes + 92);
+		const uint32_t gMask = ReadU32(bytes + 96);
+		const uint32_t bMask = ReadU32(bytes + 100);
+		const uint32_t aMask = ReadU32(bytes + 104);
+
+		if (fourCC != 0 || (pixelFlags & 0x40u) == 0)
+			return false;
+		if (width == 0 || height == 0)
+			return false;
+		if (bitCount != 8 && bitCount != 16 && bitCount != 24 && bitCount != 32)
+			return false;
+		if (rMask == 0 || gMask == 0 || bMask == 0)
+			return false;
+
+		const size_t bytesPerPixel = bitCount / 8;
+		size_t rowPitch = (size_t)width * bytesPerPixel;
+		if ((flags & 0x8u) != 0 && pitchOrLinearSize >= rowPitch)
+			rowPitch = pitchOrLinearSize;
+
+		if ((size - DDS_HEADER_SIZE) / height < rowPitch)
+			return false;
+
+		outPixels.assign((size_t)width * height * 4, 255);
+		const uint8_t* src = bytes + DDS_HEADER_SIZE;
+
+		for (uint32_t y = 0; y < height; ++y)
+		{
+			const uint8_t* row = src + rowPitch * y;
+			for (uint32_t x = 0; x < width; ++x)
+			{
+				const uint8_t* p = row + (size_t)x * bytesPerPixel;
+				uint32_t pixel = p[0];
+				if (bytesPerPixel > 1)
+					pixel |= (uint32_t)p[1] << 8;
+				if (bytesPerPixel > 2)
+					pixel |= (uint32_t)p[2] << 16;
+				if (bytesPerPixel > 3)
+					pixel |= (uint32_t)p[3] << 24;
+
+				uint8_t* dst = outPixels.data() + ((size_t)y * width + x) * 4;
+				dst[0] = ExpandChannel(pixel, bMask, 255);
+				dst[1] = ExpandChannel(pixel, gMask, 255);
+				dst[2] = ExpandChannel(pixel, rMask, 255);
+				dst[3] = ExpandChannel(pixel, aMask, 255);
+			}
+		}
+
+		if (outW)
+			*outW = width;
+		if (outH)
+			*outH = height;
+		return true;
+	}
 } // namespace
 
 bool Platform_GetImageInfo(const void* data, size_t size, uint32_t* outW, uint32_t* outH, uint32_t* outFormat)

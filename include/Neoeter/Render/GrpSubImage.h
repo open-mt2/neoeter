@@ -23,16 +23,16 @@ class CGraphicSubImage : public CGraphicImage
 
 		void SetRectReference(const RECT& c_rRect);
 
-		static void SetSearchPath(const char * c_szFileName);
+		static void SetSearchPath(const char* c_szFileName);
 
 	protected:
 		void SetImagePointer(CGraphicImage* pImage);
 
 		bool OnLoad(int iSize, const void* c_pvBuf);
-		void OnClear();		
+		void OnClear();
 		bool OnIsEmpty() const;
 		bool OnIsType(TType type);
-		
+
 	protected:
 		CGraphicImage::TRef m_roImage;
 };

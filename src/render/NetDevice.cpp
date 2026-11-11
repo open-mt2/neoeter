@@ -8,12 +8,12 @@ CNetworkDevice::CNetworkDevice()
 
 CNetworkDevice::~CNetworkDevice()
 {
-	Destroy();	
+	Destroy();
 }
 
 void CNetworkDevice::Initialize()
 {
-	m_isWSA=false;
+	m_isWSA = false;
 }
 
 void CNetworkDevice::Destroy()
@@ -21,7 +21,7 @@ void CNetworkDevice::Destroy()
 	if (m_isWSA)
 	{
 		WSACleanup();
-		m_isWSA=false;
+		m_isWSA = false;
 	}
 }
 
@@ -32,10 +32,10 @@ bool CNetworkDevice::Create()
 	Initialize();
 
 	WSADATA wsaData;
-	if (WSAStartup(MAKEWORD(1, 1), &wsaData)!=0)
+	if (WSAStartup(MAKEWORD(1, 1), &wsaData) != 0)
 		return false;
 
-	m_isWSA=true;
-	
+	m_isWSA = true;
+
 	return true;
 }

@@ -4,8 +4,9 @@
 
 class CEmitterProperty
 {
-	friend class CParticleSystemData;
-	friend class CParticleSystemInstance;
+		friend class CParticleSystemData;
+		friend class CParticleSystemInstance;
+
 	public:
 		enum
 		{
@@ -32,7 +33,7 @@ class CEmitterProperty
 		{
 			return m_dwMaxEmissionCount;
 		}
-		
+
 		float GetCycleLength()
 		{
 			return m_fCycleLength;
@@ -42,36 +43,35 @@ class CEmitterProperty
 		{
 			return m_bCycleLoopFlag;
 		}
-			
-		int	GetLoopCount()
+
+		int GetLoopCount()
 		{
 			return m_iLoopCount;
 		}
-			
 
 		BYTE GetEmitterShape();
 		BYTE GetEmitterAdvancedType();
 		BOOL isEmitFromEdge();
 
-		void GetEmittingSize(float fTime, float * pfValue);
-		void GetEmittingAngularVelocity(float fTime, float * pfValue);
+		void GetEmittingSize(float fTime, float* pfValue);
+		void GetEmittingAngularVelocity(float fTime, float* pfValue);
 
-		void GetEmittingDirectionX(float fTime, float * pfValue);
-		void GetEmittingDirectionY(float fTime, float * pfValue);
-		void GetEmittingDirectionZ(float fTime, float * pfValue);
-		void GetEmittingVelocity(float fTime, float * pfValue);
-		void GetEmissionCountPerSecond(float fTime, float * pfValue);
-		void GetParticleLifeTime(float fTime, float * pfValue);
-		void GetParticleSizeX(float fTime, float * pfValue);
-		void GetParticleSizeY(float fTime, float * pfValue);
+		void GetEmittingDirectionX(float fTime, float* pfValue);
+		void GetEmittingDirectionY(float fTime, float* pfValue);
+		void GetEmittingDirectionZ(float fTime, float* pfValue);
+		void GetEmittingVelocity(float fTime, float* pfValue);
+		void GetEmissionCountPerSecond(float fTime, float* pfValue);
+		void GetParticleLifeTime(float fTime, float* pfValue);
+		void GetParticleSizeX(float fTime, float* pfValue);
+		void GetParticleSizeY(float fTime, float* pfValue);
 
-	/////
+		/////
 
 		DWORD m_dwMaxEmissionCount;
 
 		float m_fCycleLength;
 		BOOL m_bCycleLoopFlag;
-		int	m_iLoopCount;
+		int m_iLoopCount;
 
 		BYTE m_byEmitterShape;
 		BYTE m_byEmitterAdvancedType;
@@ -81,7 +81,7 @@ class CEmitterProperty
 
 		D3DXVECTOR3 m_v3EmittingDirection;
 
-		//TTimeEventTableFloat m_TimeEventEmittingRadius;
+		// TTimeEventTableFloat m_TimeEventEmittingRadius;
 		TTimeEventTableFloat m_TimeEventEmittingSize;
 		TTimeEventTableFloat m_TimeEventEmittingAngularVelocity;
 		TTimeEventTableFloat m_TimeEventEmittingDirectionX;

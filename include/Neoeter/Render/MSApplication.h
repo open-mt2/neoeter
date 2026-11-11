@@ -5,7 +5,7 @@
 class CMSApplication : public CMSWindow
 {
 	public:
-		CMSApplication();		
+		CMSApplication();
 		virtual ~CMSApplication();
 
 		void Initialize(HINSTANCE hInstance);

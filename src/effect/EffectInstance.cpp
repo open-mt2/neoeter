@@ -7,12 +7,12 @@
 #include <Neoeter/Render/StateManager.h>
 #include <Neoeter/Audio/SoundManager.h>
 
-CDynamicPool<CEffectInstance>	CEffectInstance::ms_kPool;
+CDynamicPool<CEffectInstance> CEffectInstance::ms_kPool;
 int CEffectInstance::ms_iRenderingEffectCount = 0;
 
 bool CEffectInstance::LessRenderOrder(CEffectInstance* pkEftInst)
 {
-	return (m_pkEftData<pkEftInst->m_pkEftData);	
+	return (m_pkEftData < pkEftInst->m_pkEftData);
 }
 
 void CEffectInstance::ResetRenderingEffectCount()
@@ -27,7 +27,7 @@ int CEffectInstance::GetRenderingEffectCount()
 
 CEffectInstance* CEffectInstance::New()
 {
-	CEffectInstance* pkEftInst=ms_kPool.Alloc();
+	CEffectInstance* pkEftInst = ms_kPool.Alloc();
 	return pkEftInst;
 }
 
@@ -50,7 +50,7 @@ void CEffectInstance::UpdateSound()
 {
 	if (m_pSoundInstanceVector)
 	{
-		CSoundManager& rkSndMgr=CSoundManager::Instance();
+		CSoundManager& rkSndMgr = CSoundManager::Instance();
 		rkSndMgr.UpdateSoundInstance(m_matGlobal._41, m_matGlobal._42, m_matGlobal._43, m_dwFrame, m_pSoundInstanceVector);
 		// NOTE : 매트릭스에서 위치를 직접 얻어온다 - [levites]
 	}
@@ -59,17 +59,17 @@ void CEffectInstance::UpdateSound()
 
 struct FEffectUpdator
 {
-	BOOL isAlive;
-	float fElapsedTime;
-	FEffectUpdator(float fElapsedTime)
-		: isAlive(FALSE), fElapsedTime(fElapsedTime)
-	{
-	}
-	void operator () (CEffectElementBaseInstance * pInstance)
-	{
-		if (pInstance->Update(fElapsedTime))
-			isAlive = TRUE;
-	}
+		BOOL isAlive;
+		float fElapsedTime;
+		FEffectUpdator(float fElapsedTime)
+			: isAlive(FALSE), fElapsedTime(fElapsedTime)
+		{
+		}
+		void operator()(CEffectElementBaseInstance* pInstance)
+		{
+			if (pInstance->Update(fElapsedTime))
+				isAlive = TRUE;
+		}
 };
 
 void CEffectInstance::OnUpdate()
@@ -79,11 +79,11 @@ void CEffectInstance::OnUpdate()
 #ifdef WORLD_EDITOR
 	FEffectUpdator f(CTimer::Instance().GetElapsedSecond());
 #else
-	FEffectUpdator f(CTimer::Instance().GetCurrentSecond()-m_fLastTime);
+	FEffectUpdator f(CTimer::Instance().GetCurrentSecond() - m_fLastTime);
 #endif
-	f = std::for_each(m_ParticleInstanceVector.begin(), m_ParticleInstanceVector.end(),f);
-	f = std::for_each(m_MeshInstanceVector.begin(), m_MeshInstanceVector.end(),f);
-	f = std::for_each(m_LightInstanceVector.begin(), m_LightInstanceVector.end(),f);
+	f = std::for_each(m_ParticleInstanceVector.begin(), m_ParticleInstanceVector.end(), f);
+	f = std::for_each(m_MeshInstanceVector.begin(), m_MeshInstanceVector.end(), f);
+	f = std::for_each(m_LightInstanceVector.begin(), m_LightInstanceVector.end(), f);
 	m_isAlive = f.isAlive;
 
 	m_fLastTime = CTimer::Instance().GetCurrentSecond();
@@ -101,15 +101,15 @@ void CEffectInstance::OnRender()
 	STATEMANAGER.SaveRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	/////
 
-    STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,   D3DTOP_MODULATE);
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 	STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_TEX1);
-	std::for_each(m_ParticleInstanceVector.begin(),m_ParticleInstanceVector.end(),std::void_mem_fun(&CEffectElementBaseInstance::Render));
-	std::for_each(m_MeshInstanceVector.begin(),m_MeshInstanceVector.end(),std::void_mem_fun(&CEffectElementBaseInstance::Render));
+	std::for_each(m_ParticleInstanceVector.begin(), m_ParticleInstanceVector.end(), std::void_mem_fun(&CEffectElementBaseInstance::Render));
+	std::for_each(m_MeshInstanceVector.begin(), m_MeshInstanceVector.end(), std::void_mem_fun(&CEffectElementBaseInstance::Render));
 
 	/////
 	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
@@ -124,7 +124,7 @@ void CEffectInstance::OnRender()
 	++ms_iRenderingEffectCount;
 }
 
-void CEffectInstance::SetGlobalMatrix(const D3DXMATRIX & c_rmatGlobal)
+void CEffectInstance::SetGlobalMatrix(const D3DXMATRIX& c_rmatGlobal)
 {
 	m_matGlobal = c_rmatGlobal;
 }
@@ -166,17 +166,17 @@ void CEffectInstance::SetDeactive()
 		std::void_mem_fun(&CEffectElementBaseInstance::SetDeactive));
 }
 
-void CEffectInstance::__SetParticleData(CParticleSystemData * pData)
+void CEffectInstance::__SetParticleData(CParticleSystemData* pData)
 {
-	CParticleSystemInstance * pInstance = CParticleSystemInstance::New();
+	CParticleSystemInstance* pInstance = CParticleSystemInstance::New();
 	pInstance->SetDataPointer(pData);
 	pInstance->SetLocalMatrixPointer(&m_matGlobal);
 
 	m_ParticleInstanceVector.push_back(pInstance);
 }
-void CEffectInstance::__SetMeshData(CEffectMeshScript * pMesh)
+void CEffectInstance::__SetMeshData(CEffectMeshScript* pMesh)
 {
-	CEffectMeshInstance * pMeshInstance = CEffectMeshInstance::New();
+	CEffectMeshInstance* pMeshInstance = CEffectMeshInstance::New();
 	pMeshInstance->SetDataPointer(pMesh);
 	pMeshInstance->SetLocalMatrixPointer(&m_matGlobal);
 
@@ -185,18 +185,18 @@ void CEffectInstance::__SetMeshData(CEffectMeshScript * pMesh)
 
 void CEffectInstance::__SetLightData(CLightData* pData)
 {
-	CLightInstance * pInstance = CLightInstance::New();
+	CLightInstance* pInstance = CLightInstance::New();
 	pInstance->SetDataPointer(pData);
 	pInstance->SetLocalMatrixPointer(&m_matGlobal);
 
 	m_LightInstanceVector.push_back(pInstance);
 }
 
-void CEffectInstance::SetEffectDataPointer(CEffectData * pEffectData)
+void CEffectInstance::SetEffectDataPointer(CEffectData* pEffectData)
 {
-	m_isAlive=true;
+	m_isAlive = true;
 
-	m_pkEftData=pEffectData;
+	m_pkEftData = pEffectData;
 
 	m_fLastTime = CTimer::Instance().GetCurrentSecond();
 	m_fBoundingSphereRadius = pEffectData->GetBoundingSphereRadius();
@@ -209,21 +209,21 @@ void CEffectInstance::SetEffectDataPointer(CEffectData * pEffectData)
 
 	for (i = 0; i < pEffectData->GetParticleCount(); ++i)
 	{
-		CParticleSystemData * pParticle = pEffectData->GetParticlePointer(i);
+		CParticleSystemData* pParticle = pEffectData->GetParticlePointer(i);
 
 		__SetParticleData(pParticle);
 	}
 
 	for (i = 0; i < pEffectData->GetMeshCount(); ++i)
 	{
-		CEffectMeshScript * pMesh = pEffectData->GetMeshPointer(i);
+		CEffectMeshScript* pMesh = pEffectData->GetMeshPointer(i);
 
 		__SetMeshData(pMesh);
 	}
 
 	for (i = 0; i < pEffectData->GetLightCount(); ++i)
 	{
-		CLightData * pLight = pEffectData->GetLightPointer(i);
+		CLightData* pLight = pEffectData->GetLightPointer(i);
 
 		__SetLightData(pLight);
 	}
@@ -231,7 +231,7 @@ void CEffectInstance::SetEffectDataPointer(CEffectData * pEffectData)
 	m_pSoundInstanceVector = pEffectData->GetSoundInstanceVector();
 }
 
-bool CEffectInstance::GetBoundingSphere(D3DXVECTOR3 & v3Center, float & fRadius)
+bool CEffectInstance::GetBoundingSphere(D3DXVECTOR3& v3Center, float& fRadius)
 {
 	v3Center.x = m_matGlobal._41 + m_v3BoundingSpherePosition.x;
 	v3Center.y = m_matGlobal._42 + m_v3BoundingSpherePosition.y;
@@ -271,12 +271,12 @@ void CEffectInstance::__Initialize()
 	m_fBoundingSphereRadius = 0.0f;
 	m_v3BoundingSpherePosition.x = m_v3BoundingSpherePosition.y = m_v3BoundingSpherePosition.z = 0.0f;
 
-	m_pkEftData=NULL;
+	m_pkEftData = NULL;
 
 	D3DXMatrixIdentity(&m_matGlobal);
 }
 
-CEffectInstance::CEffectInstance() 
+CEffectInstance::CEffectInstance()
 {
 	__Initialize();
 }

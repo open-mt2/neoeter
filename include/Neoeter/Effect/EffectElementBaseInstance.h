@@ -8,12 +8,12 @@ class CEffectElementBaseInstance
 		CEffectElementBaseInstance();
 		virtual ~CEffectElementBaseInstance();
 
-		void SetDataPointer(CEffectElementBase * pElement);
+		void SetDataPointer(CEffectElementBase* pElement);
 
 		void Initialize();
 		void Destroy();
 
-		void SetLocalMatrixPointer(const D3DXMATRIX * c_pMatrix);
+		void SetLocalMatrixPointer(const D3DXMATRIX* c_pMatrix);
 		bool Update(float fElapsedTime);
 		void Render();
 
@@ -22,7 +22,7 @@ class CEffectElementBaseInstance
 		void SetDeactive();
 
 	protected:
-		virtual void OnSetDataPointer(CEffectElementBase * pElement) = 0;
+		virtual void OnSetDataPointer(CEffectElementBase* pElement) = 0;
 
 		virtual void OnInitialize() = 0;
 		virtual void OnDestroy() = 0;
@@ -31,16 +31,16 @@ class CEffectElementBaseInstance
 		virtual void OnRender() = 0;
 
 	protected:
-		const D3DXMATRIX *						mc_pmatLocal;
+		const D3DXMATRIX* mc_pmatLocal;
 
-		bool									m_isActive;
+		bool m_isActive;
 
-		float									m_fLocalTime;
-		DWORD									m_dwStartTime;
-		float									m_fElapsedTime;
-		float									m_fRemainingTime;
-		bool									m_bStart;
+		float m_fLocalTime;
+		DWORD m_dwStartTime;
+		float m_fElapsedTime;
+		float m_fRemainingTime;
+		bool m_bStart;
 
 	private:
-		CEffectElementBase *					m_pBase;
+		CEffectElementBase* m_pBase;
 };

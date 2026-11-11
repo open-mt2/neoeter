@@ -1,8 +1,8 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/TargaResource.h>
 
-CTargaResource::CTargaResource(const char * c_pszFileName) : CResource(c_pszFileName)
-{	
+CTargaResource::CTargaResource(const char* c_pszFileName) : CResource(c_pszFileName)
+{
 }
 
 CTargaResource::~CTargaResource()
@@ -23,9 +23,9 @@ bool CTargaResource::OnIsType(TType type)
 	return CResource::OnIsType(type);
 }
 
-bool CTargaResource::OnLoad(int iSize, const void * c_pvBuf)
+bool CTargaResource::OnLoad(int iSize, const void* c_pvBuf)
 {
-	return image.LoadFromMemory(iSize, static_cast<const BYTE *>(c_pvBuf));
+	return image.LoadFromMemory(iSize, static_cast<const BYTE*>(c_pvBuf));
 }
 
 void CTargaResource::OnClear()
@@ -38,18 +38,18 @@ bool CTargaResource::OnIsEmpty() const
 	return image.IsEmpty();
 }
 
-void CTargaResource::GetRect(DWORD & w, DWORD & h)
+void CTargaResource::GetRect(DWORD& w, DWORD& h)
 {
 	w = image.GetWidth();
 	h = image.GetHeight();
 }
 
-DWORD * CTargaResource::GetMemPtr()
+DWORD* CTargaResource::GetMemPtr()
 {
 	return image.GetBasePointer();
 }
 
-TGA_HEADER &	CTargaResource::GetTgaHeader()
+TGA_HEADER& CTargaResource::GetTgaHeader()
 {
 	return image.GetHeader();
 }

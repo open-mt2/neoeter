@@ -1,12 +1,12 @@
 #include <Neoeter/Audio/StdAfx.h>
 #include <Neoeter/Audio/SoundBase.h>
 
-HDIGDRIVER				CSoundBase::ms_DIGDriver = NULL;
-TSoundDataMap			CSoundBase::ms_dataMap;
-TProvider *				CSoundBase::ms_pProviderDefault = NULL;
-std::vector<TProvider>	CSoundBase::ms_ProviderVector;
-bool					CSoundBase::ms_bInitialized = false;
-int						CSoundBase::ms_iRefCount = 0;
+HDIGDRIVER CSoundBase::ms_DIGDriver = NULL;
+TSoundDataMap CSoundBase::ms_dataMap;
+TProvider* CSoundBase::ms_pProviderDefault = NULL;
+std::vector<TProvider> CSoundBase::ms_ProviderVector;
+bool CSoundBase::ms_bInitialized = false;
+int CSoundBase::ms_iRefCount = 0;
 
 CSoundBase::CSoundBase()
 {
@@ -31,7 +31,7 @@ void CSoundBase::Destroy()
 		TSoundDataMap::iterator i;
 		for (i = ms_dataMap.begin(); i != ms_dataMap.end(); ++i)
 		{
-			CSoundData * pSoundData = i->second;
+			CSoundData* pSoundData = i->second;
 			delete pSoundData;
 		}
 
@@ -47,23 +47,22 @@ void CSoundBase::Initialize()
 
 	if (ms_iRefCount > 1)
 		return;
-	
+
 	AIL_set_redist_directory("miles");
 	AIL_startup();
 
 	ms_ProviderVector.clear();
 	ms_dataMap.clear();
-	
 }
 
-DWORD CSoundBase::GetFileCRC(const char * filename)
+DWORD CSoundBase::GetFileCRC(const char* filename)
 {
 	return GetCRC32(filename, strlen(filename));
 }
 
-CSoundData * CSoundBase::AddFile(DWORD dwFileCRC, const char* filename)
+CSoundData* CSoundBase::AddFile(DWORD dwFileCRC, const char* filename)
 {
-	CSoundData * pSoundData = new CSoundData;
+	CSoundData* pSoundData = new CSoundData;
 	pSoundData->Assign(filename);
 	ms_dataMap.insert(TSoundDataMap::value_type(dwFileCRC, pSoundData));
 	return pSoundData;

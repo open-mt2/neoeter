@@ -13,8 +13,8 @@ class CNetDatagramReceiver
 		BOOL isBind();
 
 		BOOL Process();
-		BOOL Recv(void * pBuffer, int iSize);
-		BOOL Peek(void * pBuffer, int iSize);
+		BOOL Recv(void* pBuffer, int iSize);
+		BOOL Peek(void* pBuffer, int iSize);
 
 		void SetRecvBufferSize(int recvBufSize);
 
@@ -26,11 +26,11 @@ class CNetDatagramReceiver
 		SOCKET m_Socket;
 		SOCKADDR_IN m_SockAddr;
 
-		int		m_recvBufCurrentPos;
-		int		m_recvBufCurrentSize;
+		int m_recvBufCurrentPos;
+		int m_recvBufCurrentSize;
 
-		char*	m_recvBuf;
-		int		m_recvBufSize;
+		char* m_recvBuf;
+		int m_recvBufSize;
 };
 
 #endif

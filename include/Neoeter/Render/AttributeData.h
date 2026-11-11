@@ -6,8 +6,8 @@
 
 typedef struct SHeightData
 {
-	char szName[32+1];
-	std::vector<D3DXVECTOR3> v3VertexVector;
+		char szName[32 + 1];
+		std::vector<D3DXVECTOR3> v3VertexVector;
 } THeightData;
 
 typedef std::vector<THeightData> THeightDataVector;
@@ -40,23 +40,23 @@ class CAttributeData : public CResource
 		static TType Type();
 
 	public:
-		CAttributeData(const char * c_szFileName);
+		CAttributeData(const char* c_szFileName);
 		virtual ~CAttributeData();
 
-		//DWORD GetCollisionDataCount() const;
-		//BOOL GetCollisionDataPointer(DWORD dwIndex, const TCollisionData ** c_ppCollisionData) const;
-		const CStaticCollisionDataVector & GetCollisionDataVector() const;
-		const THeightDataVector & GetHeightDataVector() const;
+		// DWORD GetCollisionDataCount() const;
+		// BOOL GetCollisionDataPointer(DWORD dwIndex, const TCollisionData ** c_ppCollisionData) const;
+		const CStaticCollisionDataVector& GetCollisionDataVector() const;
+		const THeightDataVector& GetHeightDataVector() const;
 
-		size_t AddCollisionData(const CStaticCollisionData& collisionData);	// return m_StaticCollisionDataVector.size();
+		size_t AddCollisionData(const CStaticCollisionData& collisionData); // return m_StaticCollisionDataVector.size();
 
 		DWORD GetHeightDataCount() const;
-		BOOL GetHeightDataPointer(DWORD dwIndex, const THeightData ** c_ppHeightData) const;
+		BOOL GetHeightDataPointer(DWORD dwIndex, const THeightData** c_ppHeightData) const;
 
 		float GetMaximizeRadius();
 
 	protected:
-		bool OnLoad(int iSize, const void * c_pvBuf);
+		bool OnLoad(int iSize, const void* c_pvBuf);
 		void OnClear();
 		bool OnIsEmpty() const;
 		bool OnIsType(TType type);
@@ -65,7 +65,7 @@ class CAttributeData : public CResource
 	protected:
 		float m_fMaximizeRadius;
 
-		//std::vector<TCollisionData> m_CollisionDataVector;
+		// std::vector<TCollisionData> m_CollisionDataVector;
 		CStaticCollisionDataVector m_StaticCollisionDataVector;
 		THeightDataVector m_HeightDataVector;
 };

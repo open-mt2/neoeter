@@ -3,40 +3,40 @@
 // Collision Detection
 typedef struct SSphereData
 {
-	D3DXVECTOR3 v3Position;
-	float		fRadius;
+		D3DXVECTOR3 v3Position;
+		float fRadius;
 } TSphereData;
 
 typedef struct SPlaneData
 {
-	D3DXVECTOR3 v3Position;
-	D3DXVECTOR3 v3Normal;
-	
-	D3DXVECTOR3 v3QuadPosition[4];
-	D3DXVECTOR3 v3InsideVector[4];
+		D3DXVECTOR3 v3Position;
+		D3DXVECTOR3 v3Normal;
+
+		D3DXVECTOR3 v3QuadPosition[4];
+		D3DXVECTOR3 v3InsideVector[4];
 } TPlaneData;
 
 typedef struct SAABBData
 {
-	D3DXVECTOR3 v3Min;
-	D3DXVECTOR3 v3Max;
+		D3DXVECTOR3 v3Min;
+		D3DXVECTOR3 v3Max;
 
 } TAABBData;
 
 typedef struct SOBBData
 {
-	D3DXVECTOR3 v3Min;
-	D3DXVECTOR3 v3Max;
-	D3DXMATRIX matRot;
-	D3DXMATRIX matRotInv; // world -> box local, used by the collision tests
+		D3DXVECTOR3 v3Min;
+		D3DXVECTOR3 v3Max;
+		D3DXMATRIX matRot;
+		D3DXMATRIX matRotInv; // world -> box local, used by the collision tests
 
 } TOBBData;
 
 typedef struct SCylinderData
 {
-	D3DXVECTOR3 v3Position;
-	float fRadius;
-	float fHeight;
+		D3DXVECTOR3 v3Position;
+		float fRadius;
+		float fHeight;
 } TCylinderData;
 
 enum ECollisionType
@@ -51,21 +51,21 @@ enum ECollisionType
 
 struct CDynamicSphereInstance
 {
-	D3DXVECTOR3 v3Position;
-	D3DXVECTOR3 v3LastPosition;
+		D3DXVECTOR3 v3Position;
+		D3DXVECTOR3 v3LastPosition;
 
-	float fRadius;
+		float fRadius;
 };
 
 class CStaticCollisionData
 {
-public:
-	DWORD dwType;
-	char szName[32+1];
-	
-	D3DXVECTOR3 v3Position;
-	float fDimensions[3];
-	D3DXQUATERNION quatRotation;
+	public:
+		DWORD dwType;
+		char szName[32 + 1];
+
+		D3DXVECTOR3 v3Position;
+		float fDimensions[3];
+		D3DXQUATERNION quatRotation;
 };
 
 void DestroyCollisionInstanceSystem();
@@ -77,31 +77,32 @@ typedef std::vector<CStaticCollisionData> CStaticCollisionDataVector;
 class CBaseCollisionInstance
 {
 	public:
+		virtual ~CBaseCollisionInstance() {}
+
 		virtual void Render(D3DFILLMODE d3dFillMode = D3DFILL_SOLID) = 0;
 
-		bool MovementCollisionDynamicSphere(const CDynamicSphereInstance & s) const
+		bool MovementCollisionDynamicSphere(const CDynamicSphereInstance& s) const
 		{
 			return OnMovementCollisionDynamicSphere(s);
 		}
-		bool CollisionDynamicSphere(const CDynamicSphereInstance & s) const
+		bool CollisionDynamicSphere(const CDynamicSphereInstance& s) const
 		{
 			return OnCollisionDynamicSphere(s);
 		}
-		
 
-		D3DXVECTOR3 GetCollisionMovementAdjust(const CDynamicSphereInstance & s) const
+		D3DXVECTOR3 GetCollisionMovementAdjust(const CDynamicSphereInstance& s) const
 		{
 			return OnGetCollisionMovementAdjust(s);
 		}
 
 		void Destroy();
 
-		static CBaseCollisionInstance * BuildCollisionInstance(const CStaticCollisionData * c_pCollisionData, const D3DXMATRIX * pMat);
+		static CBaseCollisionInstance* BuildCollisionInstance(const CStaticCollisionData* c_pCollisionData, const D3DXMATRIX* pMat);
 
 	protected:
-		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance & s) const = 0;
-		virtual bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance & s) const  = 0;
-		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance & s) const  = 0;
+		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance& s) const = 0;
+		virtual bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance& s) const = 0;
+		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance& s) const = 0;
 		virtual void OnDestroy() = 0;
 };
 
@@ -110,15 +111,15 @@ class CBaseCollisionInstance
 class CSphereCollisionInstance : public CBaseCollisionInstance
 {
 	public:
-		TSphereData & GetAttribute();
-		const TSphereData & GetAttribute() const;
+		TSphereData& GetAttribute();
+		const TSphereData& GetAttribute() const;
 		virtual void Render(D3DFILLMODE d3dFillMode = D3DFILL_SOLID);
 
 	protected:
 		void OnDestroy();
-		bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance & s) const;
-		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance & s) const;
-		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance & s) const;
+		bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance& s) const;
+		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance& s) const;
+		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance& s) const;
 
 	protected:
 		TSphereData m_attribute;
@@ -129,15 +130,15 @@ class CSphereCollisionInstance : public CBaseCollisionInstance
 class CPlaneCollisionInstance : public CBaseCollisionInstance
 {
 	public:
-		TPlaneData & GetAttribute();
-		const TPlaneData & GetAttribute() const;
+		TPlaneData& GetAttribute();
+		const TPlaneData& GetAttribute() const;
 		virtual void Render(D3DFILLMODE d3dFillMode = D3DFILL_SOLID);
 
 	protected:
 		void OnDestroy();
-		bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance & s) const;
-		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance & s) const;
-		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance & s) const;
+		bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance& s) const;
+		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance& s) const;
+		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance& s) const;
 
 	protected:
 		TPlaneData m_attribute;
@@ -148,15 +149,15 @@ class CPlaneCollisionInstance : public CBaseCollisionInstance
 class CAABBCollisionInstance : public CBaseCollisionInstance
 {
 	public:
-		TAABBData & GetAttribute();
-		const TAABBData & GetAttribute() const;
+		TAABBData& GetAttribute();
+		const TAABBData& GetAttribute() const;
 		virtual void Render(D3DFILLMODE d3dFillMode = D3DFILL_SOLID);
 
 	protected:
 		void OnDestroy();
-		bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance & s) const;
-		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance & s) const;
-		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance & s) const;
+		bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance& s) const;
+		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance& s) const;
+		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance& s) const;
 
 	protected:
 		TAABBData m_attribute;
@@ -167,15 +168,15 @@ class CAABBCollisionInstance : public CBaseCollisionInstance
 class COBBCollisionInstance : public CBaseCollisionInstance
 {
 	public:
-		TOBBData & GetAttribute();
-		const TOBBData & GetAttribute() const;
+		TOBBData& GetAttribute();
+		const TOBBData& GetAttribute() const;
 		virtual void Render(D3DFILLMODE d3dFillMode = D3DFILL_SOLID);
 
 	protected:
 		void OnDestroy();
-		bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance & s) const;
-		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance & s) const;
-		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance & s) const;
+		bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance& s) const;
+		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance& s) const;
+		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance& s) const;
 
 	protected:
 		TOBBData m_attribute;
@@ -186,17 +187,17 @@ class COBBCollisionInstance : public CBaseCollisionInstance
 class CCylinderCollisionInstance : public CBaseCollisionInstance
 {
 	public:
-		TCylinderData & GetAttribute();
-		const TCylinderData & GetAttribute() const;
+		TCylinderData& GetAttribute();
+		const TCylinderData& GetAttribute() const;
 		virtual void Render(D3DFILLMODE d3dFillMode = D3DFILL_SOLID);
 
 	protected:
 		void OnDestroy();
-		bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance & s) const;
-		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance & s) const;
-		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance & s) const;
+		bool OnMovementCollisionDynamicSphere(const CDynamicSphereInstance& s) const;
+		virtual bool OnCollisionDynamicSphere(const CDynamicSphereInstance& s) const;
+		virtual D3DXVECTOR3 OnGetCollisionMovementAdjust(const CDynamicSphereInstance& s) const;
 
-		bool CollideCylinderVSDynamicSphere(const TCylinderData & c_rattribute, const CDynamicSphereInstance & s) const;
+		bool CollideCylinderVSDynamicSphere(const TCylinderData& c_rattribute, const CDynamicSphereInstance& s) const;
 
 	protected:
 		TCylinderData m_attribute;

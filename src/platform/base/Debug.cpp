@@ -31,7 +31,7 @@ class CLogFile : public CSingleton<CLogFile>
 			m_fp = fopen("log.txt", "w");
 		}
 
-		void Write(const char * c_pszMsg)
+		void Write(const char* c_pszMsg)
 		{
 			if (!m_fp)
 				return;
@@ -39,55 +39,55 @@ class CLogFile : public CSingleton<CLogFile>
 			time_t ct = time(0);
 			struct tm ctm = *localtime(&ct);
 
-			fprintf(m_fp, "%02d%02d %02d:%02d:%05d :: %s", 
-				ctm.tm_mon + 1, 
-				ctm.tm_mday,
-				ctm.tm_hour,
-				ctm.tm_min,
-				ELTimer_GetMSec() % 60000,
-				c_pszMsg);
+			fprintf(m_fp, "%02d%02d %02d:%02d:%05d :: %s",
+					ctm.tm_mon + 1,
+					ctm.tm_mday,
+					ctm.tm_hour,
+					ctm.tm_min,
+					ELTimer_GetMSec() % 60000,
+					c_pszMsg);
 
 			fflush(m_fp);
 		}
 
 	protected:
-		FILE *	m_fp;
+		FILE* m_fp;
 };
 
 static CLogFile gs_logfile;
 
-static UINT gs_uLevel=0;
+static UINT gs_uLevel = 0;
 
 void SetLogLevel(UINT uLevel)
 {
-	gs_uLevel=uLevel;
+	gs_uLevel = uLevel;
 }
 
 void Log(UINT uLevel, const char* c_szMsg)
 {
-	if (uLevel>=gs_uLevel)
+	if (uLevel >= gs_uLevel)
 		Trace(c_szMsg);
 }
 
 void Logn(UINT uLevel, const char* c_szMsg)
 {
-	if (uLevel>=gs_uLevel)
+	if (uLevel >= gs_uLevel)
 		Tracen(c_szMsg);
 }
 
 void Logf(UINT uLevel, const char* c_szFormat, ...)
 {
-	if (uLevel<gs_uLevel)
+	if (uLevel < gs_uLevel)
 		return;
-	
-	char szBuf[DEBUG_STRING_MAX_LEN+1];
+
+	char szBuf[DEBUG_STRING_MAX_LEN + 1];
 
 	va_list args;
 	va_start(args, c_szFormat);
 	_vsnprintf(szBuf, sizeof(szBuf), c_szFormat, args);
 	va_end(args);
 #if defined(_DEBUG) || defined(OPENMT2_PLATFORM_LINUX)
-	OutputDebugString(szBuf);	
+	OutputDebugString(szBuf);
 	fputs(szBuf, stdout);
 	fflush(stdout);
 #endif
@@ -98,14 +98,14 @@ void Logf(UINT uLevel, const char* c_szFormat, ...)
 
 void Lognf(UINT uLevel, const char* c_szFormat, ...)
 {
-	if (uLevel<gs_uLevel)
+	if (uLevel < gs_uLevel)
 		return;
 
 	va_list args;
 	va_start(args, c_szFormat);
 
-	char szBuf[DEBUG_STRING_MAX_LEN+2];
-	int len = _vsnprintf(szBuf, sizeof(szBuf)-1, c_szFormat, args);
+	char szBuf[DEBUG_STRING_MAX_LEN + 2];
+	int len = _vsnprintf(szBuf, sizeof(szBuf) - 1, c_szFormat, args);
 
 	if (len > 0)
 	{
@@ -114,7 +114,7 @@ void Lognf(UINT uLevel, const char* c_szFormat, ...)
 	}
 	va_end(args);
 #if defined(_DEBUG) || defined(OPENMT2_PLATFORM_LINUX)
-	OutputDebugString(szBuf);	
+	OutputDebugString(szBuf);
 	puts(szBuf);
 	fflush(stdout);
 #endif
@@ -123,8 +123,7 @@ void Lognf(UINT uLevel, const char* c_szFormat, ...)
 		LogFile(szBuf);
 }
 
-
-void Trace(const char * c_szMsg)
+void Trace(const char* c_szMsg)
 {
 #if defined(_DEBUG) || defined(OPENMT2_PLATFORM_LINUX)
 	OutputDebugString(c_szMsg);
@@ -139,7 +138,7 @@ void Trace(const char * c_szMsg)
 void Tracen(const char* c_szMsg)
 {
 #if defined(_DEBUG) || defined(OPENMT2_PLATFORM_LINUX)
-	char szBuf[DEBUG_STRING_MAX_LEN+1];
+	char szBuf[DEBUG_STRING_MAX_LEN + 1];
 	_snprintf(szBuf, sizeof(szBuf), "%s\n", c_szMsg);
 	OutputDebugString(szBuf);
 	puts(c_szMsg);
@@ -161,8 +160,8 @@ void Tracenf(const char* c_szFormat, ...)
 	va_list args;
 	va_start(args, c_szFormat);
 
-	char szBuf[DEBUG_STRING_MAX_LEN+2];
-	int len = _vsnprintf(szBuf, sizeof(szBuf)-1, c_szFormat, args);
+	char szBuf[DEBUG_STRING_MAX_LEN + 2];
+	int len = _vsnprintf(szBuf, sizeof(szBuf) - 1, c_szFormat, args);
 
 	if (len > 0)
 	{
@@ -171,7 +170,7 @@ void Tracenf(const char* c_szFormat, ...)
 	}
 	va_end(args);
 #if defined(_DEBUG) || defined(OPENMT2_PLATFORM_LINUX)
-	OutputDebugString(szBuf);	
+	OutputDebugString(szBuf);
 	printf("%s", szBuf);
 	fflush(stdout);
 #endif
@@ -182,7 +181,7 @@ void Tracenf(const char* c_szFormat, ...)
 
 void Tracef(const char* c_szFormat, ...)
 {
-	char szBuf[DEBUG_STRING_MAX_LEN+1];
+	char szBuf[DEBUG_STRING_MAX_LEN + 1];
 
 	va_list args;
 	va_start(args, c_szFormat);
@@ -190,7 +189,7 @@ void Tracef(const char* c_szFormat, ...)
 	va_end(args);
 
 #if defined(_DEBUG) || defined(OPENMT2_PLATFORM_LINUX)
-	OutputDebugString(szBuf);	
+	OutputDebugString(szBuf);
 	fputs(szBuf, stdout);
 	fflush(stdout);
 #endif
@@ -201,7 +200,7 @@ void Tracef(const char* c_szFormat, ...)
 
 void TraceError(const char* c_szFormat, ...)
 {
-	char szBuf[DEBUG_STRING_MAX_LEN+2];
+	char szBuf[DEBUG_STRING_MAX_LEN + 2];
 
 	strncpy(szBuf, "SYSERR: ", DEBUG_STRING_MAX_LEN);
 	int len = strlen(szBuf);
@@ -217,15 +216,15 @@ void TraceError(const char* c_szFormat, ...)
 	time_t ct = time(0);
 	struct tm ctm = *localtime(&ct);
 
-	fprintf(stderr, "%02d%02d %02d:%02d:%05d :: %s", 
-					ctm.tm_mon + 1, 
-					ctm.tm_mday,
-					ctm.tm_hour,
-					ctm.tm_min,
-					ELTimer_GetMSec() % 60000,
-					szBuf + 8);
+	fprintf(stderr, "%02d%02d %02d:%02d:%05d :: %s",
+			ctm.tm_mon + 1,
+			ctm.tm_mday,
+			ctm.tm_hour,
+			ctm.tm_min,
+			ELTimer_GetMSec() % 60000,
+			szBuf + 8);
 	fflush(stderr);
-	
+
 #if defined(_DEBUG) || defined(OPENMT2_PLATFORM_LINUX)
 	OutputDebugString(szBuf);
 	fputs(szBuf, stdout);
@@ -248,13 +247,13 @@ void TraceErrorWithoutEnter(const char* c_szFormat, ...)
 	time_t ct = time(0);
 	struct tm ctm = *localtime(&ct);
 
-	fprintf(stderr, "%02d%02d %02d:%02d:%05d :: %s", 
-					ctm.tm_mon + 1, 
-					ctm.tm_mday,
-					ctm.tm_hour,
-					ctm.tm_min,
-					ELTimer_GetMSec() % 60000,
-					szBuf + 8);
+	fprintf(stderr, "%02d%02d %02d:%02d:%05d :: %s",
+			ctm.tm_mon + 1,
+			ctm.tm_mday,
+			ctm.tm_hour,
+			ctm.tm_min,
+			ELTimer_GetMSec() % 60000,
+			szBuf + 8);
 	fflush(stderr);
 
 #if defined(_DEBUG) || defined(OPENMT2_PLATFORM_LINUX)
@@ -278,7 +277,7 @@ void LogBoxf(const char* c_szFormat, ...)
 	LogBox(szBuf);
 }
 
-void LogBox(const char* c_szMsg, const char * c_szCaption, HWND hWnd)
+void LogBox(const char* c_szMsg, const char* c_szCaption, HWND hWnd)
 {
 #if defined(_WIN32)
 	if (!hWnd)
@@ -291,16 +290,16 @@ void LogBox(const char* c_szMsg, const char * c_szCaption, HWND hWnd)
 	Tracen(c_szMsg);
 }
 
-void LogFile(const char * c_szMsg)
+void LogFile(const char* c_szMsg)
 {
 	CLogFile::Instance().Write(c_szMsg);
 }
 
-void LogFilef(const char * c_szMessage, ...)
+void LogFilef(const char* c_szMessage, ...)
 {
 	va_list args;
 	va_start(args, c_szMessage);
-	char szBuf[DEBUG_STRING_MAX_LEN+1];
+	char szBuf[DEBUG_STRING_MAX_LEN + 1];
 	_vsnprintf(szBuf, sizeof(szBuf), c_szMessage, args);
 
 	CLogFile::Instance().Write(szBuf);
