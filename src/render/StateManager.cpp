@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/StateManager.h>
 #include <Neoeter/Render/ShaderStats.h>
@@ -306,7 +308,7 @@ void CStateManager::SetDefaultState()
 	SetFVF(D3DFVF_XYZ);
 
 	D3DXVECTOR4 av4Null[STATEMANAGER_MAX_VCONSTANTS];
-	memset(av4Null, 0, sizeof(av4Null));
+	std::fill(av4Null, av4Null + STATEMANAGER_MAX_VCONSTANTS, D3DXVECTOR4());
 	SetVertexShaderConstant(0, av4Null, STATEMANAGER_MAX_VCONSTANTS);
 	SetPixelShaderConstant(0, av4Null, STATEMANAGER_MAX_PCONSTANTS);
 

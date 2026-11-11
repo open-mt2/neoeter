@@ -43,8 +43,6 @@ bool CNetworkDatagram::Create(UINT uPort)
 	return true;
 }
 
-#pragma warning(push)
-#pragma warning(disable : 4127)
 void CNetworkDatagram::Update()
 {
 	if (m_sock == INVALID_SOCKET)
@@ -64,7 +62,6 @@ void CNetworkDatagram::Update()
 	if (select((int)m_sock + 1, &m_fdsRecv, &m_fdsSend, NULL, &delay) == SOCKET_ERROR)
 		return;
 }
-#pragma warning(pop)
 
 bool CNetworkDatagram::CanRecv()
 {

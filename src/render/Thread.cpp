@@ -1,7 +1,7 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/Thread.h>
 
-CThread::CThread() : m_pArg(NULL), m_hThread(NULL), m_uThreadID(0)
+CThread::CThread() : m_hThread(NULL), m_pArg(NULL), m_uThreadID(0)
 {
 }
 

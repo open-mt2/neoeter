@@ -126,6 +126,8 @@ VOID D3D_SModeInfo::GetString(std::string* pstEnumList)
 		case D3DFMT_R8G8B8:
 			uScrDepthBits = 32;
 			break;
+		default:
+			break;
 	}
 
 	int iVP = 0;
@@ -140,6 +142,8 @@ VOID D3D_SModeInfo::GetString(std::string* pstEnumList)
 			break;
 		case D3DCREATE_SOFTWARE_VERTEXPROCESSING:
 			iVP = 3;
+			break;
+		default:
 			break;
 	}
 
@@ -287,11 +291,6 @@ BOOL D3D_CDeviceInfo::Build(IDirect3D9& rkD3D, UINT iD3DAdapterInfo, UINT iDevTy
 	DWORD adwD3DBehavior[20];
 	D3DFORMAT aeD3DFmtDepthStencil[20];
 
-	BOOL isHALExists = FALSE;
-	BOOL isHALWindowedCompatible = FALSE;
-	BOOL isHALDesktopCompatible = FALSE;
-	BOOL isHALSampleCompatible = FALSE;
-
 	// GetFlagInfo
 	{
 		UINT uD3DFmtNum = rkD3DADMList.GetPixelFormatNum();
@@ -307,15 +306,6 @@ BOOL D3D_CDeviceInfo::Build(IDirect3D9& rkD3D, UINT iD3DAdapterInfo, UINT iDevTy
 			// SkipNoRenderTargetFormat;
 			if (FAILED(rkD3D.CheckDeviceType(iD3DAdapterInfo, m_eD3DDevType, eD3DFmtPixel, eD3DFmtPixel, FALSE)))
 				continue;
-
-			if (D3DDEVTYPE_HAL == m_eD3DDevType)
-			{
-				isHALExists = TRUE;
-				isHALWindowedCompatible = TRUE;
-
-				if (iFmt == 0)
-					isHALDesktopCompatible = TRUE;
-			}
 
 			// Confirm the device/format for HW vertex processing
 			if (m_kD3DCaps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
@@ -385,9 +375,6 @@ BOOL D3D_CDeviceInfo::Build(IDirect3D9& rkD3D, UINT iD3DAdapterInfo, UINT iDevTy
 						rkModeInfo.m_eD3DFmtPixel = c_rkD3DDM.Format;
 						rkModeInfo.m_dwD3DBehavior = adwD3DBehavior[iFmt];
 						rkModeInfo.m_eD3DFmtDepthStencil = aeD3DFmtDepthStencil[iFmt];
-
-						if (m_eD3DDevType == D3DDEVTYPE_HAL)
-							isHALSampleCompatible = TRUE;
 					}
 				}
 			}
@@ -429,6 +416,8 @@ BOOL D3D_CDeviceInfo::Find(UINT uScrWidth, UINT uScrHeight, UINT uScrDepthBits, 
 						*piD3DModeInfo = iD3D_SModeInfo;
 						return TRUE;
 						break;
+					default:
+						break;
 				}
 			}
 			else
@@ -440,6 +429,8 @@ BOOL D3D_CDeviceInfo::Find(UINT uScrWidth, UINT uScrHeight, UINT uScrDepthBits, 
 					case D3DFMT_R8G8B8:
 						*piD3DModeInfo = iD3D_SModeInfo;
 						return TRUE;
+						break;
+					default:
 						break;
 				}
 			}

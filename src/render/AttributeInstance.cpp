@@ -83,10 +83,10 @@ BOOL CAttributeInstance::GetHeight(float fx, float fy, float* pfHeight)
 			const D3DXVECTOR3& c_rv3Vertex2 = m_v3HeightDataVector[i][j + 2];
 
 			if (
-				fx < c_rv3Vertex0.x && fx < c_rv3Vertex1.x && fx < c_rv3Vertex2.x ||
-				fx > c_rv3Vertex0.x && fx > c_rv3Vertex1.x && fx > c_rv3Vertex2.x ||
-				fy < c_rv3Vertex0.y && fy < c_rv3Vertex1.y && fy < c_rv3Vertex2.y ||
-				fy > c_rv3Vertex0.y && fy > c_rv3Vertex1.y && fy > c_rv3Vertex2.y)
+				(fx < c_rv3Vertex0.x && fx < c_rv3Vertex1.x && fx < c_rv3Vertex2.x) ||
+				(fx > c_rv3Vertex0.x && fx > c_rv3Vertex1.x && fx > c_rv3Vertex2.x) ||
+				(fy < c_rv3Vertex0.y && fy < c_rv3Vertex1.y && fy < c_rv3Vertex2.y) ||
+				(fy > c_rv3Vertex0.y && fy > c_rv3Vertex1.y && fy > c_rv3Vertex2.y))
 				continue;
 
 			if (IsInTriangle2D(c_rv3Vertex0.x, c_rv3Vertex0.y,

@@ -149,8 +149,6 @@ CBaseCollisionInstance* CBaseCollisionInstance::BuildCollisionInstance(const CSt
 			OBBData.v3Max.y = v3Position.y + c_pCollisionData->fDimensions[1];
 			OBBData.v3Max.z = v3Position.z + c_pCollisionData->fDimensions[2];
 
-			D3DXMATRIX matTransform = *pMat;
-
 			D3DXMatrixIdentity(&OBBData.matRot);
 			OBBData.matRot = *pMat;
 			OBBData.matRot._41 = 0;
@@ -317,7 +315,7 @@ bool CPlaneCollisionInstance::OnMovementCollisionDynamicSphere(const CDynamicSph
 	float fPosition1 = D3DXVec3Dot(&m_attribute.v3Normal, &v3SpherePosition);
 	float fPosition2 = D3DXVec3Dot(&m_attribute.v3Normal, &v3SphereLastPosition);
 
-	if (fPosition1 > 0.0f && fPosition2 < 0.0f || fPosition1 < 0.0f && fPosition2 > 0.0f || (fPosition1) <= s.fRadius && fPosition1 >= -s.fRadius)
+	if ((fPosition1 > 0.0f && fPosition2 < 0.0f) || (fPosition1 < 0.0f && fPosition2 > 0.0f) || ((fPosition1) <= s.fRadius && fPosition1 >= -s.fRadius))
 	{
 		D3DXVECTOR3 v3QuadPosition1 = s.v3Position - m_attribute.v3QuadPosition[0];
 		D3DXVECTOR3 v3QuadPosition2 = s.v3Position - m_attribute.v3QuadPosition[3];
@@ -347,7 +345,7 @@ bool CPlaneCollisionInstance::OnCollisionDynamicSphere(const CDynamicSphereInsta
 	float fPosition1 = D3DXVec3Dot(&m_attribute.v3Normal, &v3SpherePosition);
 	float fPosition2 = D3DXVec3Dot(&m_attribute.v3Normal, &v3SphereLastPosition);
 
-	if (fPosition1 > 0.0f && fPosition2 < 0.0f || fPosition1 < 0.0f && fPosition2 > 0.0f || (fPosition1) <= s.fRadius && fPosition1 >= -s.fRadius)
+	if ((fPosition1 > 0.0f && fPosition2 < 0.0f) || (fPosition1 < 0.0f && fPosition2 > 0.0f) || ((fPosition1) <= s.fRadius && fPosition1 >= -s.fRadius))
 	{
 		D3DXVECTOR3 v3QuadPosition1 = s.v3Position - m_attribute.v3QuadPosition[0];
 		D3DXVECTOR3 v3QuadPosition2 = s.v3Position - m_attribute.v3QuadPosition[3];
@@ -580,7 +578,6 @@ const TAABBData& CAABBCollisionInstance::GetAttribute() const
 bool CAABBCollisionInstance::OnMovementCollisionDynamicSphere(const CDynamicSphereInstance& s) const
 {
 	D3DXVECTOR3 v;
-	D3DXVECTOR3 v3center = (m_attribute.v3Min + m_attribute.v3Max) * 0.5f;
 
 	memcpy(&v, &s.v3Position, sizeof(D3DXVECTOR3));
 

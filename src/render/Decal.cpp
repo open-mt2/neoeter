@@ -2,6 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
+
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/Decal.h>
 #include <Neoeter/Render/StateManager.h>
@@ -37,7 +39,7 @@ void CDecal::Clear()
 
 	m_TriangleFanStructVector.clear();
 
-	memset(m_Vertices, 0, sizeof(m_Vertices));
+	std::fill(m_Vertices, m_Vertices + MAX_DECAL_VERTICES, TPDTVertex());
 	memset(m_Indices, 0, sizeof(m_Indices));
 }
 

@@ -229,7 +229,6 @@ void CGraphicTextInstance::Update()
 															   wArabicText[i] == '|')) // if end.
 						{
 							// pass
-							int temptest = 1;
 						}
 						// (1)아랍어이거나 (2)아랍어 다음의 심볼이라면 아랍어 모드 전환
 						else if (Arabic_IsInPresentation(wArabicChar) || Arabic_IsInSymbol(wArabicChar))

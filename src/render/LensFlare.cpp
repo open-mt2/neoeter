@@ -81,12 +81,12 @@ static float g_afColors[][4] =
 ///////////////////////////////////////////////////////////////////////
 //	CLensFlare::CLensFlare
 
-CLensFlare::CLensFlare() : m_fSunSize(0),
-						   m_fBeforeBright(0.0f),
+CLensFlare::CLensFlare() : m_fBeforeBright(0.0f),
 						   m_fAfterBright(0.0f),
 						   m_bFlareVisible(false),
 						   m_bDrawFlare(true),
 						   m_bDrawBrightScreen(true),
+						   m_fSunSize(0),
 						   m_bEnabled(true),
 						   m_bShowMainFlare(true),
 						   m_fMaxBrightness(1.0f)

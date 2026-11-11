@@ -77,6 +77,8 @@ typedef std::vector<CStaticCollisionData> CStaticCollisionDataVector;
 class CBaseCollisionInstance
 {
 	public:
+		virtual ~CBaseCollisionInstance() {}
+
 		virtual void Render(D3DFILLMODE d3dFillMode = D3DFILL_SOLID) = 0;
 
 		bool MovementCollisionDynamicSphere(const CDynamicSphereInstance& s) const

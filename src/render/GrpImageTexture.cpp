@@ -242,6 +242,9 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void* c_pvBu
 			case D3DFMT_R8G8B8:
 				format = D3DFMT_A1R5G5B5;
 				break;
+
+			default:
+				break;
 		}
 
 		UINT uTexBias = 0;

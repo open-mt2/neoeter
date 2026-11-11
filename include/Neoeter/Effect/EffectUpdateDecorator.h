@@ -108,9 +108,9 @@ namespace NEffectUpdateDecorator
 			typedef std::vector<TTimeEventType> TTimeEventContainerType;
 			CTimeEventDecorator(const TTimeEventContainerType& TimeEventContainer, T* pValue = 0)
 				: it_start(TimeEventContainer.begin()),
+				  it_end(TimeEventContainer.end()),
 				  it_cur(TimeEventContainer.begin()),
 				  it_next(TimeEventContainer.begin()),
-				  it_end(TimeEventContainer.end()),
 				  pData(pValue)
 			{
 				if (it_start == it_end)
@@ -183,7 +183,7 @@ namespace NEffectUpdateDecorator
 	class CTextureAnimationCWDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationCWDecorator>
 	{
 		public:
-			CTextureAnimationCWDecorator(float fFrameTime, DWORD n, BYTE* pIdx) : n(n), pIdx(pIdx), fFrameTime(fFrameTime), fLastFrameTime(fFrameTime) {}
+			CTextureAnimationCWDecorator(float fFrameTime, DWORD n, BYTE* pIdx) : n(n), fLastFrameTime(fFrameTime), fFrameTime(fFrameTime), pIdx(pIdx) {}
 			virtual ~CTextureAnimationCWDecorator() {}
 
 		protected:
@@ -206,7 +206,7 @@ namespace NEffectUpdateDecorator
 	class CTextureAnimationCCWDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationCCWDecorator>
 	{
 		public:
-			CTextureAnimationCCWDecorator(float fFrameTime, BYTE n, BYTE* pIdx) : n(n), pIdx(pIdx), fFrameTime(fFrameTime), fLastFrameTime(fFrameTime) {}
+			CTextureAnimationCCWDecorator(float fFrameTime, BYTE n, BYTE* pIdx) : n(n), fLastFrameTime(fFrameTime), fFrameTime(fFrameTime), pIdx(pIdx) {}
 			virtual ~CTextureAnimationCCWDecorator() {}
 
 		protected:
@@ -230,7 +230,7 @@ namespace NEffectUpdateDecorator
 	class CTextureAnimationRandomDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationRandomDecorator>
 	{
 		public:
-			CTextureAnimationRandomDecorator(float fFrameTime, BYTE n, BYTE* pIdx) : n(n), pIdx(pIdx), fFrameTime(fFrameTime), fLastFrameTime(fFrameTime) {}
+			CTextureAnimationRandomDecorator(float fFrameTime, BYTE n, BYTE* pIdx) : n(n), fLastFrameTime(fFrameTime), fFrameTime(fFrameTime), pIdx(pIdx) {}
 			virtual ~CTextureAnimationRandomDecorator() {}
 
 		protected:

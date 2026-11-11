@@ -512,7 +512,12 @@ BOOL CTextFileLoader::GetTokenInteger(const std::string& c_rstrKey, int* pData)
 
 BOOL CTextFileLoader::GetTokenDoubleWord(const std::string& c_rstrKey, DWORD* pData)
 {
-	return GetTokenInteger(c_rstrKey, *(int**)(&pData));
+	int iData;
+	if (!GetTokenInteger(c_rstrKey, &iData))
+		return FALSE;
+
+	*pData = static_cast<DWORD>(iData);
+	return TRUE;
 }
 
 BOOL CTextFileLoader::GetTokenFloat(const std::string& c_rstrKey, float* pData)

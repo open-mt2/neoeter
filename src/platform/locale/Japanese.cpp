@@ -10,14 +10,14 @@
 
 BOOL ShiftJIS_IsLeadByte(const char chByte)
 {
-	const unsigned char byByte = (const unsigned char)chByte;
+	const unsigned char byByte = (unsigned char)chByte;
 
 	return MACRO_IsLeadByte(byByte);
 }
 
 BOOL ShiftJIS_IsTrailByte(const char chByte)
 {
-	const unsigned char byByte = (const unsigned char)chByte;
+	const unsigned char byByte = (unsigned char)chByte;
 
 	return MACRO_IsTailByte(byByte);
 }

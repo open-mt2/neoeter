@@ -68,7 +68,7 @@ bool CTextureSet::Load(const char* c_szTextureSetFileName, float fTerrainTexCoor
 
 	for (long i = 0; i < lCount; ++i)
 	{
-		_snprintf(szTextureName, sizeof(szTextureName), "texture%03d", i + 1);
+		_snprintf(szTextureName, sizeof(szTextureName), "texture%03ld", i + 1);
 
 		if (stTokenVectorMap.end() == stTokenVectorMap.find(szTextureName))
 			continue;

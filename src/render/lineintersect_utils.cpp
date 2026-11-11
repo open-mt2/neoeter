@@ -421,9 +421,6 @@ void IntersectLineSegments(const float A1x, const float A1y, const float A1z,
 	}
 }
 
-// pragma to get rid of math.h inline function removal warnings.
-#pragma warning(disable : 4514)
-
 /**************************************************************************
 |
 |     Method: IntersectLineSegments

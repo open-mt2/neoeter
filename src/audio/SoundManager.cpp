@@ -157,6 +157,9 @@ void CSoundManager::Update()
 						pInstance->SetVolume(rMusicInstance.fVolume * fStartupMusicFade);
 				}
 				break;
+
+			default:
+				break;
 		}
 	}
 

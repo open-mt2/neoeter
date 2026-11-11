@@ -20,7 +20,7 @@ CSkyObjectQuad::CSkyObjectQuad()
 
 	for (unsigned char uci = 0; uci < 4; ++uci)
 	{
-		memset(&m_Vertex[uci], 0, sizeof(TPDTVertex));
+		m_Vertex[uci] = TPDTVertex();
 	}
 }
 

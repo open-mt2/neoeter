@@ -44,6 +44,7 @@ static bool IsReadable(const std::string& path)
 	return !path.empty() && access(path.c_str(), R_OK) == 0;
 }
 
+#if defined(OPENMT2_HAVE_FONTCONFIG)
 static bool IsPlainAscii(const char* s)
 {
 	for (; *s; ++s)
@@ -51,6 +52,7 @@ static bool IsPlainAscii(const char* s)
 			return false;
 	return true;
 }
+#endif
 
 static std::string Resolve(const char* fontName)
 {

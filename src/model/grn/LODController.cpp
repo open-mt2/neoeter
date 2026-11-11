@@ -174,11 +174,11 @@ void CGrannyLODController::SetSpecularInfo(const char* c_szMtrlName, BOOL bEnabl
 	}
 }
 
-CGrannyLODController::CGrannyLODController() : m_pCurrentModelInstance(NULL),
-											   m_bLODLevel(0),
-											   m_pAttachedParentModel(NULL),
-											   m_fLODDistance(0.0f),
+CGrannyLODController::CGrannyLODController() : m_fLODDistance(0.0f),
 											   m_dwLODAniFPS(CGrannyModelInstance::ANIFPS_MAX),
+											   m_pAttachedParentModel(NULL),
+											   m_bLODLevel(0),
+											   m_pCurrentModelInstance(NULL),
 											   m_pkSharedDeformableVertexBuffer(NULL)
 /////////////////////////////////////////////////////
 {

@@ -33,10 +33,10 @@ void CCamera::SetTargetHeight(float fTarget)
 // CCamera
 //////////////////////////////////////////////////////////////////////////
 
-CCamera::CCamera() : m_fEyeGroundHeightRatio(0.3f),
+CCamera::CCamera() : m_isLock(false),
+					 m_fEyeGroundHeightRatio(0.3f),
 					 m_fTargetHeightLimitRatio(2.0f),
-					 m_fResistance(c_fDefaultResistance),
-					 m_isLock(false)
+					 m_fResistance(c_fDefaultResistance)
 {
 	m_fDistance = 1.0f;
 	m_eCameraState = CAMERA_STATE_NORMAL;

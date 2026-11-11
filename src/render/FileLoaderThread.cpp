@@ -3,7 +3,7 @@
 #include <Neoeter/Render/FileLoaderThread.h>
 #include <Neoeter/Render/ResourceManager.h>
 
-CFileLoaderThread::CFileLoaderThread() : m_bShutdowned(false), m_pArg(NULL), m_hThread(NULL), m_uThreadID(0)
+CFileLoaderThread::CFileLoaderThread() : m_hThread(NULL), m_pArg(NULL), m_uThreadID(0), m_bShutdowned(false)
 {
 }
 

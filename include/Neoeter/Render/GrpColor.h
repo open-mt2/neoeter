@@ -10,6 +10,8 @@ class CGraphicColor
 		CGraphicColor();
 		~CGraphicColor();
 
+		CGraphicColor& operator=(const CGraphicColor&) = default;
+
 		void Clear();
 
 		void Set(float r, float g, float b, float a);

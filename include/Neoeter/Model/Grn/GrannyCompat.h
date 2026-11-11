@@ -722,7 +722,6 @@ inline granny_file* GrannyReadEntireFileFromMemory(int MemorySize, void* Memory)
 		if (env->magic == OPEN_GRANNY_MEM_MAGIC && env->fileInfo != nullptr)
 		{
 			granny_file* file = new granny_file();
-			std::memset(file, 0, sizeof(granny_file));
 			file->FileInfo = env->fileInfo;
 			file->OwnsFileInfo = false;
 			return file;
@@ -736,7 +735,6 @@ inline granny_file* GrannyReadEntireFileFromMemory(int MemorySize, void* Memory)
 
 	// Fallback to empty valid file_info container if parsing is not applicable
 	granny_file* file = new granny_file();
-	std::memset(file, 0, sizeof(granny_file));
 	file->FileInfo = new granny_file_info();
 	std::memset(file->FileInfo, 0, sizeof(granny_file_info));
 	file->OwnsFileInfo = true;

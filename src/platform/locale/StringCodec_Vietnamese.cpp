@@ -1,8 +1,6 @@
 #include <Neoeter/Platform/Locale/StdAfx.h>
 #include <Neoeter/Platform/Locale/StringCodec_Vietnamese.h>
 
-#pragma warning(disable : 4310) // char 짤림 경고 무시
-
 static wchar_t cp1258_to_unicode[256] = {
 	0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007,
 	0x0008, 0x0009, 0x000a, 0x000b, 0x000c, 0x000d, 0x000e, 0x000f,

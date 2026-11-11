@@ -87,7 +87,7 @@ void OLD_rtrim(char* base)
 
 		while (end != base)
 		{
-			if (!isnhspace((unsigned char)*end) && *end != '\n' && *end != '\r' || (end != base && *((unsigned char*)end - 1) > 0xa0))
+			if ((!isnhspace((unsigned char)*end) && *end != '\n' && *end != '\r') || (end != base && *((unsigned char*)end - 1) > 0xa0))
 				break;
 
 			*end = '\0';

@@ -118,8 +118,6 @@ void CNetworkStream::__PopSendBuffer()
 	m_sendBufOutputPos = 0;	
 }
 
-#pragma warning(push)
-#pragma warning(disable:4127)
 void CNetworkStream::Process()
 {
 	if (m_sock == INVALID_SOCKET)
@@ -189,7 +187,6 @@ void CNetworkStream::Process()
 		Clear();
 	}
 }
-#pragma warning(pop)
 
 void CNetworkStream::Disconnect()
 {

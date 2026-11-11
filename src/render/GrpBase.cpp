@@ -172,7 +172,7 @@ bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, UINT uVtxCount)
 		return false;
 	}
 
-	memcpy(pDstVertices, pSrcVertices, sizeof(TPDTVertex) * uVtxCount);
+	memcpy(static_cast<void*>(pDstVertices), pSrcVertices, sizeof(TPDTVertex) * uVtxCount);
 
 	plpd3dFillRectVB->Unlock();
 

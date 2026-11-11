@@ -139,7 +139,11 @@ class CTerrainImpl
 
 __forceinline WORD CTerrainImpl::GetHeightMapValue(short sx, short sy)
 {
-	return m_awRawHeightMap[(sy + 1) * HEIGHTMAP_RAW_XSIZE + sx + 1];
+	const int index = (sy + 1) * HEIGHTMAP_RAW_XSIZE + sx + 1;
+	if (index < 0 || index >= HEIGHTMAP_RAW_YSIZE * HEIGHTMAP_RAW_XSIZE)
+		return 0;
+
+	return m_awRawHeightMap[index];
 }
 
 #endif // __INC_PRTERRAINLIB_TERRAIN_H__

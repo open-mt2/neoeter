@@ -3,6 +3,8 @@
 #include <Neoeter/Platform/Base/Stl.h>
 #include <Neoeter/Platform/Base/Debug.h>
 
+#include <cstring>
+
 bool GRAPHICS_CAPS_CAN_NOT_DRAW_LINE = false;
 bool GRAPHICS_CAPS_CAN_NOT_DRAW_SHADOW = false;
 bool GRAPHICS_CAPS_HALF_SIZE_IMAGE = false;
@@ -183,7 +185,6 @@ bool CGraphicDevice::Reset()
 	return true;
 }
 
-static LPDIRECT3DSURFACE9 s_lpStencil;
 static DWORD s_MaxTextureWidth, s_MaxTextureHeight;
 
 BOOL EL3D_ConfirmDevice(D3DCAPS9& rkD3DCaps, UINT uBehavior, D3DFORMAT /*eD3DFmt*/)
@@ -237,7 +238,9 @@ bool CGraphicDevice::__IsInDriverBlackList(D3D_CAdapterInfo& rkD3DAdapterInfo)
 	D3DADAPTER_IDENTIFIER9& rkD3DAdapterIdentifier = rkD3DAdapterInfo.GetIdentifier();
 
 	char szSrcDriver[256];
-	strncpy(szSrcDriver, rkD3DAdapterIdentifier.Driver, sizeof(szSrcDriver) - 1);
+	const size_t driverLength = strnlen(rkD3DAdapterIdentifier.Driver, sizeof(szSrcDriver) - 1);
+	memcpy(szSrcDriver, rkD3DAdapterIdentifier.Driver, driverLength);
+	szSrcDriver[driverLength] = '\0';
 	DWORD dwSrcHighVersion = rkD3DAdapterIdentifier.DriverVersion.QuadPart >> 32;
 	DWORD dwSrcLowVersion = rkD3DAdapterIdentifier.DriverVersion.QuadPart & 0xffffffff;
 

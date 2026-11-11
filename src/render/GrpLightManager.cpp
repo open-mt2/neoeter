@@ -328,7 +328,7 @@ void CLight::Update()
 		}
 		else
 		{
-			float fRange;
+			float fRange = 0.0f;
 			m_RangeTransitor.GetValue(ms_fCurTime, &fRange);
 			SetRange(fRange);
 		}

@@ -1648,7 +1648,7 @@ inline D3DXMATRIX* D3DXMatrixLookAtRH(D3DXMATRIX* pOut, const D3DXVECTOR3* pEye,
 inline D3DXMATRIX* D3DXMatrixPerspectiveFovRH(D3DXMATRIX* pOut, float fovy, float Aspect, float zn, float zf)
 {
 	if (!pOut) return nullptr;
-	std::memset(pOut, 0, sizeof(D3DXMATRIX));
+	*pOut = D3DXMATRIX();
 	float yScale = 1.0f / std::tan(fovy * 0.5f);
 	float xScale = yScale / Aspect;
 	pOut->_11 = xScale;
@@ -1656,6 +1656,7 @@ inline D3DXMATRIX* D3DXMatrixPerspectiveFovRH(D3DXMATRIX* pOut, float fovy, floa
 	pOut->_33 = zf / (zn - zf);
 	pOut->_34 = -1.0f;
 	pOut->_43 = zn * zf / (zn - zf);
+	pOut->_44 = 0.0f;
 	return pOut;
 }
 

@@ -59,13 +59,13 @@ bool CSpeedTreeWrapper::ms_bSelfShadowOn = true;
 ///////////////////////////////////////////////////////////////////////
 //	CSpeedTreeWrapper::CSpeedTreeWrapper
 CSpeedTreeWrapper::CSpeedTreeWrapper()
-	: m_pSpeedTree(new CSpeedTreeRT), m_bIsInstance(false), m_pInstanceOf(NULL),
-	  m_pGeometryCache(NULL), m_usNumLeafLods(0), m_unNumFrondLods(0),
-	  m_pBranchIndexCounts(NULL), m_pBranchIndexBuffer(NULL),
-	  m_pBranchVertexBuffer(NULL), m_pFrondIndexCounts(NULL),
-	  m_pFrondIndexBuffers(NULL), m_pFrondVertexBuffer(NULL),
-	  m_pLeafVertexBuffer(NULL), m_pLeavesUpdatedByCpu(NULL),
-	  m_unBranchVertexCount(0), m_unFrondVertexCount(0), m_pTextureInfo(NULL)
+	: m_pSpeedTree(new CSpeedTreeRT), m_pTextureInfo(NULL), m_bIsInstance(false),
+	  m_pInstanceOf(NULL), m_pGeometryCache(NULL),
+	  m_pBranchVertexBuffer(NULL), m_unBranchVertexCount(0),
+	  m_pBranchIndexBuffer(NULL), m_pBranchIndexCounts(NULL),
+	  m_pFrondVertexBuffer(NULL), m_unFrondVertexCount(0), m_unNumFrondLods(0),
+	  m_pFrondIndexBuffers(NULL), m_pFrondIndexCounts(NULL), m_usNumLeafLods(0),
+	  m_pLeafVertexBuffer(NULL), m_pLeavesUpdatedByCpu(NULL)
 {
 	// set initial position
 	m_afPos[0] = m_afPos[1] = m_afPos[2] = 0.0f;
@@ -462,7 +462,6 @@ bool CSpeedTreeWrapper::LoadTree(const char* pszSptFile,
 		m_cLeafMaterial.Set(m_pSpeedTree->GetLeafMaterial());
 
 		// adjust lod distances
-		float fHeight = m_afBoundingBox[5] - m_afBoundingBox[2];
 		m_pTextureInfo = new CSpeedTreeRT::STextures;
 		m_pSpeedTree->GetTextures(*m_pTextureInfo);
 		string strSptFile = pszSptFile ? pszSptFile : "";
@@ -551,8 +550,7 @@ void CSpeedTreeWrapper::SetupBranchBuffers(void)
 		for (unsigned int i = 0; i < m_unBranchVertexCount; ++i)
 		{
 			// position
-			memcpy(&pVertexBuffer->m_vPosition, &(pBranches->m_pCoords[i * 3]),
-				   3 * sizeof(float));
+			pVertexBuffer->m_vPosition = D3DXVECTOR3(&(pBranches->m_pCoords[i * 3]));
 
 			// normal or color
 			pVertexBuffer->m_dwDiffuseColor = AGBR2ARGB(pBranches->m_pColors[i]);
@@ -628,8 +626,7 @@ void CSpeedTreeWrapper::SetupFrondBuffers(void)
 		for (unsigned short i = 0; i < m_unFrondVertexCount; ++i)
 		{
 			// position
-			memcpy(&pVertexBuffer->m_vPosition, &(pFronds->m_pCoords[i * 3]),
-				   3 * sizeof(float));
+			pVertexBuffer->m_vPosition = D3DXVECTOR3(&(pFronds->m_pCoords[i * 3]));
 
 			// normal or color
 			pVertexBuffer->m_dwDiffuseColor = AGBR2ARGB(pFronds->m_pColors[i]);
@@ -1044,8 +1041,8 @@ void CSpeedTreeWrapper::RenderLeaves(void) const
 	for (unsigned int unLeafLevel = 0; unLeafLevel < 2; ++unLeafLevel)
 	{
 		const CSpeedTreeRT::SGeometry::SLeaf* pLeaf =
-			(unLeafLevel == 0) ? & m_pGeometryCache->m_sLeaves0
-							   : pLeaf = &m_pGeometryCache->m_sLeaves1;
+			(unLeafLevel == 0) ? &m_pGeometryCache->m_sLeaves0
+							   : &m_pGeometryCache->m_sLeaves1;
 
 		int unLod = pLeaf->m_nDiscreteLodLevel;
 

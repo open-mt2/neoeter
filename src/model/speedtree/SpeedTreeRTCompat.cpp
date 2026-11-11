@@ -112,7 +112,6 @@ CSpeedTreeRT::CSpeedTreeRT()
 	  m_eBranchWind(WIND_NONE),
 	  m_eLeafWind(WIND_NONE),
 	  m_eFrondWind(WIND_NONE),
-	  m_pInstanceOf(nullptr),
 	  m_eShape(SHAPE_BROADLEAF),
 	  m_bGeometryGenerated(false),
 	  m_bBakedGeometry(false),
@@ -120,7 +119,8 @@ CSpeedTreeRT::CSpeedTreeRT()
 	  m_fFrondAlpha(0.0f),
 	  m_fLeafAlpha(128.0f),
 	  m_usBranchStripLength(0),
-	  m_usFrondStripLength(0)
+	  m_usFrondStripLength(0),
+	  m_pInstanceOf(nullptr)
 {
 	m_afPos[0] = m_afPos[1] = m_afPos[2] = 0.0f;
 	m_afBoundingBox[0] = -100.0f;

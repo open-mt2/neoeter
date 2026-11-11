@@ -128,7 +128,7 @@ template <typename T>
 class CTimeEvent
 {
 	public:
-		CTimeEvent() {}
+		CTimeEvent() : m_fTime(0.0f), m_Value() {}
 		~CTimeEvent() {}
 
 		float m_fTime;
@@ -141,7 +141,7 @@ struct DWORDCOLOR
 {
 		DWORD m_dwColor;
 
-		DWORDCOLOR()
+		DWORDCOLOR() : m_dwColor(0)
 		{
 		}
 		DWORDCOLOR(const DWORDCOLOR& r)

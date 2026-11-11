@@ -26,7 +26,7 @@ class CLightInstance : public CEffectElementBaseInstance
 		CLightData* m_pData;
 		DWORD m_dwRangeIndex;
 
-		DWORD m_iLoopCount;
+		int m_iLoopCount;
 
 	public:
 		static void DestroySystem();

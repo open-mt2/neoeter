@@ -8,6 +8,8 @@ class CDynamicVertexBuffer : public CGraphicVertexBuffer
 		CDynamicVertexBuffer();
 		virtual ~CDynamicVertexBuffer();
 
+		using CGraphicVertexBuffer::Create;
+
 		bool Create(int vtxCount, int fvf);
 
 	protected:

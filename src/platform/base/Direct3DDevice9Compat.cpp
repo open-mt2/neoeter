@@ -256,16 +256,16 @@ RenderHandle IDirect3DSurface9::GetDepthStencil()
 // =============================================================
 
 IDirect3DDevice9::IDirect3DDevice9()
-	: m_pIndexBuffer(nullptr), m_fvf(D3DFVF_XYZ),
+	: m_pIndexBuffer(nullptr),
+	  m_textureFactor(0xFFFFFFFF), m_lighting(0), m_colorVertex(0), m_ambient(0),
+	  m_fogEnable(false), m_fogColor(0), m_fogVertexMode(D3DFOG_NONE), m_fogTableMode(D3DFOG_NONE),
+	  m_fogStart(0.0f), m_fogEnd(0.0f), m_fogDensity(1.0f), m_rangeFogEnable(false),
+	  m_inRenderTarget(false), m_fvf(D3DFVF_XYZ),
 	  m_srcBlend(D3DBLEND_SRCALPHA), m_destBlend(D3DBLEND_INVSRCALPHA),
 	  m_zEnable(false), m_zWriteEnable(true), m_zFunc(D3DCMP_LESSEQUAL),
 	  m_alphaBlendEnable(false), m_alphaTestEnable(false),
 	  m_alphaRef(0), m_alphaFunc(D3DCMP_ALWAYS),
-	  m_cullMode(D3DCULL_CCW), m_fillMode(D3DFILL_SOLID),
-	  m_textureFactor(0xFFFFFFFF), m_lighting(0), m_colorVertex(0), m_ambient(0),
-	  m_fogEnable(false), m_fogColor(0), m_fogVertexMode(D3DFOG_NONE), m_fogTableMode(D3DFOG_NONE),
-	  m_fogStart(0.0f), m_fogEnd(0.0f), m_fogDensity(1.0f), m_rangeFogEnable(false),
-	  m_inRenderTarget(false)
+	  m_cullMode(D3DCULL_CCW), m_fillMode(D3DFILL_SOLID)
 {
 	std::memset(&m_viewport, 0, sizeof(m_viewport));
 	m_viewport.MaxZ = 1.0f;
