@@ -27,10 +27,10 @@ void CDir::Destroy()
 	Initialize();
 }
 
-bool CDir::Create(const char * c_szFilter, const char* c_szPath, BOOL bCheckedExtension)
+bool CDir::Create(const char* c_szFilter, const char* c_szPath, BOOL bCheckedExtension)
 {
 	Destroy();
-	
+
 	std::string stPath = c_szPath;
 
 #if defined(_WIN32)
@@ -39,13 +39,13 @@ bool CDir::Create(const char * c_szFilter, const char* c_szPath, BOOL bCheckedEx
 		char end = stPath[stPath.length() - 1];
 
 		if (end != '\\')
-			stPath+='\\';
+			stPath += '\\';
 	}
 
 	std::string stQuery;
 	stQuery += stPath;
 	stQuery += "*.*";
-	
+
 	m_wfd.dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
 	m_hFind = FindFirstFile(stQuery.c_str(), &m_wfd);
 
@@ -57,14 +57,14 @@ bool CDir::Create(const char * c_szFilter, const char* c_szPath, BOOL bCheckedEx
 		if (*m_wfd.cFileName == '.')
 			continue;
 
-		if (IsFolder())	
+		if (IsFolder())
 		{
 			if (!OnFolder(c_szFilter, stPath.c_str(), m_wfd.cFileName))
 				return false;
 		}
 		else
 		{
-			const char * c_szExtension = strchr(m_wfd.cFileName, '.');
+			const char* c_szExtension = strchr(m_wfd.cFileName, '.');
 			if (!c_szExtension)
 				continue;
 
@@ -75,13 +75,13 @@ bool CDir::Create(const char * c_szFilter, const char* c_szPath, BOOL bCheckedEx
 				if (iPos > 0)
 				{
 					std::string strFirstFilter = std::string(c_szFilter).substr(0, iPos);
-					std::string strSecondFilter = std::string(c_szFilter).substr(iPos+1, strlen(c_szFilter));
-					if (0 != strFirstFilter.compare(c_szExtension+1) && 0 != strSecondFilter.compare(c_szExtension+1))
+					std::string strSecondFilter = std::string(c_szFilter).substr(iPos + 1, strlen(c_szFilter));
+					if (0 != strFirstFilter.compare(c_szExtension + 1) && 0 != strSecondFilter.compare(c_szExtension + 1))
 						continue;
 				}
 				else
 				{
-					if (0 != stricmp(c_szExtension+1, c_szFilter))
+					if (0 != stricmp(c_szExtension + 1, c_szFilter))
 						continue;
 				}
 			}
@@ -89,8 +89,7 @@ bool CDir::Create(const char * c_szFilter, const char* c_szPath, BOOL bCheckedEx
 			if (!OnFile(stPath.c_str(), m_wfd.cFileName))
 				return false;
 		}
-	} 			
-	while (FindNextFile(m_hFind, &m_wfd));
+	} while (FindNextFile(m_hFind, &m_wfd));
 
 	return true;
 #else
@@ -129,7 +128,7 @@ bool CDir::Create(const char * c_szFilter, const char* c_szPath, BOOL bCheckedEx
 		}
 		else
 		{
-			const char * c_szExtension = strrchr(m_wfd.cFileName, '.');
+			const char* c_szExtension = strrchr(m_wfd.cFileName, '.');
 			if (!c_szExtension)
 				continue;
 
@@ -142,7 +141,7 @@ bool CDir::Create(const char * c_szFilter, const char* c_szPath, BOOL bCheckedEx
 					std::string strFirst = strFilter.substr(0, iPos);
 					std::string strSecond = strFilter.substr(iPos + 1);
 					if (strcasecmp(strFirst.c_str(), c_szExtension + 1) != 0 &&
-					    strcasecmp(strSecond.c_str(), c_szExtension + 1) != 0)
+						strcasecmp(strSecond.c_str(), c_szExtension + 1) != 0)
 						continue;
 				}
 				else

@@ -11,7 +11,7 @@ BOOL CNetDatagramReceiver::Process()
 #else
 	socklen_t irecvAddrLength = sizeof(SOCKADDR_IN);
 #endif
-	m_recvBufCurrentSize = recvfrom(m_Socket, (char *)m_recvBuf, m_recvBufSize, 0, (PSOCKADDR)&m_SockAddr, &irecvAddrLength);
+	m_recvBufCurrentSize = recvfrom(m_Socket, (char*)m_recvBuf, m_recvBufSize, 0, (PSOCKADDR)&m_SockAddr, &irecvAddrLength);
 
 	if (m_recvBufCurrentSize <= 0)
 	{
@@ -21,7 +21,7 @@ BOOL CNetDatagramReceiver::Process()
 	return TRUE;
 }
 
-BOOL CNetDatagramReceiver::Recv(void * pBuffer, int iSize)
+BOOL CNetDatagramReceiver::Recv(void* pBuffer, int iSize)
 {
 	if (!Peek(pBuffer, iSize))
 		return FALSE;
@@ -30,9 +30,9 @@ BOOL CNetDatagramReceiver::Recv(void * pBuffer, int iSize)
 	return TRUE;
 }
 
-BOOL CNetDatagramReceiver::Peek(void * pBuffer, int iSize)
+BOOL CNetDatagramReceiver::Peek(void* pBuffer, int iSize)
 {
-	if (m_recvBufCurrentSize < m_recvBufCurrentPos+iSize)
+	if (m_recvBufCurrentSize < m_recvBufCurrentPos + iSize)
 		return FALSE;
 
 	memcpy(pBuffer, m_recvBuf + m_recvBufCurrentPos, iSize);
@@ -49,11 +49,11 @@ BOOL CNetDatagramReceiver::Bind(DWORD /*dwAddress*/, WORD wPortIndex)
 	m_Socket = socket(AF_INET, SOCK_DGRAM, 0);
 
 	DWORD arg = 1;
-	ioctlsocket(m_Socket, FIONBIO, &arg);	// Non-blocking mode
+	ioctlsocket(m_Socket, FIONBIO, &arg); // Non-blocking mode
 
 	memset(&m_SockAddr, 0, sizeof(SOCKADDR_IN));
 	m_SockAddr.sin_family = AF_INET;
-//	m_SockAddr.sin_addr.s_addr = dwAddress;
+	//	m_SockAddr.sin_addr.s_addr = dwAddress;
 	m_SockAddr.sin_addr.s_addr = INADDR_ANY;
 	m_SockAddr.sin_port = htons(wPortIndex);
 
@@ -72,18 +72,18 @@ void CNetDatagramReceiver::SetRecvBufferSize(int recvBufSize)
 {
 	if (m_recvBuf)
 	{
-		if (m_recvBufSize>recvBufSize)
+		if (m_recvBufSize > recvBufSize)
 			return;
 
-		delete [] m_recvBuf;
+		delete[] m_recvBuf;
 	}
-	m_recvBufSize=recvBufSize;
-	m_recvBuf=new char[m_recvBufSize];
+	m_recvBufSize = recvBufSize;
+	m_recvBuf = new char[m_recvBufSize];
 }
 
 void CNetDatagramReceiver::Clear()
 {
-	
+
 	m_isBind = FALSE;
 
 	m_dwPortIndex = 1000;
@@ -92,7 +92,7 @@ void CNetDatagramReceiver::Clear()
 	memset(&m_SockAddr, 0, sizeof(SOCKADDR_IN));
 
 	m_recvBufCurrentPos = 0;
-	m_recvBufCurrentSize = 0;	
+	m_recvBufCurrentSize = 0;
 }
 
 CNetDatagramReceiver::CNetDatagramReceiver()
@@ -105,5 +105,5 @@ CNetDatagramReceiver::CNetDatagramReceiver()
 CNetDatagramReceiver::~CNetDatagramReceiver()
 {
 	if (m_recvBuf)
-		delete [] m_recvBuf;
+		delete[] m_recvBuf;
 }

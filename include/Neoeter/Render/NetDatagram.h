@@ -8,7 +8,7 @@ class CNetworkDatagram
 
 		void Destroy();
 		bool Create(UINT uPort);
-		
+
 		void Update();
 
 		bool CanRecv();

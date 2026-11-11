@@ -15,13 +15,13 @@ class CSoundManager2D : public CSoundBase
 		CSoundManager2D();
 		virtual ~CSoundManager2D();
 
-		bool				Initialize();
-		void				Destroy();
+		bool Initialize();
+		void Destroy();
 
-		ISoundInstance *	GetInstance(const char* filename);
+		ISoundInstance* GetInstance(const char* filename);
 
 	protected:
-		CSoundInstance2D	ms_Instances[INSTANCE_MAX_COUNT];
+		CSoundInstance2D ms_Instances[INSTANCE_MAX_COUNT];
 };
 
 #endif

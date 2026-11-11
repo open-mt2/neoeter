@@ -9,7 +9,7 @@ CTempFile::~CTempFile()
 	DeleteFile(m_szFileName);
 }
 
-CTempFile::CTempFile(const char * c_pszPrefix)
+CTempFile::CTempFile(const char* c_pszPrefix)
 {
 	strncpy(m_szFileName, CreateTempFileName(c_pszPrefix), MAX_PATH);
 

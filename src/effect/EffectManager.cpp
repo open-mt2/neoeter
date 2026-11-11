@@ -3,26 +3,23 @@
 #include <Neoeter/Render/StateManager.h>
 #include <Neoeter/Effect/EffectManager.h>
 
-
-
 void CEffectManager::GetInfo(std::string* pstInfo)
 {
 	char szInfo[256];
-	
-	sprintf(szInfo, "Effect: Inst - ED %d, EI %d Pool - PSI %d, MI %d, LI %d, PI %d, EI %d, ED %d, PSD %d, EM %d, LD %d", 		
-		m_kEftDataMap.size(),
-		m_kEftInstMap.size(),		
-		CParticleSystemInstance::ms_kPool.GetCapacity(),
-		CEffectMeshInstance::ms_kPool.GetCapacity(),
-		CLightInstance::ms_kPool.GetCapacity(),		
-		CParticleInstance::ms_kPool.GetCapacity(),
-		//CRayParticleInstance::ms_kPool.GetCapacity(),
-		CEffectInstance::ms_kPool.GetCapacity(),
-		CEffectData::ms_kPool.GetCapacity(),
-		CParticleSystemData::ms_kPool.GetCapacity(),
-		CEffectMeshScript::ms_kPool.GetCapacity(),
-		CLightData::ms_kPool.GetCapacity()
-	);
+
+	sprintf(szInfo, "Effect: Inst - ED %d, EI %d Pool - PSI %d, MI %d, LI %d, PI %d, EI %d, ED %d, PSD %d, EM %d, LD %d",
+			m_kEftDataMap.size(),
+			m_kEftInstMap.size(),
+			CParticleSystemInstance::ms_kPool.GetCapacity(),
+			CEffectMeshInstance::ms_kPool.GetCapacity(),
+			CLightInstance::ms_kPool.GetCapacity(),
+			CParticleInstance::ms_kPool.GetCapacity(),
+			// CRayParticleInstance::ms_kPool.GetCapacity(),
+			CEffectInstance::ms_kPool.GetCapacity(),
+			CEffectData::ms_kPool.GetCapacity(),
+			CParticleSystemData::ms_kPool.GetCapacity(),
+			CEffectMeshScript::ms_kPool.GetCapacity(),
+			CLightData::ms_kPool.GetCapacity());
 	pstInfo->append(szInfo);
 }
 
@@ -30,7 +27,7 @@ void CEffectManager::UpdateSound()
 {
 	for (TEffectInstanceMap::iterator itor = m_kEftInstMap.begin(); itor != m_kEftInstMap.end(); ++itor)
 	{
-		CEffectInstance * pEffectInstance = itor->second;
+		CEffectInstance* pEffectInstance = itor->second;
 
 		pEffectInstance->UpdateSound();
 	}
@@ -39,7 +36,7 @@ void CEffectManager::UpdateSound()
 bool CEffectManager::IsAliveEffect(DWORD dwInstanceIndex)
 {
 	TEffectInstanceMap::iterator f = m_kEftInstMap.find(dwInstanceIndex);
-	if (m_kEftInstMap.end()==f)
+	if (m_kEftInstMap.end() == f)
 		return false;
 
 	return f->second->isAlive() ? true : false;
@@ -58,22 +55,22 @@ void CEffectManager::Update()
 		Tracenf("CEffectInstance::ms_MeshInstancePool %d", CEffectInstance::ms_MeshInstancePool.GetCapacity());
 		Tracenf("CEffectInstance::ms_ParticleSystemInstancePool %d", CEffectInstance::ms_ParticleSystemInstancePool.GetCapacity());
 		Tracenf("CParticleInstance::ms_ParticleInstancePool %d", CParticleInstance::ms_kPool.GetCapacity());
-		Tracenf("CRayParticleInstance::ms_RayParticleInstancePool %d", CRayParticleInstance::ms_kPool.GetCapacity());		
+		Tracenf("CRayParticleInstance::ms_RayParticleInstancePool %d", CRayParticleInstance::ms_kPool.GetCapacity());
 		Tracen("---------------------------------------------");
 	}
 	*/
 
 	for (TEffectInstanceMap::iterator itor = m_kEftInstMap.begin(); itor != m_kEftInstMap.end();)
 	{
-		CEffectInstance * pEffectInstance = itor->second;
+		CEffectInstance* pEffectInstance = itor->second;
 
 		pEffectInstance->Update(/*fElapsedTime*/);
 
 		if (!pEffectInstance->isAlive())
 		{
 			itor = m_kEftInstMap.erase(itor);
-			
-			CEffectInstance::Delete(pEffectInstance);			
+
+			CEffectInstance::Delete(pEffectInstance);
 		}
 		else
 		{
@@ -82,33 +79,32 @@ void CEffectManager::Update()
 	}
 }
 
-
 struct CEffectManager_LessEffectInstancePtrRenderOrder
 {
-	bool operator() (CEffectInstance* pkLeft, CEffectInstance* pkRight)
-	{
-		return pkLeft->LessRenderOrder(pkRight);		
-	}
+		bool operator()(CEffectInstance* pkLeft, CEffectInstance* pkRight)
+		{
+			return pkLeft->LessRenderOrder(pkRight);
+		}
 };
 
 struct CEffectManager_FEffectInstanceRender
 {
-	inline void operator () (CEffectInstance * pkEftInst)
-	{
-		pkEftInst->Render();
-	}
+		inline void operator()(CEffectInstance* pkEftInst)
+		{
+			pkEftInst->Render();
+		}
 };
 
 void CEffectManager::Render()
 {
 	STATEMANAGER.SetTexture(0, NULL);
 	STATEMANAGER.SetTexture(1, NULL);
-	
+
 	if (m_isDisableSortRendering)
-	{	
+	{
 		for (TEffectInstanceMap::iterator itor = m_kEftInstMap.begin(); itor != m_kEftInstMap.end();)
 		{
-			CEffectInstance * pEffectInstance = itor->second;
+			CEffectInstance* pEffectInstance = itor->second;
 			pEffectInstance->Render();
 			++itor;
 		}
@@ -118,9 +114,9 @@ void CEffectManager::Render()
 		static std::vector<CEffectInstance*> s_kVct_pkEftInstSort;
 		s_kVct_pkEftInstSort.clear();
 
-		TEffectInstanceMap& rkMap_pkEftInstSrc=m_kEftInstMap;
+		TEffectInstanceMap& rkMap_pkEftInstSrc = m_kEftInstMap;
 		TEffectInstanceMap::iterator i;
-		for (i=rkMap_pkEftInstSrc.begin(); i!=rkMap_pkEftInstSrc.end(); ++i)
+		for (i = rkMap_pkEftInstSrc.begin(); i != rkMap_pkEftInstSrc.end(); ++i)
 			s_kVct_pkEftInstSort.push_back(i->second);
 
 		std::sort(s_kVct_pkEftInstSort.begin(), s_kVct_pkEftInstSort.end(), CEffectManager_LessEffectInstancePtrRenderOrder());
@@ -128,7 +124,7 @@ void CEffectManager::Render()
 	}
 }
 
-BOOL CEffectManager::RegisterEffect(const char * c_szFileName,bool isExistDelete,bool isNeedCache)
+BOOL CEffectManager::RegisterEffect(const char* c_szFileName, bool isExistDelete, bool isNeedCache)
 {
 	std::string strFileName;
 	StringPath(c_szFileName, strFileName);
@@ -139,18 +135,18 @@ BOOL CEffectManager::RegisterEffect(const char * c_szFileName,bool isExistDelete
 	{
 		if (isExistDelete)
 		{
-			CEffectData* pkEftData=itor->second;
-			CEffectData::Delete(pkEftData);			
+			CEffectData* pkEftData = itor->second;
+			CEffectData::Delete(pkEftData);
 			m_kEftDataMap.erase(itor);
 		}
 		else
 		{
-			//TraceError("CEffectManager::RegisterEffect - m_kEftDataMap.find [%s] Already Exist", c_szFileName);
+			// TraceError("CEffectManager::RegisterEffect - m_kEftDataMap.find [%s] Already Exist", c_szFileName);
 			return TRUE;
 		}
 	}
 
-	CEffectData * pkEftData = CEffectData::New();
+	CEffectData* pkEftData = CEffectData::New();
 
 	if (!pkEftData->LoadScript(c_szFileName))
 	{
@@ -163,9 +159,9 @@ BOOL CEffectManager::RegisterEffect(const char * c_szFileName,bool isExistDelete
 
 	if (isNeedCache)
 	{
-		if (m_kEftCacheMap.find(dwCRC)==m_kEftCacheMap.end())
+		if (m_kEftCacheMap.find(dwCRC) == m_kEftCacheMap.end())
 		{
-			CEffectInstance* pkNewEftInst=CEffectInstance::New();
+			CEffectInstance* pkNewEftInst = CEffectInstance::New();
 			pkNewEftInst->SetEffectDataPointer(pkEftData);
 			m_kEftCacheMap.insert(TEffectInstanceMap::value_type(dwCRC, pkNewEftInst));
 		}
@@ -175,30 +171,30 @@ BOOL CEffectManager::RegisterEffect(const char * c_szFileName,bool isExistDelete
 }
 // CEffectData 를 포인터형으로 리턴하게 하고..
 // CEffectData에서 CRC를 얻을수 있게 한다
-BOOL CEffectManager::RegisterEffect2(const char * c_szFileName, DWORD* pdwRetCRC, bool isNeedCache)
-{	
+BOOL CEffectManager::RegisterEffect2(const char* c_szFileName, DWORD* pdwRetCRC, bool isNeedCache)
+{
 	std::string strFileName;
 	StringPath(c_szFileName, strFileName);
 	DWORD dwCRC = GetCaseCRC32(strFileName.c_str(), strFileName.length());
-	*pdwRetCRC=dwCRC;
+	*pdwRetCRC = dwCRC;
 
-	return RegisterEffect(c_szFileName,false,isNeedCache);
+	return RegisterEffect(c_szFileName, false, isNeedCache);
 }
 
-int CEffectManager::CreateEffect(const char * c_szFileName, const D3DXVECTOR3 & c_rv3Position, const D3DXVECTOR3 & c_rv3Rotation)
+int CEffectManager::CreateEffect(const char* c_szFileName, const D3DXVECTOR3& c_rv3Position, const D3DXVECTOR3& c_rv3Rotation)
 {
 	DWORD dwID = GetCaseCRC32(c_szFileName, strlen(c_szFileName));
 	return CreateEffect(dwID, c_rv3Position, c_rv3Rotation);
 }
 
-int CEffectManager::CreateEffect(DWORD dwID, const D3DXVECTOR3 & c_rv3Position, const D3DXVECTOR3 & c_rv3Rotation)
+int CEffectManager::CreateEffect(DWORD dwID, const D3DXVECTOR3& c_rv3Position, const D3DXVECTOR3& c_rv3Rotation)
 {
 	int iInstanceIndex = GetEmptyIndex();
 
 	CreateEffectInstance(iInstanceIndex, dwID);
 	SelectEffectInstance(iInstanceIndex);
 	D3DXMATRIX mat;
-	D3DXMatrixRotationYawPitchRoll(&mat,D3DXToRadian(c_rv3Rotation.x),D3DXToRadian(c_rv3Rotation.y),D3DXToRadian(c_rv3Rotation.z));
+	D3DXMatrixRotationYawPitchRoll(&mat, D3DXToRadian(c_rv3Rotation.x), D3DXToRadian(c_rv3Rotation.y), D3DXToRadian(c_rv3Rotation.z));
 	mat._41 = c_rv3Position.x;
 	mat._42 = c_rv3Position.y;
 	mat._43 = c_rv3Position.z;
@@ -212,14 +208,14 @@ void CEffectManager::CreateEffectInstance(DWORD dwInstanceIndex, DWORD dwID)
 	if (!dwID)
 		return;
 
-	CEffectData * pEffect;
+	CEffectData* pEffect;
 	if (!GetEffectData(dwID, &pEffect))
 	{
-		Tracef("CEffectManager::CreateEffectInstance - NO DATA :%d\n", dwID); 
+		Tracef("CEffectManager::CreateEffectInstance - NO DATA :%d\n", dwID);
 		return;
 	}
 
-	CEffectInstance * pEffectInstance = CEffectInstance::New();	
+	CEffectInstance* pEffectInstance = CEffectInstance::New();
 	pEffectInstance->SetEffectDataPointer(pEffect);
 
 	m_kEftInstMap.insert(TEffectInstanceMap::value_type(dwInstanceIndex, pEffectInstance));
@@ -232,7 +228,7 @@ bool CEffectManager::DestroyEffectInstance(DWORD dwInstanceIndex)
 	if (itor == m_kEftInstMap.end())
 		return false;
 
-	CEffectInstance * pEffectInstance = itor->second;
+	CEffectInstance* pEffectInstance = itor->second;
 
 	m_kEftInstMap.erase(itor);
 
@@ -248,32 +244,32 @@ void CEffectManager::DeactiveEffectInstance(DWORD dwInstanceIndex)
 	if (itor == m_kEftInstMap.end())
 		return;
 
-	CEffectInstance * pEffectInstance = itor->second;
+	CEffectInstance* pEffectInstance = itor->second;
 	pEffectInstance->SetDeactive();
 }
 
-void CEffectManager::CreateUnsafeEffectInstance(DWORD dwEffectDataID, CEffectInstance ** ppEffectInstance)
+void CEffectManager::CreateUnsafeEffectInstance(DWORD dwEffectDataID, CEffectInstance** ppEffectInstance)
 {
-	CEffectData * pEffect;
+	CEffectData* pEffect;
 	if (!GetEffectData(dwEffectDataID, &pEffect))
 	{
-		Tracef("CEffectManager::CreateEffectInstance - NO DATA :%d\n", dwEffectDataID); 
+		Tracef("CEffectManager::CreateEffectInstance - NO DATA :%d\n", dwEffectDataID);
 		return;
 	}
 
-	CEffectInstance* pkEftInstNew=CEffectInstance::New();
+	CEffectInstance* pkEftInstNew = CEffectInstance::New();
 	pkEftInstNew->SetEffectDataPointer(pEffect);
 
-	*ppEffectInstance = pkEftInstNew;	
+	*ppEffectInstance = pkEftInstNew;
 }
 
-bool CEffectManager::DestroyUnsafeEffectInstance(CEffectInstance * pEffectInstance)
+bool CEffectManager::DestroyUnsafeEffectInstance(CEffectInstance* pEffectInstance)
 {
 	if (!pEffectInstance)
 		return false;
 
 	CEffectInstance::Delete(pEffectInstance);
-	
+
 	return true;
 }
 
@@ -293,43 +289,43 @@ BOOL CEffectManager::SelectEffectInstance(DWORD dwInstanceIndex)
 
 void CEffectManager::SetEffectTextures(DWORD dwID, std::vector<std::string> textures)
 {
-	CEffectData * pEffectData;
+	CEffectData* pEffectData;
 	if (!GetEffectData(dwID, &pEffectData))
 	{
-		Tracef("CEffectManager::CreateEffectInstance - NO DATA :%d\n", dwID); 
+		Tracef("CEffectManager::CreateEffectInstance - NO DATA :%d\n", dwID);
 		return;
 	}
 
-	for(DWORD i = 0; i < textures.size(); i++)
+	for (DWORD i = 0; i < textures.size(); i++)
 	{
-		CParticleSystemData * pParticle = pEffectData->GetParticlePointer(i);
+		CParticleSystemData* pParticle = pEffectData->GetParticlePointer(i);
 		pParticle->ChangeTexture(textures.at(i).c_str());
 	}
 }
 
-void CEffectManager::SetEffectInstancePosition(const D3DXVECTOR3 & c_rv3Position)
+void CEffectManager::SetEffectInstancePosition(const D3DXVECTOR3& c_rv3Position)
 {
 	if (!m_pSelectedEffectInstance)
 	{
-//		assert(!"Instance to use is not yet set!");
+		//		assert(!"Instance to use is not yet set!");
 		return;
 	}
 
 	m_pSelectedEffectInstance->SetPosition(c_rv3Position);
 }
 
-void CEffectManager::SetEffectInstanceRotation(const D3DXVECTOR3 & c_rv3Rotation)
+void CEffectManager::SetEffectInstanceRotation(const D3DXVECTOR3& c_rv3Rotation)
 {
 	if (!m_pSelectedEffectInstance)
 	{
-//		assert(!"Instance to use is not yet set!");
+		//		assert(!"Instance to use is not yet set!");
 		return;
 	}
 
-	m_pSelectedEffectInstance->SetRotation(c_rv3Rotation.x,c_rv3Rotation.y,c_rv3Rotation.z);
+	m_pSelectedEffectInstance->SetRotation(c_rv3Rotation.x, c_rv3Rotation.y, c_rv3Rotation.z);
 }
 
-void CEffectManager::SetEffectInstanceGlobalMatrix(const D3DXMATRIX & c_rmatGlobal)
+void CEffectManager::SetEffectInstanceGlobalMatrix(const D3DXMATRIX& c_rmatGlobal)
 {
 	if (!m_pSelectedEffectInstance)
 		return;
@@ -353,7 +349,7 @@ void CEffectManager::HideEffect()
 	m_pSelectedEffectInstance->Hide();
 }
 
-bool CEffectManager::GetEffectData(DWORD dwID, CEffectData ** ppEffect)
+bool CEffectManager::GetEffectData(DWORD dwID, CEffectData** ppEffect)
 {
 	TEffectDataMap::iterator itor = m_kEftDataMap.find(dwID);
 
@@ -365,7 +361,7 @@ bool CEffectManager::GetEffectData(DWORD dwID, CEffectData ** ppEffect)
 	return true;
 }
 
-bool CEffectManager::GetEffectData(DWORD dwID, const CEffectData ** c_ppEffect)
+bool CEffectManager::GetEffectData(DWORD dwID, const CEffectData** c_ppEffect)
 {
 	TEffectDataMap::iterator itor = m_kEftDataMap.find(dwID);
 
@@ -392,13 +388,13 @@ DWORD CEffectManager::GetRandomEffect()
 
 int CEffectManager::GetEmptyIndex()
 {
-	static int iMaxIndex=1;
+	static int iMaxIndex = 1;
 
-	if (iMaxIndex>2100000000)
+	if (iMaxIndex > 2100000000)
 		iMaxIndex = 1;
 
 	int iNextIndex = iMaxIndex++;
-	while(m_kEftInstMap.find(iNextIndex) != m_kEftInstMap.end())
+	while (m_kEftInstMap.find(iNextIndex) != m_kEftInstMap.end())
 		iNextIndex++;
 
 	return iNextIndex;
@@ -413,8 +409,8 @@ void CEffectManager::__DestroyEffectInstanceMap()
 {
 	for (TEffectInstanceMap::iterator i = m_kEftInstMap.begin(); i != m_kEftInstMap.end(); ++i)
 	{
-		CEffectInstance * pkEftInst = i->second;	
-		CEffectInstance::Delete(pkEftInst);			
+		CEffectInstance* pkEftInst = i->second;
+		CEffectInstance::Delete(pkEftInst);
 	}
 
 	m_kEftInstMap.clear();
@@ -424,8 +420,8 @@ void CEffectManager::__DestroyEffectCacheMap()
 {
 	for (TEffectInstanceMap::iterator i = m_kEftCacheMap.begin(); i != m_kEftCacheMap.end(); ++i)
 	{
-		CEffectInstance * pkEftInst = i->second;	
-		CEffectInstance::Delete(pkEftInst);			
+		CEffectInstance* pkEftInst = i->second;
+		CEffectInstance::Delete(pkEftInst);
 	}
 
 	m_kEftCacheMap.clear();
@@ -435,19 +431,19 @@ void CEffectManager::__DestroyEffectDataMap()
 {
 	for (TEffectDataMap::iterator i = m_kEftDataMap.begin(); i != m_kEftDataMap.end(); ++i)
 	{
-		CEffectData * pData = i->second;
-		CEffectData::Delete(pData);				
+		CEffectData* pData = i->second;
+		CEffectData::Delete(pData);
 	}
 
 	m_kEftDataMap.clear();
 }
 
 void CEffectManager::Destroy()
-{	
+{
 	__DestroyEffectInstanceMap();
 	__DestroyEffectCacheMap();
 	__DestroyEffectDataMap();
-		
+
 	__Initialize();
 }
 
@@ -468,4 +464,3 @@ CEffectManager::~CEffectManager()
 }
 
 // just for map effect
-

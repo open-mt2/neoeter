@@ -3,7 +3,6 @@
 #include <Neoeter/Model/Grn/Model.h>
 #include <Neoeter/Render/ResourceManager.h>
 
-
 CGrannyModel* CGrannyModelInstance::GetModel()
 {
 	return m_pModel;
@@ -40,7 +39,7 @@ float CGrannyModelInstance::GetLocalTime()
 	return m_fLocalTime;
 }
 
-void CGrannyModelInstance::SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, const char * c_szBoneName)
+void CGrannyModelInstance::SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, const char* c_szBoneName)
 {
 	int iBoneIndex;
 	if (!c_pParentModelInstance->GetBoneIndexByName(c_szBoneName, &iBoneIndex))
@@ -70,7 +69,7 @@ bool CGrannyModelInstance::IsEmpty()
 }
 
 bool CGrannyModelInstance::CreateDeviceObjects()
-{	
+{
 	__CreateDynamicVertexBuffer();
 
 	return true;
@@ -91,10 +90,10 @@ void CGrannyModelInstance::__Initialize()
 	mc_pParentInstance = NULL;
 	m_iParentBoneIndex = 0;
 
-	m_pgrnModelInstance = NULL;	
+	m_pgrnModelInstance = NULL;
 
 	// WORK
-	m_pgrnWorldPoseReal = NULL;	
+	m_pgrnWorldPoseReal = NULL;
 	// END_OF_WORK
 
 	// TEST
@@ -106,8 +105,7 @@ void CGrannyModelInstance::__Initialize()
 	m_pgrnCtrl = NULL;
 	m_pgrnAni = NULL;
 
-	m_dwOldUpdateFrame=0;
-
+	m_dwOldUpdateFrame = 0;
 }
 
 CGrannyModelInstance::CGrannyModelInstance()

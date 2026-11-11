@@ -14,9 +14,9 @@ void CFrameController::Update(float fElapsedTime)
 
 			if (m_dwcurFrame >= m_dwMaxFrame)
 			{
-				if (m_isLoop && --m_iLoopCount!=0)
+				if (m_isLoop && --m_iLoopCount != 0)
 				{
-					if (m_iLoopCount<0)
+					if (m_iLoopCount < 0)
 						m_iLoopCount = 0;
 					m_dwcurFrame = 0;
 				}

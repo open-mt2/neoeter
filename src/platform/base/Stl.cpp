@@ -14,7 +14,7 @@ char korean_tolower(const char c)
 	return c;
 }
 
-std::string& stl_static_string(const char * c_sz)
+std::string& stl_static_string(const char* c_sz)
 {
 	std::string str;
 	str.assign(c_sz);
@@ -46,7 +46,7 @@ int split_string(const std::string& input, const std::string& delimiter, std::ve
 	newPos = input.find(delimiter, 0);
 
 	if (newPos < 0)
-		return 0; 
+		return 0;
 
 	int numFound = 0;
 
@@ -55,7 +55,7 @@ int split_string(const std::string& input, const std::string& delimiter, std::ve
 		numFound++;
 		positions.push_back(newPos);
 		iPos = newPos;
-		newPos = input.find(delimiter, iPos+sizeS2);
+		newPos = input.find(delimiter, iPos + sizeS2);
 	}
 
 	if (numFound == 0)
@@ -64,13 +64,13 @@ int split_string(const std::string& input, const std::string& delimiter, std::ve
 	for (UINT i = 0; i <= positions.size(); ++i)
 	{
 		std::string s("");
-		if (i == 0) 
-		{ 
-			s = input.substr(i, positions[i]); 
+		if (i == 0)
+		{
+			s = input.substr(i, positions[i]);
 		}
 		else
 		{
-			UINT offset = positions[i-1] + sizeS2;
+			UINT offset = positions[i - 1] + sizeS2;
 
 			if (offset < isize)
 			{
@@ -80,7 +80,7 @@ int split_string(const std::string& input, const std::string& delimiter, std::ve
 				}
 				else if (i > 0)
 				{
-					s = input.substr(positions[i-1] + sizeS2, positions[i] - positions[i-1] - sizeS2);
+					s = input.substr(positions[i - 1] + sizeS2, positions[i] - positions[i - 1] - sizeS2);
 				}
 			}
 		}

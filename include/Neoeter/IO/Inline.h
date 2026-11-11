@@ -10,9 +10,9 @@ inline void inlinePathCreate(const char* path)
 	char dir[256];
 	const char* p;
 	const char* k;
-	
+
 	p = (strlen(path) > 3 && path[1] == ':') ? (path + 3) : path;
-	
+
 	while (NULL != (k = strchr(p, '/')))
 	{
 		size_t len = static_cast<size_t>(k - path);
@@ -28,7 +28,7 @@ inline void inlinePathCreate(const char* path)
 
 inline void inlineConvertPackFilename(char* name)
 {
-	char * p = name;
+	char* p = name;
 
 	while (*p)
 	{

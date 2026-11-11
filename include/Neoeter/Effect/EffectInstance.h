@@ -13,7 +13,7 @@
 class CEffectInstance : public CGraphicObjectInstance
 {
 	public:
- 		typedef std::vector<CEffectElementBaseInstance*> TEffectElementInstanceVector;
+		typedef std::vector<CEffectElementBaseInstance*> TEffectElementInstanceVector;
 
 		enum
 		{
@@ -24,7 +24,7 @@ class CEffectInstance : public CGraphicObjectInstance
 			return CEffectInstance::ID;
 		}
 
-		bool GetBoundingSphere(D3DXVECTOR3 & v3Center, float & fRadius);
+		bool GetBoundingSphere(D3DXVECTOR3& v3Center, float& fRadius);
 
 		static void DestroySystem();
 
@@ -37,47 +37,47 @@ class CEffectInstance : public CGraphicObjectInstance
 	public:
 		CEffectInstance();
 		virtual ~CEffectInstance();
-		
+
 		bool LessRenderOrder(CEffectInstance* pkEftInst);
 
-		void SetEffectDataPointer(CEffectData * pEffectData);
+		void SetEffectDataPointer(CEffectData* pEffectData);
 
 		void Clear();
 		BOOL isAlive();
 		void SetActive();
 		void SetDeactive();
-		void SetGlobalMatrix(const D3DXMATRIX & c_rmatGlobal);
+		void SetGlobalMatrix(const D3DXMATRIX& c_rmatGlobal);
 		void UpdateSound();
 		void OnUpdate();
 		void OnRender();
-		void OnBlendRender() {} // Not used
+		void OnBlendRender() {}		  // Not used
 		void OnRenderToShadowMap() {} // Not used
-		void OnRenderShadow() {} // Not used
-		void OnRenderPCBlocker() {} // Not used
+		void OnRenderShadow() {}	  // Not used
+		void OnRenderPCBlocker() {}	  // Not used
 
 	protected:
-		void					__Initialize();
+		void __Initialize();
 
-		void					__SetParticleData(CParticleSystemData * pData);
-		void					__SetMeshData(CEffectMeshScript * pMesh);
-		void					__SetLightData(CLightData * pData);
+		void __SetParticleData(CParticleSystemData* pData);
+		void __SetMeshData(CEffectMeshScript* pMesh);
+		void __SetLightData(CLightData* pData);
 
-		virtual void			OnUpdateCollisionData(const CStaticCollisionDataVector * pscdVector) {} // Not used
-		virtual void			OnUpdateHeighInstance(CAttributeInstance * pAttributeInstance) {}
-		virtual bool			OnGetObjectHeight(float fX, float fY, float * pfHeight) { return false; }
+		virtual void OnUpdateCollisionData(const CStaticCollisionDataVector* pscdVector) {} // Not used
+		virtual void OnUpdateHeighInstance(CAttributeInstance* pAttributeInstance) {}
+		virtual bool OnGetObjectHeight(float fX, float fY, float* pfHeight) { return false; }
 
 	protected:
-		BOOL					m_isAlive;
-		DWORD					m_dwFrame;
-		D3DXMATRIX				m_matGlobal;
+		BOOL m_isAlive;
+		DWORD m_dwFrame;
+		D3DXMATRIX m_matGlobal;
 
-		CEffectData * m_pkEftData;
+		CEffectData* m_pkEftData;
 
- 		std::vector<CParticleSystemInstance*>	m_ParticleInstanceVector;
-		std::vector<CEffectMeshInstance*>		m_MeshInstanceVector;
-		std::vector<CLightInstance*>			m_LightInstanceVector;
+		std::vector<CParticleSystemInstance*> m_ParticleInstanceVector;
+		std::vector<CEffectMeshInstance*> m_MeshInstanceVector;
+		std::vector<CLightInstance*> m_LightInstanceVector;
 
-		NSound::TSoundInstanceVector *	m_pSoundInstanceVector;
+		NSound::TSoundInstanceVector* m_pSoundInstanceVector;
 
 		float m_fBoundingSphereRadius;
 		D3DXVECTOR3 m_v3BoundingSpherePosition;
@@ -85,6 +85,6 @@ class CEffectInstance : public CGraphicObjectInstance
 		float m_fLastTime;
 
 	public:
-		static CDynamicPool<CEffectInstance>	ms_kPool;
+		static CDynamicPool<CEffectInstance> ms_kPool;
 		static int ms_iRenderingEffectCount;
 };

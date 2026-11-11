@@ -10,7 +10,8 @@
 
 class CLightData : public CEffectElementBase
 {
-	friend class CLightInstance;
+		friend class CLightInstance;
+
 	public:
 		CLightData();
 		virtual ~CLightData();
@@ -31,13 +32,13 @@ class CLightData : public CEffectElementBase
 		void OnClear();
 		bool OnIsData();
 
-		BOOL OnLoadScript(CTextFileLoader & rTextFileLoader);
+		BOOL OnLoadScript(CTextFileLoader& rTextFileLoader);
 
 	protected:
 		float m_fMaxRange;
 		float m_fDuration;
 		TTimeEventTableFloat m_TimeEventTableRange;
-		
+
 		D3DXCOLOR m_cAmbient;
 		D3DXCOLOR m_cDiffuse;
 
@@ -54,5 +55,5 @@ class CLightData : public CEffectElementBase
 		static CLightData* New();
 		static void Delete(CLightData* pkData);
 
-		static CDynamicPool<CLightData>		ms_kPool;
+		static CDynamicPool<CLightData> ms_kPool;
 };

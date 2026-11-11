@@ -6,11 +6,11 @@
 class CTempFile : public CFileBase
 {
 	public:
-		CTempFile(const char * c_pszPrefix = NULL);
+		CTempFile(const char* c_pszPrefix = NULL);
 		virtual ~CTempFile();
 
 	protected:
-		char	m_szFileName[MAX_PATH+1];
+		char m_szFileName[MAX_PATH + 1];
 };
 
 #endif

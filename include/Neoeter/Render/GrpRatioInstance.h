@@ -13,7 +13,7 @@ class CGraphicRatioInstance
 
 		void Update();
 
-		const float& GetCurrentRatioReference() const;		
+		const float& GetCurrentRatioReference() const;
 
 	protected:
 		DWORD GetTime();
@@ -22,7 +22,7 @@ class CGraphicRatioInstance
 		float m_curRatio;
 		float m_srcRatio;
 		float m_dstRatio;
-		
+
 		DWORD m_baseTime;
 		DWORD m_blendTime;
 };

@@ -3,15 +3,15 @@
 
 float CrossProduct2D(float x1, float y1, float x2, float y2)
 {
-	return x1*y2-y1*x2;
+	return x1 * y2 - y1 * x2;
 }
 
 bool IsInTriangle2D(float ax, float ay, float bx, float by, float cx, float cy, float tx, float ty)
 {
-	float c1 = CrossProduct2D(bx-ax, by-ay, tx-ax, ty-ay);
-	float c2 = CrossProduct2D(cx-bx, cy-by, tx-bx, ty-by);
-	float c3 = CrossProduct2D(ax-cx, ay-cy, tx-cx, ty-cy);
-	
+	float c1 = CrossProduct2D(bx - ax, by - ay, tx - ax, ty - ay);
+	float c2 = CrossProduct2D(cx - bx, cy - by, tx - bx, ty - by);
+	float c3 = CrossProduct2D(ax - cx, ay - cy, tx - cx, ty - cy);
+
 	if (c1 * c2 > 0.0f && c1 * c3 > 0.0f)
 		return true;
 
@@ -51,16 +51,14 @@ D3DXVECTOR3* D3DXVec3Rotation(D3DXVECTOR3* pvtOut, const D3DXVECTOR3* c_pvtSrc, 
 	D3DXQuaternionMultiply(&qtRet, &qtSrc, &qtRet);
 	D3DXQuaternionMultiply(&qtRet, c_pqtRot, &qtRet);
 
-	pvtOut->x=qtRet.x;
-	pvtOut->y=qtRet.y;
-	pvtOut->z=qtRet.z;
+	pvtOut->x = qtRet.x;
+	pvtOut->y = qtRet.y;
+	pvtOut->z = qtRet.z;
 
 	return pvtOut;
 }
 
-
-
-void GetRotationFromMatrix(D3DXVECTOR3 * pRotation, const D3DXMATRIX * c_pMatrix)
+void GetRotationFromMatrix(D3DXVECTOR3* pRotation, const D3DXMATRIX* c_pMatrix)
 {
 	float sx = c_pMatrix->_32;
 	float cx = sqrtf(1.0f - sx * sx);
@@ -71,7 +69,7 @@ void GetRotationFromMatrix(D3DXVECTOR3 * pRotation, const D3DXMATRIX * c_pMatrix
 			pRotation->x = D3DX_PI / 2;
 		else
 			pRotation->x = -D3DX_PI / 2;
-		
+
 		pRotation->y = atan2f(c_pMatrix->_31, c_pMatrix->_11);
 		pRotation->z = 0.0f;
 	}
@@ -83,7 +81,7 @@ void GetRotationFromMatrix(D3DXVECTOR3 * pRotation, const D3DXMATRIX * c_pMatrix
 	}
 }
 
-void GetPivotAndRotationFromMatrix(D3DXMATRIX * pMatrix, D3DXVECTOR3 * pPivot, D3DXVECTOR3 * pRotation)
+void GetPivotAndRotationFromMatrix(D3DXMATRIX* pMatrix, D3DXVECTOR3* pPivot, D3DXVECTOR3* pRotation)
 {
 	float sx = pMatrix->_32;
 	float cx = sqrtf(1.0f - sx * sx);
@@ -116,7 +114,7 @@ void GetPivotAndRotationFromMatrix(D3DXMATRIX * pMatrix, D3DXVECTOR3 * pPivot, D
 }
 
 // NOTE : must be optimized!
-void ExtractMovement(D3DXMATRIX * pTargetMatrix, D3DXMATRIX * pSourceMatrix)
+void ExtractMovement(D3DXMATRIX* pTargetMatrix, D3DXMATRIX* pSourceMatrix)
 {
 	D3DXVECTOR3 v3Pivot;
 	D3DXVECTOR3 v3Rotation;

@@ -1,15 +1,15 @@
 #pragma once
 
-template<typename T>
+template <typename T>
 class CDynamic
 {
 	public:
 		struct FClear
 		{
-			void operator() (CDynamic<T>& rDynamic)
-			{
-				rDynamic.Clear();
-			}
+				void operator()(CDynamic<T>& rDynamic)
+				{
+					rDynamic.Clear();
+				}
 		};
 
 	public:
@@ -27,7 +27,7 @@ class CDynamic
 		{
 			if (m_pObject)
 				ms_objectPool.Free(m_pObject);
-							
+
 			Initialize();
 		}
 
@@ -35,7 +35,7 @@ class CDynamic
 		{
 			if (!m_pObject)
 				m_pObject = ms_objectPool.Alloc();
-					
+
 			return m_pObject;
 		}
 
@@ -51,7 +51,7 @@ class CDynamic
 			assert(m_pObject != NULL);
 			return m_pObject;
 		}
-		
+
 		T* operator->() const
 		{
 			assert(m_pObject != NULL);
@@ -59,7 +59,7 @@ class CDynamic
 		}
 
 	private:
-		T*	m_pObject;
+		T* m_pObject;
 
 	private:
 		void Initialize()
@@ -71,5 +71,5 @@ class CDynamic
 		static CDynamicPool<T> ms_objectPool;
 };
 
-template<typename T>
+template <typename T>
 CDynamicPool<T> CDynamic<T>::ms_objectPool;

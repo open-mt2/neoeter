@@ -10,8 +10,8 @@ class CDirect3DXBuffer
 		void Destroy();
 		void Create(LPD3DXBUFFER lpd3dxBuffer);
 
-		void*GetPointer();
-		int  GetSize();
+		void* GetPointer();
+		int GetSize();
 
 	protected:
 		LPD3DXBUFFER m_lpd3dxBuffer;

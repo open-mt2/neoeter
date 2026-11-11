@@ -5,7 +5,7 @@
 #include <cstring>
 
 #if __has_include(<Neoeter/Platform/Base/MappedFile.h>)
-    #include <Neoeter/Platform/Base/MappedFile.h>
+#include <Neoeter/Platform/Base/MappedFile.h>
 #endif
 #include <Neoeter/Image/TGAImage.h>
 
@@ -18,14 +18,14 @@ CTGAImage::~CTGAImage()
 {
 }
 
-CTGAImage::CTGAImage(CImage &image) : m_dwFlag(0), m_pdwEndPtr(nullptr)
+CTGAImage::CTGAImage(CImage& image) : m_dwFlag(0), m_pdwEndPtr(nullptr)
 {
 	int w = image.GetWidth();
 	int h = image.GetHeight();
 
 	Create(w, h);
 
-	DWORD * pdwDest = GetBasePointer();
+	DWORD* pdwDest = GetBasePointer();
 	memcpy(pdwDest, image.GetBasePointer(), w * h * sizeof(DWORD));
 	FlipTopToBottom();
 }
@@ -34,17 +34,17 @@ void CTGAImage::Create(int width, int height)
 {
 	memset(&m_Header, 0, sizeof(m_Header));
 
-	m_Header.imgType	= 2;
-	m_Header.width		= (short) width;
-	m_Header.height		= (short) height;
-	m_Header.colorBits	= 32;
-	m_Header.desc		= 0x08;	// alpha channel 있음
+	m_Header.imgType = 2;
+	m_Header.width = (short)width;
+	m_Header.height = (short)height;
+	m_Header.colorBits = 32;
+	m_Header.desc = 0x08; // alpha channel 있음
 
 	CImage::Create(width, height);
 	m_pdwEndPtr = GetBasePointer() + (width * height);
 }
 
-bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
+bool CTGAImage::LoadFromMemory(int iSize, const BYTE* c_pbMem)
 {
 	if (iSize < 18 || !c_pbMem)
 		return false;
@@ -60,182 +60,201 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 	BYTE r, g, b, a;
 	DWORD i;
 
-	DWORD * pdwDest = GetBasePointer();
+	DWORD* pdwDest = GetBasePointer();
 
 	switch (m_Header.imgType)
 	{
-		case 3:	// 알파만 있는 것 (1bytes per pixel, 거의 안쓰임)
+		case 3: // 알파만 있는 것 (1bytes per pixel, 거의 안쓰임)
+		{
+			for (i = 0; i < hxw; ++i)
+			{
+				a = (char)*(c_pbMem++);
+				pdwDest[i] = (a << 24) | (a << 16) | (a << 8) | a;
+			}
+		}
+		break;
+
+		case 2: // 압축 안된 TGA
+		{
+			if (m_Header.colorBits == 16) // 16bit
 			{
 				for (i = 0; i < hxw; ++i)
 				{
-					a = (char) *(c_pbMem++);
-					pdwDest[i] = (a << 24) | (a << 16) | (a << 8) | a;
+					WORD w;
+
+					memcpy(&w, c_pbMem, sizeof(WORD));
+					c_pbMem += sizeof(WORD);
+					iSize -= sizeof(WORD);
+
+					b = (BYTE)(w & 0x1F);
+					g = (BYTE)((w >> 5) & 0x1F);
+					r = (BYTE)((w >> 10) & 0x1F);
+
+					b <<= 3;
+					g <<= 3;
+					r <<= 3;
+					a = 0xff;
+
+					pdwDest[i] = (a << 24) | (r << 16) | (g << 8) | b;
 				}
 			}
-			break;
-
-		case 2:	// 압축 안된 TGA
+			else if (m_Header.colorBits == 24) // 24bit
 			{
-				if (m_Header.colorBits == 16)	// 16bit
+				for (i = 0; i < hxw; ++i)
 				{
-					for (i = 0; i < hxw; ++i)
-					{
-						WORD w;
+					r = (BYTE) * (c_pbMem++);
+					--iSize;
+					g = (BYTE) * (c_pbMem++);
+					--iSize;
+					b = (BYTE) * (c_pbMem++);
+					--iSize;
+					a = 0xff;
 
-						memcpy(&w, c_pbMem, sizeof(WORD));
-						c_pbMem += sizeof(WORD);
-						iSize -= sizeof(WORD);
-						
-						b = (BYTE) (w & 0x1F);
-						g = (BYTE) ((w >> 5) & 0x1F);
-						r = (BYTE) ((w >> 10) & 0x1F);
-						
-						b <<= 3;
-						g <<= 3;
-						r <<= 3;
-						a = 0xff;
-						
-						pdwDest[i] = (a << 24) | (r << 16) | (g << 8) | b;
-					}
-				}
-				else if (m_Header.colorBits == 24)	// 24bit
-				{
-					for (i = 0; i < hxw; ++i)
-					{
-						r = (BYTE) *(c_pbMem++); --iSize;
-						g = (BYTE) *(c_pbMem++); --iSize;
-						b = (BYTE) *(c_pbMem++); --iSize;
-						a = 0xff;
-						
-						pdwDest[i] = (a << 24) | (r << 16) | (g << 8) | b;
-					}
-				}
-				else if (m_Header.colorBits == 32)	// 32bit
-				{
-					int size = GetWidth();
-					size *= GetHeight() * 4;
-
-					memcpy(pdwDest, c_pbMem, size);
-					c_pbMem += size;
-					iSize -= size;
+					pdwDest[i] = (a << 24) | (r << 16) | (g << 8) | b;
 				}
 			}
-			break;
+			else if (m_Header.colorBits == 32) // 32bit
+			{
+				int size = GetWidth();
+				size *= GetHeight() * 4;
+
+				memcpy(pdwDest, c_pbMem, size);
+				c_pbMem += size;
+				iSize -= size;
+			}
+		}
+		break;
 
 		case 10: // 압축 된 TGA (RLE)
+		{
+			BYTE rle;
+
+			if (m_Header.colorBits == 24)
 			{
-				BYTE rle;
-
-				if (m_Header.colorBits == 24)
+				i = 0;
+				while (i < hxw)
 				{
-					i = 0;
-					while (i < hxw)
+					rle = (BYTE) * (c_pbMem++);
+					--iSize;
+
+					if (rle < 0x80) // 압축 안된 곳
 					{
-						rle = (BYTE) *(c_pbMem++); --iSize;
+						rle++;
 
-						if (rle < 0x80)	// 압축 안된 곳
+						while (rle)
 						{
-							rle++;
-
-							while (rle)
-							{
-								b = (BYTE) *(c_pbMem++); --iSize;
-								g = (BYTE) *(c_pbMem++); --iSize;
-								r = (BYTE) *(c_pbMem++); --iSize;
-								a = 0xff;
-								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
-
-								if (i > hxw)
-								{
-									assert(!"RLE overflow");
-									printf("RLE overflow");
-									return false;
-								}
-								--rle;
-							}
-						}
-						else
-						{
-							// 압축 된 곳
-							rle -= 127;
-
-							b = (BYTE) *(c_pbMem++); --iSize;
-							g = (BYTE) *(c_pbMem++); --iSize;
-							r = (BYTE) *(c_pbMem++); --iSize;
+							b = (BYTE) * (c_pbMem++);
+							--iSize;
+							g = (BYTE) * (c_pbMem++);
+							--iSize;
+							r = (BYTE) * (c_pbMem++);
+							--iSize;
 							a = 0xff;
+							pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
 
-							while (rle)
+							if (i > hxw)
 							{
-								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
-
-								if (i > hxw)
-								{
-									assert(!"RLE overflow");
-									printf("RLE overflow");
-									return false;
-								}
-								--rle;
+								assert(!"RLE overflow");
+								printf("RLE overflow");
+								return false;
 							}
+							--rle;
 						}
 					}
-				}
-				else if (m_Header.colorBits == 32)
-				{
-					i = 0;
-					while (i < hxw)
+					else
 					{
-						rle = (BYTE) *(c_pbMem++); --iSize;
-						
-						if (rle < 0x80)
-						{
-							rle++;
-							
-							while (rle)
-							{
-								b = (BYTE) *(c_pbMem++); --iSize;
-								g = (BYTE) *(c_pbMem++); --iSize;
-								r = (BYTE) *(c_pbMem++); --iSize;
-								a = (BYTE) *(c_pbMem++); --iSize;
-								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
-								
-								if (i > hxw)
-								{
-									assert(!"RLE overflow");
-									printf("RLE overflow");
-									return false;
-								}
-								--rle;
-							}
-						}
-						else
-						{
-							rle -= 127;
-							
-							b = (BYTE) *(c_pbMem++); --iSize;
-							g = (BYTE) *(c_pbMem++); --iSize;
-							r = (BYTE) *(c_pbMem++); --iSize;
-							a = (BYTE) *(c_pbMem++); --iSize;
-							
-							while (rle)
-							{
-								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
-								
-								if (i > hxw)
-								{
-									assert(!"RLE overflow");
-									printf("RLE overflow");
-									return false;
-								}
+						// 압축 된 곳
+						rle -= 127;
 
-								--rle;
+						b = (BYTE) * (c_pbMem++);
+						--iSize;
+						g = (BYTE) * (c_pbMem++);
+						--iSize;
+						r = (BYTE) * (c_pbMem++);
+						--iSize;
+						a = 0xff;
+
+						while (rle)
+						{
+							pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
+
+							if (i > hxw)
+							{
+								assert(!"RLE overflow");
+								printf("RLE overflow");
+								return false;
 							}
+							--rle;
 						}
 					}
 				}
 			}
-			break;
+			else if (m_Header.colorBits == 32)
+			{
+				i = 0;
+				while (i < hxw)
+				{
+					rle = (BYTE) * (c_pbMem++);
+					--iSize;
+
+					if (rle < 0x80)
+					{
+						rle++;
+
+						while (rle)
+						{
+							b = (BYTE) * (c_pbMem++);
+							--iSize;
+							g = (BYTE) * (c_pbMem++);
+							--iSize;
+							r = (BYTE) * (c_pbMem++);
+							--iSize;
+							a = (BYTE) * (c_pbMem++);
+							--iSize;
+							pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
+
+							if (i > hxw)
+							{
+								assert(!"RLE overflow");
+								printf("RLE overflow");
+								return false;
+							}
+							--rle;
+						}
+					}
+					else
+					{
+						rle -= 127;
+
+						b = (BYTE) * (c_pbMem++);
+						--iSize;
+						g = (BYTE) * (c_pbMem++);
+						--iSize;
+						r = (BYTE) * (c_pbMem++);
+						--iSize;
+						a = (BYTE) * (c_pbMem++);
+						--iSize;
+
+						while (rle)
+						{
+							pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
+
+							if (i > hxw)
+							{
+								assert(!"RLE overflow");
+								printf("RLE overflow");
+								return false;
+							}
+
+							--rle;
+						}
+					}
+				}
+			}
+		}
+		break;
 	}
-	
+
 	if (!(m_Header.desc & 0x20))
 	{
 		FlipTopToBottom();
@@ -244,46 +263,46 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 	return true;
 }
 
-int CTGAImage::GetRLEPixelCount(const DWORD * data)
+int CTGAImage::GetRLEPixelCount(const DWORD* data)
 {
-    int r = 1;
-    DWORD pixel;
+	int r = 1;
+	DWORD pixel;
 
-    if (data >= m_pdwEndPtr)
-        return 0;
+	if (data >= m_pdwEndPtr)
+		return 0;
 
-    pixel = *data;
+	pixel = *data;
 
-    while ((r < 127) && (data < m_pdwEndPtr - 1))
-    {
-        if (pixel != *(++data))
-            return r;
+	while ((r < 127) && (data < m_pdwEndPtr - 1))
+	{
+		if (pixel != *(++data))
+			return r;
 
-        r++;
-    }
+		r++;
+	}
 
-    return r;
+	return r;
 }
 
-int CTGAImage::GetRawPixelCount(const DWORD * data)
+int CTGAImage::GetRawPixelCount(const DWORD* data)
 {
-    int i = 0;
-    
-    if (data >= m_pdwEndPtr)
-        return 0;
-	
-    while ((data < m_pdwEndPtr) && (i < 127))
-    {
+	int i = 0;
+
+	if (data >= m_pdwEndPtr)
+		return 0;
+
+	while ((data < m_pdwEndPtr) && (i < 127))
+	{
 		int rle = GetRLEPixelCount(data);
-		
+
 		if (rle >= 4)
 			break;
 
-        data++;
-        i++;
-    }
-	
-    return i;
+		data++;
+		i++;
+	}
+
+	return i;
 }
 
 void CTGAImage::SetCompressed(bool isCompress)
@@ -304,31 +323,31 @@ void CTGAImage::SetAlphaChannel(bool isExist)
 
 bool CTGAImage::SaveToDiskFile(const char* c_szFileName)
 {
-	FILE * fp = fopen(c_szFileName, "wb");
-	
+	FILE* fp = fopen(c_szFileName, "wb");
+
 	if (!fp)
 		return false;
 
 	fwrite(&m_Header, 18, 1, fp);
-	
-	if (m_Header.imgType == 10)	// RLE 압축으로 저장
+
+	if (m_Header.imgType == 10) // RLE 압축으로 저장
 	{
-		DWORD * data = GetBasePointer();
+		DWORD* data = GetBasePointer();
 		m_pdwEndPtr = data + (GetWidth() * GetHeight());
-		
+
 		while (data < m_pdwEndPtr)
 		{
 			int rle = GetRLEPixelCount(data);
-			
+
 			if (rle < 4)
 			{
 				int raw = GetRawPixelCount(data);
-				
+
 				if (raw == 0)
 					break;
-				
+
 				fputc(raw - 1, fp);
-				
+
 				while (raw)
 				{
 					fwrite(data, sizeof(DWORD), 1, fp);
@@ -355,7 +374,7 @@ bool CTGAImage::SaveToDiskFile(const char* c_szFileName)
 	return true;
 }
 
-TGA_HEADER & CTGAImage::GetHeader()
+TGA_HEADER& CTGAImage::GetHeader()
 {
 	return m_Header;
 }

@@ -12,38 +12,38 @@ class CGraphicThing : public CResource
 		static CGraphicThing::TType Type();
 
 	public:
-		CGraphicThing(const char * c_szFileName);
+		CGraphicThing(const char* c_szFileName);
 		virtual ~CGraphicThing();
 
-		virtual bool			CreateDeviceObjects();
-		virtual void			DestroyDeviceObjects();
+		virtual bool CreateDeviceObjects();
+		virtual void DestroyDeviceObjects();
 
-		bool					CheckModelIndex(int iModel) const;
-		CGrannyModel *			GetModelPointer(int iModel);
-		int						GetModelCount() const;
+		bool CheckModelIndex(int iModel) const;
+		CGrannyModel* GetModelPointer(int iModel);
+		int GetModelCount() const;
 
-		bool					CheckMotionIndex(int iMotion) const;
-		CGrannyMotion *			GetMotionPointer(int iMotion);
-		int						GetMotionCount() const;
-
-	protected:
-		void					Initialize();
-
-		bool					LoadModels();
-		bool					LoadMotions();
+		bool CheckMotionIndex(int iMotion) const;
+		CGrannyMotion* GetMotionPointer(int iMotion);
+		int GetMotionCount() const;
 
 	protected:
-		bool					OnLoad(int iSize, const void* c_pvBuf);
-		void					OnClear();
-		bool					OnIsEmpty() const;
-		bool					OnIsType(TType type);
+		void Initialize();
+
+		bool LoadModels();
+		bool LoadMotions();
 
 	protected:
-		granny_file *			m_pgrnFile;
-		granny_file_info *		m_pgrnFileInfo;
+		bool OnLoad(int iSize, const void* c_pvBuf);
+		void OnClear();
+		bool OnIsEmpty() const;
+		bool OnIsType(TType type);
 
-		granny_animation *		m_pgrnAni;
+	protected:
+		granny_file* m_pgrnFile;
+		granny_file_info* m_pgrnFileInfo;
 
-		CGrannyModel *			m_models;
-		CGrannyMotion *			m_motions;
+		granny_animation* m_pgrnAni;
+
+		CGrannyModel* m_models;
+		CGrannyMotion* m_motions;
 };

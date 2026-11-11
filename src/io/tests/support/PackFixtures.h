@@ -11,48 +11,48 @@
 
 struct ZipFixtureEntry
 {
-    std::string name;
-    std::vector<char> data;
+		std::string name;
+		std::vector<char> data;
 };
 
-inline bool WriteZipFixture(const std::string & path,
-                            const std::vector<ZipFixtureEntry> & entries)
+inline bool WriteZipFixture(const std::string& path,
+							const std::vector<ZipFixtureEntry>& entries)
 {
-    int err = 0;
-    zip_t * za = zip_open(path.c_str(), ZIP_CREATE | ZIP_TRUNCATE, &err);
-    if (!za)
-        return false;
+	int err = 0;
+	zip_t* za = zip_open(path.c_str(), ZIP_CREATE | ZIP_TRUNCATE, &err);
+	if (!za)
+		return false;
 
-    for (const ZipFixtureEntry & entry : entries)
-    {
-        zip_source_t * source = zip_source_buffer(za, entry.data.data(),
-                                                  entry.data.size(), 0);
-        if (!source)
-        {
-            zip_discard(za);
-            return false;
-        }
+	for (const ZipFixtureEntry& entry : entries)
+	{
+		zip_source_t* source = zip_source_buffer(za, entry.data.data(),
+												 entry.data.size(), 0);
+		if (!source)
+		{
+			zip_discard(za);
+			return false;
+		}
 
-        if (zip_file_add(za, entry.name.c_str(), source,
-                         ZIP_FL_OVERWRITE | ZIP_FL_ENC_UTF_8) < 0)
-        {
-            zip_source_free(source);
-            zip_discard(za);
-            return false;
-        }
-    }
+		if (zip_file_add(za, entry.name.c_str(), source,
+						 ZIP_FL_OVERWRITE | ZIP_FL_ENC_UTF_8) < 0)
+		{
+			zip_source_free(source);
+			zip_discard(za);
+			return false;
+		}
+	}
 
-    return zip_close(za) == 0;
+	return zip_close(za) == 0;
 }
 
 inline std::vector<char> DeterministicBytes(size_t size, unsigned int seed)
 {
-    std::vector<char> data(size);
-    unsigned int state = seed;
-    for (size_t i = 0; i < size; ++i)
-    {
-        state = state * 1664525u + 1013904223u;
-        data[i] = static_cast<char>(state >> 24);
-    }
-    return data;
+	std::vector<char> data(size);
+	unsigned int state = seed;
+	for (size_t i = 0; i < size; ++i)
+	{
+		state = state * 1664525u + 1013904223u;
+		data[i] = static_cast<char>(state >> 24);
+	}
+	return data;
 }

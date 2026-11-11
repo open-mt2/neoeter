@@ -3,7 +3,7 @@
 
 #include <Neoeter/Effect/SimpleLightInstance.h>
 
-CDynamicPool<CLightInstance> CLightInstance::ms_kPool;	
+CDynamicPool<CLightInstance> CLightInstance::ms_kPool;
 
 void CLightInstance::DestroySystem()
 {
@@ -21,7 +21,7 @@ void CLightInstance::Delete(CLightInstance* pkData)
 	ms_kPool.Free(pkData);
 }
 
-void CLightInstance::OnSetDataPointer(CEffectElementBase * pElement)
+void CLightInstance::OnSetDataPointer(CEffectElementBase* pElement)
 {
 	Destroy();
 
@@ -44,9 +44,9 @@ bool CLightInstance::OnUpdate(float fElapsedTime)
 
 	if (m_fLocalTime >= m_pData->GetDuration())
 	{
-		if (m_pData->isLoop() && --m_iLoopCount!=0)
+		if (m_pData->isLoop() && --m_iLoopCount != 0)
 		{
-			if (m_iLoopCount<0)
+			if (m_iLoopCount < 0)
 				m_iLoopCount = 0;
 			m_fLocalTime -= m_pData->GetDuration();
 		}
@@ -66,7 +66,7 @@ bool CLightInstance::OnUpdate(float fElapsedTime)
 		*/
 	}
 
-	CLight * pLight = CLightManager::Instance().GetLight(m_LightID);
+	CLight* pLight = CLightManager::Instance().GetLight(m_LightID);
 
 	if (pLight)
 	{
@@ -76,7 +76,7 @@ bool CLightInstance::OnUpdate(float fElapsedTime)
 		/*if (m_pData->m_TimeEventTableRange.size()
 			&& m_fLocalTime>=m_pData->GetDuration()*m_pData->m_TimeEventTableRange[m_dwRangeIndex].m_fTime)
 		{
-			while(m_dwRangeIndex<m_pData->m_TimeEventTableRange.size() 
+			while(m_dwRangeIndex<m_pData->m_TimeEventTableRange.size()
 				&& m_fLocalTime>=m_pData->GetDuration()*m_pData->m_TimeEventTableRange[m_dwRangeIndex].m_fTime)
 				m_dwRangeIndex++;
 			float fLastTime;
@@ -89,7 +89,7 @@ bool CLightInstance::OnUpdate(float fElapsedTime)
 				fLastRange = m_pData->m_TimeEventTableRange[m_dwRangeIndex].m_Value;
 			}
 			m_dwRangeIndex--;
-			pLight->BlendRange(fLastRange*m_pData->m_fMaxRange, 
+			pLight->BlendRange(fLastRange*m_pData->m_fMaxRange,
 				(fLastTime-m_pData->m_TimeEventTableRange[m_dwRangeIndex].m_fTime)*m_pData->GetDuration());
 			m_dwRangeIndex++;
 		}*/
@@ -97,12 +97,11 @@ bool CLightInstance::OnUpdate(float fElapsedTime)
 		float fRange;
 		m_pData->GetRange(m_fLocalTime, fRange);
 		pLight->SetRange(fRange);
-		
-		D3DXVECTOR3 pos;
-		m_pData->GetPosition(m_fLocalTime,pos);
-		D3DXVec3TransformCoord(&pos,&pos,mc_pmatLocal);
-		pLight->SetPosition(pos.x,pos.y,pos.z);
 
+		D3DXVECTOR3 pos;
+		m_pData->GetPosition(m_fLocalTime, pos);
+		D3DXVec3TransformCoord(&pos, &pos, mc_pmatLocal);
+		pLight->SetPosition(pos.x, pos.y, pos.z);
 	}
 
 	return true;
@@ -110,7 +109,7 @@ bool CLightInstance::OnUpdate(float fElapsedTime)
 
 void CLightInstance::OnRender()
 {
-	//OnUpdate(0);
+	// OnUpdate(0);
 }
 
 void CLightInstance::OnInitialize()

@@ -8,8 +8,8 @@ void CScreenFilter::Render()
 		return;
 
 	STATEMANAGER.SaveTransform(D3DTS_PROJECTION, &ms_matIdentity);
- 	STATEMANAGER.SaveTransform(D3DTS_VIEW, &ms_matIdentity);
- 	STATEMANAGER.SetTransform(D3DTS_WORLD, &ms_matIdentity);
+	STATEMANAGER.SaveTransform(D3DTS_VIEW, &ms_matIdentity);
+	STATEMANAGER.SetTransform(D3DTS_WORLD, &ms_matIdentity);
 	STATEMANAGER.SaveRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	STATEMANAGER.SaveRenderState(D3DRS_SRCBLEND, m_bySrcType);
 	STATEMANAGER.SaveRenderState(D3DRS_DESTBLEND, m_byDestType);
@@ -21,7 +21,7 @@ void CScreenFilter::Render()
 	STATEMANAGER.RestoreRenderState(D3DRS_ALPHABLENDENABLE);
 	STATEMANAGER.RestoreRenderState(D3DRS_SRCBLEND);
 	STATEMANAGER.RestoreRenderState(D3DRS_DESTBLEND);
- 	STATEMANAGER.RestoreTransform(D3DTS_VIEW);
+	STATEMANAGER.RestoreTransform(D3DTS_VIEW);
 	STATEMANAGER.RestoreTransform(D3DTS_PROJECTION);
 }
 
@@ -35,7 +35,7 @@ void CScreenFilter::SetBlendType(BYTE bySrcType, BYTE byDestType)
 	m_bySrcType = bySrcType;
 	m_byDestType = byDestType;
 }
-void CScreenFilter::SetColor(const D3DXCOLOR & c_rColor)
+void CScreenFilter::SetColor(const D3DXCOLOR& c_rColor)
 {
 	m_Color = c_rColor;
 }

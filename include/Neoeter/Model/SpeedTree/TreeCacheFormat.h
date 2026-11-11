@@ -46,44 +46,44 @@
 
 namespace TreeCache
 {
-constexpr uint32_t kMagic = 0x4D543254u; // 'MT2T' in little-endian
-// Layout identifier, not a serialized field in v1. Bump it (and the magic, or
-// add a version field) if the record order below ever changes.
-constexpr uint32_t kVersion = 1;
-constexpr uint32_t kAllParts = 15u;
-constexpr uint32_t kInvalidColor = 0xFFFFFFFFu;
-constexpr size_t kHashHexDigits = 8;
+	constexpr uint32_t kMagic = 0x4D543254u; // 'MT2T' in little-endian
+	// Layout identifier, not a serialized field in v1. Bump it (and the magic, or
+	// add a version field) if the record order below ever changes.
+	constexpr uint32_t kVersion = 1;
+	constexpr uint32_t kAllParts = 15u;
+	constexpr uint32_t kInvalidColor = 0xFFFFFFFFu;
+	constexpr size_t kHashHexDigits = 8;
 
-// Bits accepted by SpeedTreeRT::GetGeometry for the part selection mask.
-enum PartMask : uint32_t
-{
-    kPartBranches = 1u << 0,
-    kPartFronds = 1u << 1,
-    kPartLeaves = 1u << 2,
-    kPartBillboards = 1u << 3
-};
+	// Bits accepted by SpeedTreeRT::GetGeometry for the part selection mask.
+	enum PartMask : uint32_t
+	{
+		kPartBranches = 1u << 0,
+		kPartFronds = 1u << 1,
+		kPartLeaves = 1u << 2,
+		kPartBillboards = 1u << 3
+	};
 
-inline uint32_t Fnv1a32(const unsigned char* pData, size_t nSize)
-{
-    uint32_t nHash = 2166136261u;
-    for (size_t i = 0; i < nSize; ++i)
-    {
-        nHash ^= pData[i];
-        nHash *= 16777619u;
-    }
-    return nHash;
-}
+	inline uint32_t Fnv1a32(const unsigned char* pData, size_t nSize)
+	{
+		uint32_t nHash = 2166136261u;
+		for (size_t i = 0; i < nSize; ++i)
+		{
+			nHash ^= pData[i];
+			nHash *= 16777619u;
+		}
+		return nHash;
+	}
 
-// Writes the 8 hex digits of nHash plus a NUL into name[9].
-inline void FormatHash(uint32_t nHash, char (&name)[kHashHexDigits + 1])
-{
-    static const char s_hex[] = "0123456789abcdef";
-    for (int i = static_cast<int>(kHashHexDigits) - 1; i >= 0; --i)
-    {
-        name[i] = s_hex[nHash & 0xFu];
-        nHash >>= 4;
-    }
-    name[kHashHexDigits] = '\0';
-}
+	// Writes the 8 hex digits of nHash plus a NUL into name[9].
+	inline void FormatHash(uint32_t nHash, char (&name)[kHashHexDigits + 1])
+	{
+		static const char s_hex[] = "0123456789abcdef";
+		for (int i = static_cast<int>(kHashHexDigits) - 1; i >= 0; --i)
+		{
+			name[i] = s_hex[nHash & 0xFu];
+			nHash >>= 4;
+		}
+		name[kHashHexDigits] = '\0';
+	}
 
 } // namespace TreeCache

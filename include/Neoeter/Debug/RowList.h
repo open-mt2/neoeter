@@ -37,8 +37,8 @@ namespace Neoeter::Debug
 		private:
 			struct Row
 			{
-				std::string label;
-				ValueProvider value;
+					std::string label;
+					ValueProvider value;
 			};
 
 			std::vector<Row> m_rows;

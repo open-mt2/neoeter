@@ -9,12 +9,12 @@ class CReferenceObject
 		void AddReference();
 		void AddReferenceOnly();
 		void Release();
-		
+
 		int GetReferenceCount();
 
 		bool canDestroy();
-		
-	protected:		
+
+	protected:
 		virtual void OnConstruct();
 		virtual void OnSelfDestruct();
 

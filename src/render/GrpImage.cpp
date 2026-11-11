@@ -1,9 +1,8 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/GrpImage.h>
 
-CGraphicImage::CGraphicImage(const char * c_szFileName, DWORD dwFilter) : 
-CResource(c_szFileName),
-m_dwFilter(dwFilter)
+CGraphicImage::CGraphicImage(const char* c_szFileName, DWORD dwFilter) : CResource(c_szFileName),
+																		 m_dwFilter(dwFilter)
 {
 	m_rect.bottom = m_rect.right = m_rect.top = m_rect.left = 0;
 }
@@ -61,7 +60,7 @@ const RECT& CGraphicImage::GetRectReference() const
 	return m_rect;
 }
 
-bool CGraphicImage::OnLoad(int iSize, const void * c_pvBuf)
+bool CGraphicImage::OnLoad(int iSize, const void* c_pvBuf)
 {
 	if (!c_pvBuf)
 		return false;
@@ -81,7 +80,7 @@ bool CGraphicImage::OnLoad(int iSize, const void * c_pvBuf)
 
 void CGraphicImage::OnClear()
 {
-//	Tracef("Image Destroy : %s\n", m_pszFileName);
+	//	Tracef("Image Destroy : %s\n", m_pszFileName);
 	m_imageTexture.Destroy();
 	memset(&m_rect, 0, sizeof(m_rect));
 }

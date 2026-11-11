@@ -16,17 +16,17 @@ class CSoundManagerStream : public CSoundBase
 		CSoundManagerStream();
 		virtual ~CSoundManagerStream();
 
-		bool					Initialize();
-		void					Destroy();
+		bool Initialize();
+		void Destroy();
 
-		bool					SetInstance(DWORD dwIndex, const char* filename);
-		CSoundInstanceStream *	GetInstance(DWORD dwIndex);
-
-	protected:
-		bool					CheckInstanceIndex(DWORD dwIndex);
+		bool SetInstance(DWORD dwIndex, const char* filename);
+		CSoundInstanceStream* GetInstance(DWORD dwIndex);
 
 	protected:
-		CSoundInstanceStream	m_Instances[MUSIC_INSTANCE_MAX_NUM];
+		bool CheckInstanceIndex(DWORD dwIndex);
+
+	protected:
+		CSoundInstanceStream m_Instances[MUSIC_INSTANCE_MAX_NUM];
 };
 
 #endif

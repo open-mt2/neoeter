@@ -83,8 +83,7 @@ static std::string Resolve(const char* fontName)
 		"/usr/share/fonts/liberation-sans/LiberationSans-Regular.ttf",
 		"/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
 		"/usr/share/fonts/truetype/freefont/FreeSans.ttf",
-		nullptr
-	};
+		nullptr};
 	for (int i = 0; s_fontPaths[i]; ++i)
 		if (IsReadable(s_fontPaths[i]))
 			return s_fontPaths[i];

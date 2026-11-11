@@ -12,11 +12,11 @@
 
 class TestIME : public CIME
 {
-public:
-	using CIME::DecCurPos;
-	using CIME::DelCurPos;
-	using CIME::OnChar;
-	using CIME::WMChar;
+	public:
+		using CIME::DecCurPos;
+		using CIME::DelCurPos;
+		using CIME::OnChar;
+		using CIME::WMChar;
 };
 
 static std::string CurrentText()

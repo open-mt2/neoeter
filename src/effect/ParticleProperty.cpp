@@ -2,9 +2,9 @@
 #include <Neoeter/Effect/ParticleProperty.h>
 #include <Neoeter/Render/ResourceManager.h>
 
-void CParticleProperty::InsertTexture(const char * c_szFileName)
+void CParticleProperty::InsertTexture(const char* c_szFileName)
 {
-	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	CGraphicImage* pImage = (CGraphicImage*)CResourceManager::Instance().GetResourcePointer(c_szFileName);
 
 	m_ImageVector.push_back(pImage);
 #ifdef WORLD_EDITOR
@@ -12,7 +12,7 @@ void CParticleProperty::InsertTexture(const char * c_szFileName)
 #endif
 }
 
-bool CParticleProperty::SetTexture(const char * c_szFileName)
+bool CParticleProperty::SetTexture(const char* c_szFileName)
 {
 	if (m_ImageVector.size() > 1)
 	{
@@ -39,7 +39,7 @@ void CParticleProperty::Clear()
 
 	m_bySrcBlendType = D3DBLEND_SRCALPHA;
 	m_byDestBlendType = D3DBLEND_ONE;
-	m_byColorOperationType = D3DTOP_MODULATE; 
+	m_byColorOperationType = D3DTOP_MODULATE;
 
 	m_byBillboardType = BILLBOARD_TYPE_NONE;
 
@@ -47,15 +47,15 @@ void CParticleProperty::Clear()
 	m_fTexAniDelay = 0.05f;
 	m_bTexAniRandomStartFrameFlag = FALSE;
 
-	//m_fGravity = 0.0f;
-	//m_fAirResistance = 0.0f;
+	// m_fGravity = 0.0f;
+	// m_fAirResistance = 0.0f;
 
 	m_TimeEventGravity.clear();
 	m_TimeEventAirResistance.clear();
 
 	m_TimeEventScaleX.clear();
 	m_TimeEventScaleY.clear();
-	//m_TimeEventScaleXY.clear();
+	// m_TimeEventScaleXY.clear();
 #ifdef WORLD_EDITOR
 	m_TimeEventColorRed.clear();
 	m_TimeEventColorGreen.clear();
@@ -77,29 +77,29 @@ CParticleProperty::~CParticleProperty()
 {
 }
 
-CParticleProperty & CParticleProperty::operator = ( const CParticleProperty& c_ParticleProperty )
+CParticleProperty& CParticleProperty::operator=(const CParticleProperty& c_ParticleProperty)
 {
 	m_byTexAniType = c_ParticleProperty.m_byTexAniType;
 	m_fTexAniDelay = c_ParticleProperty.m_fTexAniDelay;
 	m_bTexAniRandomStartFrameFlag = c_ParticleProperty.m_bTexAniRandomStartFrameFlag;
-	
+
 	m_bySrcBlendType = c_ParticleProperty.m_bySrcBlendType;
 	m_byDestBlendType = c_ParticleProperty.m_byDestBlendType;
 	m_byColorOperationType = c_ParticleProperty.m_byColorOperationType;
-	
+
 	m_byBillboardType = c_ParticleProperty.m_byBillboardType;
-	
+
 	m_byRotationType = c_ParticleProperty.m_byRotationType;
 	m_fRotationSpeed = c_ParticleProperty.m_fRotationSpeed;
 	m_wRotationRandomStartingBegin = c_ParticleProperty.m_wRotationRandomStartingBegin;
 	m_wRotationRandomStartingEnd = c_ParticleProperty.m_wRotationRandomStartingEnd;
-	
+
 	m_bAttachFlag = c_ParticleProperty.m_bAttachFlag;
 	m_bStretchFlag = c_ParticleProperty.m_bStretchFlag;
-	
+
 	m_TimeEventGravity = c_ParticleProperty.m_TimeEventGravity;
 	m_TimeEventAirResistance = c_ParticleProperty.m_TimeEventAirResistance;
-	
+
 	m_TimeEventScaleX = c_ParticleProperty.m_TimeEventScaleX;
 	m_TimeEventScaleY = c_ParticleProperty.m_TimeEventScaleY;
 

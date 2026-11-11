@@ -18,6 +18,26 @@ env:
   BUILD_TYPE: Release
 
 jobs:
+  format:
+    name: Format
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install clang-format
+        run: pip install clang-format==18.1.8
+
+      - name: Check formatting
+        run: |
+          clang-format --version
+          clang-format --dry-run --Werror $(git ls-files '*.cpp' '*.h' '*.c' '*.cc')
+
   build:
     name: Build library
     runs-on: ubuntu-latest

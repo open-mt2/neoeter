@@ -34,81 +34,98 @@ __CRT_UUID_DECL(ITfReadingInformationUIElement, 0xEA1EA139, 0x19DF, 0x11D7, 0xA6
 #endif
 #endif
 
-#define COUNTOF(a)						( sizeof( a ) / sizeof( ( a )[0] ) )
+#define COUNTOF(a) (sizeof(a) / sizeof((a)[0]))
 
 int CIME::ms_compLen;
 int CIME::ms_curpos;
 int CIME::ms_lastpos;
-wchar_t	CIME::m_wText[IMESTR_MAXLEN];
+wchar_t CIME::m_wText[IMESTR_MAXLEN];
 
-#define MAKEIMEVERSION(major, minor)	((DWORD)(((BYTE)(major) << 24) | ((BYTE)(minor) << 16)))
-#define IMEID_VER(dwId)					((dwId) & 0xffff0000)
-#define IMEID_LANG(dwId)				((dwId) & 0x0000ffff)
+#define MAKEIMEVERSION(major, minor) ((DWORD)(((BYTE)(major) << 24) | ((BYTE)(minor) << 16)))
+#define IMEID_VER(dwId) ((dwId) & 0xffff0000)
+#define IMEID_LANG(dwId) ((dwId) & 0x0000ffff)
 
-#define GETLANG()						LOWORD(CIME::ms_hklCurrent)
-#define GETPRIMLANG()					((WORD)PRIMARYLANGID(GETLANG()))
-#define GETSUBLANG()					SUBLANGID(GETLANG())
+#define GETLANG() LOWORD(CIME::ms_hklCurrent)
+#define GETPRIMLANG() ((WORD)PRIMARYLANGID(GETLANG()))
+#define GETSUBLANG() SUBLANGID(GETLANG())
 
-#define LANG_CHT						MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL)
-#define LANG_CHS						MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED)
+#define LANG_CHT MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL)
+#define LANG_CHS MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED)
 
 // Chinese Traditional
-#define _CHT_HKL_DAYI					((HKL)(uintptr_t)0xE0060404)	// DaYi
-#define _CHT_HKL_NEW_PHONETIC			((HKL)(uintptr_t)0xE0080404)	// New Phonetic
-#define _CHT_HKL_NEW_CHANG_JIE			((HKL)(uintptr_t)0xE0090404)	// New Chang Jie
-#define _CHT_HKL_NEW_QUICK				((HKL)(uintptr_t)0xE00A0404)	// New Quick
-#define _CHT_HKL_HK_CANTONESE			((HKL)(uintptr_t)0xE00B0404)	// Hong Kong Cantonese
+#define _CHT_HKL_DAYI ((HKL)(uintptr_t)0xE0060404)			// DaYi
+#define _CHT_HKL_NEW_PHONETIC ((HKL)(uintptr_t)0xE0080404)	// New Phonetic
+#define _CHT_HKL_NEW_CHANG_JIE ((HKL)(uintptr_t)0xE0090404) // New Chang Jie
+#define _CHT_HKL_NEW_QUICK ((HKL)(uintptr_t)0xE00A0404)		// New Quick
+#define _CHT_HKL_HK_CANTONESE ((HKL)(uintptr_t)0xE00B0404)	// Hong Kong Cantonese
 
-#define CHT_IMEFILENAME1				"TINTLGNT.IME" // New Phonetic
-#define CHT_IMEFILENAME2				"CINTLGNT.IME" // New Chang Jie
-#define CHT_IMEFILENAME3				"MSTCIPHA.IME" // Phonetic 5.1
+#define CHT_IMEFILENAME1 "TINTLGNT.IME" // New Phonetic
+#define CHT_IMEFILENAME2 "CINTLGNT.IME" // New Chang Jie
+#define CHT_IMEFILENAME3 "MSTCIPHA.IME" // Phonetic 5.1
 
-#define IMEID_CHT_VER42					(LANG_CHT | MAKEIMEVERSION(4, 2))	// New(Phonetic/ChanJie)IME98  : 4.2.x.x // Win98
-#define IMEID_CHT_VER43					(LANG_CHT | MAKEIMEVERSION(4, 3))	// New(Phonetic/ChanJie)IME98a : 4.3.x.x // Win2k
-#define IMEID_CHT_VER44					(LANG_CHT | MAKEIMEVERSION(4, 4))	// New ChanJie IME98b          : 4.4.x.x // WinXP
-#define IMEID_CHT_VER50					(LANG_CHT | MAKEIMEVERSION(5, 0))	// New(Phonetic/ChanJie)IME5.0 : 5.0.x.x // WinME
-#define IMEID_CHT_VER51					(LANG_CHT | MAKEIMEVERSION(5, 1))	// New(Phonetic/ChanJie)IME5.1 : 5.1.x.x // IME2002(w/OfficeXP)
-#define IMEID_CHT_VER52					(LANG_CHT | MAKEIMEVERSION(5, 2))	// New(Phonetic/ChanJie)IME5.2 : 5.2.x.x // IME2002a(w/Whistler)
-#define IMEID_CHT_VER60					(LANG_CHT | MAKEIMEVERSION(6, 0))	// New(Phonetic/ChanJie)IME6.0 : 6.0.x.x // IME XP(w/WinXP SP1)
-#define IMEID_CHT_VER_VISTA				(LANG_CHT | MAKEIMEVERSION(7, 0))	// All TSF TIP under Cicero UI-less mode: a hack to make GetImeId() return non-zero value
+#define IMEID_CHT_VER42 (LANG_CHT | MAKEIMEVERSION(4, 2))	  // New(Phonetic/ChanJie)IME98  : 4.2.x.x // Win98
+#define IMEID_CHT_VER43 (LANG_CHT | MAKEIMEVERSION(4, 3))	  // New(Phonetic/ChanJie)IME98a : 4.3.x.x // Win2k
+#define IMEID_CHT_VER44 (LANG_CHT | MAKEIMEVERSION(4, 4))	  // New ChanJie IME98b          : 4.4.x.x // WinXP
+#define IMEID_CHT_VER50 (LANG_CHT | MAKEIMEVERSION(5, 0))	  // New(Phonetic/ChanJie)IME5.0 : 5.0.x.x // WinME
+#define IMEID_CHT_VER51 (LANG_CHT | MAKEIMEVERSION(5, 1))	  // New(Phonetic/ChanJie)IME5.1 : 5.1.x.x // IME2002(w/OfficeXP)
+#define IMEID_CHT_VER52 (LANG_CHT | MAKEIMEVERSION(5, 2))	  // New(Phonetic/ChanJie)IME5.2 : 5.2.x.x // IME2002a(w/Whistler)
+#define IMEID_CHT_VER60 (LANG_CHT | MAKEIMEVERSION(6, 0))	  // New(Phonetic/ChanJie)IME6.0 : 6.0.x.x // IME XP(w/WinXP SP1)
+#define IMEID_CHT_VER_VISTA (LANG_CHT | MAKEIMEVERSION(7, 0)) // All TSF TIP under Cicero UI-less mode: a hack to make GetImeId() return non-zero value
 
 // Chinese Simplized
-#define _CHS_HKL						((HKL)0xE00E0804) // MSPY
-#define _CHS_HKL_QQPINYIN				((HKL)0xE0210804) // QQ PinYin
-#define _CHS_HKL_SOGOU					((HKL)0xE0220804) // Sougou PinYin
-#define _CHS_HKL_GOOGLEPINYIN			((HKL)0xE0230804) // Google PinYin
+#define _CHS_HKL ((HKL)0xE00E0804)				// MSPY
+#define _CHS_HKL_QQPINYIN ((HKL)0xE0210804)		// QQ PinYin
+#define _CHS_HKL_SOGOU ((HKL)0xE0220804)		// Sougou PinYin
+#define _CHS_HKL_GOOGLEPINYIN ((HKL)0xE0230804) // Google PinYin
 
-#define CHS_IMEFILENAME1			    "PINTLGNT.IME"		// MSPY1.5/2/3
-#define CHS_IMEFILENAME2			    "MSSCIPYA.IME"		// MSPY3 for OfficeXP
-#define CHS_IMEFILENAME_QQPINYIN		"QQPINYIN.IME"		// QQ PinYin
-#define CHS_IMEFILENAME_SOGOUPY			"SOGOUPY.IME"		// Sougou PinYin
-#define CHS_IMEFILENAME_GOOGLEPINYIN2	"GOOGLEPINYIN2.IME"	// Google PinYin 2
+#define CHS_IMEFILENAME1 "PINTLGNT.IME"					  // MSPY1.5/2/3
+#define CHS_IMEFILENAME2 "MSSCIPYA.IME"					  // MSPY3 for OfficeXP
+#define CHS_IMEFILENAME_QQPINYIN "QQPINYIN.IME"			  // QQ PinYin
+#define CHS_IMEFILENAME_SOGOUPY "SOGOUPY.IME"			  // Sougou PinYin
+#define CHS_IMEFILENAME_GOOGLEPINYIN2 "GOOGLEPINYIN2.IME" // Google PinYin 2
 
-#define IMEID_CHS_VER41					(LANG_CHS | MAKEIMEVERSION(4, 1))	// MSPY1.5	// SCIME97 or MSPY1.5 (w/Win98, Office97)
-#define IMEID_CHS_VER42					(LANG_CHS | MAKEIMEVERSION(4, 2))	// MSPY2	// Win2k/WinME
-#define IMEID_CHS_VER53					(LANG_CHS | MAKEIMEVERSION(5, 3))	// MSPY3	// WinXP
+#define IMEID_CHS_VER41 (LANG_CHS | MAKEIMEVERSION(4, 1)) // MSPY1.5	// SCIME97 or MSPY1.5 (w/Win98, Office97)
+#define IMEID_CHS_VER42 (LANG_CHS | MAKEIMEVERSION(4, 2)) // MSPY2	// Win2k/WinME
+#define IMEID_CHS_VER53 (LANG_CHS | MAKEIMEVERSION(5, 3)) // MSPY3	// WinXP
 
-enum { INDICATOR_NON_IME, INDICATOR_CHS, INDICATOR_CHT, INDICATOR_KOREAN, INDICATOR_JAPANESE };
-enum { IMEUI_STATE_OFF, IMEUI_STATE_ON, IMEUI_STATE_ENGLISH };
+enum
+{
+	INDICATOR_NON_IME,
+	INDICATOR_CHS,
+	INDICATOR_CHT,
+	INDICATOR_KOREAN,
+	INDICATOR_JAPANESE
+};
+enum
+{
+	IMEUI_STATE_OFF,
+	IMEUI_STATE_ON,
+	IMEUI_STATE_ENGLISH
+};
 
 #define LCID_INVARIANT MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT)
 
-wchar_t s_aszIndicator[5][3] =  
-{
-	L"En",
-	L"\x7B80",
-	L"\x7E41",
-	L"\xAC00",
-	L"\x3042",
+wchar_t s_aszIndicator[5][3] =
+	{
+		L"En",
+		L"\x7B80",
+		L"\x7E41",
+		L"\xAC00",
+		L"\x3042",
 };
 
-INPUTCONTEXT*	(WINAPI * CIME::_ImmLockIMC)( HIMC );
-BOOL			(WINAPI * CIME::_ImmUnlockIMC)( HIMC );
-LPVOID			(WINAPI * CIME::_ImmLockIMCC)( HIMCC );
-BOOL			(WINAPI * CIME::_ImmUnlockIMCC)( HIMCC );
+INPUTCONTEXT*(WINAPI* CIME::_ImmLockIMC)(HIMC);
+BOOL(WINAPI* CIME::_ImmUnlockIMC)
+(HIMC);
+LPVOID(WINAPI* CIME::_ImmLockIMCC)
+(HIMCC);
+BOOL(WINAPI* CIME::_ImmUnlockIMCC)
+(HIMCC);
 
-UINT			(WINAPI * CIME::_GetReadingString)( HIMC, UINT, LPWSTR, PINT, BOOL*, PUINT );
-BOOL			(WINAPI * CIME::_ShowReadingWindow)( HIMC, BOOL );
+UINT(WINAPI* CIME::_GetReadingString)
+(HIMC, UINT, LPWSTR, PINT, BOOL*, PUINT);
+BOOL(WINAPI* CIME::_ShowReadingWindow)
+(HIMC, BOOL);
 
 bool CIME::ms_bInitialized = false;
 bool CIME::ms_bDisableIMECompletely = false;
@@ -119,15 +136,15 @@ bool CIME::ms_bChineseIME = false;
 bool CIME::ms_bUseIMMCandidate = false;
 
 HWND CIME::ms_hWnd;
-HKL	CIME::ms_hklCurrent;
-char CIME::ms_szKeyboardLayout[KL_NAMELENGTH+1];
+HKL CIME::ms_hklCurrent;
+char CIME::ms_szKeyboardLayout[KL_NAMELENGTH + 1];
 OSVERSIONINFOA CIME::ms_stOSVI;
 
 HINSTANCE CIME::ms_hImm32Dll;
 HINSTANCE CIME::ms_hCurrentImeDll;
 DWORD CIME::ms_dwImeState;
 
-DWORD CIME::ms_adwId[2] = { 0, 0 };
+DWORD CIME::ms_adwId[2] = {0, 0};
 
 // IME Level
 DWORD CIME::ms_dwIMELevel;
@@ -146,7 +163,7 @@ DWORD CIME::ms_dwCandidatePageSize;
 bool CIME::ms_bReadingInformation;
 int CIME::ms_iReadingError = 0;
 bool CIME::ms_bHorizontalReading;
-std::vector<wchar_t>	CIME::ms_wstrReading;
+std::vector<wchar_t> CIME::ms_wstrReading;
 
 // Indicator
 wchar_t* CIME::ms_wszCurrentIndicator;
@@ -159,7 +176,7 @@ int CIME::ms_ulend;
 UINT CIME::ms_uOutputCodePage = 0;
 UINT CIME::ms_uInputCodePage = 0;
 
-extern DWORD gs_codePage=0;
+extern DWORD gs_codePage = 0;
 extern DWORD GetDefaultCodePage();
 extern int ReadToken(const char* token);
 extern const char* FindToken(const char* begin, const char* end);
@@ -176,60 +193,62 @@ extern const char* FindToken(const char* begin, const char* end);
 ///////////////////////////////////////////////////////////////////////////////
 class CTsfUiLessMode
 {
-protected:
-	// Sink receives event notifications
-	class CUIElementSink : public ITfUIElementSink, public ITfInputProcessorProfileActivationSink, public ITfCompartmentEventSink
-	{
+	protected:
+		// Sink receives event notifications
+		class CUIElementSink : public ITfUIElementSink, public ITfInputProcessorProfileActivationSink, public ITfCompartmentEventSink
+		{
+			public:
+				CUIElementSink();
+				~CUIElementSink();
+
+				// IUnknown
+				STDMETHODIMP QueryInterface(REFIID riid, void** ppvObj);
+				STDMETHODIMP_(ULONG)
+				AddRef(void);
+				STDMETHODIMP_(ULONG)
+				Release(void);
+
+				// ITfUIElementSink
+				//   Notifications for Reading Window events. We could process candidate as well, but we'll use IMM for simplicity sake.
+				STDMETHODIMP BeginUIElement(DWORD dwUIElementId, BOOL* pbShow);
+				STDMETHODIMP UpdateUIElement(DWORD dwUIElementId);
+				STDMETHODIMP EndUIElement(DWORD dwUIElementId);
+
+				// ITfInputProcessorProfileActivationSink
+				//   Notification for keyboard input locale change
+				STDMETHODIMP OnActivated(DWORD dwProfileType, LANGID langid, REFCLSID clsid, REFGUID catid,
+										 REFGUID guidProfile, HKL hkl, DWORD dwFlags);
+
+				// ITfCompartmentEventSink
+				//    Notification for open mode (toggle state) change
+				STDMETHODIMP OnChange(REFGUID rguid);
+
+			private:
+				LONG _cRef;
+		};
+
+		static void MakeReadingInformationString(ITfReadingInformationUIElement* preading);
+		static void MakeCandidateStrings(ITfCandidateListUIElement* pcandidate);
+		static ITfUIElement* GetUIElement(DWORD dwUIElementId);
+		static BOOL GetCompartments(ITfCompartmentMgr** ppcm, ITfCompartment** ppTfOpenMode, ITfCompartment** ppTfConvMode);
+		static BOOL SetupCompartmentSinks(BOOL bResetOnly = FALSE, ITfCompartment* pTfOpenMode = NULL, ITfCompartment* ppTfConvMode = NULL);
+
+		static ITfThreadMgrEx* m_tm;
+		static DWORD m_dwUIElementSinkCookie;
+		static DWORD m_dwAlpnSinkCookie;
+		static DWORD m_dwOpenModeSinkCookie;
+		static DWORD m_dwConvModeSinkCookie;
+		static CUIElementSink* m_TsfSink;
+		static int m_nCandidateRefCount; // Some IME shows multiple candidate lists but the Library doesn't support multiple candidate list.
+										 // So track open / close events to make sure the candidate list opened last is shown.
+		CTsfUiLessMode() {}				 // this class can't be instanciated
+
 	public:
-		CUIElementSink();
-		~CUIElementSink();
-
-		// IUnknown
-		STDMETHODIMP QueryInterface(REFIID riid, void **ppvObj);
-		STDMETHODIMP_(ULONG) AddRef(void);
-		STDMETHODIMP_(ULONG) Release(void);
-
-		// ITfUIElementSink
-		//   Notifications for Reading Window events. We could process candidate as well, but we'll use IMM for simplicity sake.
-		STDMETHODIMP BeginUIElement(DWORD dwUIElementId, BOOL *pbShow);
-		STDMETHODIMP UpdateUIElement(DWORD dwUIElementId);
-		STDMETHODIMP EndUIElement(DWORD dwUIElementId);
-
-		// ITfInputProcessorProfileActivationSink
-		//   Notification for keyboard input locale change
-		STDMETHODIMP OnActivated(DWORD dwProfileType, LANGID langid, REFCLSID clsid, REFGUID catid,
-			REFGUID guidProfile, HKL hkl, DWORD dwFlags);
-
-		// ITfCompartmentEventSink
-		//    Notification for open mode (toggle state) change
-		STDMETHODIMP OnChange(REFGUID rguid);
-
-	private:
-		LONG _cRef;
-	};
-
-	static void MakeReadingInformationString(ITfReadingInformationUIElement* preading);
-	static void MakeCandidateStrings(ITfCandidateListUIElement* pcandidate);
-	static ITfUIElement* GetUIElement(DWORD dwUIElementId);
-	static BOOL GetCompartments( ITfCompartmentMgr** ppcm, ITfCompartment** ppTfOpenMode, ITfCompartment** ppTfConvMode );
-	static BOOL SetupCompartmentSinks( BOOL bResetOnly = FALSE, ITfCompartment* pTfOpenMode = NULL, ITfCompartment* ppTfConvMode = NULL );
-
-	static ITfThreadMgrEx* m_tm;
-	static DWORD m_dwUIElementSinkCookie;
-	static DWORD m_dwAlpnSinkCookie;
-	static DWORD m_dwOpenModeSinkCookie;
-	static DWORD m_dwConvModeSinkCookie;
-	static CUIElementSink *m_TsfSink;
-	static int m_nCandidateRefCount;	// Some IME shows multiple candidate lists but the Library doesn't support multiple candidate list. 
-										// So track open / close events to make sure the candidate list opened last is shown.
-	CTsfUiLessMode() {}	// this class can't be instanciated
-
-public:
-	static BOOL SetupSinks();
-	static void ReleaseSinks();
-	static BOOL CurrentInputLocaleIsIme();
-	static void UpdateImeState(BOOL bResetCompartmentEventSink = FALSE);
-	static void EnableUiUpdates(bool bEnable);
+		static BOOL SetupSinks();
+		static void ReleaseSinks();
+		static BOOL CurrentInputLocaleIsIme();
+		static void UpdateImeState(BOOL bResetCompartmentEventSink = FALSE);
+		static void EnableUiUpdates(bool bEnable);
 };
 
 ITfThreadMgrEx* CTsfUiLessMode::m_tm;
@@ -243,66 +262,67 @@ int CTsfUiLessMode::m_nCandidateRefCount = NULL;
 // Class to disable Cicero in case ImmDisableTextFrameService() doesn't disable it completely
 class CDisableCicero
 {
-public:
-	CDisableCicero() : m_ptim( NULL ), m_bComInit( false )
-	{
-	}
-	~CDisableCicero()
-	{
-		Uninitialize();
-	}
-	void Initialize()
-	{
-		if ( m_bComInit )
+	public:
+		CDisableCicero() : m_ptim(NULL), m_bComInit(false)
 		{
-			return;
 		}
-		HRESULT hr;
-		hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
-	    if ( SUCCEEDED( hr ) )
+		~CDisableCicero()
 		{
-			m_bComInit = true;
-			hr = CoCreateInstance( CLSID_TF_ThreadMgr,
-				NULL,
-				CLSCTX_INPROC_SERVER,
-				__uuidof(ITfThreadMgr),
-				(void**)&m_ptim );
+			Uninitialize();
 		}
-	}
-	void Uninitialize()
-	{
-		if ( m_ptim )
+		void Initialize()
 		{
-			m_ptim->Release();
-			m_ptim = NULL;
+			if (m_bComInit)
+			{
+				return;
+			}
+			HRESULT hr;
+			hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+			if (SUCCEEDED(hr))
+			{
+				m_bComInit = true;
+				hr = CoCreateInstance(CLSID_TF_ThreadMgr,
+									  NULL,
+									  CLSCTX_INPROC_SERVER,
+									  __uuidof(ITfThreadMgr),
+									  (void**)&m_ptim);
+			}
 		}
-		if ( m_bComInit )
-			CoUninitialize();
-		m_bComInit = false;
-	}
+		void Uninitialize()
+		{
+			if (m_ptim)
+			{
+				m_ptim->Release();
+				m_ptim = NULL;
+			}
+			if (m_bComInit)
+				CoUninitialize();
+			m_bComInit = false;
+		}
 
-	void DisableCiceroOnThisWnd( HWND hwnd )
-	{
-		if ( m_ptim == NULL )
-			return;
-		ITfDocumentMgr* pdimPrev; // the dim that is associated previously.
-		// Associate NULL dim to the window.
-		// When this window gets the focus, Cicero does not work and IMM32 IME
-		// will be activated.
-		if ( SUCCEEDED( m_ptim->AssociateFocus( hwnd, NULL, &pdimPrev ) ) )
+		void DisableCiceroOnThisWnd(HWND hwnd)
 		{
-			if ( pdimPrev )
-				pdimPrev->Release();
+			if (m_ptim == NULL)
+				return;
+			ITfDocumentMgr* pdimPrev; // the dim that is associated previously.
+			// Associate NULL dim to the window.
+			// When this window gets the focus, Cicero does not work and IMM32 IME
+			// will be activated.
+			if (SUCCEEDED(m_ptim->AssociateFocus(hwnd, NULL, &pdimPrev)))
+			{
+				if (pdimPrev)
+					pdimPrev->Release();
+			}
 		}
-	}
-private:
-	ITfThreadMgr* m_ptim;
-	bool m_bComInit;
+
+	private:
+		ITfThreadMgr* m_ptim;
+		bool m_bComInit;
 };
 static CDisableCicero g_disableCicero;
 #endif
 
-/*---------------------------------------------------------------------------*/ /* Public */ 
+/*---------------------------------------------------------------------------*/ /* Public */
 CIME::CIME()
 {
 	ms_hWnd = NULL;
@@ -330,7 +350,7 @@ CIME::~CIME()
 
 bool CIME::Initialize(HWND hWnd)
 {
-	if(ms_bInitialized)
+	if (ms_bInitialized)
 		return true;
 	ms_hWnd = hWnd;
 
@@ -342,37 +362,42 @@ bool CIME::Initialize(HWND hWnd)
 
 	bool bUnicodeImm = false;
 	// IMM in NT or Win98 supports Unicode
-	if ( ms_stOSVI.dwPlatformId == VER_PLATFORM_WIN32_NT ||
-		( ms_stOSVI.dwMajorVersion > 4 ) ||
-		( ms_stOSVI.dwMajorVersion == 4 ) && ( ms_stOSVI.dwMinorVersion > 0 ) ) {
+	if (ms_stOSVI.dwPlatformId == VER_PLATFORM_WIN32_NT ||
+		(ms_stOSVI.dwMajorVersion > 4) ||
+		(ms_stOSVI.dwMajorVersion == 4) && (ms_stOSVI.dwMinorVersion > 0))
+	{
 		bUnicodeImm = true;
 	}
 
 	// Load ImmLock/ImmUnlock Function Proc
-    CHAR szPath[MAX_PATH+1];
+	CHAR szPath[MAX_PATH + 1];
 	ms_bDisableIMECompletely = false;
-    
-	if(GetSystemDirectoryA(szPath, MAX_PATH+1)) {
+
+	if (GetSystemDirectoryA(szPath, MAX_PATH + 1))
+	{
 		strcat(szPath, "\\imm32.dll");
 		ms_hImm32Dll = LoadLibraryA(szPath);
-		if(ms_hImm32Dll)
+		if (ms_hImm32Dll)
 		{
-			_ImmLockIMC		= (INPUTCONTEXT*(WINAPI *)(HIMC))	GetProcAddress(ms_hImm32Dll, "ImmLockIMC");
-			_ImmUnlockIMC	= (BOOL(WINAPI *)(HIMC))			GetProcAddress(ms_hImm32Dll, "ImmUnlockIMC");
-			_ImmLockIMCC	= (LPVOID(WINAPI *)(HIMCC))			GetProcAddress(ms_hImm32Dll, "ImmLockIMCC");
-			_ImmUnlockIMCC	= (BOOL(WINAPI *)(HIMCC))			GetProcAddress(ms_hImm32Dll, "ImmUnlockIMCC");
-			BOOL (WINAPI* _ImmDisableTextFrameService)(DWORD) = (BOOL (WINAPI*)(DWORD))GetProcAddress(ms_hImm32Dll, "ImmDisableTextFrameService");
-			if ( _ImmDisableTextFrameService )
-				_ImmDisableTextFrameService( (DWORD)-1 );
-		} else {
+			_ImmLockIMC = (INPUTCONTEXT * (WINAPI*)(HIMC)) GetProcAddress(ms_hImm32Dll, "ImmLockIMC");
+			_ImmUnlockIMC = (BOOL(WINAPI*)(HIMC))GetProcAddress(ms_hImm32Dll, "ImmUnlockIMC");
+			_ImmLockIMCC = (LPVOID(WINAPI*)(HIMCC))GetProcAddress(ms_hImm32Dll, "ImmLockIMCC");
+			_ImmUnlockIMCC = (BOOL(WINAPI*)(HIMCC))GetProcAddress(ms_hImm32Dll, "ImmUnlockIMCC");
+			BOOL(WINAPI * _ImmDisableTextFrameService)
+			(DWORD) = (BOOL(WINAPI*)(DWORD))GetProcAddress(ms_hImm32Dll, "ImmDisableTextFrameService");
+			if (_ImmDisableTextFrameService)
+				_ImmDisableTextFrameService((DWORD)-1);
+		}
+		else
+		{
 			ms_bDisableIMECompletely = true;
 		}
 	}
 
 	ms_bInitialized = true;
 
-	m_hOrgIMC = ImmGetContext( ms_hWnd );
-	ImmReleaseContext( ms_hWnd, m_hOrgIMC );
+	m_hOrgIMC = ImmGetContext(ms_hWnd);
+	ImmReleaseContext(ms_hWnd, m_hOrgIMC);
 
 	CheckInputLocale();
 	ChangeInputLanguageWorker();
@@ -380,9 +405,9 @@ bool CIME::Initialize(HWND hWnd)
 
 	ms_bUILessMode = CTsfUiLessMode::SetupSinks() != FALSE;
 	CheckToggleState();
-	if ( ms_bUILessMode )
+	if (ms_bUILessMode)
 	{
-		ms_bChineseIME = ( GETPRIMLANG() == LANG_CHINESE ) && CTsfUiLessMode::CurrentInputLocaleIsIme();
+		ms_bChineseIME = (GETPRIMLANG() == LANG_CHINESE) && CTsfUiLessMode::CurrentInputLocaleIsIme();
 		CTsfUiLessMode::UpdateImeState();
 	}
 #else
@@ -397,11 +422,11 @@ bool CIME::Initialize(HWND hWnd)
 
 void CIME::Uninitialize()
 {
-	if ( !ms_bInitialized )
+	if (!ms_bInitialized)
 		return;
 #ifdef _WIN32
 	CTsfUiLessMode::ReleaseSinks();
-	if ( ms_hWnd )
+	if (ms_hWnd)
 		ImmAssociateContext(ms_hWnd, m_hOrgIMC);
 #endif
 	ms_hWnd = NULL;
@@ -471,11 +496,11 @@ void CIME::Clear()
 	ms_ulend = 0;
 }
 
-int CIME::GetReading(std::string & rstrText)
+int CIME::GetReading(std::string& rstrText)
 {
 	char reading[IMEREADING_MAXLEN];
-	
-	if(ms_wstrReading.size() == 0)
+
+	if (ms_wstrReading.size() == 0)
 		return 0;
 	int readingLen = WideCharToMultiByte(ms_uOutputCodePage, 0, &ms_wstrReading[0], ms_wstrReading.size(), reading, sizeof(reading), NULL, NULL);
 
@@ -510,23 +535,23 @@ void CIME::SetText(const char* szText, int len)
 	const char* end = begin + len;
 	const char* iter = FindToken(begin, end);
 
-	int m_wTextLen = sizeof(m_wText)/sizeof(wchar_t);
+	int m_wTextLen = sizeof(m_wText) / sizeof(wchar_t);
 
-	ms_lastpos = MultiByteToWideChar(ms_uInputCodePage, 0, begin, iter-begin, m_wText, m_wTextLen);
+	ms_lastpos = MultiByteToWideChar(ms_uInputCodePage, 0, begin, iter - begin, m_wText, m_wTextLen);
 
 	if (iter < end)
-		ms_lastpos += MultiByteToWideChar(ReadToken(iter), 0, (iter+5), end-(iter+5), m_wText+ms_lastpos, m_wTextLen-ms_lastpos);
+		ms_lastpos += MultiByteToWideChar(ReadToken(iter), 0, (iter + 5), end - (iter + 5), m_wText + ms_lastpos, m_wTextLen - ms_lastpos);
 
 	ms_curpos = min(ms_curpos, ms_lastpos);
 }
 
-int  CIME::GetText(std::string & rstrText, bool addCodePage)
+int CIME::GetText(std::string& rstrText, bool addCodePage)
 {
 	int outCodePage = ms_uOutputCodePage;
 	int dataCodePage;
 	switch (outCodePage)
 	{
-		//case 1256: // ARABIC
+		// case 1256: // ARABIC
 		case 1268: // VIETNAM
 			dataCodePage = CP_UTF8;
 			break;
@@ -537,26 +562,26 @@ int  CIME::GetText(std::string & rstrText, bool addCodePage)
 	int len = 0;
 	char text[IMESTR_MAXLEN];
 
-	len += WideCharToMultiByte(dataCodePage, 0, m_wText, ms_curpos, text, sizeof(text)-len, NULL, NULL);
-	len += WideCharToMultiByte(dataCodePage, 0, m_wszComposition, ms_compLen, text+len, sizeof(text)-len, NULL, NULL);
-	len += WideCharToMultiByte(dataCodePage, 0, m_wText+ms_curpos, ms_lastpos-ms_curpos, text+len, sizeof(text)-len, NULL, NULL);
+	len += WideCharToMultiByte(dataCodePage, 0, m_wText, ms_curpos, text, sizeof(text) - len, NULL, NULL);
+	len += WideCharToMultiByte(dataCodePage, 0, m_wszComposition, ms_compLen, text + len, sizeof(text) - len, NULL, NULL);
+	len += WideCharToMultiByte(dataCodePage, 0, m_wText + ms_curpos, ms_lastpos - ms_curpos, text + len, sizeof(text) - len, NULL, NULL);
 
 	int i;
-	for(i=0; i<len; ++i)
-		if((BYTE)text[i] > 0x7F) break;
+	for (i = 0; i < len; ++i)
+		if ((BYTE)text[i] > 0x7F) break;
 
-	if(i == len)
+	if (i == len)
 	{
-		rstrText.append(text, text+len);
+		rstrText.append(text, text + len);
 	}
 	else
 	{
-		rstrText.append(text, text+i);
+		rstrText.append(text, text + i);
 
-		//if (addCodePage)
+		// if (addCodePage)
 		//	rstrText.append(GetCodePageText());
 
-		rstrText.append(text+i, text+len);
+		rstrText.append(text + i, text + len);
 	}
 
 	return rstrText.size();
@@ -596,24 +621,24 @@ int CIME::GetCandidateCount()
 	return ms_dwCandidateCount;
 }
 
-int  CIME::GetCandidate(DWORD index, std::string & rstrText)
+int CIME::GetCandidate(DWORD index, std::string& rstrText)
 {
-	if(index >= MAX_CANDLIST)
+	if (index >= MAX_CANDLIST)
 		return 0;
 
 	LPCWSTR wszText = ms_wszCandidate[index];
-	if(wszText == NULL)
+	if (wszText == NULL)
 		return 0;
 
 	int wTextLen = wcslen(wszText);
-	if(wTextLen == 0)
+	if (wTextLen == 0)
 		return 0;
 
 	char text[IMESTR_MAXLEN];
 	int len = ::WideCharToMultiByte(CP_UTF8, 0, wszText, wTextLen, text, sizeof(text), 0, 0);
 
 	rstrText.append("@9999");
-	rstrText.append(text, text+len);
+	rstrText.append(text, text + len);
 
 	return wTextLen;
 }
@@ -675,7 +700,7 @@ void CIME::ClearExceptKey()
 
 bool CIME::__IsWritable(wchar_t key)
 {
-	if ( m_exceptKey.end() == std::find(m_exceptKey.begin(),m_exceptKey.end(),key) )
+	if (m_exceptKey.end() == std::find(m_exceptKey.begin(), m_exceptKey.end(), key))
 		return true;
 	else
 		return false;
@@ -695,7 +720,7 @@ void CIME::PasteTextFromClipBoard()
 		return;
 
 	HANDLE handle = GetClipboardData(CF_TEXT);
-	char * buffer = (char*)GlobalLock(handle);
+	char* buffer = (char*)GlobalLock(handle);
 	std::string strClipboard = buffer;
 	GlobalUnlock(handle);
 	CloseClipboard();
@@ -706,10 +731,10 @@ void CIME::PasteTextFromClipBoard()
 	const char* begin = strClipboard.c_str();
 	const char* end = begin + strClipboard.length();
 	wchar_t m_wText[IMESTR_MAXLEN];
-	int wstrLen = MultiByteToWideChar(ms_uInputCodePage, 0, begin, end-begin, m_wText, IMESTR_MAXLEN);
+	int wstrLen = MultiByteToWideChar(ms_uInputCodePage, 0, begin, end - begin, m_wText, IMESTR_MAXLEN);
 
 	InsertString(m_wText, wstrLen);
-	if(ms_pEvent)
+	if (ms_pEvent)
 		ms_pEvent->OnUpdate();
 }
 
@@ -718,7 +743,7 @@ void CIME::FinalizeString(bool bSend)
 #ifdef _WIN32
 	HIMC himc;
 	static bool s_bProcessing = false; // to avoid infinite recursion
-	if ( !ms_bInitialized || s_bProcessing || NULL == ( himc = ImmGetContext( ms_hWnd ) ) )
+	if (!ms_bInitialized || s_bProcessing || NULL == (himc = ImmGetContext(ms_hWnd)))
 		return;
 	s_bProcessing = true;
 
@@ -726,8 +751,8 @@ void CIME::FinalizeString(bool bSend)
 	{
 	}
 
-	//InitCompStringData();
-	// clear composition string in IME
+	// InitCompStringData();
+	//  clear composition string in IME
 	ImmNotifyIME(himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
 	if (ms_bUILessMode)
 	{
@@ -735,7 +760,7 @@ void CIME::FinalizeString(bool bSend)
 		ImmSetCompositionStringW(himc, SCS_SETSTR, (LPVOID)L"", sizeof(wchar_t), (LPVOID)L"", sizeof(wchar_t));
 	}
 	// the following line is necessary as Korean IME doesn't close cand list when comp string is cancelled.
-	ImmNotifyIME( himc, NI_CLOSECANDIDATE, 0, 0 );	
+	ImmNotifyIME(himc, NI_CLOSECANDIDATE, 0, 0);
 	ImmReleaseContext(ms_hWnd, himc);
 	// Zooty2 RAID #4759: Sometimes application doesn't receive IMN_CLOSECANDIDATE on Alt+Tab
 	// So the same code for IMN_CLOSECANDIDATE is replicated here.
@@ -767,63 +792,63 @@ void CIME::CloseCandidateList()
 	ms_bCandidateList = false;
 	ms_dwCandidateCount = 0;
 	memset(&ms_wszCandidate, 0, sizeof(ms_wszCandidate));
-	if(ms_pEvent)
+	if (ms_pEvent)
 		ms_pEvent->OnCloseCandidateList();
 }
 
 void CIME::CloseReadingInformation()
 {
 	CIME::ms_bReadingInformation = false;
-	if(CIME::ms_pEvent)
+	if (CIME::ms_pEvent)
 		CIME::ms_pEvent->OnCloseReadingWnd();
 }
 
 void CIME::ChangeInputLanguage()
 {
-	UINT uLanguage = (UINT) GETLANG();
+	UINT uLanguage = (UINT)GETLANG();
 	CheckToggleState();
 	ChangeInputLanguageWorker();
 	if (uLanguage != GETLANG())
 	{
 		// Korean IME always uses level 3 support.
 		// Other languages use the level that is specified by ImeUi_SetSupportLevel()
-		SetSupportLevel( ( GETPRIMLANG() == LANG_KOREAN ) ? 3 : ms_dwIMELevelSaved );
+		SetSupportLevel((GETPRIMLANG() == LANG_KOREAN) ? 3 : ms_dwIMELevelSaved);
 	}
 
-	if(ms_pEvent)
+	if (ms_pEvent)
 		ms_pEvent->OnChangeCodePage();
 
-	//HWND hwndImeDef = ImmGetDefaultIMEWnd(ms_hWnd);
-	//if ( hwndImeDef )
+	// HWND hwndImeDef = ImmGetDefaultIMEWnd(ms_hWnd);
+	// if ( hwndImeDef )
 	//{
 	//	// Fix for Zooty #3995: prevent CHT IME toobar from showing up
 	//	SendMessageA(hwndImeDef, WM_IME_CONTROL, IMC_OPENSTATUSWINDOW, 0);
 	//	SendMessageA(hwndImeDef, WM_IME_CONTROL, IMC_CLOSESTATUSWINDOW, 0);
-	//}
+	// }
 }
 
 void CIME::ChangeInputLanguageWorker()
 {
-	if ( !ms_bUILessMode )
-		ms_iCandListIndexBase = ( ms_hklCurrent == _CHT_HKL_DAYI ) ? 0 : 1;
+	if (!ms_bUILessMode)
+		ms_iCandListIndexBase = (ms_hklCurrent == _CHT_HKL_DAYI) ? 0 : 1;
 	SetupImeApi();
 }
 
-void CIME::SetSupportLevel( DWORD dwImeLevel )
+void CIME::SetSupportLevel(DWORD dwImeLevel)
 {
-	if ( dwImeLevel < 2 || 3 < dwImeLevel )
+	if (dwImeLevel < 2 || 3 < dwImeLevel)
 		return;
-	if ( GETPRIMLANG() == LANG_KOREAN )
+	if (GETPRIMLANG() == LANG_KOREAN)
 	{
 		dwImeLevel = 3;
 	}
 	ms_dwIMELevel = dwImeLevel;
 	// cancel current composition string.
 	FinalizeString();
-	//SetCompStringColor();
+	// SetCompStringColor();
 }
 
-/*---------------------------------------------------------------------------*/ /* Protected */ 
+/*---------------------------------------------------------------------------*/ /* Protected */
 void CIME::IncCurPos()
 {
 	if (ms_curpos < ms_lastpos)
@@ -843,7 +868,7 @@ void CIME::DecCurPos()
 	if (ms_curpos > 0)
 	{
 		int pos = FindColorTagStartPosition(m_wText + ms_curpos - 1, ms_curpos);
-		
+
 		if (pos > 0)
 			ms_curpos = min(ms_lastpos, max(0, ms_curpos - (pos + 1)));
 		else
@@ -856,7 +881,7 @@ int CIME::GetCurPos()
 {
 	int pos = GetTextTagOutputLen(m_wText, ms_curpos);
 	return pos;
-	//return ms_curpos;
+	// return ms_curpos;
 }
 
 void CIME::SetCurPos(int offset)
@@ -869,7 +894,7 @@ void CIME::SetCurPos(int offset)
 	else
 	{
 		// offset은 보여지는 텍스트의 위치로 온다. 따라서 새로 계산해야함.
-		//ms_curpos = min(ms_lastpos, offset);
+		// ms_curpos = min(ms_lastpos, offset);
 		ms_curpos = min(ms_lastpos, GetTextTagInternalPosFromRenderPos(m_wText, ms_lastpos, offset));
 	}
 }
@@ -885,27 +910,27 @@ void CIME::DelCurPos()
 	}
 }
 
-void CIME::PasteString(const char * str)
+void CIME::PasteString(const char* str)
 {
-	const char * begin = str;
-	const char * end = str + strlen(str);
+	const char* begin = str;
+	const char* end = str + strlen(str);
 	wchar_t m_wText[IMESTR_MAXLEN];
 	int wstrLen = MultiByteToWideChar(ms_uInputCodePage, 0, begin, end - begin, m_wText, IMESTR_MAXLEN);
 	InsertString(m_wText, wstrLen);
-	if(ms_pEvent)
+	if (ms_pEvent)
 		ms_pEvent->OnUpdate();
 }
 
-/*---------------------------------------------------------------------------*/ /* Private */ 
+/*---------------------------------------------------------------------------*/ /* Private */
 void CIME::InsertString(wchar_t* wString, int iSize)
 {
 	if (IsMax(wString, iSize))
 		return;
 
 	if (ms_curpos < ms_lastpos)
-		memmove(m_wText+ms_curpos+iSize, m_wText+ms_curpos, sizeof(wchar_t)*(ms_lastpos-ms_curpos));
+		memmove(m_wText + ms_curpos + iSize, m_wText + ms_curpos, sizeof(wchar_t) * (ms_lastpos - ms_curpos));
 
-	memcpy(m_wText+ms_curpos, wString, sizeof(wchar_t)*iSize);
+	memcpy(m_wText + ms_curpos, wString, sizeof(wchar_t) * iSize);
 
 	ms_curpos += iSize;
 	ms_lastpos += iSize;
@@ -929,48 +954,48 @@ UINT CIME::GetCodePageFromLang(LANGID langid)
 	switch (pri_langid)
 	{
 		case LANG_JAPANESE:
-			//setlocale(LC_ALL, ".932");
+			// setlocale(LC_ALL, ".932");
 			return 932;
 		case LANG_KOREAN:
-			//setlocale(LC_ALL, ".949");
+			// setlocale(LC_ALL, ".949");
 			return 949;
 		case LANG_CHINESE:
+		{
+			switch (SUBLANGID(langid))
 			{
-				switch (SUBLANGID(langid))
-				{
-					case SUBLANG_CHINESE_SIMPLIFIED:
-					case SUBLANG_CHINESE_SINGAPORE:
-						//setlocale(LC_ALL, ".936");
-						return 936;
-					case SUBLANG_CHINESE_TRADITIONAL:
-					case SUBLANG_CHINESE_MACAU:
-					case SUBLANG_CHINESE_HONGKONG:
-						//setlocale(LC_ALL, ".950");
-						return 950;
-				}
+				case SUBLANG_CHINESE_SIMPLIFIED:
+				case SUBLANG_CHINESE_SINGAPORE:
+					// setlocale(LC_ALL, ".936");
+					return 936;
+				case SUBLANG_CHINESE_TRADITIONAL:
+				case SUBLANG_CHINESE_MACAU:
+				case SUBLANG_CHINESE_HONGKONG:
+					// setlocale(LC_ALL, ".950");
+					return 950;
 			}
-			//setlocale(LC_ALL, ".936");
+		}
+			// setlocale(LC_ALL, ".936");
 			return 936;
 		case LANG_ARABIC:
 			return 1256;
 		case LANG_GREEK:
-			//setlocale(LC_ALL, ".1253");
+			// setlocale(LC_ALL, ".1253");
 			return 1253;
 		case LANG_TURKISH:
-			//setlocale(LC_ALL, ".1254");
+			// setlocale(LC_ALL, ".1254");
 			return 1254;
 		case LANG_HEBREW:
-			//setlocale(LC_ALL, ".1255");
+			// setlocale(LC_ALL, ".1255");
 			return 1255;
 		case LANG_ESTONIAN:
 		case LANG_LATVIAN:
 		case LANG_LITHUANIAN:
-			//setlocale(LC_ALL, ".1257");
+			// setlocale(LC_ALL, ".1257");
 			return 1257;
 		case LANG_VIETNAMESE:
 			return 1258;
 		case LANG_THAI:
-			//setlocale(LC_ALL, ".874");
+			// setlocale(LC_ALL, ".874");
 			return 874;
 		case LANG_CZECH:
 		case LANG_HUNGARIAN:
@@ -980,7 +1005,7 @@ UINT CIME::GetCodePageFromLang(LANGID langid)
 		case LANG_ROMANIAN:
 		case LANG_SLOVAK:
 		case LANG_SLOVENIAN:
-			//setlocale(LC_ALL, ".1250");
+			// setlocale(LC_ALL, ".1250");
 			return 1250;
 		case LANG_RUSSIAN:
 		case LANG_BELARUSIAN:
@@ -991,8 +1016,8 @@ UINT CIME::GetCodePageFromLang(LANGID langid)
 			//_wsetlocale(LC_ALL, ".1252");
 			return 1252;
 		default:
-			//TraceError("UNKNOWN IME[%d]\n", langid);
-			//setlocale(LC_ALL, ".949");
+			// TraceError("UNKNOWN IME[%d]\n", langid);
+			// setlocale(LC_ALL, ".949");
 			return 1252;
 	}
 }
@@ -1000,7 +1025,7 @@ UINT CIME::GetCodePageFromLang(LANGID langid)
 void CIME::CompositionProcess(HIMC hImc)
 {
 #ifdef _WIN32
-	ms_compLen = ImmGetCompositionStringW(hImc, GCS_COMPSTR, m_wszComposition, sizeof(m_wszComposition))/sizeof(wchar_t);
+	ms_compLen = ImmGetCompositionStringW(hImc, GCS_COMPSTR, m_wszComposition, sizeof(m_wszComposition)) / sizeof(wchar_t);
 
 	if (IsMax(m_wszComposition, ms_compLen))
 	{
@@ -1023,8 +1048,8 @@ void CIME::CompositionProcessBuilding(HIMC hImc)
 		ms_compLen = 0;
 		return;
 	}
-	
-	ms_compLen = ImmGetCompositionStringW(hImc, GCS_COMPSTR, m_wszComposition, sizeof(m_wszComposition))/sizeof(wchar_t);
+
+	ms_compLen = ImmGetCompositionStringW(hImc, GCS_COMPSTR, m_wszComposition, sizeof(m_wszComposition)) / sizeof(wchar_t);
 #else
 	(void)hImc;
 #endif
@@ -1035,7 +1060,7 @@ void CIME::ResultProcess(HIMC hImc)
 #ifdef _WIN32
 	wchar_t temp[IMESTR_MAXLEN];
 
-	int len = ImmGetCompositionStringW(hImc, GCS_RESULTSTR, temp, sizeof(temp))/sizeof(wchar_t);
+	int len = ImmGetCompositionStringW(hImc, GCS_RESULTSTR, temp, sizeof(temp)) / sizeof(wchar_t);
 
 	if (len <= 0)
 		return;
@@ -1049,12 +1074,14 @@ void CIME::ResultProcess(HIMC hImc)
 void CIME::AttributeProcess(HIMC hImc)
 {
 #ifdef _WIN32
-	BYTE	attribute[IMESTR_MAXLEN];
-	LONG	attributeLen = ImmGetCompositionStringW(hImc, GCS_COMPATTR, &attribute, sizeof(attribute)) / sizeof(BYTE);
+	BYTE attribute[IMESTR_MAXLEN];
+	LONG attributeLen = ImmGetCompositionStringW(hImc, GCS_COMPATTR, &attribute, sizeof(attribute)) / sizeof(BYTE);
 
-	int start,end;
-	for(start=0; start<attributeLen; ++start) if(attribute[start]==ATTR_TARGET_CONVERTED || attribute[start]==ATTR_TARGET_NOTCONVERTED) break;
-	for(end=start; end<attributeLen; ++end) if(attribute[end]!=attribute[start]) break;
+	int start, end;
+	for (start = 0; start < attributeLen; ++start)
+		if (attribute[start] == ATTR_TARGET_CONVERTED || attribute[start] == ATTR_TARGET_NOTCONVERTED) break;
+	for (end = start; end < attributeLen; ++end)
+		if (attribute[end] != attribute[start]) break;
 
 	ms_ulbegin = start;
 	ms_ulend = end;
@@ -1066,21 +1093,23 @@ void CIME::AttributeProcess(HIMC hImc)
 void CIME::CandidateProcess(HIMC hImc)
 {
 #ifdef _WIN32
-	std::vector<BYTE>	abyCandidate;
+	std::vector<BYTE> abyCandidate;
 	DWORD dwCandidateLen = ImmGetCandidateListW(hImc, 0, NULL, 0);
 	abyCandidate.resize(dwCandidateLen);
-	if(dwCandidateLen > 0) {
+	if (dwCandidateLen > 0)
+	{
 		ms_bCandidateList = true;
 
 		CANDIDATELIST* lpCandidateList = (CANDIDATELIST*)(&abyCandidate[0]);
 		dwCandidateLen = ImmGetCandidateListW(hImc, 0, lpCandidateList, dwCandidateLen);
 
-		ms_dwCandidateSelection	= lpCandidateList->dwSelection;
-		ms_dwCandidateCount		= lpCandidateList->dwCount;
+		ms_dwCandidateSelection = lpCandidateList->dwSelection;
+		ms_dwCandidateCount = lpCandidateList->dwCount;
 
 		int iStartOfPage = 0;
 
-		if( GETLANG() == LANG_CHS ) {
+		if (GETLANG() == LANG_CHS)
+		{
 			// MSPY (CHS IME) has variable number of candidates in candidate window find where current page starts, and the size of current page
 			const int maxCandChar = 18 * (3 - sizeof(TCHAR));
 			UINT cChars = 0;
@@ -1102,23 +1131,26 @@ void CIME::CandidateProcess(HIMC hImc)
 					cChars += uLen;
 				}
 			}
-			ms_dwCandidatePageSize	= i - iStartOfPage;
-		} else {
-			ms_dwCandidatePageSize	= MIN( lpCandidateList->dwPageSize, MAX_CANDLIST );
+			ms_dwCandidatePageSize = i - iStartOfPage;
+		}
+		else
+		{
+			ms_dwCandidatePageSize = MIN(lpCandidateList->dwPageSize, MAX_CANDLIST);
 			iStartOfPage = ms_bUILessMode ? lpCandidateList->dwPageStart : (ms_dwCandidateSelection / (MAX_CANDLIST - 1)) * (MAX_CANDLIST - 1);
 		}
 
-		ms_dwCandidateSelection = ( GETLANG() == LANG_CHS && !GetImeId() ) ? (DWORD)-1 : ms_dwCandidateSelection - iStartOfPage;
+		ms_dwCandidateSelection = (GETLANG() == LANG_CHS && !GetImeId()) ? (DWORD)-1 : ms_dwCandidateSelection - iStartOfPage;
 
-		//printf( "SEL: %d, START: %d, PAGED: %d\n", ms_dwCandidateSelection, iStartOfPage, ms_dwCandidatePageSize );
-	    memset(&ms_wszCandidate, 0, sizeof(ms_wszCandidate));
-	    for(UINT i = iStartOfPage, j = 0; (DWORD)i < lpCandidateList->dwCount && j < ms_dwCandidatePageSize; i++, j++) {
-			wcscpy( ms_wszCandidate[j], (LPWSTR)( (DWORD_PTR)lpCandidateList + lpCandidateList->dwOffset[i] ) );
-	    }
+		// printf( "SEL: %d, START: %d, PAGED: %d\n", ms_dwCandidateSelection, iStartOfPage, ms_dwCandidatePageSize );
+		memset(&ms_wszCandidate, 0, sizeof(ms_wszCandidate));
+		for (UINT i = iStartOfPage, j = 0; (DWORD)i < lpCandidateList->dwCount && j < ms_dwCandidatePageSize; i++, j++)
+		{
+			wcscpy(ms_wszCandidate[j], (LPWSTR)((DWORD_PTR)lpCandidateList + lpCandidateList->dwOffset[i]));
+		}
 
 		// don't display selection in candidate list in case of Korean and old Chinese IME.
-		if ( GETPRIMLANG() == LANG_KOREAN || GETLANG() == LANG_CHT && !GetImeId() )
-			ms_dwCandidateSelection = (DWORD) -1;
+		if (GETPRIMLANG() == LANG_KOREAN || GETLANG() == LANG_CHT && !GetImeId())
+			ms_dwCandidateSelection = (DWORD)-1;
 	}
 #else
 	(void)hImc;
@@ -1128,37 +1160,41 @@ void CIME::CandidateProcess(HIMC hImc)
 void CIME::ReadingProcess(HIMC hImc)
 {
 #ifdef _WIN32
-    if (!ms_adwId[0])
+	if (!ms_adwId[0])
 	{
 		return;
-    }
+	}
 
-    DWORD dwErr = 0;
+	DWORD dwErr = 0;
 
-    if (_GetReadingString)
+	if (_GetReadingString)
 	{
-        UINT uMaxUiLen;
-        BOOL bVertical;
-        // Obtain the reading string size
-        int wstrLen = _GetReadingString(hImc, 0, NULL, (PINT)&dwErr, &bVertical, &uMaxUiLen);
+		UINT uMaxUiLen;
+		BOOL bVertical;
+		// Obtain the reading string size
+		int wstrLen = _GetReadingString(hImc, 0, NULL, (PINT)&dwErr, &bVertical, &uMaxUiLen);
 
-		if(wstrLen == 0) {
+		if (wstrLen == 0)
+		{
 			ms_wstrReading.resize(0);
-		} else {
-			wchar_t *wstr = (wchar_t*)alloca(sizeof(wchar_t) * wstrLen);
-            _GetReadingString(hImc, wstrLen, wstr, (PINT)&dwErr, &bVertical, &uMaxUiLen);
-			ms_wstrReading.assign(wstr, wstr+wstrLen);
+		}
+		else
+		{
+			wchar_t* wstr = (wchar_t*)alloca(sizeof(wchar_t) * wstrLen);
+			_GetReadingString(hImc, wstrLen, wstr, (PINT)&dwErr, &bVertical, &uMaxUiLen);
+			ms_wstrReading.assign(wstr, wstr + wstrLen);
 		}
 
 		ms_bHorizontalReading = (bVertical == 0);
+	}
+	else
+	{
 
-    } else {
-
-        // IMEs that doesn't implement Reading String API
+		// IMEs that doesn't implement Reading String API
 		wchar_t* temp = NULL;
 		DWORD tempLen = 0;
-	    bool bUnicodeIme = false;
-		INPUTCONTEXT *lpIC = _ImmLockIMC(hImc);
+		bool bUnicodeIme = false;
+		INPUTCONTEXT* lpIC = _ImmLockIMC(hImc);
 
 		if (lpIC == NULL)
 		{
@@ -1168,74 +1204,74 @@ void CIME::ReadingProcess(HIMC hImc)
 		else
 		{
 			LPBYTE p = 0;
-			switch(ms_adwId[0])
+			switch (ms_adwId[0])
 			{
 				case IMEID_CHT_VER42: // New(Phonetic/ChanJie)IME98  : 4.2.x.x // Win98
 				case IMEID_CHT_VER43: // New(Phonetic/ChanJie)IME98a : 4.3.x.x // WinMe, Win2k
 				case IMEID_CHT_VER44: // New ChanJie IME98b          : 4.4.x.x // WinXP
-					p = *(LPBYTE *)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + 24);
+					p = *(LPBYTE*)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + 24);
 					if (!p) break;
-					tempLen = *(DWORD *)(p + 7 * 4 + 32 * 4);
-					dwErr = *(DWORD *)(p + 8 * 4 + 32 * 4);
-					temp = (wchar_t *)(p + 56);
+					tempLen = *(DWORD*)(p + 7 * 4 + 32 * 4);
+					dwErr = *(DWORD*)(p + 8 * 4 + 32 * 4);
+					temp = (wchar_t*)(p + 56);
 					bUnicodeIme = true;
 					break;
 
 				case IMEID_CHT_VER50: // 5.0.x.x // WinME
-					p = *(LPBYTE *)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + 3 * 4);
-					if(!p) break;
-					p = *(LPBYTE *)((LPBYTE)p + 1*4 + 5*4 + 4*2);
-					if(!p) break;
-					tempLen = *(DWORD *)(p + 1*4 + (16*2+2*4) + 5*4 + 16);
-					dwErr = *(DWORD *)(p + 1*4 + (16*2+2*4) + 5*4 + 16 + 1*4);
-					temp = (wchar_t *)(p + 1*4 + (16*2+2*4) + 5*4);
+					p = *(LPBYTE*)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + 3 * 4);
+					if (!p) break;
+					p = *(LPBYTE*)((LPBYTE)p + 1 * 4 + 5 * 4 + 4 * 2);
+					if (!p) break;
+					tempLen = *(DWORD*)(p + 1 * 4 + (16 * 2 + 2 * 4) + 5 * 4 + 16);
+					dwErr = *(DWORD*)(p + 1 * 4 + (16 * 2 + 2 * 4) + 5 * 4 + 16 + 1 * 4);
+					temp = (wchar_t*)(p + 1 * 4 + (16 * 2 + 2 * 4) + 5 * 4);
 					bUnicodeIme = false;
 					break;
 
 				case IMEID_CHT_VER51: // 5.1.x.x // IME2002(w/OfficeXP)
 				case IMEID_CHT_VER52: // 5.2.x.x // (w/whistler)
 				case IMEID_CHS_VER53: // 5.3.x.x // SCIME2k or MSPY3 (w/OfficeXP and Whistler)
-					p = *(LPBYTE *)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + 4);
-					if(!p) break;
-					p = *(LPBYTE *)((LPBYTE)p + 1*4 + 5*4);
-					if(!p) break;
-					tempLen = *(DWORD *)(p + 1*4 + (16*2+2*4) + 5*4 + 16 * 2);
-					dwErr = *(DWORD *)(p + 1*4 + (16*2+2*4) + 5*4 + 16 * 2 + 1*4);
-					temp  = (wchar_t *) (p + 1*4 + (16*2+2*4) + 5*4);
+					p = *(LPBYTE*)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + 4);
+					if (!p) break;
+					p = *(LPBYTE*)((LPBYTE)p + 1 * 4 + 5 * 4);
+					if (!p) break;
+					tempLen = *(DWORD*)(p + 1 * 4 + (16 * 2 + 2 * 4) + 5 * 4 + 16 * 2);
+					dwErr = *(DWORD*)(p + 1 * 4 + (16 * 2 + 2 * 4) + 5 * 4 + 16 * 2 + 1 * 4);
+					temp = (wchar_t*)(p + 1 * 4 + (16 * 2 + 2 * 4) + 5 * 4);
 					bUnicodeIme = true;
 					break;
 
 				// the code tested only with Win 98 SE (MSPY 1.5/ ver 4.1.0.21)
 				case IMEID_CHS_VER41:
-					{
-						int nOffset;
-						nOffset = (ms_adwId[1] >= 0x00000002) ? 8 : 7;
+				{
+					int nOffset;
+					nOffset = (ms_adwId[1] >= 0x00000002) ? 8 : 7;
 
-						p = *(LPBYTE *)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + nOffset * 4);
-						if(!p) break;
-						tempLen = *(DWORD *)(p + 7*4 + 16*2*4);
-						dwErr = *(DWORD *)(p + 8*4 + 16*2*4);
-						dwErr = min(dwErr, tempLen);
-						temp = (wchar_t *)(p + 6*4 + 16*2*1);
-						bUnicodeIme = true;
-					}
-					break;
+					p = *(LPBYTE*)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + nOffset * 4);
+					if (!p) break;
+					tempLen = *(DWORD*)(p + 7 * 4 + 16 * 2 * 4);
+					dwErr = *(DWORD*)(p + 8 * 4 + 16 * 2 * 4);
+					dwErr = min(dwErr, tempLen);
+					temp = (wchar_t*)(p + 6 * 4 + 16 * 2 * 1);
+					bUnicodeIme = true;
+				}
+				break;
 
 				case IMEID_CHS_VER42: // 4.2.x.x // SCIME98 or MSPY2 (w/Office2k, Win2k, WinME, etc)
-					{
-						OSVERSIONINFOA osi;
-						osi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-						GetVersionExA(&osi);
+				{
+					OSVERSIONINFOA osi;
+					osi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+					GetVersionExA(&osi);
 
-						int nTcharSize = (osi.dwPlatformId == VER_PLATFORM_WIN32_NT) ? sizeof(wchar_t) : sizeof(char);
-						p = *(LPBYTE *)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + 1*4 + 1*4 + 6*4);
-						if(!p) break;
-						tempLen = *(DWORD *)(p + 1*4 + (16*2+2*4) + 5*4 + 16 * nTcharSize);
-						dwErr = *(DWORD *)(p + 1*4 + (16*2+2*4) + 5*4 + 16 * nTcharSize + 1*4);
-						temp  = (wchar_t *) (p + 1*4 + (16*2+2*4) + 5*4);
-						bUnicodeIme = (osi.dwPlatformId == VER_PLATFORM_WIN32_NT) ? true : false;
-					}
-					break;
+					int nTcharSize = (osi.dwPlatformId == VER_PLATFORM_WIN32_NT) ? sizeof(wchar_t) : sizeof(char);
+					p = *(LPBYTE*)((LPBYTE)_ImmLockIMCC(lpIC->hPrivate) + 1 * 4 + 1 * 4 + 6 * 4);
+					if (!p) break;
+					tempLen = *(DWORD*)(p + 1 * 4 + (16 * 2 + 2 * 4) + 5 * 4 + 16 * nTcharSize);
+					dwErr = *(DWORD*)(p + 1 * 4 + (16 * 2 + 2 * 4) + 5 * 4 + 16 * nTcharSize + 1 * 4);
+					temp = (wchar_t*)(p + 1 * 4 + (16 * 2 + 2 * 4) + 5 * 4);
+					bUnicodeIme = (osi.dwPlatformId == VER_PLATFORM_WIN32_NT) ? true : false;
+				}
+				break;
 
 				default:
 					temp = NULL;
@@ -1244,16 +1280,22 @@ void CIME::ReadingProcess(HIMC hImc)
 			}
 		}
 
-		if(tempLen == 0) {
+		if (tempLen == 0)
+		{
 			ms_wstrReading.resize(0);
-		} else {
-			if(bUnicodeIme) {
-				ms_wstrReading.assign(temp, temp+tempLen);
-			} else {
-				int wstrLen = MultiByteToWideChar(ms_uInputCodePage, 0, (char*)temp, tempLen, NULL, 0); 
-				wchar_t* wstr = (wchar_t*)alloca(sizeof(wchar_t)*wstrLen);
-				MultiByteToWideChar(ms_uInputCodePage, 0, (char*)temp, tempLen, wstr, wstrLen); 
-				ms_wstrReading.assign(wstr, wstr+wstrLen);
+		}
+		else
+		{
+			if (bUnicodeIme)
+			{
+				ms_wstrReading.assign(temp, temp + tempLen);
+			}
+			else
+			{
+				int wstrLen = MultiByteToWideChar(ms_uInputCodePage, 0, (char*)temp, tempLen, NULL, 0);
+				wchar_t* wstr = (wchar_t*)alloca(sizeof(wchar_t) * wstrLen);
+				MultiByteToWideChar(ms_uInputCodePage, 0, (char*)temp, tempLen, wstr, wstrLen);
+				ms_wstrReading.assign(wstr, wstr + wstrLen);
 			}
 		}
 
@@ -1261,12 +1303,15 @@ void CIME::ReadingProcess(HIMC hImc)
 		_ImmUnlockIMC(hImc);
 
 		ms_bHorizontalReading = GetReadingWindowOrientation();
-    }
-	if (ms_wstrReading.size()) {
+	}
+	if (ms_wstrReading.size())
+	{
 		ms_bReadingInformation = true;
-		if(ms_pEvent)
+		if (ms_pEvent)
 			ms_pEvent->OnOpenReadingWnd();
-	} else {
+	}
+	else
+	{
 		CloseReadingInformation();
 	}
 #else
@@ -1281,7 +1326,7 @@ bool CIME::IsMax(const wchar_t* wInput, int len)
 
 	int textLen = WideCharToMultiByte(ms_uOutputCodePage, 0, m_wText, ms_lastpos, 0, 0, NULL, NULL);
 	int inputLen = WideCharToMultiByte(ms_uOutputCodePage, 0, wInput, len, 0, 0, NULL, NULL);
-	//return textLen + inputLen > m_max;
+	// return textLen + inputLen > m_max;
 
 	if (textLen + inputLen > m_max)
 		return true;
@@ -1296,92 +1341,93 @@ bool CIME::IsMax(const wchar_t* wInput, int len)
 	return false;
 }
 
-DWORD CIME::GetImeId( UINT uIndex )
+DWORD CIME::GetImeId(UINT uIndex)
 {
 #ifdef _WIN32
 	static HKL hklPrev = 0;
-    char szTmp[1024];
+	char szTmp[1024];
 
 	if (uIndex >= COUNTOF(ms_adwId))
 		return 0;
 	HKL hkl = ms_hklCurrent;
-	if(hklPrev == hkl)
+	if (hklPrev == hkl)
 		return ms_adwId[uIndex];
 	hklPrev = hkl;
 
 	DWORD dwLang = (DWORD)((DWORD_PTR)hkl & 0xffff);
 
-	if ( ms_bUILessMode && GETLANG() == LANG_CHT ) {
+	if (ms_bUILessMode && GETLANG() == LANG_CHT)
+	{
 		// In case of Vista, artifitial value is returned so that it's not considered as older IME.
 		ms_adwId[0] = IMEID_CHT_VER_VISTA;
 		ms_adwId[1] = 0;
 		return ms_adwId[0];
 	}
 
-	if (!((ms_hklCurrent == _CHT_HKL_NEW_PHONETIC) || (ms_hklCurrent == _CHT_HKL_NEW_CHANG_JIE) || (ms_hklCurrent == _CHT_HKL_NEW_QUICK) || (ms_hklCurrent == _CHT_HKL_HK_CANTONESE) || (ms_hklCurrent == _CHS_HKL))) {
-		ms_adwId[0] = ms_adwId[1] = 0;
-        return 0;
-	}
-
-	if (!ImmGetIMEFileNameA(ms_hklCurrent, szTmp, (sizeof(szTmp) / sizeof(szTmp[0])) - 1)) {
-		ms_adwId[0] = ms_adwId[1] = 0;
-        return 0;
-	}
-
-    if (!_GetReadingString)
+	if (!((ms_hklCurrent == _CHT_HKL_NEW_PHONETIC) || (ms_hklCurrent == _CHT_HKL_NEW_CHANG_JIE) || (ms_hklCurrent == _CHT_HKL_NEW_QUICK) || (ms_hklCurrent == _CHT_HKL_HK_CANTONESE) || (ms_hklCurrent == _CHS_HKL)))
 	{
-        if ((CompareStringA(LCID_INVARIANT, NORM_IGNORECASE, szTmp, -1, CHT_IMEFILENAME1, -1) != CSTR_EQUAL) &&
-            (CompareStringA(LCID_INVARIANT, NORM_IGNORECASE, szTmp, -1, CHT_IMEFILENAME2, -1) != CSTR_EQUAL) &&
-            (CompareStringA(LCID_INVARIANT, NORM_IGNORECASE, szTmp, -1, CHT_IMEFILENAME3, -1) != CSTR_EQUAL) &&
-            (CompareStringA(LCID_INVARIANT, NORM_IGNORECASE, szTmp, -1, CHS_IMEFILENAME1, -1) != CSTR_EQUAL) &&
-            (CompareStringA(LCID_INVARIANT, NORM_IGNORECASE, szTmp, -1, CHS_IMEFILENAME2, -1) != CSTR_EQUAL))
+		ms_adwId[0] = ms_adwId[1] = 0;
+		return 0;
+	}
+
+	if (!ImmGetIMEFileNameA(ms_hklCurrent, szTmp, (sizeof(szTmp) / sizeof(szTmp[0])) - 1))
+	{
+		ms_adwId[0] = ms_adwId[1] = 0;
+		return 0;
+	}
+
+	if (!_GetReadingString)
+	{
+		if ((CompareStringA(LCID_INVARIANT, NORM_IGNORECASE, szTmp, -1, CHT_IMEFILENAME1, -1) != CSTR_EQUAL) &&
+			(CompareStringA(LCID_INVARIANT, NORM_IGNORECASE, szTmp, -1, CHT_IMEFILENAME2, -1) != CSTR_EQUAL) &&
+			(CompareStringA(LCID_INVARIANT, NORM_IGNORECASE, szTmp, -1, CHT_IMEFILENAME3, -1) != CSTR_EQUAL) &&
+			(CompareStringA(LCID_INVARIANT, NORM_IGNORECASE, szTmp, -1, CHS_IMEFILENAME1, -1) != CSTR_EQUAL) &&
+			(CompareStringA(LCID_INVARIANT, NORM_IGNORECASE, szTmp, -1, CHS_IMEFILENAME2, -1) != CSTR_EQUAL))
 		{
 			ms_adwId[0] = ms_adwId[1] = 0;
-	        return 0;
-        }
-    }
+			return 0;
+		}
+	}
 
-    DWORD   dwVerHandle;
-    DWORD   dwVerSize = GetFileVersionInfoSize(szTmp, &dwVerHandle);
-	LANGID	langId = LOWORD(ms_hklCurrent);
+	DWORD dwVerHandle;
+	DWORD dwVerSize = GetFileVersionInfoSize(szTmp, &dwVerHandle);
+	LANGID langId = LOWORD(ms_hklCurrent);
 
-    if (dwVerSize)
+	if (dwVerSize)
 	{
-        LPVOID lpVerBuffer = alloca(dwVerSize);
+		LPVOID lpVerBuffer = alloca(dwVerSize);
 
-        if (GetFileVersionInfo(szTmp, dwVerHandle, dwVerSize, lpVerBuffer))
+		if (GetFileVersionInfo(szTmp, dwVerHandle, dwVerSize, lpVerBuffer))
 		{
-			LPVOID  lpVerData;
-			UINT    cbVerData;
+			LPVOID lpVerData;
+			UINT cbVerData;
 
-            if(VerQueryValue(lpVerBuffer, "\\", &lpVerData, &cbVerData))
+			if (VerQueryValue(lpVerBuffer, "\\", &lpVerData, &cbVerData))
 			{
-                DWORD dwVer = ((VS_FIXEDFILEINFO*) lpVerData)->dwFileVersionMS;
-                dwVer = (dwVer & 0x00ff0000) << 8 | (dwVer & 0x000000ff) << 16;
+				DWORD dwVer = ((VS_FIXEDFILEINFO*)lpVerData)->dwFileVersionMS;
+				dwVer = (dwVer & 0x00ff0000) << 8 | (dwVer & 0x000000ff) << 16;
 
-                if (_GetReadingString
-                    ||
-                    (langId == LANG_CHT &&
-                        (dwVer == MAKEIMEVERSION(4, 2) || 
-                        dwVer == MAKEIMEVERSION(4, 3) || 
-                        dwVer == MAKEIMEVERSION(4, 4) || 
-                        dwVer == MAKEIMEVERSION(5, 0) ||
-                        dwVer == MAKEIMEVERSION(5, 1) ||
-                        dwVer == MAKEIMEVERSION(5, 2) ||
-                        dwVer == MAKEIMEVERSION(6, 0)))
-                    ||
-                    (langId == LANG_CHS &&
-                        (dwVer == MAKEIMEVERSION(4, 1) ||
-                        dwVer == MAKEIMEVERSION(4, 2) ||
-                        dwVer == MAKEIMEVERSION(5, 3))))
+				if (_GetReadingString ||
+					(langId == LANG_CHT &&
+					 (dwVer == MAKEIMEVERSION(4, 2) ||
+					  dwVer == MAKEIMEVERSION(4, 3) ||
+					  dwVer == MAKEIMEVERSION(4, 4) ||
+					  dwVer == MAKEIMEVERSION(5, 0) ||
+					  dwVer == MAKEIMEVERSION(5, 1) ||
+					  dwVer == MAKEIMEVERSION(5, 2) ||
+					  dwVer == MAKEIMEVERSION(6, 0))) ||
+					(langId == LANG_CHS &&
+					 (dwVer == MAKEIMEVERSION(4, 1) ||
+					  dwVer == MAKEIMEVERSION(4, 2) ||
+					  dwVer == MAKEIMEVERSION(5, 3))))
 				{
-                    ms_adwId[0] = dwVer | langId;
-                    ms_adwId[1] = ((VS_FIXEDFILEINFO*)lpVerData)->dwFileVersionLS;
+					ms_adwId[0] = dwVer | langId;
+					ms_adwId[1] = ((VS_FIXEDFILEINFO*)lpVerData)->dwFileVersionLS;
 					return ms_adwId[uIndex];
-                }
-            }
-        }
-    }
+				}
+			}
+		}
+	}
 	ms_adwId[0] = ms_adwId[1] = 0;
 	return ms_adwId[0];
 #else
@@ -1393,34 +1439,32 @@ DWORD CIME::GetImeId( UINT uIndex )
 bool CIME::GetReadingWindowOrientation()
 {
 #ifdef _WIN32
-    bool bHorizontalReading = (ms_hklCurrent == _CHS_HKL) || (ms_hklCurrent == _CHT_HKL_NEW_CHANG_JIE) || (ms_adwId[0] == 0);
-    if(!bHorizontalReading && (GETLANG() == LANG_CHT))
-    {
-        char szRegPath[MAX_PATH];
-        HKEY hKey;
-        DWORD dwVer = ms_adwId[0] & 0xFFFF0000;
-        strcpy(szRegPath, "software\\microsoft\\windows\\currentversion\\");
-        strcat(szRegPath, (dwVer >= MAKEIMEVERSION(5, 1)) ? "MSTCIPH" : "TINTLGNT");
-        LONG lRc = RegOpenKeyExA(HKEY_CURRENT_USER, szRegPath, 0, KEY_READ, &hKey);
-        if (lRc == ERROR_SUCCESS)
-        {
-            DWORD dwSize = sizeof(DWORD), dwMapping, dwType;
-            lRc = RegQueryValueExA(hKey, "Keyboard Mapping", NULL, &dwType, (PBYTE)&dwMapping, &dwSize);
-            if (lRc == ERROR_SUCCESS)
-            {
-                if ((dwVer <= MAKEIMEVERSION(5, 0) && 
-                       ((BYTE)dwMapping == 0x22 || (BYTE)dwMapping == 0x23))
-                     ||
-                     ((dwVer == MAKEIMEVERSION(5, 1) || dwVer == MAKEIMEVERSION(5, 2)) &&
-                       (BYTE)dwMapping >= 0x22 && (BYTE)dwMapping <= 0x24)
-                  )
-                {
-                    bHorizontalReading = true;
-                }
-            }
-            RegCloseKey(hKey);
-        }
-    }
+	bool bHorizontalReading = (ms_hklCurrent == _CHS_HKL) || (ms_hklCurrent == _CHT_HKL_NEW_CHANG_JIE) || (ms_adwId[0] == 0);
+	if (!bHorizontalReading && (GETLANG() == LANG_CHT))
+	{
+		char szRegPath[MAX_PATH];
+		HKEY hKey;
+		DWORD dwVer = ms_adwId[0] & 0xFFFF0000;
+		strcpy(szRegPath, "software\\microsoft\\windows\\currentversion\\");
+		strcat(szRegPath, (dwVer >= MAKEIMEVERSION(5, 1)) ? "MSTCIPH" : "TINTLGNT");
+		LONG lRc = RegOpenKeyExA(HKEY_CURRENT_USER, szRegPath, 0, KEY_READ, &hKey);
+		if (lRc == ERROR_SUCCESS)
+		{
+			DWORD dwSize = sizeof(DWORD), dwMapping, dwType;
+			lRc = RegQueryValueExA(hKey, "Keyboard Mapping", NULL, &dwType, (PBYTE)&dwMapping, &dwSize);
+			if (lRc == ERROR_SUCCESS)
+			{
+				if ((dwVer <= MAKEIMEVERSION(5, 0) &&
+					 ((BYTE)dwMapping == 0x22 || (BYTE)dwMapping == 0x23)) ||
+					((dwVer == MAKEIMEVERSION(5, 1) || dwVer == MAKEIMEVERSION(5, 2)) &&
+					 (BYTE)dwMapping >= 0x22 && (BYTE)dwMapping <= 0x24))
+				{
+					bHorizontalReading = true;
+				}
+			}
+			RegCloseKey(hKey);
+		}
+	}
 
 	return bHorizontalReading;
 #else
@@ -1431,28 +1475,31 @@ bool CIME::GetReadingWindowOrientation()
 void CIME::SetupImeApi()
 {
 #ifdef _WIN32
-    char szImeFile[MAX_PATH + 1];
+	char szImeFile[MAX_PATH + 1];
 
 	_GetReadingString = NULL;
-    _ShowReadingWindow = NULL;
+	_ShowReadingWindow = NULL;
 	ms_bUseIMMCandidate = false;
 
-	if(ImmGetIMEFileNameA(ms_hklCurrent, szImeFile, COUNTOF(szImeFile) - 1) == 0)
+	if (ImmGetIMEFileNameA(ms_hklCurrent, szImeFile, COUNTOF(szImeFile) - 1) == 0)
 		return;
-	if(stricmp(szImeFile, CHS_IMEFILENAME_QQPINYIN) == 0 || stricmp(szImeFile, CHS_IMEFILENAME_SOGOUPY) == 0 || stricmp(szImeFile, CHS_IMEFILENAME_GOOGLEPINYIN2) == 0)
+	if (stricmp(szImeFile, CHS_IMEFILENAME_QQPINYIN) == 0 || stricmp(szImeFile, CHS_IMEFILENAME_SOGOUPY) == 0 || stricmp(szImeFile, CHS_IMEFILENAME_GOOGLEPINYIN2) == 0)
 		ms_bUseIMMCandidate = true;
 	if (ms_bUILessMode)
 		return;
 	SAFE_FREE_LIBRARY(ms_hCurrentImeDll);
 	ms_hCurrentImeDll = LoadLibraryA(szImeFile);
 
-	if (ms_hCurrentImeDll) {
-		_GetReadingString = (UINT (WINAPI*)(HIMC, UINT, LPWSTR, PINT, BOOL*, PUINT)) (GetProcAddress(ms_hCurrentImeDll, "GetReadingString"));
-		_ShowReadingWindow =(BOOL (WINAPI*)(HIMC, BOOL)) (GetProcAddress(ms_hCurrentImeDll, "ShowReadingWindow"));
+	if (ms_hCurrentImeDll)
+	{
+		_GetReadingString = (UINT(WINAPI*)(HIMC, UINT, LPWSTR, PINT, BOOL*, PUINT))(GetProcAddress(ms_hCurrentImeDll, "GetReadingString"));
+		_ShowReadingWindow = (BOOL(WINAPI*)(HIMC, BOOL))(GetProcAddress(ms_hCurrentImeDll, "ShowReadingWindow"));
 
-		if(_ShowReadingWindow) {
+		if (_ShowReadingWindow)
+		{
 			HIMC hImc = ImmGetContext(ms_hWnd);
-			if(hImc) {
+			if (hImc)
+			{
 				_ShowReadingWindow(hImc, false);
 				ImmReleaseContext(ms_hWnd, hImc);
 			}
@@ -1462,23 +1509,23 @@ void CIME::SetupImeApi()
 }
 
 #ifdef _WIN32
-static unsigned long _strtoul( LPCSTR psz, LPTSTR*, int )
+static unsigned long _strtoul(LPCSTR psz, LPTSTR*, int)
 {
-	if ( !psz )
+	if (!psz)
 		return 0;
 
 	ULONG ulRet = 0;
-	if ( psz[0] == '0' && ( psz[1] == 'x' || psz[1] == 'X' ) )
+	if (psz[0] == '0' && (psz[1] == 'x' || psz[1] == 'X'))
 	{
 		psz += 2;
 		ULONG ul = 0;
-		while ( *psz )
+		while (*psz)
 		{
-			if ( '0' <= *psz && *psz <= '9' )
+			if ('0' <= *psz && *psz <= '9')
 				ul = *psz - '0';
-			else if ( 'A' <= *psz && *psz <= 'F' )
+			else if ('A' <= *psz && *psz <= 'F')
 				ul = *psz - 'A' + 10;
-			else if ( 'a' <= *psz && *psz <= 'f' )
+			else if ('a' <= *psz && *psz <= 'f')
 				ul = *psz - 'a' + 10;
 			else
 				break;
@@ -1486,10 +1533,11 @@ static unsigned long _strtoul( LPCSTR psz, LPTSTR*, int )
 			psz++;
 		}
 	}
-	else {
-		while ( *psz && ( '0' <= *psz && *psz <= '9' ) )
+	else
+	{
+		while (*psz && ('0' <= *psz && *psz <= '9'))
 		{
-			ulRet = ulRet * 10 + ( *psz - '0' );
+			ulRet = ulRet * 10 + (*psz - '0');
 			psz++;
 		}
 	}
@@ -1501,23 +1549,24 @@ void CIME::CheckInputLocale()
 {
 #ifdef _WIN32
 	static UINT s_uPrevCodePage = 0xFFFF;
-	static HKL	s_hklPrev = NULL;
+	static HKL s_hklPrev = NULL;
 
-	ms_hklCurrent = GetKeyboardLayout( 0 );
-	if ( s_hklPrev == ms_hklCurrent )
+	ms_hklCurrent = GetKeyboardLayout(0);
+	if (s_hklPrev == ms_hklCurrent)
 		return;
 	s_hklPrev = ms_hklCurrent;
 
 	char szCodePage[8];
-	int iRc = GetLocaleInfoA( MAKELCID( GETLANG(), SORT_DEFAULT ), LOCALE_IDEFAULTANSICODEPAGE, szCodePage, COUNTOF( szCodePage ) ); iRc;
-	ms_uInputCodePage = _strtoul( szCodePage, NULL, 0 );
-	if ( s_uPrevCodePage == ms_uInputCodePage )
+	int iRc = GetLocaleInfoA(MAKELCID(GETLANG(), SORT_DEFAULT), LOCALE_IDEFAULTANSICODEPAGE, szCodePage, COUNTOF(szCodePage));
+	iRc;
+	ms_uInputCodePage = _strtoul(szCodePage, NULL, 0);
+	if (s_uPrevCodePage == ms_uInputCodePage)
 		return;
 	s_uPrevCodePage = ms_uInputCodePage;
 
 	GetKeyboardLayoutName(ms_szKeyboardLayout);
 
-    switch (GETPRIMLANG()) 
+	switch (GETPRIMLANG())
 	{
 		case LANG_KOREAN:
 			ms_bVerticalCandidate = false;
@@ -1532,11 +1581,11 @@ void CIME::CheckInputLocale()
 		case LANG_CHINESE:
 			ms_bVerticalCandidate = true;
 
-			switch(GETSUBLANG()) 
+			switch (GETSUBLANG())
 			{
 				case SUBLANG_CHINESE_SIMPLIFIED:
 				case SUBLANG_CHINESE_SINGAPORE:
-					//ms_bVerticalCandidate = (GetImeId() == 0);
+					// ms_bVerticalCandidate = (GetImeId() == 0);
 					ms_bVerticalCandidate = false;
 					ms_wszCurrentIndicator = s_aszIndicator[INDICATOR_CHS];
 					break;
@@ -1547,7 +1596,7 @@ void CIME::CheckInputLocale()
 					ms_wszCurrentIndicator = s_aszIndicator[INDICATOR_CHT];
 					break;
 
-				default:	// unsupported sub-language
+				default: // unsupported sub-language
 					ms_wszCurrentIndicator = s_aszIndicator[INDICATOR_NON_IME];
 					break;
 			}
@@ -1556,19 +1605,20 @@ void CIME::CheckInputLocale()
 		default:
 			ms_wszCurrentIndicator = s_aszIndicator[INDICATOR_NON_IME];
 			break;
-    }
+	}
 
-    if (ms_wszCurrentIndicator == s_aszIndicator[INDICATOR_NON_IME])
-    {
-        char szLang[10];
-        GetLocaleInfoA(MAKELCID(GETLANG(), SORT_DEFAULT), LOCALE_SABBREVLANGNAME, szLang, sizeof(szLang));
-        ms_wszCurrentIndicator[0] = szLang[0];
-        ms_wszCurrentIndicator[1] = towlower(szLang[1]);
-    }
+	if (ms_wszCurrentIndicator == s_aszIndicator[INDICATOR_NON_IME])
+	{
+		char szLang[10];
+		GetLocaleInfoA(MAKELCID(GETLANG(), SORT_DEFAULT), LOCALE_SABBREVLANGNAME, szLang, sizeof(szLang));
+		ms_wszCurrentIndicator[0] = szLang[0];
+		ms_wszCurrentIndicator[1] = towlower(szLang[1]);
+	}
 
 	// 아랍어에서 영어로 변경시 코드 페이지를 바꾸지 않는다
 	// 내용도 지우지 않는다.
-	if(ms_uOutputCodePage != 1256) {
+	if (ms_uOutputCodePage != 1256)
+	{
 		ms_uOutputCodePage = ms_uInputCodePage;
 		Clear();
 	}
@@ -1583,26 +1633,27 @@ void CIME::CheckToggleState()
 
 #ifdef _WIN32
 	// In Vista, we have to use TSF since few IMM functions don't work as expected.
-	// WARNING: Because of timing, g_dwState and g_bChineseIME may not be updated 
+	// WARNING: Because of timing, g_dwState and g_bChineseIME may not be updated
 	// immediately after the change on IME states by user.
-	if ( ms_bUILessMode )
+	if (ms_bUILessMode)
 		return;
 
-	/* Check Toggle State */ 
-	bool bIme = ImmIsIME( ms_hklCurrent ) != 0
-		&& ( ( 0xF0000000 & (DWORD)(DWORD_PTR)ms_hklCurrent ) == 0xE0000000 ); // Hack to detect IME correctly. When IME is running as TIP, ImmIsIME() returns true for CHT US keyboard.
-	ms_bChineseIME = ( GETPRIMLANG() == LANG_CHINESE ) && bIme;
+	/* Check Toggle State */
+	bool bIme = ImmIsIME(ms_hklCurrent) != 0 && ((0xF0000000 & (DWORD)(DWORD_PTR)ms_hklCurrent) == 0xE0000000); // Hack to detect IME correctly. When IME is running as TIP, ImmIsIME() returns true for CHT US keyboard.
+	ms_bChineseIME = (GETPRIMLANG() == LANG_CHINESE) && bIme;
 
 	HIMC himc;
-	if (NULL != (himc = ImmGetContext(ms_hWnd))) {
-		if (ms_bChineseIME) {
+	if (NULL != (himc = ImmGetContext(ms_hWnd)))
+	{
+		if (ms_bChineseIME)
+		{
 			DWORD dwConvMode, dwSentMode;
 			ImmGetConversionStatus(himc, &dwConvMode, &dwSentMode);
-			ms_dwImeState = ( dwConvMode & IME_CMODE_NATIVE ) ? IMEUI_STATE_ON : IMEUI_STATE_ENGLISH;
+			ms_dwImeState = (dwConvMode & IME_CMODE_NATIVE) ? IMEUI_STATE_ON : IMEUI_STATE_ENGLISH;
 		}
 		else
 		{
-			ms_dwImeState = ( bIme && ImmGetOpenStatus( himc ) != 0 ) ? IMEUI_STATE_ON : IMEUI_STATE_OFF;
+			ms_dwImeState = (bIme && ImmGetOpenStatus(himc) != 0) ? IMEUI_STATE_ON : IMEUI_STATE_OFF;
 		}
 		ImmReleaseContext(ms_hWnd, himc);
 	}
@@ -1629,31 +1680,31 @@ BOOL CTsfUiLessMode::SetupSinks()
 {
 	// ITfThreadMgrEx is available on Vista or later.
 	HRESULT hr;
-    hr = CoCreateInstance(CLSID_TF_ThreadMgr, 
-                          NULL, 
-                          CLSCTX_INPROC_SERVER, 
-                          __uuidof(ITfThreadMgrEx), 
-                          (void**)&m_tm);
+	hr = CoCreateInstance(CLSID_TF_ThreadMgr,
+						  NULL,
+						  CLSCTX_INPROC_SERVER,
+						  __uuidof(ITfThreadMgrEx),
+						  (void**)&m_tm);
 
-    if (hr != S_OK)
-    {
-        return FALSE;
-    }
+	if (hr != S_OK)
+	{
+		return FALSE;
+	}
 
-    // ready to start interacting
-	TfClientId cid;	// not used
-    if (FAILED(m_tm->ActivateEx(&cid, TF_TMAE_UIELEMENTENABLEDONLY)))
-    {
-        return FALSE;
-    }
+	// ready to start interacting
+	TfClientId cid; // not used
+	if (FAILED(m_tm->ActivateEx(&cid, TF_TMAE_UIELEMENTENABLEDONLY)))
+	{
+		return FALSE;
+	}
 
 	// Setup sinks
 	BOOL bRc = FALSE;
-    m_TsfSink = new CUIElementSink();
+	m_TsfSink = new CUIElementSink();
 	if (m_TsfSink)
 	{
-		ITfSource *srcTm;
-		if (SUCCEEDED(hr = m_tm->QueryInterface(__uuidof(ITfSource), (void **)&srcTm)))
+		ITfSource* srcTm;
+		if (SUCCEEDED(hr = m_tm->QueryInterface(__uuidof(ITfSource), (void**)&srcTm)))
 		{
 			// Sink for reading window change
 			if (SUCCEEDED(hr = srcTm->AdviseSink(__uuidof(ITfUIElementSink), (ITfUIElementSink*)m_TsfSink, &m_dwUIElementSinkCookie)))
@@ -1661,7 +1712,7 @@ BOOL CTsfUiLessMode::SetupSinks()
 				// Sink for input locale change
 				if (SUCCEEDED(hr = srcTm->AdviseSink(__uuidof(ITfInputProcessorProfileActivationSink), (ITfInputProcessorProfileActivationSink*)m_TsfSink, &m_dwAlpnSinkCookie)))
 				{
-					if (SetupCompartmentSinks())	// Setup compartment sinks for the first time
+					if (SetupCompartmentSinks()) // Setup compartment sinks for the first time
 					{
 						bRc = TRUE;
 					}
@@ -1676,46 +1727,45 @@ BOOL CTsfUiLessMode::SetupSinks()
 void CTsfUiLessMode::ReleaseSinks()
 {
 	HRESULT hr;
-	ITfSource *source;
+	ITfSource* source;
 
 	// Remove all sinks
-	if ( m_tm && SUCCEEDED(m_tm->QueryInterface(__uuidof(ITfSource), (void **)&source)))
+	if (m_tm && SUCCEEDED(m_tm->QueryInterface(__uuidof(ITfSource), (void**)&source)))
 	{
-        hr = source->UnadviseSink(m_dwUIElementSinkCookie);
+		hr = source->UnadviseSink(m_dwUIElementSinkCookie);
 		hr = source->UnadviseSink(m_dwAlpnSinkCookie);
-        source->Release();
-		SetupCompartmentSinks(TRUE);	// Remove all compartment sinks
+		source->Release();
+		SetupCompartmentSinks(TRUE); // Remove all compartment sinks
 		m_tm->Deactivate();
 		SAFE_RELEASE(m_tm);
 		SAFE_RELEASE(m_TsfSink);
-	}	
+	}
 }
 
 CTsfUiLessMode::CUIElementSink::CUIElementSink()
 {
-    _cRef = 1;
+	_cRef = 1;
 }
-
 
 CTsfUiLessMode::CUIElementSink::~CUIElementSink()
 {
 }
 
-STDAPI CTsfUiLessMode::CUIElementSink::QueryInterface(REFIID riid, void **ppvObj)
+STDAPI CTsfUiLessMode::CUIElementSink::QueryInterface(REFIID riid, void** ppvObj)
 {
-    if (ppvObj == NULL)
-        return E_INVALIDARG;
+	if (ppvObj == NULL)
+		return E_INVALIDARG;
 
-    *ppvObj = NULL;
+	*ppvObj = NULL;
 
-    if (IsEqualIID(riid, IID_IUnknown))
+	if (IsEqualIID(riid, IID_IUnknown))
 	{
-        *ppvObj = reinterpret_cast<IUnknown *>(this);
+		*ppvObj = reinterpret_cast<IUnknown*>(this);
 	}
 	else if (IsEqualIID(riid, __uuidof(ITfUIElementSink)))
-    {
-        *ppvObj = (ITfUIElementSink *)this;
-    }
+	{
+		*ppvObj = (ITfUIElementSink*)this;
+	}
 	else if (IsEqualIID(riid, __uuidof(ITfInputProcessorProfileActivationSink)))
 	{
 		*ppvObj = (ITfInputProcessorProfileActivationSink*)this;
@@ -1725,123 +1775,125 @@ STDAPI CTsfUiLessMode::CUIElementSink::QueryInterface(REFIID riid, void **ppvObj
 		*ppvObj = (ITfCompartmentEventSink*)this;
 	}
 
-    if (*ppvObj)
-    {
-        AddRef();
-        return S_OK;
-    }
+	if (*ppvObj)
+	{
+		AddRef();
+		return S_OK;
+	}
 
-    return E_NOINTERFACE;
+	return E_NOINTERFACE;
 }
 
-STDAPI_(ULONG) CTsfUiLessMode::CUIElementSink::AddRef()
+STDAPI_(ULONG)
+CTsfUiLessMode::CUIElementSink::AddRef()
 {
-    return ++_cRef;
+	return ++_cRef;
 }
 
-STDAPI_(ULONG) CTsfUiLessMode::CUIElementSink::Release()
+STDAPI_(ULONG)
+CTsfUiLessMode::CUIElementSink::Release()
 {
-    LONG cr = --_cRef;
+	LONG cr = --_cRef;
 
-    if (_cRef == 0)
-    {
-        delete this;
-    }
+	if (_cRef == 0)
+	{
+		delete this;
+	}
 
-    return cr;
+	return cr;
 }
 
-STDAPI CTsfUiLessMode::CUIElementSink::BeginUIElement(DWORD dwUIElementId, BOOL *pbShow)
+STDAPI CTsfUiLessMode::CUIElementSink::BeginUIElement(DWORD dwUIElementId, BOOL* pbShow)
 {
-    ITfUIElement *pElement = GetUIElement(dwUIElementId);
-    if (!pElement)
-        return E_INVALIDARG;
+	ITfUIElement* pElement = GetUIElement(dwUIElementId);
+	if (!pElement)
+		return E_INVALIDARG;
 
-    ITfReadingInformationUIElement   *preading = NULL;
-	ITfCandidateListUIElement		*pcandidate = NULL;
+	ITfReadingInformationUIElement* preading = NULL;
+	ITfCandidateListUIElement* pcandidate = NULL;
 	*pbShow = FALSE;
 
-	//BSTR bstrDesc;
-	//OutputDebugStringW(L"BEGINUI: ");
-	//pElement->GetDescription(&bstrDesc);
-	//OutputDebugStringW(bstrDesc);
-	//OutputDebugStringW(L"\n");
+	// BSTR bstrDesc;
+	// OutputDebugStringW(L"BEGINUI: ");
+	// pElement->GetDescription(&bstrDesc);
+	// OutputDebugStringW(bstrDesc);
+	// OutputDebugStringW(L"\n");
 
-	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfReadingInformationUIElement), (void **)&preading)))
-    {
+	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfReadingInformationUIElement), (void**)&preading)))
+	{
 		MakeReadingInformationString(preading);
-		if(CIME::ms_pEvent)
+		if (CIME::ms_pEvent)
 			CIME::ms_pEvent->OnOpenReadingWnd();
-        preading->Release();
-    }
-	else if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfCandidateListUIElement), (void **)&pcandidate)))
+		preading->Release();
+	}
+	else if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfCandidateListUIElement), (void**)&pcandidate)))
 	{
 		m_nCandidateRefCount++;
 		MakeCandidateStrings(pcandidate);
-		if(CIME::ms_pEvent)
+		if (CIME::ms_pEvent)
 			CIME::ms_pEvent->OnOpenCandidateList();
 		pcandidate->Release();
-    }
+	}
 
-    pElement->Release();
-    return S_OK;
+	pElement->Release();
+	return S_OK;
 }
 
 STDAPI CTsfUiLessMode::CUIElementSink::UpdateUIElement(DWORD dwUIElementId)
 {
-    ITfUIElement *pElement = GetUIElement(dwUIElementId);
-    if (!pElement)
-        return E_INVALIDARG;
+	ITfUIElement* pElement = GetUIElement(dwUIElementId);
+	if (!pElement)
+		return E_INVALIDARG;
 
-    ITfReadingInformationUIElement   *preading = NULL;
-    ITfCandidateListUIElement		*pcandidate = NULL;
+	ITfReadingInformationUIElement* preading = NULL;
+	ITfCandidateListUIElement* pcandidate = NULL;
 
-	//BSTR bstrDesc;
-	//pElement->GetDescription(&bstrDesc);
-	//OutputDebugStringW(L"UPDATEUI: ");
-	//OutputDebugStringW(bstrDesc);
-	//OutputDebugStringW(L"\n");
+	// BSTR bstrDesc;
+	// pElement->GetDescription(&bstrDesc);
+	// OutputDebugStringW(L"UPDATEUI: ");
+	// OutputDebugStringW(bstrDesc);
+	// OutputDebugStringW(L"\n");
 
-	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfReadingInformationUIElement), (void **)&preading)))
-    {
+	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfReadingInformationUIElement), (void**)&preading)))
+	{
 		MakeReadingInformationString(preading);
-		if(CIME::ms_pEvent)
+		if (CIME::ms_pEvent)
 			CIME::ms_pEvent->OnOpenReadingWnd();
-        preading->Release();
-    }
-	else if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfCandidateListUIElement), (void **)&pcandidate)))
+		preading->Release();
+	}
+	else if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfCandidateListUIElement), (void**)&pcandidate)))
 	{
 		MakeCandidateStrings(pcandidate);
-		if(CIME::ms_pEvent)
+		if (CIME::ms_pEvent)
 			CIME::ms_pEvent->OnOpenCandidateList();
 		pcandidate->Release();
-    }
+	}
 
-    pElement->Release();
-    return S_OK;
+	pElement->Release();
+	return S_OK;
 }
 
 STDAPI CTsfUiLessMode::CUIElementSink::EndUIElement(DWORD dwUIElementId)
 {
-    ITfUIElement *pElement = GetUIElement(dwUIElementId);
-    if (!pElement)
-        return E_INVALIDARG;
+	ITfUIElement* pElement = GetUIElement(dwUIElementId);
+	if (!pElement)
+		return E_INVALIDARG;
 
-	//BSTR bstrDesc;
-	//OutputDebugStringW(L"ENDUI: ");
-	//pElement->GetDescription(&bstrDesc);
-	//OutputDebugStringW(bstrDesc);
-	//OutputDebugStringW(L"\n");
+	// BSTR bstrDesc;
+	// OutputDebugStringW(L"ENDUI: ");
+	// pElement->GetDescription(&bstrDesc);
+	// OutputDebugStringW(bstrDesc);
+	// OutputDebugStringW(L"\n");
 
-	ITfReadingInformationUIElement   *preading = NULL;
-	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfReadingInformationUIElement), (void **)&preading)))
-    {
+	ITfReadingInformationUIElement* preading = NULL;
+	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfReadingInformationUIElement), (void**)&preading)))
+	{
 		CIME::CloseReadingInformation();
-        preading->Release();
-    }
+		preading->Release();
+	}
 
-	ITfCandidateListUIElement   *pcandidate = NULL;
-	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfCandidateListUIElement), (void **)&pcandidate)))
+	ITfCandidateListUIElement* pcandidate = NULL;
+	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfCandidateListUIElement), (void**)&pcandidate)))
 	{
 		m_nCandidateRefCount--;
 		if (m_nCandidateRefCount == 0)
@@ -1849,8 +1901,8 @@ STDAPI CTsfUiLessMode::CUIElementSink::EndUIElement(DWORD dwUIElementId)
 		pcandidate->Release();
 	}
 
-    pElement->Release();
-    return S_OK;
+	pElement->Release();
+	return S_OK;
 }
 
 void CTsfUiLessMode::UpdateImeState(BOOL bResetCompartmentEventSink)
@@ -1858,15 +1910,15 @@ void CTsfUiLessMode::UpdateImeState(BOOL bResetCompartmentEventSink)
 	ITfCompartmentMgr* pcm;
 	ITfCompartment* pTfOpenMode = NULL;
 	ITfCompartment* pTfConvMode = NULL;
-	if ( GetCompartments( &pcm, &pTfOpenMode, &pTfConvMode ) )
+	if (GetCompartments(&pcm, &pTfOpenMode, &pTfConvMode))
 	{
 		VARIANT valOpenMode;
 		VARIANT valConvMode;
-		pTfOpenMode->GetValue( &valOpenMode );
-		pTfConvMode->GetValue( &valConvMode );
-		if ( valOpenMode.vt == VT_I4 )
+		pTfOpenMode->GetValue(&valOpenMode);
+		pTfConvMode->GetValue(&valConvMode);
+		if (valOpenMode.vt == VT_I4)
 		{
-			if ( CIME::ms_bChineseIME )
+			if (CIME::ms_bChineseIME)
 			{
 				CIME::ms_dwImeState = valOpenMode.lVal != 0 && valConvMode.lVal != 0 ? IMEUI_STATE_ON : IMEUI_STATE_ENGLISH;
 			}
@@ -1875,12 +1927,12 @@ void CTsfUiLessMode::UpdateImeState(BOOL bResetCompartmentEventSink)
 				CIME::ms_dwImeState = valOpenMode.lVal != 0 ? IMEUI_STATE_ON : IMEUI_STATE_OFF;
 			}
 		}
-		VariantClear( &valOpenMode );
-		VariantClear( &valConvMode );
+		VariantClear(&valOpenMode);
+		VariantClear(&valConvMode);
 
-		if ( bResetCompartmentEventSink )
+		if (bResetCompartmentEventSink)
 		{
-			SetupCompartmentSinks( FALSE, pTfOpenMode, pTfConvMode );	// Reset compartment sinks
+			SetupCompartmentSinks(FALSE, pTfOpenMode, pTfConvMode); // Reset compartment sinks
 		}
 		pTfOpenMode->Release();
 		pTfConvMode->Release();
@@ -1889,14 +1941,14 @@ void CTsfUiLessMode::UpdateImeState(BOOL bResetCompartmentEventSink)
 }
 
 STDAPI CTsfUiLessMode::CUIElementSink::OnActivated(DWORD dwProfileType, LANGID langid, REFCLSID clsid, REFGUID catid,
-		REFGUID guidProfile, HKL hkl, DWORD dwFlags)
+												   REFGUID guidProfile, HKL hkl, DWORD dwFlags)
 {
-	static GUID TF_PROFILE_DAYI = { 0x037B2C25, 0x480C, 0x4D7F, 0xB0, 0x27, 0xD6, 0xCA, 0x6B, 0x69, 0x78, 0x8A };
-	CIME::ms_iCandListIndexBase = IsEqualGUID( TF_PROFILE_DAYI, guidProfile ) ? 0 : 1;   
-	if ( IsEqualIID( catid, GUID_TFCAT_TIP_KEYBOARD ) && ( dwFlags & TF_IPSINK_FLAG_ACTIVE ) )
+	static GUID TF_PROFILE_DAYI = {0x037B2C25, 0x480C, 0x4D7F, 0xB0, 0x27, 0xD6, 0xCA, 0x6B, 0x69, 0x78, 0x8A};
+	CIME::ms_iCandListIndexBase = IsEqualGUID(TF_PROFILE_DAYI, guidProfile) ? 0 : 1;
+	if (IsEqualIID(catid, GUID_TFCAT_TIP_KEYBOARD) && (dwFlags & TF_IPSINK_FLAG_ACTIVE))
 	{
-		CIME::ms_bChineseIME = ( dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ) && langid == LANG_CHT;
-		if ( dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR )
+		CIME::ms_bChineseIME = (dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR) && langid == LANG_CHT;
+		if (dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR)
 		{
 			UpdateImeState(TRUE);
 		}
@@ -1904,13 +1956,13 @@ STDAPI CTsfUiLessMode::CUIElementSink::OnActivated(DWORD dwProfileType, LANGID l
 			CIME::ms_dwImeState = IMEUI_STATE_OFF;
 		CIME::ChangeInputLanguage();
 	}
-    return S_OK;
+	return S_OK;
 }
 
 STDAPI CTsfUiLessMode::CUIElementSink::OnChange(REFGUID rguid)
 {
 	UpdateImeState();
-    return S_OK;
+	return S_OK;
 }
 
 void CTsfUiLessMode::MakeReadingInformationString(ITfReadingInformationUIElement* preading)
@@ -1923,7 +1975,7 @@ void CTsfUiLessMode::MakeReadingInformationString(ITfReadingInformationUIElement
 	CIME::ms_wstrReading.resize(0);
 	preading->GetUpdatedFlags(&dwFlags);
 	preading->GetMaxReadingStringLength(&cchMax);
-	preading->GetErrorIndex(&uErrorIndex);	// errorIndex is zero-based
+	preading->GetErrorIndex(&uErrorIndex); // errorIndex is zero-based
 	preading->IsVerticalOrderPreferred(&fVertical);
 	CIME::ms_iReadingError = (int)uErrorIndex;
 	CIME::ms_bHorizontalReading = !fVertical;
@@ -1933,33 +1985,33 @@ void CTsfUiLessMode::MakeReadingInformationString(ITfReadingInformationUIElement
 	{
 		if (bstr)
 		{
-			CIME::ms_wstrReading.assign( (wchar_t *) bstr, (wchar_t *) bstr+lstrlenW(bstr) );
+			CIME::ms_wstrReading.assign((wchar_t*)bstr, (wchar_t*)bstr + lstrlenW(bstr));
 			LPCWSTR pszSource = &(CIME::ms_wstrReading[0]);
-			if ( fVertical )
+			if (fVertical)
 			{
 				CIME::ms_dwCandidatePageSize = CIME::MAX_CANDLIST;
 				// ms_iReadingError is used only in horizontal window, and has to be -1 if there's no error.
 				CIME::ms_dwCandidateSelection = CIME::ms_iReadingError ? CIME::ms_iReadingError - 1 : (DWORD)-1;
 				CIME::ms_dwCandidateCount = cchMax;
 				// for vertical reading window, copy each character to g_szCandidate array.
-				for ( UINT i = 0; i < cchMax; i++ )
+				for (UINT i = 0; i < cchMax; i++)
 				{
 					LPWSTR pszDest = CIME::ms_wszCandidate[i];
-					if ( *pszSource )
+					if (*pszSource)
 					{
 						LPWSTR pszNextSrc = CharNextW(pszSource);
 						SIZE_T size = (LPSTR)pszNextSrc - (LPSTR)pszSource;
-						CopyMemory( pszDest, pszSource, size );
+						CopyMemory(pszDest, pszSource, size);
 						pszSource = pszNextSrc;
 						pszDest += size;
 					}
 					*pszDest = 0;
 				}
 			}
-			//else
+			// else
 			//{
 			//	CIME::ms_wszCandidate[0][0] = L' ';	// hack to make rendering happen
-			//}
+			// }
 			SysFreeString(bstr);
 		}
 	}
@@ -1970,7 +2022,7 @@ void CTsfUiLessMode::MakeCandidateStrings(ITfCandidateListUIElement* pcandidate)
 	UINT uIndex = 0;
 	UINT uCount = 0;
 	UINT uCurrentPage = 0;
-	UINT *IndexList = NULL;
+	UINT* IndexList = NULL;
 	UINT uPageCnt = 0;
 	DWORD dwPageStart = 0;
 	DWORD dwPageSize = 0;
@@ -1984,16 +2036,14 @@ void CTsfUiLessMode::MakeCandidateStrings(ITfCandidateListUIElement* pcandidate)
 	CIME::ms_bCandidateList = true;
 
 	pcandidate->GetPageIndex(NULL, 0, &uPageCnt);
-	if(uPageCnt > 0)
+	if (uPageCnt > 0)
 	{
-		IndexList = (UINT *) malloc(sizeof(UINT)*uPageCnt);
-		if(IndexList)
+		IndexList = (UINT*)malloc(sizeof(UINT) * uPageCnt);
+		if (IndexList)
 		{
 			pcandidate->GetPageIndex(IndexList, uPageCnt, &uPageCnt);
 			dwPageStart = IndexList[uCurrentPage];
-			dwPageSize = (uCurrentPage < uPageCnt-1) ? 
-				min(uCount, IndexList[uCurrentPage+1]) - dwPageStart:
-				uCount - dwPageStart;
+			dwPageSize = (uCurrentPage < uPageCnt - 1) ? min(uCount, IndexList[uCurrentPage + 1]) - dwPageStart : uCount - dwPageStart;
 		}
 	}
 
@@ -2003,23 +2053,23 @@ void CTsfUiLessMode::MakeCandidateStrings(ITfCandidateListUIElement* pcandidate)
 	memset(&CIME::ms_wszCandidate, 0, sizeof(CIME::ms_wszCandidate));
 	for (UINT i = dwPageStart, j = 0; (DWORD)i < CIME::ms_dwCandidateCount && j < CIME::ms_dwCandidatePageSize; i++, j++)
 	{
-		if (SUCCEEDED(pcandidate->GetString( i, &bstr )))
+		if (SUCCEEDED(pcandidate->GetString(i, &bstr)))
 		{
-			if(bstr)
+			if (bstr)
 			{
-				wcscpy( CIME::ms_wszCandidate[j], bstr );
+				wcscpy(CIME::ms_wszCandidate[j], bstr);
 				SysFreeString(bstr);
 			}
 		}
 	}
-	//OutputDebugStringW( L"\n" );
+	// OutputDebugStringW( L"\n" );
 
 	if (GETPRIMLANG() == LANG_KOREAN)
 	{
 		CIME::ms_dwCandidateSelection = (DWORD)-1;
 	}
 
-	if(IndexList)
+	if (IndexList)
 	{
 		free(IndexList);
 	}
@@ -2027,16 +2077,16 @@ void CTsfUiLessMode::MakeCandidateStrings(ITfCandidateListUIElement* pcandidate)
 
 ITfUIElement* CTsfUiLessMode::GetUIElement(DWORD dwUIElementId)
 {
-    ITfUIElementMgr *puiem;
-    ITfUIElement *pElement = NULL;
+	ITfUIElementMgr* puiem;
+	ITfUIElement* pElement = NULL;
 
-    if (SUCCEEDED(m_tm->QueryInterface(__uuidof(ITfUIElementMgr), (void **)&puiem)))
-    {
-        puiem->GetUIElement(dwUIElementId, &pElement);
-        puiem->Release();
-    }
+	if (SUCCEEDED(m_tm->QueryInterface(__uuidof(ITfUIElementMgr), (void**)&puiem)))
+	{
+		puiem->GetUIElement(dwUIElementId, &pElement);
+		puiem->Release();
+	}
 
-    return pElement;
+	return pElement;
 }
 
 BOOL CTsfUiLessMode::CurrentInputLocaleIsIme()
@@ -2044,19 +2094,19 @@ BOOL CTsfUiLessMode::CurrentInputLocaleIsIme()
 	BOOL ret = FALSE;
 	HRESULT hr;
 
-	ITfInputProcessorProfiles *pProfiles;
+	ITfInputProcessorProfiles* pProfiles;
 	hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER, __uuidof(ITfInputProcessorProfiles), (LPVOID*)&pProfiles);
 	if (SUCCEEDED(hr))
 	{
-		ITfInputProcessorProfileMgr *pProfileMgr;
+		ITfInputProcessorProfileMgr* pProfileMgr;
 		hr = pProfiles->QueryInterface(__uuidof(ITfInputProcessorProfileMgr), (LPVOID*)&pProfileMgr);
 		if (SUCCEEDED(hr))
 		{
 			TF_INPUTPROCESSORPROFILE tip;
-			hr = pProfileMgr->GetActiveProfile( GUID_TFCAT_TIP_KEYBOARD, &tip );
+			hr = pProfileMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &tip);
 			if (SUCCEEDED(hr))
 			{
-				ret = ( tip.dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR ) != 0;
+				ret = (tip.dwProfileType & TF_PROFILETYPE_INPUTPROCESSOR) != 0;
 			}
 			pProfileMgr->Release();
 		}
@@ -2065,22 +2115,22 @@ BOOL CTsfUiLessMode::CurrentInputLocaleIsIme()
 	return ret;
 }
 
-// Sets up or removes sink for UI element. 
+// Sets up or removes sink for UI element.
 // UI element sink should be removed when IME is disabled,
 // otherwise the sink can be triggered when a game has multiple instances of IME UI library.
 void CTsfUiLessMode::EnableUiUpdates(bool bEnable)
 {
-	if ( m_tm == NULL ||
-		 ( bEnable && m_dwUIElementSinkCookie != TF_INVALID_COOKIE )  ||
-		 ( !bEnable && m_dwUIElementSinkCookie == TF_INVALID_COOKIE ) )
+	if (m_tm == NULL ||
+		(bEnable && m_dwUIElementSinkCookie != TF_INVALID_COOKIE) ||
+		(!bEnable && m_dwUIElementSinkCookie == TF_INVALID_COOKIE))
 	{
 		return;
 	}
-	ITfSource *srcTm = NULL;
+	ITfSource* srcTm = NULL;
 	HRESULT hr = E_FAIL;
-	if (SUCCEEDED(hr = m_tm->QueryInterface(__uuidof(ITfSource), (void **)&srcTm)))
+	if (SUCCEEDED(hr = m_tm->QueryInterface(__uuidof(ITfSource), (void**)&srcTm)))
 	{
-		if ( bEnable )
+		if (bEnable)
 		{
 			hr = srcTm->AdviseSink(__uuidof(ITfUIElementSink), (ITfUIElementSink*)m_TsfSink, &m_dwUIElementSinkCookie);
 		}
@@ -2095,20 +2145,20 @@ void CTsfUiLessMode::EnableUiUpdates(bool bEnable)
 
 // Returns open mode compartments and compartment manager.
 // Function fails if it fails to acquire any of the objects to be returned.
-BOOL CTsfUiLessMode::GetCompartments( ITfCompartmentMgr** ppcm, ITfCompartment** ppTfOpenMode, ITfCompartment** ppTfConvMode )
+BOOL CTsfUiLessMode::GetCompartments(ITfCompartmentMgr** ppcm, ITfCompartment** ppTfOpenMode, ITfCompartment** ppTfConvMode)
 {
 	ITfCompartmentMgr* pcm = NULL;
 	ITfCompartment* pTfOpenMode = NULL;
 	ITfCompartment* pTfConvMode = NULL;
 
-	static GUID _GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION = { 0xCCF05DD8, 0x4A87, 0x11D7, 0xA6, 0xE2, 0x00, 0x06, 0x5B, 0x84, 0x43, 0x5C };
+	static GUID _GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION = {0xCCF05DD8, 0x4A87, 0x11D7, 0xA6, 0xE2, 0x00, 0x06, 0x5B, 0x84, 0x43, 0x5C};
 
 	HRESULT hr;
-	if (SUCCEEDED(hr = m_tm->QueryInterface( IID_ITfCompartmentMgr, (void**)&pcm )))
+	if (SUCCEEDED(hr = m_tm->QueryInterface(IID_ITfCompartmentMgr, (void**)&pcm)))
 	{
-		if (SUCCEEDED(hr = pcm->GetCompartment( GUID_COMPARTMENT_KEYBOARD_OPENCLOSE, &pTfOpenMode )))
+		if (SUCCEEDED(hr = pcm->GetCompartment(GUID_COMPARTMENT_KEYBOARD_OPENCLOSE, &pTfOpenMode)))
 		{
-			if (SUCCEEDED(hr = pcm->GetCompartment( _GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &pTfConvMode )))
+			if (SUCCEEDED(hr = pcm->GetCompartment(_GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION, &pTfConvMode)))
 			{
 				*ppcm = pcm;
 				*ppTfOpenMode = pTfOpenMode;
@@ -2126,46 +2176,46 @@ BOOL CTsfUiLessMode::GetCompartments( ITfCompartmentMgr** ppcm, ITfCompartment**
 // SetupCompartmentSinks() : initialization
 // SetupCompartmentSinks(FALSE, openmode, convmode) : Resetting sinks. This is necessary as DaYi and Array IME resets compartment on switching input locale
 // SetupCompartmentSinks(TRUE) : clean up sinks
-BOOL CTsfUiLessMode::SetupCompartmentSinks( BOOL bRemoveOnly, ITfCompartment* pTfOpenMode, ITfCompartment* pTfConvMode )
+BOOL CTsfUiLessMode::SetupCompartmentSinks(BOOL bRemoveOnly, ITfCompartment* pTfOpenMode, ITfCompartment* pTfConvMode)
 {
 	bool bLocalCompartments = false;
 	ITfCompartmentMgr* pcm = NULL;
 	BOOL bRc = FALSE;
 	HRESULT hr = E_FAIL;
 
-	if ( !pTfOpenMode && !pTfConvMode )
+	if (!pTfOpenMode && !pTfConvMode)
 	{
 		bLocalCompartments = true;
-		GetCompartments( &pcm, &pTfOpenMode, &pTfConvMode );
+		GetCompartments(&pcm, &pTfOpenMode, &pTfConvMode);
 	}
-	if ( !( pTfOpenMode && pTfConvMode ) )
+	if (!(pTfOpenMode && pTfConvMode))
 	{
 		// Invalid parameters or GetCompartments() has failed.
 		return FALSE;
 	}
-	ITfSource *srcOpenMode = NULL;
-	if (SUCCEEDED(hr = pTfOpenMode->QueryInterface( IID_ITfSource, (void**)&srcOpenMode )))
+	ITfSource* srcOpenMode = NULL;
+	if (SUCCEEDED(hr = pTfOpenMode->QueryInterface(IID_ITfSource, (void**)&srcOpenMode)))
 	{
 		// Remove existing sink for open mode
-		if ( m_dwOpenModeSinkCookie != TF_INVALID_COOKIE )
+		if (m_dwOpenModeSinkCookie != TF_INVALID_COOKIE)
 		{
-			srcOpenMode->UnadviseSink( m_dwOpenModeSinkCookie );
+			srcOpenMode->UnadviseSink(m_dwOpenModeSinkCookie);
 			m_dwOpenModeSinkCookie = TF_INVALID_COOKIE;
 		}
 		// Setup sink for open mode (toggle state) change
-		if ( bRemoveOnly || SUCCEEDED(hr = srcOpenMode->AdviseSink( IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)m_TsfSink, &m_dwOpenModeSinkCookie )))
+		if (bRemoveOnly || SUCCEEDED(hr = srcOpenMode->AdviseSink(IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)m_TsfSink, &m_dwOpenModeSinkCookie)))
 		{
-			ITfSource *srcConvMode = NULL;
-			if (SUCCEEDED(hr = pTfConvMode->QueryInterface( IID_ITfSource, (void**)&srcConvMode )))
+			ITfSource* srcConvMode = NULL;
+			if (SUCCEEDED(hr = pTfConvMode->QueryInterface(IID_ITfSource, (void**)&srcConvMode)))
 			{
 				// Remove existing sink for open mode
-				if ( m_dwConvModeSinkCookie != TF_INVALID_COOKIE )
+				if (m_dwConvModeSinkCookie != TF_INVALID_COOKIE)
 				{
-					srcConvMode->UnadviseSink( m_dwConvModeSinkCookie );
+					srcConvMode->UnadviseSink(m_dwConvModeSinkCookie);
 					m_dwConvModeSinkCookie = TF_INVALID_COOKIE;
 				}
 				// Setup sink for open mode (toggle state) change
-				if ( bRemoveOnly || SUCCEEDED(hr = srcConvMode->AdviseSink( IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)m_TsfSink, &m_dwConvModeSinkCookie )))
+				if (bRemoveOnly || SUCCEEDED(hr = srcConvMode->AdviseSink(IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)m_TsfSink, &m_dwConvModeSinkCookie)))
 				{
 					bRc = TRUE;
 				}
@@ -2174,7 +2224,7 @@ BOOL CTsfUiLessMode::SetupCompartmentSinks( BOOL bRemoveOnly, ITfCompartment* pT
 		}
 		srcOpenMode->Release();
 	}
-	if ( bLocalCompartments )
+	if (bLocalCompartments)
 	{
 		pTfOpenMode->Release();
 		pTfConvMode->Release();
@@ -2184,7 +2234,7 @@ BOOL CTsfUiLessMode::SetupCompartmentSinks( BOOL bRemoveOnly, ITfCompartment* pT
 }
 #endif
 
-/* IME Message Handler */ 
+/* IME Message Handler */
 LRESULT CIME::WMInputLanguage(HWND hWnd, UINT /*uiMsg*/, WPARAM /*wParam*/, LPARAM lParam)
 {
 	(void)hWnd;
@@ -2200,26 +2250,26 @@ LRESULT CIME::WMStartComposition(HWND /*hWnd*/, UINT /*uiMsg*/, WPARAM /*wParam*
 
 LRESULT CIME::WMComposition(HWND hWnd, UINT /*uiMsg*/, WPARAM /*wParam*/, LPARAM lParam)
 {
-	LRESULT		result = 0;
+	LRESULT result = 0;
 
-	if(ms_bCaptureInput == false)
+	if (ms_bCaptureInput == false)
 		return 0;
 
 #ifdef _WIN32
 	HIMC hImc = ImmGetContext(hWnd);
 
-	if(hImc == NULL)
+	if (hImc == NULL)
 		return 0;
 
-	if(lParam&GCS_RESULTSTR) 
+	if (lParam & GCS_RESULTSTR)
 		ResultProcess(hImc);
-	if(lParam&GCS_COMPATTR) 
+	if (lParam & GCS_COMPATTR)
 		AttributeProcess(hImc);
-	if(lParam&GCS_COMPSTR)
+	if (lParam & GCS_COMPSTR)
 	{
 		if (ms_uOutputCodePage == 950) // 대만 주음 입력 처리
 		{
-			if (lParam&GCS_COMPATTR) 
+			if (lParam & GCS_COMPATTR)
 				CompositionProcessBuilding(hImc);
 			else
 				CompositionProcess(hImc);
@@ -2232,7 +2282,7 @@ LRESULT CIME::WMComposition(HWND hWnd, UINT /*uiMsg*/, WPARAM /*wParam*/, LPARAM
 
 	ImmReleaseContext(hWnd, hImc);
 
-	if(ms_pEvent)
+	if (ms_pEvent)
 		ms_pEvent->OnUpdate();
 #else
 	(void)hWnd;
@@ -2248,7 +2298,7 @@ LRESULT CIME::WMEndComposition(HWND /*hWnd*/, UINT /*uiMsg*/, WPARAM /*wParam*/,
 	ms_ulbegin = 0;
 	ms_ulend = 0;
 
-	if(ms_pEvent)
+	if (ms_pEvent)
 		ms_pEvent->OnUpdate();
 
 	return 0L;
@@ -2256,80 +2306,85 @@ LRESULT CIME::WMEndComposition(HWND /*hWnd*/, UINT /*uiMsg*/, WPARAM /*wParam*/,
 
 LRESULT CIME::WMNotify(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
-	LRESULT		result = 0;
+	LRESULT result = 0;
 
-	if(ms_bCaptureInput == false)
+	if (ms_bCaptureInput == false)
 		return 0;
 #ifdef _WIN32
-	switch (wParam) {
+	switch (wParam)
+	{
 
-	case IMN_OPENCANDIDATE:
-	case IMN_CHANGECANDIDATE: {
-		if (ms_bUILessMode && !ms_bUseIMMCandidate)
+		case IMN_OPENCANDIDATE:
+		case IMN_CHANGECANDIDATE:
+		{
+			if (ms_bUILessMode && !ms_bUseIMMCandidate)
+				break;
+			HIMC hImc = ImmGetContext(hWnd);
+			if (hImc == NULL)
+				break;
+			CandidateProcess(hImc);
+			if (!m_bUseDefaultIME)
+			{
+				if (ms_pEvent)
+					ms_pEvent->OnOpenCandidateList();
+			}
+			else
+				result = ::DefWindowProc(hWnd, uiMsg, wParam, lParam);
+			ImmReleaseContext(hWnd, hImc);
 			break;
-		HIMC hImc = ImmGetContext(hWnd);
-		if (hImc == NULL)
-			break;
-		CandidateProcess(hImc);
-		if (!m_bUseDefaultIME) {
-			if(ms_pEvent)
-				ms_pEvent->OnOpenCandidateList();
-		} else
-			result = ::DefWindowProc(hWnd, uiMsg, wParam, lParam);
-		ImmReleaseContext(hWnd, hImc);
-		break;
 		}
-	case IMN_CLOSECANDIDATE:
-		if (ms_bUILessMode && !ms_bUseIMMCandidate)
+		case IMN_CLOSECANDIDATE:
+			if (ms_bUILessMode && !ms_bUseIMMCandidate)
+				break;
+			if (!m_bUseDefaultIME)
+				CloseCandidateList();
+			else
+				result = DefWindowProc(hWnd, uiMsg, wParam, lParam);
 			break;
-		if (!m_bUseDefaultIME)
-			CloseCandidateList();
-		else
-			result = DefWindowProc(hWnd, uiMsg, wParam, lParam);
-		break;
 
-	case IMN_SETCONVERSIONMODE:
-	case IMN_SETOPENSTATUS:
-		if (ms_bUILessMode)
+		case IMN_SETCONVERSIONMODE:
+		case IMN_SETOPENSTATUS:
+			if (ms_bUILessMode)
+				break;
+			CheckToggleState();
 			break;
-		CheckToggleState();
-		break;
 
-	case IMN_PRIVATE: {
-		if (ms_bUILessMode)
+		case IMN_PRIVATE:
+		{
+			if (ms_bUILessMode)
+				break;
+			HIMC hImc = ImmGetContext(hWnd);
+			if (hImc == NULL)
+				break;
+			ReadingProcess(hImc);
+
+			// Trap some messages to hide reading window
+			switch (ms_adwId[0])
+			{
+				case IMEID_CHT_VER42:
+				case IMEID_CHT_VER43:
+				case IMEID_CHT_VER44:
+				case IMEID_CHS_VER41:
+				case IMEID_CHS_VER42:
+					if ((lParam == 1) || (lParam == 2))
+						return true;
+					break;
+
+				case IMEID_CHT_VER50:
+				case IMEID_CHT_VER51:
+				case IMEID_CHT_VER52:
+				case IMEID_CHT_VER60:
+				case IMEID_CHS_VER53:
+					if ((lParam == 16) || (lParam == 17) || (lParam == 26) || (lParam == 27) || (lParam == 28))
+						return true;
+					break;
+			}
+			ImmReleaseContext(hWnd, hImc);
 			break;
-		HIMC hImc = ImmGetContext(hWnd);
-		if (hImc == NULL)
-			break;
-        ReadingProcess(hImc);
-
-		// Trap some messages to hide reading window
-        switch(ms_adwId[0])
-        {
-            case IMEID_CHT_VER42:
-            case IMEID_CHT_VER43:
-            case IMEID_CHT_VER44:
-            case IMEID_CHS_VER41:
-            case IMEID_CHS_VER42:
-				if ((lParam == 1)||(lParam == 2))
-					return true;
-                break;
-
-            case IMEID_CHT_VER50:
-            case IMEID_CHT_VER51:
-            case IMEID_CHT_VER52:
-            case IMEID_CHT_VER60:
-            case IMEID_CHS_VER53:
-                if ((lParam == 16)||(lParam == 17)||(lParam == 26)||(lParam == 27)||(lParam == 28))
-					return true;
-                break;
-        }
-		ImmReleaseContext(hWnd, hImc);
-		break;
 		}
 	}
 
-	if(ms_pEvent)
+	if (ms_pEvent)
 		ms_pEvent->OnUpdate();
 #else
 	(void)hWnd;
@@ -2345,46 +2400,47 @@ LRESULT CIME::WMChar(HWND /*hWnd*/, UINT /*uiMsg*/, WPARAM wParam, LPARAM lParam
 {
 	unsigned char c = (unsigned char)(wParam & 0xff);
 
-	switch (c) 
+	switch (c)
 	{
-	case 8:
-		if(ms_bCaptureInput == false)
+		case 8:
+			if (ms_bCaptureInput == false)
+				return 0;
+			if (ms_curpos > 0)
+			{
+				DecCurPos();
+				DelCurPos();
+			}
+			if (ms_pEvent)
+				ms_pEvent->OnUpdate();
 			return 0;
-		if (ms_curpos > 0)
-		{
-			DecCurPos();
+			break;
+
+		case 127:
+			if (ms_bCaptureInput == false)
+				return 0;
 			DelCurPos();
-		}
-		if(ms_pEvent)
-			ms_pEvent->OnUpdate();
-		return 0;
-		break;
-
-	case 127:
-		if(ms_bCaptureInput == false)
+			if (ms_pEvent)
+				ms_pEvent->OnUpdate();
 			return 0;
-		DelCurPos();
-		if(ms_pEvent)
-			ms_pEvent->OnUpdate();
-		return 0;
-		break;
+			break;
 
-	default:
-		if(ms_pEvent) {
-			if (ms_pEvent->OnWM_CHAR(wParam, lParam))
-				break;
-		}
-		if(ms_bCaptureInput == false)
-			return 0;
-		wchar_t w[10];
-		MultiByteToWideChar(ms_uInputCodePage, 0, (char*)&c, 1, w, 1);
+		default:
+			if (ms_pEvent)
+			{
+				if (ms_pEvent->OnWM_CHAR(wParam, lParam))
+					break;
+			}
+			if (ms_bCaptureInput == false)
+				return 0;
+			wchar_t w[10];
+			MultiByteToWideChar(ms_uInputCodePage, 0, (char*)&c, 1, w, 1);
 
-		OnChar(w[0]);
-		if (w[0] == L'|')
 			OnChar(w[0]);
-		if(ms_pEvent)
-			ms_pEvent->OnUpdate();
-		break;
+			if (w[0] == L'|')
+				OnChar(w[0]);
+			if (ms_pEvent)
+				ms_pEvent->OnUpdate();
+			break;
 	}
 
 	return 0;

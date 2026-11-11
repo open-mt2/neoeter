@@ -3,7 +3,7 @@
 #include <Neoeter/Render/GrpVertexBuffer.h>
 #include <Neoeter/Render/StateManager.h>
 
-int	CGraphicVertexBuffer::GetVertexStride() const
+int CGraphicVertexBuffer::GetVertexStride() const
 {
 	int retSize = D3DXGetFVFVertexSize(m_dwFVF);
 	return retSize;
@@ -22,7 +22,7 @@ int CGraphicVertexBuffer::GetVertexCount() const
 void CGraphicVertexBuffer::SetStream(int stride, int layer) const
 {
 	assert(ms_lpd3dDevice != NULL);
-	STATEMANAGER.SetStreamSource(layer, m_lpd3dVB, stride);	
+	STATEMANAGER.SetStreamSource(layer, m_lpd3dVB, stride);
 }
 
 bool CGraphicVertexBuffer::LockRange(unsigned count, void** pretVertices) const
@@ -30,19 +30,19 @@ bool CGraphicVertexBuffer::LockRange(unsigned count, void** pretVertices) const
 	if (!m_lpd3dVB)
 		return false;
 
-	DWORD dwLockSize=GetVertexStride() * count;
+	DWORD dwLockSize = GetVertexStride() * count;
 	if (FAILED(m_lpd3dVB->Lock(0, dwLockSize, pretVertices, m_dwLockFlag)))
 		return false;
 
 	return true;
 }
 
-bool CGraphicVertexBuffer::Lock(void ** pretVertices) const
+bool CGraphicVertexBuffer::Lock(void** pretVertices) const
 {
 	if (!m_lpd3dVB)
 		return false;
 
-	DWORD dwLockSize=GetVertexStride()*GetVertexCount();
+	DWORD dwLockSize = GetVertexStride() * GetVertexCount();
 	if (FAILED(m_lpd3dVB->Lock(0, dwLockSize, pretVertices, m_dwLockFlag)))
 		return false;
 
@@ -54,7 +54,7 @@ bool CGraphicVertexBuffer::Unlock() const
 	if (!m_lpd3dVB)
 		return false;
 
-	if ( FAILED(m_lpd3dVB->Unlock()) )
+	if (FAILED(m_lpd3dVB->Unlock()))
 		return false;
 	return true;
 }
@@ -78,7 +78,7 @@ bool CGraphicVertexBuffer::LockDynamic(void** pretVertices)
 	return true;
 }
 
-bool CGraphicVertexBuffer::Lock(void ** pretVertices)
+bool CGraphicVertexBuffer::Lock(void** pretVertices)
 {
 	if (!m_lpd3dVB)
 		return false;
@@ -94,20 +94,20 @@ bool CGraphicVertexBuffer::Unlock()
 	if (!m_lpd3dVB)
 		return false;
 
-	if ( FAILED(m_lpd3dVB->Unlock()) )
+	if (FAILED(m_lpd3dVB->Unlock()))
 		return false;
 	return true;
 }
 
 bool CGraphicVertexBuffer::Copy(int bufSize, const void* srcVertices)
 {
-	void * dstVertices;
+	void* dstVertices;
 
 	if (!Lock(&dstVertices))
 		return false;
 
 	memcpy(dstVertices, srcVertices, bufSize);
-	
+
 	Unlock();
 	return true;
 }

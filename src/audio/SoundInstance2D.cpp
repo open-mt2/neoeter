@@ -25,12 +25,12 @@ bool CSoundInstance2D::Initialize()
 {
 	if (m_sample)
 		return true;
-	
+
 	m_sample = AIL_allocate_sample_handle(ms_DIGDriver);
 	return m_sample ? true : false;
 }
 
-bool CSoundInstance2D::SetSound(CSoundData * pSoundData)
+bool CSoundInstance2D::SetSound(CSoundData* pSoundData)
 {
 	assert(m_sample != NULL && pSoundData != NULL);
 
@@ -42,8 +42,8 @@ bool CSoundInstance2D::SetSound(CSoundData * pSoundData)
 	LPVOID lpData = pSoundData->Get();
 
 	AIL_init_sample(m_sample);
-	
-    if (AIL_set_sample_file(m_sample, lpData, pSoundData->GetSize()) == 0)
+
+	if (AIL_set_sample_file(m_sample, lpData, pSoundData->GetSize()) == 0)
 	{
 		if (m_pSoundData != NULL)
 		{
@@ -61,7 +61,7 @@ bool CSoundInstance2D::SetSound(CSoundData * pSoundData)
 		m_pSoundData->Release();
 		m_pSoundData = NULL;
 	}
-	
+
 	m_pSoundData = pSoundData;
 	return true;
 }
@@ -73,7 +73,7 @@ bool CSoundInstance2D::IsDone() const
 
 void CSoundInstance2D::Play(int iLoopCount, DWORD dwPlayCycleTimeLimit) const
 {
-    AIL_set_sample_loop_count(m_sample, iLoopCount);
+	AIL_set_sample_loop_count(m_sample, iLoopCount);
 	AIL_start_sample(m_sample);
 }
 
@@ -109,7 +109,7 @@ void CSoundInstance2D::SetPosition(float x, float y, float z) const
 	assert(!"must not call this method");
 }
 
-void CSoundInstance2D::SetOrientation(float x_face, float y_face, float z_face, 
+void CSoundInstance2D::SetOrientation(float x_face, float y_face, float z_face,
 									  float x_normal, float y_normal, float z_normal) const
 {
 	assert(!"must not call this method");

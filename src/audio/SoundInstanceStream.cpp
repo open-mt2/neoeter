@@ -104,7 +104,7 @@ void CSoundInstanceStream::SetPosition(float x, float y, float z) const
 {
 }
 
-void CSoundInstanceStream::SetOrientation(float x_face, float y_face, float z_face, 
+void CSoundInstanceStream::SetOrientation(float x_face, float y_face, float z_face,
 										  float x_normal, float y_normal, float z_normal) const
 {
 }

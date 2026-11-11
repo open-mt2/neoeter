@@ -5,22 +5,23 @@
 
 #include <assert.h>
 
-template<typename T> class CRef
+template <typename T>
+class CRef
 {
 	public:
 		struct FClear
 		{
-			void operator() (CRef<T>& rRef)
-			{
-				rRef.Clear();
-			}
+				void operator()(CRef<T>& rRef)
+				{
+					rRef.Clear();
+				}
 		};
 
 	public:
 		CRef() : m_pObject(NULL)
 		{
 		}
-		
+
 		CRef(CReferenceObject* pObject)
 		{
 			m_pObject = NULL;
@@ -30,22 +31,22 @@ template<typename T> class CRef
 		CRef(const CRef& c_rRef)
 		{
 			m_pObject = NULL;
-			Initialize(c_rRef.m_pObject);			
+			Initialize(c_rRef.m_pObject);
 		}
 
 		~CRef()
 		{
 			Clear();
 		}
-		
-		void operator = (CReferenceObject* pObject)
+
+		void operator=(CReferenceObject* pObject)
 		{
 			SetPointer(pObject);
 		}
 
-		void operator = (const CRef& c_rRef)
+		void operator=(const CRef& c_rRef)
 		{
-			SetPointer(c_rRef.m_pObject);			
+			SetPointer(c_rRef.m_pObject);
 		}
 
 		void Clear()
@@ -85,7 +86,7 @@ template<typename T> class CRef
 			assert(m_pObject != NULL);
 			return static_cast<T*>(m_pObject);
 		}
-				
+
 	private:
 		void Initialize(CReferenceObject* pObject)
 		{

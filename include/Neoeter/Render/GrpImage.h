@@ -23,22 +23,22 @@ class CGraphicImage : public CResource
 		int GetWidth() const;
 		int GetHeight() const;
 
-		const RECT & GetRectReference() const;
+		const RECT& GetRectReference() const;
 
-		const CGraphicTexture & GetTextureReference() const;
-		CGraphicTexture * GetTexturePointer();
+		const CGraphicTexture& GetTextureReference() const;
+		CGraphicTexture* GetTexturePointer();
 
 	protected:
-		bool OnLoad(int iSize, const void * c_pvBuf);
-		
-		void OnClear();	
+		bool OnLoad(int iSize, const void* c_pvBuf);
+
+		void OnClear();
 		bool OnIsEmpty() const;
 		bool OnIsType(TType type);
 
 	protected:
-		CGraphicImageTexture	m_imageTexture;
-		RECT					m_rect;
-		DWORD					m_dwFilter;
+		CGraphicImageTexture m_imageTexture;
+		RECT m_rect;
+		DWORD m_dwFilter;
 };
 
 #endif

@@ -12,11 +12,11 @@
 
 IRenderBackend& Platform_GetRenderBackend()
 {
-    // GL state is process-wide, so the backend is too. Construction performs no
-    // GL call, which keeps headless tests that never draw independent of a
-    // context.
-    static eterbase::gl::GLRenderBackend backend;
-    return backend;
+	// GL state is process-wide, so the backend is too. Construction performs no
+	// GL call, which keeps headless tests that never draw independent of a
+	// context.
+	static eterbase::gl::GLRenderBackend backend;
+	return backend;
 }
 
 #endif // OPENMT2_RENDERER_GL

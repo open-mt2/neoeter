@@ -17,13 +17,13 @@ void CEffectData::Delete(CEffectData* pkData)
 void CEffectData::DestroySystem()
 {
 	ms_kPool.Destroy();
-	
+
 	CParticleSystemData::DestroySystem();
 	CEffectMeshScript::DestroySystem();
 	CLightData::DestroySystem();
 }
 
-bool CEffectData::LoadScript(const char * c_szFileName)
+bool CEffectData::LoadScript(const char* c_szFileName)
 {
 	m_strFileName = c_szFileName;
 	CFileNameHelper::StringPath(m_strFileName);
@@ -56,19 +56,19 @@ bool CEffectData::LoadScript(const char * c_szFileName)
 
 		if (0 == strName.compare("mesh"))
 		{
-			CEffectMeshScript * pMesh = AllocMesh();
+			CEffectMeshScript* pMesh = AllocMesh();
 			pMesh->Clear();
 			pMesh->LoadScript(TextFileLoader);
 		}
 		else if (0 == strName.compare("particle"))
 		{
-			CParticleSystemData * pParticleSystemData = AllocParticle();
+			CParticleSystemData* pParticleSystemData = AllocParticle();
 			pParticleSystemData->Clear();
 			pParticleSystemData->LoadScript(TextFileLoader);
 		}
 		else if (0 == strName.compare("light"))
 		{
-			CLightData * pLightData = AllocLight();
+			CLightData* pLightData = AllocLight();
 			pLightData->Clear();
 			pLightData->LoadScript(TextFileLoader);
 		}
@@ -81,20 +81,20 @@ bool CEffectData::LoadScript(const char * c_szFileName)
 	std::string strNoExtensionName = CFileNameHelper::NoExtension(m_strFileName);
 	int iPos = strNoExtensionName.find(strPathHeader.c_str());
 	if (iPos >= 0)
-	if (strNoExtensionName.size() > strPathHeader.size())
-	{
-		std::string strSoundFileName;
-		strSoundFileName = "sound/";
-		strSoundFileName += &strNoExtensionName[strPathHeader.size()];
-		strSoundFileName += ".mss";
+		if (strNoExtensionName.size() > strPathHeader.size())
+		{
+			std::string strSoundFileName;
+			strSoundFileName = "sound/";
+			strSoundFileName += &strNoExtensionName[strPathHeader.size()];
+			strSoundFileName += ".mss";
 
-		LoadSoundScriptData(strSoundFileName.c_str());
-	}
+			LoadSoundScriptData(strSoundFileName.c_str());
+		}
 
 	return true;
 }
 
-bool CEffectData::LoadSoundScriptData(const char * c_szFileName)
+bool CEffectData::LoadSoundScriptData(const char* c_szFileName)
 {
 	NSound::TSoundDataVector SoundDataVector;
 
@@ -107,23 +107,23 @@ bool CEffectData::LoadSoundScriptData(const char * c_szFileName)
 	return true;
 }
 
-CParticleSystemData * CEffectData::AllocParticle()
+CParticleSystemData* CEffectData::AllocParticle()
 {
-	CParticleSystemData * pParticle = CParticleSystemData::New();
+	CParticleSystemData* pParticle = CParticleSystemData::New();
 	m_ParticleVector.push_back(pParticle);
 	return pParticle;
 }
 
-CEffectMeshScript * CEffectData::AllocMesh()
+CEffectMeshScript* CEffectData::AllocMesh()
 {
-	CEffectMeshScript * pMesh = CEffectMeshScript::New();
+	CEffectMeshScript* pMesh = CEffectMeshScript::New();
 	m_MeshVector.push_back(pMesh);
 	return pMesh;
 }
 
-CLightData * CEffectData::AllocLight()
+CLightData* CEffectData::AllocLight()
 {
-	CLightData * pLight = CLightData::New();
+	CLightData* pLight = CLightData::New();
 	m_LightVector.push_back(pLight);
 	return pLight;
 }
@@ -133,7 +133,7 @@ DWORD CEffectData::GetLightCount()
 	return m_LightVector.size();
 }
 
-CLightData * CEffectData::GetLightPointer(DWORD dwPosition)
+CLightData* CEffectData::GetLightPointer(DWORD dwPosition)
 {
 	assert(dwPosition < m_LightVector.size());
 	return m_LightVector[dwPosition];
@@ -143,9 +143,9 @@ DWORD CEffectData::GetParticleCount()
 {
 	return m_ParticleVector.size();
 }
-CParticleSystemData * CEffectData::GetParticlePointer(DWORD dwPosition)
+CParticleSystemData* CEffectData::GetParticlePointer(DWORD dwPosition)
 {
-	if(dwPosition < m_ParticleVector.size())
+	if (dwPosition < m_ParticleVector.size())
 		return m_ParticleVector[dwPosition];
 	else
 	{
@@ -158,13 +158,13 @@ DWORD CEffectData::GetMeshCount()
 {
 	return m_MeshVector.size();
 }
-CEffectMeshScript * CEffectData::GetMeshPointer(DWORD dwPosition)
+CEffectMeshScript* CEffectData::GetMeshPointer(DWORD dwPosition)
 {
 	assert(dwPosition < m_MeshVector.size());
 	return m_MeshVector[dwPosition];
 }
 
-NSound::TSoundInstanceVector * CEffectData::GetSoundInstanceVector()
+NSound::TSoundInstanceVector* CEffectData::GetSoundInstanceVector()
 {
 	return &m_SoundInstanceVector;
 }
@@ -179,7 +179,7 @@ D3DXVECTOR3 CEffectData::GetBoundingSpherePosition()
 	return m_v3BoundingSpherePosition;
 }
 
-const char * CEffectData::GetFileName() const
+const char* CEffectData::GetFileName() const
 {
 	return m_strFileName.c_str();
 }
@@ -208,7 +208,7 @@ void CEffectData::Clear()
 	m_v3BoundingSpherePosition.x = m_v3BoundingSpherePosition.y = m_v3BoundingSpherePosition.z = 0.0f;
 	__ClearParticleDataVector();
 	__ClearLightDataVector();
-	__ClearMeshDataVector();	
+	__ClearMeshDataVector();
 }
 
 CEffectData::CEffectData()

@@ -42,19 +42,18 @@ bool CSpeedTreeDirectX::SetRenderingDevice()
 	if (!InitVertexShaders())
 		return false;
 
-	const float c_afLightPosition[4] = { -0.707f, -0.300f, 0.707f, 0.0f };
-	const float	c_afLightAmbient[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	const float	c_afLightDiffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	const float	c_afLightSpecular[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	const float c_afLightPosition[4] = {-0.707f, -0.300f, 0.707f, 0.0f};
+	const float c_afLightAmbient[4] = {0.5f, 0.5f, 0.5f, 1.0f};
+	const float c_afLightDiffuse[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+	const float c_afLightSpecular[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 	float afLight1[] =
-	{
-		c_afLightPosition[0], c_afLightPosition[1], c_afLightPosition[2],
-		c_afLightDiffuse[0], c_afLightDiffuse[1], c_afLightDiffuse[2],
-		c_afLightAmbient[0], c_afLightAmbient[1], c_afLightAmbient[2],
-		c_afLightSpecular[0], c_afLightSpecular[1], c_afLightSpecular[2],
-		c_afLightPosition[3],
-		1.0f, 0.0f, 0.0f
-	};
+		{
+			c_afLightPosition[0], c_afLightPosition[1], c_afLightPosition[2],
+			c_afLightDiffuse[0], c_afLightDiffuse[1], c_afLightDiffuse[2],
+			c_afLightAmbient[0], c_afLightAmbient[1], c_afLightAmbient[2],
+			c_afLightSpecular[0], c_afLightSpecular[1], c_afLightSpecular[2],
+			c_afLightPosition[3],
+			1.0f, 0.0f, 0.0f};
 
 	CSpeedTreeRT::SetLightAttributes(0, afLight1);
 	CSpeedTreeRT::SetLightState(0, true);
@@ -127,7 +126,9 @@ void CSpeedTreeDirectX::Render(unsigned long ulRenderBitVector)
 	STATEMANAGER.SaveRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 	STATEMANAGER.SaveRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 
-	if (STATEMANAGER.GetRenderState(D3DRS_FOGENABLE)){}
+	if (STATEMANAGER.GetRenderState(D3DRS_FOGENABLE))
+	{
+	}
 
 	STATEMANAGER.SetFVF(D3DFVF_SPEEDTREE_BRANCH_VERTEX);
 	STATEMANAGER.SetVertexShader(m_dwBranchVertexShader);
@@ -173,7 +174,9 @@ void CSpeedTreeDirectX::Render(unsigned long ulRenderBitVector)
 		STATEMANAGER.SetFVF(D3DFVF_SPEEDTREE_LEAF_VERTEX);
 		STATEMANAGER.SetVertexShader(m_dwLeafVertexShader);
 
-		if (STATEMANAGER.GetRenderState(D3DRS_FOGENABLE)){}
+		if (STATEMANAGER.GetRenderState(D3DRS_FOGENABLE))
+		{
+		}
 		if (ulRenderBitVector & Forest_RenderToShadow || ulRenderBitVector & Forest_RenderToMiniMap)
 		{
 			STATEMANAGER.SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_NOTEQUAL);
@@ -231,7 +234,6 @@ void CSpeedTreeDirectX::Render(unsigned long ulRenderBitVector)
 	{
 		STATEMANAGER.SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 		STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-
 	}
 
 	STATEMANAGER.RestoreRenderState(D3DRS_ALPHATESTENABLE);

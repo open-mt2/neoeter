@@ -29,11 +29,11 @@ class CGraphicImageInstance
 		int GetWidth();
 		int GetHeight();
 
-		CGraphicTexture * GetTexturePointer();
-		const CGraphicTexture &	GetTextureReference() const;
-		CGraphicImage * GetGraphicImagePointer();
+		CGraphicTexture* GetTexturePointer();
+		const CGraphicTexture& GetTextureReference() const;
+		CGraphicImage* GetGraphicImagePointer();
 
-		bool operator == (const CGraphicImageInstance & rhs) const;
+		bool operator==(const CGraphicImageInstance& rhs) const;
 
 	protected:
 		void Initialize();
@@ -48,7 +48,7 @@ class CGraphicImageInstance
 		D3DXVECTOR2 m_v2Position;
 
 		CGraphicImage::TRef m_roImage;
-		
+
 	public:
 		static void CreateSystem(UINT uCapacity);
 		static void DestroySystem();
@@ -56,5 +56,5 @@ class CGraphicImageInstance
 		static CGraphicImageInstance* New();
 		static void Delete(CGraphicImageInstance* pkImgInst);
 
-		static CDynamicPool<CGraphicImageInstance>		ms_kPool;
+		static CDynamicPool<CGraphicImageInstance> ms_kPool;
 };

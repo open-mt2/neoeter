@@ -14,9 +14,9 @@
 //////////////////////////////////////////////////////////////////////////
 // Texture Set
 //////////////////////////////////////////////////////////////////////////
-CTextureSet * CTerrainImpl::ms_pTextureSet = NULL;
+CTextureSet* CTerrainImpl::ms_pTextureSet = NULL;
 
-void CTerrainImpl::SetTextureSet(CTextureSet * pTextureSet)
+void CTerrainImpl::SetTextureSet(CTextureSet* pTextureSet)
 {
 	static CTextureSet s_EmptyTextureSet;
 
@@ -26,7 +26,7 @@ void CTerrainImpl::SetTextureSet(CTextureSet * pTextureSet)
 		ms_pTextureSet = pTextureSet;
 }
 
-CTextureSet * CTerrainImpl::GetTextureSet()
+CTextureSet* CTerrainImpl::GetTextureSet()
 {
 	if (!ms_pTextureSet)
 		SetTextureSet(NULL);
@@ -52,17 +52,17 @@ void CTerrainImpl::Initialize()
 	memset(&m_HeightMapHeader, 0, sizeof(TGA_HEADER));
 	memset(&m_awShadowMap, 0xFFFF, sizeof(m_awShadowMap));
 	memset(&m_lpAlphaTexture, 0, sizeof(m_lpAlphaTexture));
-	
+
 	m_lViewRadius = 0;
 
 	m_wTileMapVersion = 8976;
 
 	m_fHeightScale = 0.0f;
-	
+
 	m_lpShadowTexture = NULL;
 
 	m_lSplatTilesX = 0;
-	m_lSplatTilesY = 0;	
+	m_lSplatTilesY = 0;
 }
 
 void CTerrainImpl::Clear()
@@ -75,14 +75,14 @@ void CTerrainImpl::Clear()
 			m_lpAlphaTexture[i] = NULL;
 		}
 	}
-	
+
 	Initialize();
 }
 
-bool CTerrainImpl::LoadHeightMap(const char * c_szFileName)
+bool CTerrainImpl::LoadHeightMap(const char* c_szFileName)
 {
 	Tracef("LoadRawHeightMapFile %s ", c_szFileName);
-	
+
 	std::stringstream data;
 	if (!CEterPackManager::Instance().Get(c_szFileName, data))
 	{
@@ -90,8 +90,8 @@ bool CTerrainImpl::LoadHeightMap(const char * c_szFileName)
 		TraceError("CTerrainImpl::LoadHeightMap - %s OPEN ERROR", c_szFileName);
 		return false;
 	}
-	
-	data.read((char*) m_awRawHeightMap, sizeof(WORD)*HEIGHTMAP_RAW_XSIZE*HEIGHTMAP_RAW_YSIZE);
+
+	data.read((char*)m_awRawHeightMap, sizeof(WORD) * HEIGHTMAP_RAW_XSIZE * HEIGHTMAP_RAW_YSIZE);
 	if (!data)
 	{
 		// Could not read data
@@ -103,7 +103,7 @@ bool CTerrainImpl::LoadHeightMap(const char * c_szFileName)
 	return true;
 }
 
-bool CTerrainImpl::LoadAttrMap(const char * c_szFileName)
+bool CTerrainImpl::LoadAttrMap(const char* c_szFileName)
 {
 	DWORD dwStart = ELTimer_GetMSec();
 	Tracef("LoadAttrMapFile %s ", c_szFileName);
@@ -121,14 +121,14 @@ bool CTerrainImpl::LoadAttrMap(const char * c_szFileName)
 #pragma pack(1)
 		struct SAttrMapHeader
 		{
-			WORD m_wMagic;
-			WORD m_wWidth;
-			WORD m_wHeight;
+				WORD m_wMagic;
+				WORD m_wWidth;
+				WORD m_wHeight;
 		};
 #pragma pack(pop)
 
 		SAttrMapHeader kAttrMapHeader;
-		data.read((char*) &kAttrMapHeader, sizeof(kAttrMapHeader));
+		data.read((char*)&kAttrMapHeader, sizeof(kAttrMapHeader));
 		if (!data)
 		{
 			TraceError(" CTerrainImpl::LoadAttrMap - %s FILE SIZE ERROR", c_szFileName);
@@ -166,7 +166,7 @@ bool CTerrainImpl::LoadAttrMap(const char * c_szFileName)
 	return true;
 }
 
-bool CTerrainImpl::RAW_LoadTileMap(const char * c_szFileName)
+bool CTerrainImpl::RAW_LoadTileMap(const char* c_szFileName)
 {
 	Tracef("LoadSplatFile %s ", c_szFileName);
 
@@ -190,8 +190,8 @@ bool CTerrainImpl::RAW_LoadTileMap(const char * c_szFileName)
 	return true;
 }
 
-bool CTerrainImpl::LoadWaterMap(const char * c_szFileName)
-{	
+bool CTerrainImpl::LoadWaterMap(const char* c_szFileName)
+{
 	DWORD dwStart = ELTimer_GetMSec();
 
 	if (!LoadWaterMapFile(c_szFileName))
@@ -200,7 +200,7 @@ bool CTerrainImpl::LoadWaterMap(const char * c_szFileName)
 
 		m_byNumWater = 0;
 		memset(m_lWaterHeight, -1, sizeof(m_lWaterHeight));
-		
+
 		TraceError("CMapOutdoor::LoadWaterMap LoadWaterMapFile(%s) Failed", c_szFileName);
 
 		return false;
@@ -210,8 +210,8 @@ bool CTerrainImpl::LoadWaterMap(const char * c_szFileName)
 	return true;
 }
 
-bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
-{	
+bool CTerrainImpl::LoadWaterMapFile(const char* c_szFileName)
+{
 	std::stringstream data;
 	size_t fileSize = 0;
 	if (!CEterPackManager::Instance().Get(c_szFileName, data))
@@ -228,13 +228,13 @@ bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
 #pragma pack(1)
 		struct SWaterMapHeader
 		{
-			WORD m_wMagic;
-			WORD m_wWidth;
-			WORD m_wHeight;
-			BYTE m_byLayerCount;
+				WORD m_wMagic;
+				WORD m_wWidth;
+				WORD m_wHeight;
+				BYTE m_byLayerCount;
 		};
 #pragma pack(pop)
-		
+
 		SWaterMapHeader kWaterMapHeader;
 		data.read((char*)&kWaterMapHeader, sizeof(kWaterMapHeader));
 		if (!data)
@@ -244,13 +244,13 @@ bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
 		}
 
 		const WORD c_wWaterMapMagic = 5426;
-		
+
 		if (c_wWaterMapMagic != kWaterMapHeader.m_wMagic)
 		{
 			TraceError("CTerrainImpl::LoadWaterMap - %s MAGIC NUMBER(%d!=MAGIC[%d]) ERROR", c_szFileName, kWaterMapHeader.m_wMagic, c_wWaterMapMagic);
 			return false;
-		}	
-		
+		}
+
 		if (WATERMAP_XSIZE != kWaterMapHeader.m_wWidth)
 		{
 			TraceError("CTerrainImpl::LoadWaterMap - kWaterMapHeader(%s).m_width(%d)!=WATERMAP_XSIZE(%d)", c_szFileName, kWaterMapHeader.m_wWidth, WATERMAP_XSIZE);
@@ -271,7 +271,7 @@ bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
 		if (dwFileRestSize == dwFileNeedSize2)
 		{
 			WORD wWaterHeight[MAX_WATER_NUM + 1];
-			
+
 			data.read((char*)m_abyWaterMap, sizeof(m_abyWaterMap));
 			if (!data)
 				return false;
@@ -292,13 +292,14 @@ bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
 			TraceError("CTerrainImpl::LoadWaterMap - %s FILE DATA SIZE(rest %d != need %d) ERROR", c_szFileName, dwFileRestSize, dwFileNeedSize);
 			return false;
 		}
-	
+
 		data.read((char*)m_abyWaterMap, sizeof(m_abyWaterMap));
 		if (!data)
 			return false;
 
-		if (m_byNumWater) {
-			data.read((char*)m_lWaterHeight, sizeof(LONG)* m_byNumWater);
+		if (m_byNumWater)
+		{
+			data.read((char*)m_lWaterHeight, sizeof(LONG) * m_byNumWater);
 			if (!data)
 				return false;
 		}
@@ -322,9 +323,14 @@ DWORD CTerrainImpl::GetShadowMapColor(float fx, float fy)
 
 	WORD w = *(m_awShadowMap + (iy * SHADOWMAP_XSIZE) + ix);
 
-	int b = w & 0x1f; w >>= 5; b <<= 3;
-	int g = w & 0x1f; w >>= 5; g <<= 3;
-	int r = w & 0x1f;		   r <<= 3;
+	int b = w & 0x1f;
+	w >>= 5;
+	b <<= 3;
+	int g = w & 0x1f;
+	w >>= 5;
+	g <<= 3;
+	int r = w & 0x1f;
+	r <<= 3;
 
 	return (DWORD)((0xffU << 24) | (static_cast<DWORD>(g) << 16) | (static_cast<DWORD>(g) << 8) | static_cast<DWORD>(r));
 }

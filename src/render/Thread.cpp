@@ -5,10 +5,10 @@ CThread::CThread() : m_pArg(NULL), m_hThread(NULL), m_uThreadID(0)
 {
 }
 
-int CThread::Create(void * arg)
+int CThread::Create(void* arg)
 {
 	Arg(arg);
-	m_hThread = (HANDLE) _beginthreadex(NULL, 0, EntryPoint, this, 0, &m_uThreadID);
+	m_hThread = (HANDLE)_beginthreadex(NULL, 0, EntryPoint, this, 0, &m_uThreadID);
 
 	if (!m_hThread)
 		return false;
@@ -17,7 +17,7 @@ int CThread::Create(void * arg)
 	return true;
 }
 
-UINT CThread::Run(void * arg)
+UINT CThread::Run(void* arg)
 {
 	if (!Setup())
 		return 0;
@@ -26,8 +26,8 @@ UINT CThread::Run(void * arg)
 }
 
 /* Static */
-UINT CALLBACK CThread::EntryPoint(void * pThis)
+UINT CALLBACK CThread::EntryPoint(void* pThis)
 {
-	CThread * pThread = (CThread *) pThis;
+	CThread* pThread = (CThread*)pThis;
 	return pThread->Run(pThread->Arg());
 }

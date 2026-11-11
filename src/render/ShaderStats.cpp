@@ -8,17 +8,17 @@
 namespace
 {
 
-struct SShaderStatsState
-{
-	CShaderStats::SCounters counters;
-	std::set<std::string> files;
-};
+	struct SShaderStatsState
+	{
+			CShaderStats::SCounters counters;
+			std::set<std::string> files;
+	};
 
-SShaderStatsState& GetState()
-{
-	static SShaderStatsState state;
-	return state;
-}
+	SShaderStatsState& GetState()
+	{
+		static SShaderStatsState state;
+		return state;
+	}
 
 } // namespace
 

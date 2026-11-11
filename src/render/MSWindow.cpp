@@ -18,7 +18,7 @@ SDL_GLContext CMSWindow::ms_pGLContext = NULL;
 
 static void* SDLGetProcAddress(const char* name)
 {
-	return (void*) SDL_GL_GetProcAddress(name);
+	return (void*)SDL_GL_GetProcAddress(name);
 }
 
 HINSTANCE CMSWindow::ms_hInstance = NULL;
@@ -28,8 +28,8 @@ LRESULT CMSWindow::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM 
 	// The window is SDL-owned on every target (T1.2); the WM_* messages are
 	// synthesised by CMSApplication from SDL events, so there is no Win32
 	// window procedure to chain to.
-	(void) hWnd;
-	(void) lParam;
+	(void)hWnd;
+	(void)lParam;
 
 	switch (uiMsg)
 	{
@@ -47,9 +47,9 @@ LRESULT CMSWindow::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM 
 
 void CMSWindow::OnSize(WPARAM wParam, LPARAM /*lParam*/)
 {
-	if (wParam == SIZE_MINIMIZED) 
+	if (wParam == SIZE_MINIMIZED)
 	{
-		m_isActive = false;        
+		m_isActive = false;
 		m_isVisible = false;
 	}
 	else
@@ -121,8 +121,7 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, DWORD /*cs*/, DWORD 
 		SDL_WINDOWPOS_CENTERED,
 		width,
 		height,
-		windowFlags
-	);
+		windowFlags);
 
 	if (!ms_pSDLWindow)
 	{
@@ -174,15 +173,15 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, DWORD /*cs*/, DWORD 
 	m_isActive = true;
 	m_isVisible = true;
 	Platform_SetWindowResolution(width, height);
-	Platform_SetWarpMouseCallback([](int x, int y) {
+	Platform_SetWarpMouseCallback([](int x, int y)
+								  {
 		if (ms_pSDLWindow) {
 			SDL_WarpMouseInWindow(ms_pSDLWindow, x, y);
-		}
-	});
+		} });
 	SetRect(&m_rect, 0, 0, width, height);
 
 	Tracef("[SDL2] Created native game window (floating): %p ('%s', %dx%d, video driver: %s)\n",
-		ms_pSDLWindow, c_szName, width, height, SDL_GetCurrentVideoDriver());
+		   ms_pSDLWindow, c_szName, width, height, SDL_GetCurrentVideoDriver());
 	return true;
 }
 
@@ -233,7 +232,7 @@ HWND CMSWindow::GetWindowHandle()
 	return m_hWnd;
 }
 
-int	CMSWindow::GetScreenWidth()
+int CMSWindow::GetScreenWidth()
 {
 	SDL_DisplayMode dm;
 	if (SDL_GetCurrentDisplayMode(0, &dm) == 0)
@@ -241,7 +240,7 @@ int	CMSWindow::GetScreenWidth()
 	return 0;
 }
 
-int	CMSWindow::GetScreenHeight()
+int CMSWindow::GetScreenHeight()
 {
 	SDL_DisplayMode dm;
 	if (SDL_GetCurrentDisplayMode(0, &dm) == 0)
@@ -302,7 +301,7 @@ void CMSWindow::SetCenterPosition()
 	int windowWidth = rc.right - rc.left;
 	int windowHeight = rc.bottom - rc.top;
 
-	SetPosition((GetScreenWidth()-windowWidth)/2, (GetScreenHeight()-windowHeight)/2);
+	SetPosition((GetScreenWidth() - windowWidth) / 2, (GetScreenHeight() - windowHeight) / 2);
 }
 
 void CMSWindow::AdjustSize(int width, int height)

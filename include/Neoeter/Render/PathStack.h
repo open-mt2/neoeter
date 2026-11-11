@@ -21,6 +21,6 @@ class CPathStack
 		void GetCurrentPathName(std::string* pstCurPathName);
 
 	protected:
-		std::string				m_stBasePathName;
-		std::deque<std::string>	m_stPathNameDeque;
+		std::string m_stBasePathName;
+		std::deque<std::string> m_stPathNameDeque;
 };

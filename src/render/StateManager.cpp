@@ -2,19 +2,17 @@
 #include <Neoeter/Render/StateManager.h>
 #include <Neoeter/Render/ShaderStats.h>
 
-//#define StateManager_Assert(a) if (!(a)) puts("assert"#a)
+// #define StateManager_Assert(a) if (!(a)) puts("assert"#a)
 #define StateManager_Assert(a) assert(a)
 
 struct SLightData
 {
-	enum
-	{
-		LIGHT_NUM = 8,
-	};
-	D3DLIGHT9 m_akD3DLight[LIGHT_NUM];
+		enum
+		{
+			LIGHT_NUM = 8,
+		};
+		D3DLIGHT9 m_akD3DLight[LIGHT_NUM];
 } m_kLightData;
-
-
 
 void CStateManager::SetLight(DWORD index, CONST D3DLIGHT9* pLight)
 {
@@ -26,13 +24,13 @@ void CStateManager::SetLight(DWORD index, CONST D3DLIGHT9* pLight)
 
 void CStateManager::GetLight(DWORD index, D3DLIGHT9* pLight)
 {
-	assert(index<8);
-	*pLight=m_kLightData.m_akD3DLight[index];
+	assert(index < 8);
+	*pLight = m_kLightData.m_akD3DLight[index];
 }
 
 bool CStateManager::BeginScene()
 {
-	m_bScene=true;
+	m_bScene = true;
 
 	D3DXMATRIX m4Proj;
 	D3DXMATRIX m4View;
@@ -52,7 +50,7 @@ bool CStateManager::BeginScene()
 void CStateManager::EndScene()
 {
 	m_lpD3DDev->EndScene();
-	m_bScene=false;
+	m_bScene = false;
 }
 
 CStateManager::CStateManager(LPDIRECT3DDEVICE9 lpDevice) : m_lpD3DDev(NULL)
@@ -92,7 +90,7 @@ void CStateManager::SetDevice(LPDIRECT3DDEVICE9 lpDevice)
 		m_dwBestMagFilter = D3DTEXF_ANISOTROPIC;
 	else
 		m_dwBestMagFilter = D3DTEXF_LINEAR;
-	
+
 	if (d3dCaps.TextureFilterCaps & D3DPTFILTERCAPS_MINFANISOTROPIC)
 		m_dwBestMinFilter = D3DTEXF_ANISOTROPIC;
 	else
@@ -133,7 +131,7 @@ void CStateManager::Restore()
 
 	for (i = 0; i < STATEMANAGER_MAX_STAGES; ++i)
 		SetTexture(i, m_CurrentState.m_Textures[i]);
-	
+
 	m_bForce = false;
 }
 
@@ -407,7 +405,7 @@ void CStateManager::SetRenderState(D3DRENDERSTATETYPE Type, DWORD Value)
 	m_CurrentState.m_RenderStates[Type] = Value;
 }
 
-void CStateManager::GetRenderState(D3DRENDERSTATETYPE Type, DWORD * pdwValue)
+void CStateManager::GetRenderState(D3DRENDERSTATETYPE Type, DWORD* pdwValue)
 {
 	*pdwValue = m_CurrentState.m_RenderStates[Type];
 }
@@ -477,7 +475,7 @@ void CStateManager::SetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE
 	m_CurrentState.m_TextureStates[dwStage][Type] = dwValue;
 }
 
-void CStateManager::GetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE Type, DWORD * pdwValue)
+void CStateManager::GetTextureStageState(DWORD dwStage, D3DTEXTURESTAGESTATETYPE Type, DWORD* pdwValue)
 {
 	*pdwValue = m_CurrentState.m_TextureStates[dwStage][Type];
 }
@@ -489,7 +487,7 @@ void CStateManager::SaveSamplerState(DWORD dwStage, D3DSAMPLERSTATETYPE Type, DW
 #ifdef _DEBUG
 	if (m_bSamplerStateSavingFlag[dwStage][Type])
 	{
-        Tracef(" CStateManager::SaveSamplerState - This sampler state is already saved [%d, %d]\n", dwStage, Type);
+		Tracef(" CStateManager::SaveSamplerState - This sampler state is already saved [%d, %d]\n", dwStage, Type);
 		StateManager_Assert(!" This sampler state is already saved!");
 	}
 	m_bSamplerStateSavingFlag[dwStage][Type] = TRUE;
@@ -503,7 +501,7 @@ void CStateManager::RestoreSamplerState(DWORD dwStage, D3DSAMPLERSTATETYPE Type)
 #ifdef _DEBUG
 	if (!m_bSamplerStateSavingFlag[dwStage][Type])
 	{
-        Tracef(" CStateManager::RestoreSamplerState - This sampler state was not saved [%d, %d]\n", dwStage, Type);
+		Tracef(" CStateManager::RestoreSamplerState - This sampler state was not saved [%d, %d]\n", dwStage, Type);
 		StateManager_Assert(!" This sampler state was not saved!");
 	}
 	m_bSamplerStateSavingFlag[dwStage][Type] = FALSE;
@@ -556,7 +554,6 @@ void CStateManager::GetVertexShader(LPDIRECT3DVERTEXSHADER9* pdwShader)
 	*pdwShader = m_CurrentState.m_dwVertexShader;
 }
 
-
 // Vertex Declaration
 void CStateManager::SaveVertexDeclaration(LPDIRECT3DVERTEXDECLARATION9 dwShader)
 {
@@ -597,7 +594,8 @@ void CStateManager::RestorePixelShader()
 
 void CStateManager::SetPixelShader(LPDIRECT3DPIXELSHADER9 dwShader)
 {
-	if (m_CurrentState.m_dwPixelShader != dwShader) {
+	if (m_CurrentState.m_dwPixelShader != dwShader)
+	{
 		m_CurrentState.m_dwPixelShader = dwShader;
 		m_lpD3DDev->SetPixelShader(dwShader);
 
@@ -611,7 +609,6 @@ void CStateManager::GetPixelShader(LPDIRECT3DPIXELSHADER9* pdwShader)
 {
 	*pdwShader = m_CurrentState.m_dwPixelShader;
 }
-
 
 // FVF
 void CStateManager::SaveFVF(DWORD dwFVF)
@@ -653,7 +650,7 @@ void CStateManager::SaveTransform(D3DTRANSFORMSTATETYPE Type, const D3DMATRIX* p
 #endif // _DEBUG
 
 	m_CopyState.m_Matrices[Type] = m_CurrentState.m_Matrices[Type];
-	SetTransform(Type, (D3DXMATRIX *)pMatrix);
+	SetTransform(Type, (D3DXMATRIX*)pMatrix);
 }
 
 void CStateManager::RestoreTransform(D3DTRANSFORMSTATETYPE Type)
@@ -679,19 +676,19 @@ void CStateManager::SetTransform(D3DTRANSFORMSTATETYPE Type, const D3DMATRIX* pM
 	}
 	else
 	{
-		assert(D3DTS_VIEW==Type || D3DTS_PROJECTION==Type || D3DTS_WORLD==Type);
+		assert(D3DTS_VIEW == Type || D3DTS_PROJECTION == Type || D3DTS_WORLD == Type);
 	}
 
 	m_CurrentState.m_Matrices[Type] = *pMatrix;
 }
 
-void CStateManager::GetTransform(D3DTRANSFORMSTATETYPE Type, D3DMATRIX * pMatrix)
+void CStateManager::GetTransform(D3DTRANSFORMSTATETYPE Type, D3DMATRIX* pMatrix)
 {
 	*pMatrix = m_CurrentState.m_Matrices[Type];
 }
 
 // SetVertexShaderConstant
-void CStateManager::SaveVertexShaderConstant(DWORD dwRegister,CONST void* pConstantData,DWORD dwConstantCount)
+void CStateManager::SaveVertexShaderConstant(DWORD dwRegister, CONST void* pConstantData, DWORD dwConstantCount)
 {
 	for (DWORD i = 0; i < dwConstantCount; i++)
 	{
@@ -707,7 +704,7 @@ void CStateManager::RestoreVertexShaderConstant(UINT dwRegister, UINT dwConstant
 	SetVertexShaderConstant(dwRegister, &m_CopyState.m_VertexShaderConstants[dwRegister], dwConstantCount);
 }
 
-void CStateManager::SetVertexShaderConstant(DWORD dwRegister,CONST void* pConstantData,DWORD dwConstantCount)
+void CStateManager::SetVertexShaderConstant(DWORD dwRegister, CONST void* pConstantData, DWORD dwConstantCount)
 {
 	m_lpD3DDev->SetVertexShaderConstantF(dwRegister, (const float*)pConstantData, dwConstantCount);
 	CShaderStats::OnConstants(true);
@@ -721,7 +718,7 @@ void CStateManager::SetVertexShaderConstant(DWORD dwRegister,CONST void* pConsta
 }
 
 // SetPixelShaderConstant
-void CStateManager::SavePixelShaderConstant(DWORD dwRegister,CONST void* pConstantData,DWORD dwConstantCount)
+void CStateManager::SavePixelShaderConstant(DWORD dwRegister, CONST void* pConstantData, DWORD dwConstantCount)
 {
 	for (DWORD i = 0; i < dwConstantCount; i++)
 	{
@@ -732,7 +729,7 @@ void CStateManager::SavePixelShaderConstant(DWORD dwRegister,CONST void* pConsta
 	SetPixelShaderConstant(dwRegister, pConstantData, dwConstantCount);
 }
 
-void CStateManager::SetPixelShaderConstant(DWORD dwRegister,CONST void* pConstantData,DWORD dwConstantCount)
+void CStateManager::SetPixelShaderConstant(DWORD dwRegister, CONST void* pConstantData, DWORD dwConstantCount)
 {
 	m_lpD3DDev->SetPixelShaderConstantF(dwRegister, (const float*)pConstantData, dwConstantCount);
 	CShaderStats::OnConstants(false);
@@ -759,8 +756,8 @@ void CStateManager::SaveStreamSource(UINT StreamNumber, LPDIRECT3DVERTEXBUFFER9 
 
 void CStateManager::RestoreStreamSource(UINT StreamNumber)
 {
-	SetStreamSource(StreamNumber, 
-					m_CopyState.m_StreamData[StreamNumber].m_lpStreamData, 
+	SetStreamSource(StreamNumber,
+					m_CopyState.m_StreamData[StreamNumber].m_lpStreamData,
 					m_CopyState.m_StreamData[StreamNumber].m_Stride);
 }
 
@@ -768,7 +765,7 @@ void CStateManager::SetStreamSource(UINT StreamNumber, LPDIRECT3DVERTEXBUFFER9 p
 {
 	CStreamData kStreamData(pStreamData, Stride);
 	if (m_CurrentState.m_StreamData[StreamNumber] == kStreamData)
-		return;	
+		return;
 
 	m_lpD3DDev->SetStreamSource(StreamNumber, pStreamData, 0, Stride);
 	m_CurrentState.m_StreamData[StreamNumber] = kStreamData;
@@ -812,7 +809,7 @@ HRESULT CStateManager::DrawIndexedPrimitive(D3DPRIMITIVETYPE PrimitiveType, UINT
 	return (m_lpD3DDev->DrawIndexedPrimitive(PrimitiveType, baseVertexIndex, minIndex, NumVertices, startIndex, primCount));
 }
 
-HRESULT CStateManager::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, UINT MinVertexIndex, UINT NumVertexIndices, UINT PrimitiveCount, CONST void * pIndexData, D3DFORMAT IndexDataFormat, CONST void * pVertexStreamZeroData, UINT VertexStreamZeroStride)
+HRESULT CStateManager::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, UINT MinVertexIndex, UINT NumVertexIndices, UINT PrimitiveCount, CONST void* pIndexData, D3DFORMAT IndexDataFormat, CONST void* pVertexStreamZeroData, UINT VertexStreamZeroStride)
 {
 	m_CurrentState.m_IndexData = NULL;
 	m_CurrentState.m_StreamData[0] = NULL;

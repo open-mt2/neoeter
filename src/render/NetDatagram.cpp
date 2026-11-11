@@ -13,21 +13,21 @@ CNetworkDatagram::~CNetworkDatagram()
 
 void CNetworkDatagram::Destroy()
 {
-	if (INVALID_SOCKET==m_sock)
+	if (INVALID_SOCKET == m_sock)
 		return;
 
 	closesocket(m_sock);
-	
+
 	__Initialize();
 }
 
 bool CNetworkDatagram::Create(UINT uPort)
 {
-	assert(INVALID_SOCKET==m_sock);
+	assert(INVALID_SOCKET == m_sock);
 	m_sock = socket(AF_INET, SOCK_DGRAM, 0);
 
 	DWORD arg = 1;
-	ioctlsocket(m_sock, FIONBIO, &arg);	// Non-blocking mode
+	ioctlsocket(m_sock, FIONBIO, &arg); // Non-blocking mode
 
 	SOCKADDR_IN sockAddrIn;
 	memset(&sockAddrIn, 0, sizeof(SOCKADDR_IN));
@@ -44,7 +44,7 @@ bool CNetworkDatagram::Create(UINT uPort)
 }
 
 #pragma warning(push)
-#pragma warning(disable:4127)
+#pragma warning(disable : 4127)
 void CNetworkDatagram::Update()
 {
 	if (m_sock == INVALID_SOCKET)
@@ -60,7 +60,7 @@ void CNetworkDatagram::Update()
 
 	delay.tv_sec = 0;
 	delay.tv_usec = 0;
-	
+
 	if (select((int)m_sock + 1, &m_fdsRecv, &m_fdsSend, NULL, &delay) == SOCKET_ERROR)
 		return;
 }
@@ -74,13 +74,12 @@ bool CNetworkDatagram::CanRecv()
 	return false;
 }
 
-		
 int CNetworkDatagram::PeekRecvFrom(UINT uBufLen, void* pvBuf, SOCKADDR_IN* pkSockAddrIn)
 {
 #ifdef _WIN32
-	int nSockAddrInLen=sizeof(SOCKADDR_IN);
+	int nSockAddrInLen = sizeof(SOCKADDR_IN);
 #else
-	socklen_t nSockAddrInLen=sizeof(SOCKADDR_IN);
+	socklen_t nSockAddrInLen = sizeof(SOCKADDR_IN);
 #endif
 	return recvfrom(m_sock, (char*)pvBuf, uBufLen, MSG_PEEK, (PSOCKADDR)pkSockAddrIn, &nSockAddrInLen);
 }
@@ -88,20 +87,19 @@ int CNetworkDatagram::PeekRecvFrom(UINT uBufLen, void* pvBuf, SOCKADDR_IN* pkSoc
 int CNetworkDatagram::RecvFrom(UINT uBufLen, void* pvBuf, SOCKADDR_IN* pkSockAddrIn)
 {
 #ifdef _WIN32
-	int nSockAddrInLen=sizeof(SOCKADDR_IN);
+	int nSockAddrInLen = sizeof(SOCKADDR_IN);
 #else
-	socklen_t nSockAddrInLen=sizeof(SOCKADDR_IN);
+	socklen_t nSockAddrInLen = sizeof(SOCKADDR_IN);
 #endif
 	return recvfrom(m_sock, (char*)pvBuf, uBufLen, 0, (PSOCKADDR)pkSockAddrIn, &nSockAddrInLen);
 }
 
 int CNetworkDatagram::SendTo(UINT uBufLen, const void* c_pvBuf, const SOCKADDR_IN& c_rkSockAddrIn)
 {
-	return sendto(m_sock, (const char *)c_pvBuf, uBufLen, 0, (PSOCKADDR)&c_rkSockAddrIn, sizeof(SOCKADDR_IN));
+	return sendto(m_sock, (const char*)c_pvBuf, uBufLen, 0, (PSOCKADDR)&c_rkSockAddrIn, sizeof(SOCKADDR_IN));
 }
-
 
 void CNetworkDatagram::__Initialize()
 {
-	m_sock=INVALID_SOCKET;
+	m_sock = INVALID_SOCKET;
 }

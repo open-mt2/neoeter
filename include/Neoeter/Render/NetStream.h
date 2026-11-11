@@ -7,12 +7,12 @@ class CNetworkStream
 {
 	public:
 		CNetworkStream();
-		virtual ~CNetworkStream();		
+		virtual ~CNetworkStream();
 
 		void SetRecvBufferSize(int recvBufSize);
 		void SetSendBufferSize(int sendBufSize);
 
-		int	GetRecvBufferSize();
+		int GetRecvBufferSize();
 
 		void Clear();
 		void ClearRecvBuffer();
@@ -41,11 +41,11 @@ class CNetworkStream
 		void SetPacketSequenceMode(bool isOn);
 		bool SendSequence();
 
-	protected:			
-		virtual void OnConnectSuccess();				
+	protected:
+		virtual void OnConnectSuccess();
 		virtual void OnConnectFailure();
 		virtual void OnRemoteDisconnect();
-		virtual void OnDisconnect();		
+		virtual void OnDisconnect();
 		virtual bool OnProcess();
 
 		bool __SendInternalBuffer();
@@ -56,34 +56,34 @@ class CNetworkStream
 		int __GetSendBufferSize();
 
 	private:
-		time_t	m_connectLimitTime;
+		time_t m_connectLimitTime;
 
-		char*	m_recvTEABuf;
-		int		m_recvTEABufInputPos;
-		int		m_recvTEABufSize;
+		char* m_recvTEABuf;
+		int m_recvTEABufInputPos;
+		int m_recvTEABufSize;
 
-		char*	m_recvBuf;
-		int		m_recvBufSize;
-		int		m_recvBufInputPos;
-		int		m_recvBufOutputPos;
+		char* m_recvBuf;
+		int m_recvBufSize;
+		int m_recvBufInputPos;
+		int m_recvBufOutputPos;
 
-		char*	m_sendBuf;
-		int		m_sendBufSize;
-		int		m_sendBufInputPos;
-		int		m_sendBufOutputPos;
+		char* m_sendBuf;
+		int m_sendBufSize;
+		int m_sendBufInputPos;
+		int m_sendBufOutputPos;
 
-		char*	m_sendTEABuf;
-		int		m_sendTEABufSize;
-		int		m_sendTEABufInputPos;
+		char* m_sendTEABuf;
+		int m_sendTEABufSize;
+		int m_sendTEABufInputPos;
 
-		bool	m_isOnline;
+		bool m_isOnline;
 
-		SOCKET	m_sock;
+		SOCKET m_sock;
 
 		CNetworkAddress m_addr;
 
 		// Sequence
-		DWORD					m_iSequence;
-		bool					m_bUseSequence;
-		std::vector<BYTE>		m_kVec_bSequenceTable;
+		DWORD m_iSequence;
+		bool m_bUseSequence;
+		std::vector<BYTE> m_kVec_bSequenceTable;
 };

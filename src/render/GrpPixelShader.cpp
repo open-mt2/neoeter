@@ -16,13 +16,13 @@ CPixelShader::~CPixelShader()
 
 void CPixelShader::Initialize()
 {
-	m_handle=0;
+	m_handle = 0;
 }
 
 void CPixelShader::Destroy()
 {
 	if (m_handle)
-		m_handle=0;
+		m_handle = 0;
 }
 
 bool CPixelShader::CreateFromDiskFile(const char* c_szFileName)

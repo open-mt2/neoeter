@@ -3,7 +3,7 @@
 
 #include <Neoeter/Render/TextFileLoader.h>
 
-void PrintfTabs(FILE * File, int iTabCount, const char * c_szString, ...)
+void PrintfTabs(FILE* File, int iTabCount, const char* c_szString, ...)
 {
 	va_list args;
 	va_start(args, c_szString);
@@ -18,7 +18,7 @@ void PrintfTabs(FILE * File, int iTabCount, const char * c_szString, ...)
 	fprintf(File, szBuf);
 }
 
-bool LoadTextData(const char * c_szFileName, CTokenMap & rstTokenMap)
+bool LoadTextData(const char* c_szFileName, CTokenMap& rstTokenMap)
 {
 	CEterPackManager::TPackDataPtr motionData;
 	CMemoryTextFileLoader textFileLoader;
@@ -46,7 +46,7 @@ bool LoadTextData(const char * c_szFileName, CTokenMap & rstTokenMap)
 	return true;
 }
 
-bool LoadMultipleTextData(const char * c_szFileName, CTokenVectorMap & rstTokenVectorMap)
+bool LoadMultipleTextData(const char* c_szFileName, CTokenVectorMap& rstTokenVectorMap)
 {
 	CEterPackManager::TPackDataPtr modelData;
 	CMemoryTextFileLoader textFileLoader;
@@ -75,7 +75,7 @@ bool LoadMultipleTextData(const char * c_szFileName, CTokenVectorMap & rstTokenV
 			std::string key = stTokenVector[1];
 			stTokenVector.clear();
 
-			for (i=i+1; i < textFileLoader.GetLineCount(); ++i)
+			for (i = i + 1; i < textFileLoader.GetLineCount(); ++i)
 			{
 				if (!textFileLoader.SplitLine(i, &stSubTokenVector))
 					continue;
@@ -106,7 +106,7 @@ bool LoadMultipleTextData(const char * c_szFileName, CTokenVectorMap & rstTokenV
 	return true;
 }
 
-D3DXVECTOR3 TokenToVector(CTokenVector & rVector)
+D3DXVECTOR3 TokenToVector(CTokenVector& rVector)
 {
 	if (3 != rVector.size())
 	{
@@ -115,11 +115,11 @@ D3DXVECTOR3 TokenToVector(CTokenVector & rVector)
 	}
 
 	return D3DXVECTOR3(atof(rVector[0].c_str()),
-						atof(rVector[1].c_str()),
-						atof(rVector[2].c_str()));
+					   atof(rVector[1].c_str()),
+					   atof(rVector[2].c_str()));
 }
 
-D3DXCOLOR TokenToColor(CTokenVector & rVector)
+D3DXCOLOR TokenToColor(CTokenVector& rVector)
 {
 	if (4 != rVector.size())
 	{
@@ -128,15 +128,15 @@ D3DXCOLOR TokenToColor(CTokenVector & rVector)
 	}
 
 	return D3DXCOLOR(atof(rVector[0].c_str()),
-						atof(rVector[1].c_str()),
-						atof(rVector[2].c_str()),
-						atof(rVector[3].c_str()));
+					 atof(rVector[1].c_str()),
+					 atof(rVector[2].c_str()),
+					 atof(rVector[3].c_str()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-static std::string	gs_fontFace="";
-static DWORD		gs_codePage=0;
+static std::string gs_fontFace = "";
+static DWORD gs_codePage = 0;
 
 int CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* /*textMetric*/, DWORD /*dwWord*/, LPARAM lParam)
 {
@@ -145,90 +145,89 @@ int CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* /*text
 
 int GetCharsetFromCodePage(WORD codePage)
 {
-	switch( codePage )
+	switch (codePage)
 	{
-	case CP_932:
-		return SHIFTJIS_CHARSET;
-	case CP_949:
-		return HANGUL_CHARSET;
-	case CP_936:
-		return GB2312_CHARSET;
-	case CP_950:
-		return CHINESEBIG5_CHARSET;
-	case CP_1253:
-		return GREEK_CHARSET;
-	case CP_1254:
-		return TURKISH_CHARSET;
-	case CP_1255:
-		return HEBREW_CHARSET;
-	case CP_1256:
-		return ARABIC_CHARSET;
-	case CP_1257:
-		return BALTIC_CHARSET;
-	case CP_1258:
-		return VIETNAMESE_CHARSET;
-	case CP_874:
-		return THAI_CHARSET;
-	case CP_1250:
-		return EASTEUROPE_CHARSET;
-	case CP_1251:
-		return RUSSIAN_CHARSET;
-	default:
-		return DEFAULT_CHARSET;
+		case CP_932:
+			return SHIFTJIS_CHARSET;
+		case CP_949:
+			return HANGUL_CHARSET;
+		case CP_936:
+			return GB2312_CHARSET;
+		case CP_950:
+			return CHINESEBIG5_CHARSET;
+		case CP_1253:
+			return GREEK_CHARSET;
+		case CP_1254:
+			return TURKISH_CHARSET;
+		case CP_1255:
+			return HEBREW_CHARSET;
+		case CP_1256:
+			return ARABIC_CHARSET;
+		case CP_1257:
+			return BALTIC_CHARSET;
+		case CP_1258:
+			return VIETNAMESE_CHARSET;
+		case CP_874:
+			return THAI_CHARSET;
+		case CP_1250:
+			return EASTEUROPE_CHARSET;
+		case CP_1251:
+			return RUSSIAN_CHARSET;
+		default:
+			return DEFAULT_CHARSET;
 	}
 }
 
-
 const char* GetFontFaceFromCodePageNT(WORD codePage)
 {
-	switch( codePage )
+	switch (codePage)
 	{
-	case CP_932:
-		return "MS PGothic";
-	case CP_949:
-		return "GulimChe";
-	case CP_936:
-		return "SimSun";
-	case CP_950:
-		return "MingLiU";
-	case CP_874:
-		return "Tahoma";
-	case CP_1252:
-		return "Arial";
-	case CP_1256:
-		return "Tahoma"; 
-	case CP_1258:
-		return "Tahoma"; 
-	case CP_65001:
-		return "Arial";
-	default:
-		return "Arial";
+		case CP_932:
+			return "MS PGothic";
+		case CP_949:
+			return "GulimChe";
+		case CP_936:
+			return "SimSun";
+		case CP_950:
+			return "MingLiU";
+		case CP_874:
+			return "Tahoma";
+		case CP_1252:
+			return "Arial";
+		case CP_1256:
+			return "Tahoma";
+		case CP_1258:
+			return "Tahoma";
+		case CP_65001:
+			return "Arial";
+		default:
+			return "Arial";
 	}
 }
 const char* GetFontFaceFromCodePage9x(WORD codePage)
 {
-	switch( codePage )
+	switch (codePage)
 	{
-	case CP_932:
-		return "MS PGothic";
-	case CP_949:
-		return "GulimChe";
-	case CP_936:
-		return "SimSun";
-	case CP_950:
-		return "MingLiU";
-	case CP_874:
-		return "Tahoma";
-	case CP_1252:
-		return "Arial";
-	case CP_1256:
-		return "Tahoma"; 
-	case CP_1258:
-		return "Tahoma"; 
-	case CP_65001:
-		return "Arial"; 
-	default:
-		return "Arial";
+		case CP_932:
+			return "MS PGothic";
+		case CP_949:
+			return "GulimChe";
+		case CP_936:
+			return "SimSun";
+		case CP_950:
+			return "MingLiU";
+		case CP_874:
+			return "Tahoma";
+		case CP_1252:
+			return "Arial";
+		case CP_1256:
+			return "Tahoma";
+		case CP_1258:
+			return "Tahoma";
+		case CP_65001:
+			return "Arial";
+		default:
+			return "Arial";
 	}
 }
 
@@ -237,12 +236,12 @@ DWORD GetDefaultCodePage()
 	return gs_codePage;
 }
 
-const char * GetDefaultFontFace()
+const char* GetDefaultFontFace()
 {
 	return gs_fontFace.c_str();
 }
 
-const char*	GetFontFaceFromCodePage(WORD codePage)
+const char* GetFontFaceFromCodePage(WORD codePage)
 {
 	LOGFONT logFont;
 
@@ -252,9 +251,9 @@ const char*	GetFontFaceFromCodePage(WORD codePage)
 
 	const char* fontFace = GetFontFaceFromCodePage9x(codePage);
 
-	HDC hDC=GetDC(NULL);
+	HDC hDC = GetDC(NULL);
 
-	if(EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)fontFace, 0) == 0)
+	if (EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)fontFace, 0) == 0)
 	{
 		ReleaseDC(NULL, hDC);
 		return fontFace;
@@ -262,7 +261,7 @@ const char*	GetFontFaceFromCodePage(WORD codePage)
 
 	fontFace = GetFontFaceFromCodePageNT(codePage);
 
-	if(EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)fontFace, 0) == 0)
+	if (EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)fontFace, 0) == 0)
 	{
 		ReleaseDC(NULL, hDC);
 		return fontFace;
@@ -275,14 +274,14 @@ const char*	GetFontFaceFromCodePage(WORD codePage)
 
 void SetDefaultFontFace(const char* fontFace)
 {
-	gs_fontFace=fontFace;
+	gs_fontFace = fontFace;
 }
 
 bool SetDefaultCodePage(DWORD codePage)
 {
-	gs_codePage=codePage;
+	gs_codePage = codePage;
 
-	std::string fontFace=GetFontFaceFromCodePage(codePage);
+	std::string fontFace = GetFontFaceFromCodePage(codePage);
 	if (fontFace.empty())
 		return false;
 
@@ -291,96 +290,96 @@ bool SetDefaultCodePage(DWORD codePage)
 	return true;
 }
 
-
-int __base64_get( const int c )
+int __base64_get(const int c)
 {
-	if( 'A' <= c && c <= 'Z' )
-		return c-'A';
-	if( 'a' <= c && c <= 'z' )
+	if ('A' <= c && c <= 'Z')
+		return c - 'A';
+	if ('a' <= c && c <= 'z')
 		return c - 'a' + 26;
-	if( '0' <= c && c <= '9' )
+	if ('0' <= c && c <= '9')
 		return c - '0' + 52;
-	if( c == '+' )
+	if (c == '+')
 		return 62;
-	if( c == '/' )
+	if (c == '/')
 		return 63;
-	if( c == '=' )	// end of line
+	if (c == '=') // end of line
 		return -1;
-	return -2;	// non value;
+	return -2; // non value;
 }
 
-void __strcat1(char * str,int i)
+void __strcat1(char* str, int i)
 {
 	char result[2];
 	result[0] = i;
 	result[1] = '\0';
-	strcat(str,result);
+	strcat(str, result);
 }
 
-void base64_decode(const char * str,char * resultStr)
+void base64_decode(const char* str, char* resultStr)
 {
-	int nCount=0, i=0, r, result;
+	int nCount = 0, i = 0, r, result;
 	int length = strlen(str);
-	char szDest[5]="";
+	char szDest[5] = "";
 
-	strcpy(resultStr,"");
-	while(nCount < length)
+	strcpy(resultStr, "");
+	while (nCount < length)
 	{
-		i=0;
+		i = 0;
 		strcpy(szDest, "");
-		while(nCount<length && i<4)	// 4개의 바이트를 얻는다.
-		{			
+		while (nCount < length && i < 4) // 4개의 바이트를 얻는다.
+		{
 			r = str[nCount++];
 			result = __base64_get(r);
-			if(result!=-2)
+			if (result != -2)
 			{
-				if(result!=-1)
+				if (result != -1)
 					szDest[i++] = result;
-				else szDest[i++] = '@';	// It's end  (64번은 디코딩시 사용되지 않기 때문)
+				else
+					szDest[i++] = '@'; // It's end  (64번은 디코딩시 사용되지 않기 때문)
 			}
 		}
 
-		if(i==4)	// 4개의 소스를 모두 얻어냈다. 디코드 시작
-		{	
-			if( nCount+3 >= length )	// 데이터의 끝에 도달했다.
+		if (i == 4) // 4개의 소스를 모두 얻어냈다. 디코드 시작
+		{
+			if (nCount + 3 >= length) // 데이터의 끝에 도달했다.
 			{
-				if( szDest[1] == '@' )
+				if (szDest[1] == '@')
 				{
-					__strcat1(resultStr,(szDest[0]<<2));		
+					__strcat1(resultStr, (szDest[0] << 2));
 					break;
-				}// exit while loop
-				else 
-					__strcat1(resultStr,(szDest[0]<<2 | szDest[1]>>4));	// 1 Byte
-				if( szDest[2] == '@' )
+				} // exit while loop
+				else
+					__strcat1(resultStr, (szDest[0] << 2 | szDest[1] >> 4)); // 1 Byte
+				if (szDest[2] == '@')
 				{
-					__strcat1(resultStr,(szDest[1]<<4));
-					break;
-				}
-				else 
-					__strcat1(resultStr,(szDest[1]<<4 | szDest[2]>>2));	// 2 Byte				
-				if( szDest[3] == '@' )
-				{
-					__strcat1(resultStr,(szDest[2]<<6));
+					__strcat1(resultStr, (szDest[1] << 4));
 					break;
 				}
-				else 
-					__strcat1(resultStr,(szDest[2]<<6 | szDest[3]));	// 3 Byte				
+				else
+					__strcat1(resultStr, (szDest[1] << 4 | szDest[2] >> 2)); // 2 Byte
+				if (szDest[3] == '@')
+				{
+					__strcat1(resultStr, (szDest[2] << 6));
+					break;
+				}
+				else
+					__strcat1(resultStr, (szDest[2] << 6 | szDest[3])); // 3 Byte
 			}
 			else
 			{
-				__strcat1(resultStr,(szDest[0]<<2 | szDest[1]>>4));	// 1 Byte
-				__strcat1(resultStr,(szDest[1]<<4 | szDest[2]>>2));	// 2 Byte				
-				__strcat1(resultStr,(szDest[2]<<6 | szDest[3]));	// 3 Byte
+				__strcat1(resultStr, (szDest[0] << 2 | szDest[1] >> 4)); // 1 Byte
+				__strcat1(resultStr, (szDest[1] << 4 | szDest[2] >> 2)); // 2 Byte
+				__strcat1(resultStr, (szDest[2] << 6 | szDest[3]));		 // 3 Byte
 			}
 		}
-		
-	}// end of while
 
-	for (i = 0; i < strlen(resultStr); i++) 
+	} // end of while
+
+	for (i = 0; i < strlen(resultStr); i++)
 	{
 		char c = resultStr[i];
 		int xor_val = i + 5;
 		resultStr[i] = char(c ^ xor_val);
-	}	
+	}
 	// E
 }

@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFilename Class
 //
 //	(c) 2003 IDV, Inc.
@@ -21,14 +21,13 @@
 //		Web:   http://www.idvinc.com
 //
 
-
 #pragma once
 #include <string>
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFilename Class
 
-//class CFilename
+// class CFilename
 //{
 //	public:
 //		CFilename() { }
@@ -43,7 +42,7 @@
 //		bool operator ==(const CFilename& r) const { return m_sRaw == r.m_sRaw; }
 //		CFilename operator +(const CFilename& r) const { return CFilename(m_sRaw + r.m_sRaw); }
 //		CFilename& operator +=(const CFilename& r) { m_sRaw += r.m_sRaw; return *this; }
-//		const char& operator[](size_t nIdx) const { return m_sRaw[nIdx]; } 
+//		const char& operator[](size_t nIdx) const { return m_sRaw[nIdx]; }
 //		const char* c_str() const { return m_sRaw.c_str(); }
 //		size_t find(const char* pcszSrc) const { return m_sRaw.find(pcszSrc); }
 //		bool empty() const { return m_sRaw.empty(); }
@@ -51,7 +50,7 @@
 //		size_t length() const { return m_sRaw.length(); }
 //
 //		string& GetString() { return m_sRaw; }
-//		
+//
 //		void ChangeDosPath()
 //		{
 //			size_t nLength = m_sRaw.length();
@@ -65,7 +64,7 @@
 //
 //		void StringPath()
 //		{
-//			size_t nLength = m_sRaw.length();		
+//			size_t nLength = m_sRaw.length();
 //
 //			for (size_t i = 0; i<nLength; ++i)
 //			{
@@ -82,45 +81,46 @@
 //		CFilename NoExtension(void);       // if filename is "/idv/code/file.cpp", it returns "/idv/code/file"
 //		CFilename NoPath(void);            // if filename is "/idv/code/file.cpp", it returns "file.cpp"
 //		string m_sRaw;
-//};
+// };
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFileNameHelper Class
 
 class CFileNameHelper
 {
-public:
-	static void ChangeDosPath(std::string& str) {
-		size_t nLength = str.length();
-
-		for (size_t i = 0; i < nLength; ++i)
+	public:
+		static void ChangeDosPath(std::string& str)
 		{
-			if (str.at(i) == '/')
-				str.at(i) = '\\';
+			size_t nLength = str.length();
+
+			for (size_t i = 0; i < nLength; ++i)
+			{
+				if (str.at(i) == '/')
+					str.at(i) = '\\';
+			}
 		}
-	}
 
-	static void StringPath(std::string& str) {
-		size_t nLength = str.length();		
-
-		for (size_t i = 0; i<nLength; ++i)
+		static void StringPath(std::string& str)
 		{
-			if (str.at(i) == '\\')
-				str.at(i) = '/';
-			else
-				str.at(i) = (char)tolower(str.at(i));
-		}
-	}
+			size_t nLength = str.length();
 
-	static std::string GetName(const std::string& str);           // if filename is "/idv/code/file.cpp", it returns "file"
-	static std::string GetExtension(const std::string& str);      // if filename is "/idv/code/file.cpp", it returns "cpp"
-	static std::string GetPath(const std::string& str);           // if filename is "/idv/code/file.cpp", it returns "/idv/code"
-	static std::string NoExtension(const std::string& str);       // if filename is "/idv/code/file.cpp", it returns "/idv/code/file"
-	static std::string NoPath(const std::string& str);            // if filename is "/idv/code/file.cpp", it returns "file.cpp"
+			for (size_t i = 0; i < nLength; ++i)
+			{
+				if (str.at(i) == '\\')
+					str.at(i) = '/';
+				else
+					str.at(i) = (char)tolower(str.at(i));
+			}
+		}
+
+		static std::string GetName(const std::string& str);		 // if filename is "/idv/code/file.cpp", it returns "file"
+		static std::string GetExtension(const std::string& str); // if filename is "/idv/code/file.cpp", it returns "cpp"
+		static std::string GetPath(const std::string& str);		 // if filename is "/idv/code/file.cpp", it returns "/idv/code"
+		static std::string NoExtension(const std::string& str);	 // if filename is "/idv/code/file.cpp", it returns "/idv/code/file"
+		static std::string NoPath(const std::string& str);		 // if filename is "/idv/code/file.cpp", it returns "file.cpp"
 };
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFileNameHelper::GetExtension
 
 inline std::string CFileNameHelper::GetName(const std::string& str)
@@ -152,8 +152,7 @@ inline std::string CFileNameHelper::GetName(const std::string& str)
 	return strName;
 }
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFilenameHelper::GetExtension
 
 inline std::string CFileNameHelper::GetExtension(const std::string& str)
@@ -167,7 +166,7 @@ inline std::string CFileNameHelper::GetExtension(const std::string& str)
 		for (size_t i = nLength - 1; i > 0 && str[i] != '/'; i--)
 			if (str[i] == '.')
 			{
-				strExtension = std::string(str.c_str( ) + i + 1);
+				strExtension = std::string(str.c_str() + i + 1);
 				break;
 			}
 	}
@@ -175,8 +174,7 @@ inline std::string CFileNameHelper::GetExtension(const std::string& str)
 	return strExtension;
 }
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFilenameHelper::GetPath
 
 inline std::string CFileNameHelper::GetPath(const std::string& str)
@@ -194,7 +192,7 @@ inline std::string CFileNameHelper::GetPath(const std::string& str)
 			{
 				for (size_t j = 0; j < i + 1; j++)
 					szPath[j] = str[j];
-				szPath[i+1] = '\0';
+				szPath[i + 1] = '\0';
 				break;
 			}
 
@@ -205,8 +203,7 @@ inline std::string CFileNameHelper::GetPath(const std::string& str)
 	return szPath;
 }
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFilenameHelper::NoExtension
 
 inline std::string CFileNameHelper::NoExtension(const std::string& str)
@@ -219,8 +216,7 @@ inline std::string CFileNameHelper::NoExtension(const std::string& str)
 	return str;
 }
 
-
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFilenameHelper::NoPath
 
 inline std::string CFileNameHelper::NoPath(const std::string& str)
