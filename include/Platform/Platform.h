@@ -5,6 +5,11 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
+#pragma warning(disable : 4201)
+#include <mmsystem.h>
+#pragma warning(default : 4201)
+#include <direct.h>
+#include <io.h>
 // DirectInput Keyboard Scan Codes
 #ifndef DIK_ESCAPE
 #define DIK_ESCAPE 0x01
