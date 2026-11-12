@@ -73,6 +73,15 @@
 #define GL_INTERPOLATE 0x8575
 #define GL_SUBTRACT 0x84E7
 #endif
+#ifndef GL_NORMAL_MAP
+#define GL_NORMAL_MAP 0x8511
+#endif
+#ifndef GL_REFLECTION_MAP
+#define GL_REFLECTION_MAP 0x8512
+#endif
+#ifndef GL_SPHERE_MAP
+#define GL_SPHERE_MAP 0x2402
+#endif
 
 namespace eterbase
 {
@@ -1013,6 +1022,23 @@ namespace eterbase
 				(state.textureFactor & 0xFF) / 255.0f,
 				((state.textureFactor >> 24) & 0xFF) / 255.0f};
 
+			bool needsNormalize = false;
+			for (uint32_t stage = 0; stage < kAppliedStages; ++stage)
+			{
+				const DWORD tciMode = state.stages[stage].texCoordIndex & 0xFFFF0000u;
+				if (tciMode == D3DTSS_TCI_CAMERASPACENORMAL ||
+					tciMode == D3DTSS_TCI_CAMERASPACEREFLECTIONVECTOR ||
+					tciMode == D3DTSS_TCI_SPHEREMAP)
+				{
+					needsNormalize = true;
+					break;
+				}
+			}
+			if (needsNormalize)
+				glEnable(GL_NORMALIZE);
+			else
+				glDisable(GL_NORMALIZE);
+
 			for (uint32_t stage = 0; stage < kAppliedStages; ++stage)
 			{
 				glActiveTexture(GL_TEXTURE0 + stage);
@@ -1119,6 +1145,27 @@ namespace eterbase
 					glLoadIdentity();
 					glMatrixMode(GL_MODELVIEW);
 				}
+				else if (tciMode == D3DTSS_TCI_CAMERASPACENORMAL ||
+						 tciMode == D3DTSS_TCI_CAMERASPACEREFLECTIONVECTOR ||
+						 tciMode == D3DTSS_TCI_SPHEREMAP)
+				{
+					GLenum genMode = GL_REFLECTION_MAP;
+					if (tciMode == D3DTSS_TCI_CAMERASPACENORMAL)
+						genMode = GL_NORMAL_MAP;
+					else if (tciMode == D3DTSS_TCI_SPHEREMAP)
+						genMode = GL_SPHERE_MAP;
+
+					glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, genMode);
+					glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, genMode);
+					glEnable(GL_TEXTURE_GEN_S);
+					glEnable(GL_TEXTURE_GEN_T);
+					glMatrixMode(GL_TEXTURE);
+					if (pTexMatrix)
+						glLoadMatrixf((const GLfloat*)pTexMatrix);
+					else
+						glLoadIdentity();
+					glMatrixMode(GL_MODELVIEW);
+				}
 				else if (tciMode == D3DTSS_TCI_PASSTHRU && stage >= (int)numTex)
 				{
 					// No per-vertex texture coordinates for this stage: preserve the
@@ -1148,23 +1195,62 @@ namespace eterbase
 
 		void GLRenderBackend::Draw(const DrawCall& call)
 		{
-			ApplyState(call.state);
-
-			const BYTE* vbData = static_cast<const BYTE*>(call.vertexData);
-			SetupVertexArrays(vbData, call.stride, call.fvf, call.primaryColor);
-
-			const GLenum mode = ToGLPrimitive((D3DPRIMITIVETYPE)call.primitiveType);
-			if (call.indexData)
+			auto drawWithState = [this, &call](const RenderState& state, bool writeAlpha)
 			{
-				const GLenum indexType = call.index32 ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT;
-				glDrawElements(mode, (GLsizei)call.indexCount, indexType, call.indexData);
-			}
-			else
+				ApplyState(state);
+				if (!writeAlpha)
+					glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
+
+				const BYTE* vbData = static_cast<const BYTE*>(call.vertexData);
+				SetupVertexArrays(vbData, call.stride, call.fvf, call.primaryColor);
+
+				const GLenum mode = ToGLPrimitive((D3DPRIMITIVETYPE)call.primitiveType);
+				if (call.indexData)
+				{
+					const GLenum indexType = call.index32 ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT;
+					glDrawElements(mode, (GLsizei)call.indexCount, indexType, call.indexData);
+				}
+				else
+				{
+					glDrawArrays(mode, (GLint)call.startVertex, (GLsizei)call.vertexCount);
+				}
+
+				TeardownVertexArrays(call.fvf);
+
+				if (!writeAlpha)
+					glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+			};
+
+			const ResourceSlot* sphereMap = Lookup(call.state.textures[1], ResourceKind::Texture);
+			const bool specularAdd = sphereMap && sphereMap->glName &&
+									 call.state.stages[1].colorOp == D3DTOP_MODULATEALPHA_ADDCOLOR;
+
+			if (!specularAdd)
 			{
-				glDrawArrays(mode, (GLint)call.startVertex, (GLsizei)call.vertexCount);
+				drawWithState(call.state, true);
+				return;
 			}
 
-			TeardownVertexArrays(call.fvf);
+			RenderState baseState = call.state;
+			baseState.stages[1].colorOp = D3DTOP_DISABLE;
+			baseState.stages[1].alphaOp = D3DTOP_DISABLE;
+			drawWithState(baseState, true);
+
+			if ((call.state.textureFactor >> 24) == 0)
+				return;
+
+			RenderState glowState = call.state;
+			glowState.stages[1].colorOp = D3DTOP_SELECTARG2;
+			glowState.stages[1].colorArg2 = D3DTA_TEXTURE;
+			glowState.stages[1].alphaOp = D3DTOP_SELECTARG1;
+			glowState.stages[1].alphaArg1 = D3DTA_CURRENT;
+			glowState.alphaBlendEnable = true;
+			glowState.srcBlend = D3DBLEND_SRCALPHA;
+			glowState.destBlend = D3DBLEND_ONE;
+			glowState.zWriteEnable = false;
+			if (glowState.zEnable)
+				glowState.zFunc = D3DCMP_LESSEQUAL;
+			drawWithState(glowState, false);
 		}
 
 		bool GLRenderBackend::Readback(uint32_t x, uint32_t y, uint32_t width, uint32_t height,

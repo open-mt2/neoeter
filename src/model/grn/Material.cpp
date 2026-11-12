@@ -54,6 +54,8 @@ void CGrannyMaterial::Copy(CGrannyMaterial& rkMtrl)
 	m_roImage[0] = rkMtrl.m_roImage[0];
 	m_roImage[1] = rkMtrl.m_roImage[1];
 	m_eType = rkMtrl.m_eType;
+	m_bTwoSideRender = rkMtrl.m_bTwoSideRender;
+	m_dwLastCullRenderStateForTwoSideRendering = rkMtrl.m_dwLastCullRenderStateForTwoSideRendering;
 }
 
 CGrannyMaterial::CGrannyMaterial()
@@ -449,7 +451,11 @@ void CGrannyMaterialPalette::SetMaterialData(const char* c_szMtrlName, const SMa
 		for (i = m_mtrlVector.begin(); i != m_mtrlVector.end(); ++i)
 		{
 			CGrannyMaterial::TRef& roMtrl = *i;
-			roMtrl->SetSpecularInfo(c_rkMaterialData.isSpecularEnable, c_rkMaterialData.fSpecularPower, c_rkMaterialData.bSphereMapIndex);
+
+			CGrannyMaterial* pkNewMtrl = new CGrannyMaterial;
+			pkNewMtrl->Copy(*roMtrl.GetPointer());
+			pkNewMtrl->SetSpecularInfo(c_rkMaterialData.isSpecularEnable, c_rkMaterialData.fSpecularPower, c_rkMaterialData.bSphereMapIndex);
+			roMtrl = pkNewMtrl;
 		}
 	}
 }
@@ -477,7 +483,11 @@ void CGrannyMaterialPalette::SetSpecularInfo(const char* c_szMtrlName, BOOL bEna
 		for (i = 0; i < size; ++i)
 		{
 			CGrannyMaterial::TRef& roMtrl = m_mtrlVector[i];
-			roMtrl->SetSpecularInfo(bEnable, fPower, 0);
+
+			CGrannyMaterial* pkNewMtrl = new CGrannyMaterial;
+			pkNewMtrl->Copy(*roMtrl.GetPointer());
+			pkNewMtrl->SetSpecularInfo(bEnable, fPower, 0);
+			roMtrl = pkNewMtrl;
 		}
 	}
 }
