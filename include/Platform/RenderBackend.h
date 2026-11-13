@@ -47,7 +47,33 @@ struct RenderHandle
 // remaining slots are carried so a synthesising backend can key on them.
 enum : uint32_t
 {
-	kRenderMaxTextureStages = 8
+	kRenderMaxTextureStages = 8,
+	kRenderMaxLights = 8
+};
+
+struct RenderLight
+{
+		bool enabled;
+		uint32_t type;
+		float position[3];
+		float direction[3];
+		float ambient[4];
+		float diffuse[4];
+		float specular[4];
+		float range;
+		float falloff;
+		float theta;
+		float phi;
+		float attenuation[3];
+};
+
+struct RenderMaterial
+{
+		float ambient[4];
+		float diffuse[4];
+		float specular[4];
+		float emissive[4];
+		float power;
 };
 
 // A full fixed-function snapshot. It is a value type on purpose: the backend
@@ -107,6 +133,9 @@ struct RenderState
 		uint32_t lighting;
 		uint32_t colorVertex;
 		uint32_t ambient;
+		bool specularEnable;
+		RenderMaterial material;
+		RenderLight lights[kRenderMaxLights];
 
 		// Render targets: the client's D3D render-target textures are stored top
 		// row first, so the backend flips clip-space Y while this is set.
@@ -201,3 +230,7 @@ class IRenderBackend
 // Process-wide backend, selected at configure time (R8). Created on first use
 // so headless tests that never draw do not need a GL context.
 IRenderBackend& Platform_GetRenderBackend();
+
+void Platform_PushLightingDisabled();
+void Platform_PopLightingDisabled();
+bool Platform_IsLightingDisabled();

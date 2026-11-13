@@ -74,6 +74,74 @@ int main()
 	TEST_ASSERT(value == D3DTOP_SELECTARG1);
 	TEST_PASS("state round-trips through the facade");
 
+	TEST_SECTION("lights and materials round-trip through the facade");
+
+	{
+		D3DLIGHT9 light;
+		std::memset(&light, 0, sizeof(light));
+		light.Type = D3DLIGHT_DIRECTIONAL;
+		light.Diffuse.r = 1.0f;
+		light.Diffuse.g = 0.5f;
+		light.Diffuse.b = 0.25f;
+		light.Diffuse.a = 1.0f;
+		light.Ambient.r = 0.1f;
+		light.Ambient.g = 0.2f;
+		light.Ambient.b = 0.3f;
+		light.Ambient.a = 1.0f;
+		light.Direction.x = 0.25f;
+		light.Direction.y = 0.5f;
+		light.Direction.z = -0.75f;
+
+		TEST_ASSERT(device.SetLight(1, &light) == S_OK);
+		TEST_ASSERT(device.LightEnable(1, TRUE) == S_OK);
+
+		D3DLIGHT9 stored;
+		std::memset(&stored, 0, sizeof(stored));
+		TEST_ASSERT(device.GetLight(1, &stored) == S_OK);
+		TEST_ASSERT(stored.Type == D3DLIGHT_DIRECTIONAL);
+		TEST_ASSERT(stored.Diffuse.r == 1.0f && stored.Diffuse.g == 0.5f && stored.Diffuse.b == 0.25f);
+		TEST_ASSERT(stored.Direction.x == 0.25f && stored.Direction.y == 0.5f && stored.Direction.z == -0.75f);
+		TEST_ASSERT(device.SetLight(8, &light) == E_INVALIDARG);
+		TEST_ASSERT(device.LightEnable(8, TRUE) == E_INVALIDARG);
+
+		D3DMATERIAL9 material;
+		std::memset(&material, 0, sizeof(material));
+		material.Diffuse.r = 0.8f;
+		material.Ambient.g = 0.6f;
+		material.Emissive.b = 0.4f;
+		material.Power = 5.0f;
+		TEST_ASSERT(device.SetMaterial(&material) == S_OK);
+
+		D3DMATERIAL9 storedMaterial;
+		std::memset(&storedMaterial, 0, sizeof(storedMaterial));
+		TEST_ASSERT(device.GetMaterial(&storedMaterial) == S_OK);
+		TEST_ASSERT(storedMaterial.Diffuse.r == 0.8f);
+		TEST_ASSERT(storedMaterial.Ambient.g == 0.6f);
+		TEST_ASSERT(storedMaterial.Emissive.b == 0.4f);
+		TEST_ASSERT(storedMaterial.Power == 5.0f);
+
+		device.SetRenderState(D3DRS_SPECULARENABLE, TRUE);
+		DWORD specular = 0;
+		TEST_ASSERT(device.GetRenderState(D3DRS_SPECULARENABLE, &specular) == S_OK);
+		TEST_ASSERT(specular == 1);
+		TEST_PASS("light, material and specular state survive the facade");
+	}
+
+	TEST_SECTION("lighting can be disabled for a render section");
+
+	TEST_ASSERT(!Platform_IsLightingDisabled());
+	Platform_PushLightingDisabled();
+	TEST_ASSERT(Platform_IsLightingDisabled());
+	Platform_PushLightingDisabled();
+	TEST_ASSERT(Platform_IsLightingDisabled());
+	Platform_PopLightingDisabled();
+	TEST_ASSERT(Platform_IsLightingDisabled());
+	Platform_PopLightingDisabled();
+	TEST_ASSERT(!Platform_IsLightingDisabled());
+	Platform_PopLightingDisabled();
+	TEST_ASSERT(!Platform_IsLightingDisabled());
+	TEST_PASS("the lighting scope nests and never underflows");
+
 	TEST_SECTION("empty draws stay no-ops");
 
 	TEST_ASSERT(device.DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1) == S_OK);

@@ -56,6 +56,40 @@ bool CSpeedTreeWrapper::ms_bSelfShadowOn = true;
 	(dwColor & 0xff00ff00) + ((dwColor & 0x00ff0000) >> 16) + \
 		((dwColor & 0x000000ff) << 16)
 
+static D3DXVECTOR3 GetTreeVertexNormal(const float* c_pCoord, const float* c_pBBox)
+{
+	float fZ = 0.35f;
+	const float fHeight = c_pBBox[5] - c_pBBox[2];
+	if (fHeight > 1.0f)
+		fZ += 0.5f * (c_pCoord[2] - c_pBBox[2]) / fHeight;
+
+	D3DXVECTOR3 vNormal(c_pCoord[0], c_pCoord[1], fZ);
+	if (D3DXVec3Length(&vNormal) < 1e-4f)
+		return D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+
+	D3DXVec3Normalize(&vNormal, &vNormal);
+	return vNormal;
+}
+
+static D3DXVECTOR3 GetTreeLeafNormal(const float* c_pCenter, const float* c_pBBox)
+{
+	const D3DXVECTOR3 vCanopy(
+		(c_pBBox[0] + c_pBBox[3]) * 0.5f,
+		(c_pBBox[1] + c_pBBox[4]) * 0.5f,
+		c_pBBox[2] + (c_pBBox[5] - c_pBBox[2]) * 0.65f);
+
+	D3DXVECTOR3 vNormal(
+		c_pCenter[0] - vCanopy.x,
+		c_pCenter[1] - vCanopy.y,
+		c_pCenter[2] - vCanopy.z);
+
+	if (D3DXVec3Length(&vNormal) < 1e-4f)
+		return D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+
+	D3DXVec3Normalize(&vNormal, &vNormal);
+	return vNormal;
+}
+
 ///////////////////////////////////////////////////////////////////////
 //	CSpeedTreeWrapper::CSpeedTreeWrapper
 CSpeedTreeWrapper::CSpeedTreeWrapper()
@@ -89,7 +123,7 @@ void CSpeedTreeWrapper::OnRenderPCBlocker()
 	DWORD dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
 	DWORD dwAlphaBlendEnable =
 		STATEMANAGER.GetRenderState(D3DRS_ALPHABLENDENABLE);
-	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
+	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, TRUE);
 	STATEMANAGER.SaveRenderState(D3DRS_COLORVERTEX, TRUE);
 	STATEMANAGER.SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	STATEMANAGER.SaveRenderState(D3DRS_ALPHATESTENABLE, TRUE);
@@ -183,7 +217,7 @@ void CSpeedTreeWrapper::OnRender()
 	STATEMANAGER.SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
 	STATEMANAGER.SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
 
-	STATEMANAGER.SaveRenderState(D3DRS_LIGHTING, FALSE);
+	STATEMANAGER.SaveRenderState(D3DRS_LIGHTING, TRUE);
 	STATEMANAGER.SaveRenderState(D3DRS_COLORVERTEX, TRUE);
 	STATEMANAGER.SaveRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 	STATEMANAGER.SaveRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
@@ -551,6 +585,7 @@ void CSpeedTreeWrapper::SetupBranchBuffers(void)
 		{
 			// position
 			pVertexBuffer->m_vPosition = D3DXVECTOR3(&(pBranches->m_pCoords[i * 3]));
+			pVertexBuffer->m_vNormal = GetTreeVertexNormal(&(pBranches->m_pCoords[i * 3]), m_afBoundingBox);
 
 			// normal or color
 			pVertexBuffer->m_dwDiffuseColor = AGBR2ARGB(pBranches->m_pColors[i]);
@@ -627,6 +662,7 @@ void CSpeedTreeWrapper::SetupFrondBuffers(void)
 		{
 			// position
 			pVertexBuffer->m_vPosition = D3DXVECTOR3(&(pFronds->m_pCoords[i * 3]));
+			pVertexBuffer->m_vNormal = GetTreeVertexNormal(&(pFronds->m_pCoords[i * 3]), m_afBoundingBox);
 
 			// normal or color
 			pVertexBuffer->m_dwDiffuseColor = AGBR2ARGB(pFronds->m_pColors[i]);
@@ -730,12 +766,14 @@ void CSpeedTreeWrapper::SetupLeafBuffers(void)
 		{
 			const CSpeedTreeRT::SGeometry::SLeaf* pLeaf =
 				&(m_pGeometryCache->m_sLeaves0);
+			const D3DXVECTOR3 vNormal = GetTreeLeafNormal(&(pLeaf->m_pCenterCoords[unLeaf * 3]), m_afBoundingBox);
 			for (unsigned int unVert = 0; unVert < 6;
 				 ++unVert) // 6 verts == 2 triangles
 			{
 				// position
 				memcpy(pVertex->m_vPosition, &(pLeaf->m_pCenterCoords[unLeaf * 3]),
 					   3 * sizeof(float));
+				pVertex->m_vNormal = vNormal;
 
 				// color
 				pVertex->m_dwDiffuseColor = AGBR2ARGB(pLeaf->m_pColors[unLeaf]);

@@ -205,6 +205,178 @@ namespace eterbase
 				return GL_SRC_ALPHA;
 			}
 
+			GLfloat ClampColor(float value)
+			{
+				if (value < 0.0f) return 0.0f;
+				if (value > 1.0f) return 1.0f;
+				return value;
+			}
+
+			void ApplyRenderLight(uint32_t index, const RenderLight& light)
+			{
+				const GLenum id = GL_LIGHT0 + index;
+				if (!light.enabled || light.type == 0)
+				{
+					glDisable(id);
+					return;
+				}
+
+				glEnable(id);
+
+				const GLfloat ambient[4] = {ClampColor(light.ambient[0]), ClampColor(light.ambient[1]),
+											ClampColor(light.ambient[2]), ClampColor(light.ambient[3])};
+				const GLfloat diffuse[4] = {ClampColor(light.diffuse[0]), ClampColor(light.diffuse[1]),
+											ClampColor(light.diffuse[2]), ClampColor(light.diffuse[3])};
+				const GLfloat specular[4] = {ClampColor(light.specular[0]), ClampColor(light.specular[1]),
+											 ClampColor(light.specular[2]), ClampColor(light.specular[3])};
+				glLightfv(id, GL_AMBIENT, ambient);
+				glLightfv(id, GL_DIFFUSE, diffuse);
+				glLightfv(id, GL_SPECULAR, specular);
+
+				if (light.type == D3DLIGHT_DIRECTIONAL)
+				{
+					const GLfloat position[4] = {-light.direction[0], -light.direction[1], -light.direction[2], 0.0f};
+					glLightfv(id, GL_POSITION, position);
+					glLightf(id, GL_SPOT_CUTOFF, 180.0f);
+					glLightf(id, GL_SPOT_EXPONENT, 0.0f);
+					glLightf(id, GL_CONSTANT_ATTENUATION, 1.0f);
+					glLightf(id, GL_LINEAR_ATTENUATION, 0.0f);
+					glLightf(id, GL_QUADRATIC_ATTENUATION, 0.0f);
+					return;
+				}
+
+				GLfloat constantAttenuation = light.attenuation[0];
+				GLfloat linearAttenuation = light.attenuation[1];
+				const GLfloat quadraticAttenuation = light.attenuation[2];
+				if (constantAttenuation == 0.0f && linearAttenuation == 0.0f && quadraticAttenuation == 0.0f)
+					constantAttenuation = 1.0f;
+
+				const GLfloat position[4] = {light.position[0], light.position[1], light.position[2], 1.0f};
+				glLightfv(id, GL_POSITION, position);
+				glLightf(id, GL_CONSTANT_ATTENUATION, constantAttenuation);
+				glLightf(id, GL_LINEAR_ATTENUATION, linearAttenuation);
+				glLightf(id, GL_QUADRATIC_ATTENUATION, quadraticAttenuation);
+
+				if (light.type == D3DLIGHT_SPOT)
+				{
+					const GLfloat direction[3] = {light.direction[0], light.direction[1], light.direction[2]};
+					GLfloat cutoff = light.phi * 57.2957795f * 0.5f;
+					if (cutoff < 0.5f) cutoff = 0.5f;
+					if (cutoff > 90.0f) cutoff = 90.0f;
+					glLightfv(id, GL_SPOT_DIRECTION, direction);
+					glLightf(id, GL_SPOT_EXPONENT, light.falloff);
+					glLightf(id, GL_SPOT_CUTOFF, cutoff);
+				}
+				else
+				{
+					glLightf(id, GL_SPOT_CUTOFF, 180.0f);
+					glLightf(id, GL_SPOT_EXPONENT, 0.0f);
+				}
+			}
+
+			void ApplyRenderMaterial(const RenderState& state)
+			{
+				const RenderMaterial& material = state.material;
+				const GLfloat ambient[4] = {ClampColor(material.ambient[0]), ClampColor(material.ambient[1]),
+											ClampColor(material.ambient[2]), ClampColor(material.ambient[3])};
+				const GLfloat diffuse[4] = {ClampColor(material.diffuse[0]), ClampColor(material.diffuse[1]),
+											ClampColor(material.diffuse[2]), ClampColor(material.diffuse[3])};
+				const GLfloat emissive[4] = {ClampColor(material.emissive[0]), ClampColor(material.emissive[1]),
+											 ClampColor(material.emissive[2]), ClampColor(material.emissive[3])};
+
+				GLfloat specular[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+				if (state.specularEnable)
+				{
+					specular[0] = ClampColor(material.specular[0]);
+					specular[1] = ClampColor(material.specular[1]);
+					specular[2] = ClampColor(material.specular[2]);
+					specular[3] = ClampColor(material.specular[3]);
+				}
+
+				GLfloat shininess = material.power;
+				if (shininess < 0.0f) shininess = 0.0f;
+				if (shininess > 128.0f) shininess = 128.0f;
+
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emissive);
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+			}
+
+			bool ShouldUseLighting(const RenderState& state)
+			{
+				return state.lighting &&
+					   (state.fvf & D3DFVF_NORMAL) &&
+					   !Platform_IsLightingDisabled();
+			}
+
+			struct TLightCache
+			{
+					bool valid;
+					bool enabled;
+					uint32_t ambient;
+					bool specular;
+					float view[16];
+					RenderMaterial material;
+					RenderLight lights[kRenderMaxLights];
+			};
+
+			TLightCache gs_lightCache = {};
+
+			bool IsCachedLightState(const RenderState& state)
+			{
+				return gs_lightCache.valid &&
+					   gs_lightCache.ambient == state.ambient &&
+					   gs_lightCache.specular == state.specularEnable &&
+					   std::memcmp(gs_lightCache.view, state.view, sizeof(state.view)) == 0 &&
+					   std::memcmp(&gs_lightCache.material, &state.material, sizeof(state.material)) == 0 &&
+					   std::memcmp(gs_lightCache.lights, state.lights, sizeof(state.lights)) == 0;
+			}
+
+			void ApplyFixedFunctionLighting(const RenderState& state)
+			{
+				if (!ShouldUseLighting(state))
+				{
+					if (gs_lightCache.enabled)
+					{
+						glDisable(GL_LIGHTING);
+						gs_lightCache.enabled = false;
+					}
+					return;
+				}
+
+				glEnable(GL_LIGHTING);
+				gs_lightCache.enabled = true;
+
+				if (IsCachedLightState(state))
+					return;
+
+				glDisable(GL_COLOR_MATERIAL);
+				glShadeModel(GL_SMOOTH);
+				glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_FALSE);
+				glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+
+				const GLfloat globalAmbient[4] = {
+					((state.ambient >> 16) & 0xFF) / 255.0f,
+					((state.ambient >> 8) & 0xFF) / 255.0f,
+					(state.ambient & 0xFF) / 255.0f,
+					((state.ambient >> 24) & 0xFF) / 255.0f};
+				glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+
+				for (uint32_t i = 0; i < kRenderMaxLights; ++i)
+					ApplyRenderLight(i, state.lights[i]);
+
+				ApplyRenderMaterial(state);
+
+				gs_lightCache.valid = true;
+				gs_lightCache.ambient = state.ambient;
+				gs_lightCache.specular = state.specularEnable;
+				std::memcpy(gs_lightCache.view, state.view, sizeof(state.view));
+				gs_lightCache.material = state.material;
+				std::memcpy(gs_lightCache.lights, state.lights, sizeof(state.lights));
+			}
+
 			void SetStageColorCombine(DWORD op, DWORD arg1, DWORD arg2)
 			{
 				const GLenum s0 = ToGLStageSource(arg1);
@@ -825,6 +997,7 @@ namespace eterbase
 			// Frame boundaries stay with the window layer until the swapchain
 			// abstraction lands (plan §4.4 item 4); the seam still exposes the hook
 			// so the façade's BeginScene/EndScene have a single owner.
+			gs_lightCache.valid = false;
 		}
 
 		void GLRenderBackend::Present()
@@ -908,8 +1081,12 @@ namespace eterbase
 				applyClipYFlip();
 				glMatrixMode(GL_MODELVIEW);
 				glLoadMatrixf(state.view);
+				ApplyFixedFunctionLighting(state);
 				glMultMatrixf(state.world);
 			}
+
+			if (posType == D3DFVF_XYZRHW)
+				glDisable(GL_LIGHTING);
 
 			// 2. Depth Test & Write
 			if (state.zEnable)
@@ -1022,7 +1199,7 @@ namespace eterbase
 				(state.textureFactor & 0xFF) / 255.0f,
 				((state.textureFactor >> 24) & 0xFF) / 255.0f};
 
-			bool needsNormalize = false;
+			bool needsNormalize = ShouldUseLighting(state);
 			for (uint32_t stage = 0; stage < kAppliedStages; ++stage)
 			{
 				const DWORD tciMode = state.stages[stage].texCoordIndex & 0xFFFF0000u;
