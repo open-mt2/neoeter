@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 
 #include <Neoeter/Debug/RowList.h>
+#include <Neoeter/Debug/SliderList.h>
 
 namespace Neoeter::Debug
 {
@@ -27,6 +28,19 @@ namespace Neoeter::Debug
 	{
 		AddRowImpl(label, RowList::ValueProvider(std::forward<Provider>(provider)));
 	}
+
+	void AddSliderImpl(const char* label, float minimum, float maximum, SliderList::ValueGetter value, SliderList::ValueSetter setter);
+
+	template <typename Getter, typename Setter>
+	void AddSlider(const char* label, float minimum, float maximum, Getter&& getter, Setter&& setter)
+	{
+		AddSliderImpl(
+			label,
+			minimum,
+			maximum,
+			SliderList::ValueGetter(std::forward<Getter>(getter)),
+			SliderList::ValueSetter(std::forward<Setter>(setter)));
+	}
 #else
 	inline void Initialize() {}
 	inline void Shutdown() {}
@@ -40,5 +54,8 @@ namespace Neoeter::Debug
 
 	template <typename Provider>
 	inline void AddRow(const char*, Provider&&) {}
+
+	template <typename Getter, typename Setter>
+	inline void AddSlider(const char*, float, float, Getter&&, Setter&&) {}
 #endif
 }

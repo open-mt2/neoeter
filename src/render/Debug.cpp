@@ -12,6 +12,7 @@ namespace Neoeter::Debug
 	namespace
 	{
 		RowList gs_rows;
+		SliderList gs_sliders;
 		bool gs_visible = false;
 		bool gs_initialized = false;
 		bool gs_hovered = false;
@@ -106,6 +107,11 @@ namespace Neoeter::Debug
 		gs_rows.Add(label, std::move(value));
 	}
 
+	void AddSliderImpl(const char* label, float minimum, float maximum, SliderList::ValueGetter value, SliderList::ValueSetter setter)
+	{
+		gs_sliders.Add(label, minimum, maximum, std::move(value), std::move(setter));
+	}
+
 	void Draw()
 	{
 		if (!gs_visible || !gs_initialized)
@@ -127,6 +133,19 @@ namespace Neoeter::Debug
 
 		for (std::size_t index = 0; index < gs_rows.Size(); ++index)
 			ImGui::Text("%s: %s", gs_rows.Label(index).c_str(), gs_rows.Value(index).c_str());
+
+		for (std::size_t index = 0; index < gs_sliders.Size(); ++index)
+		{
+			float value = gs_sliders.Value(index);
+			ImGui::SetNextItemWidth(180.0f);
+			if (ImGui::SliderFloat(
+					gs_sliders.Label(index).c_str(),
+					&value,
+					gs_sliders.Minimum(index),
+					gs_sliders.Maximum(index),
+					"%.2f"))
+				gs_sliders.SetValue(index, value);
+		}
 		ImGui::End();
 
 		ImGui::Render();
