@@ -72,7 +72,7 @@ void CSpeedTreeDirectX::Render(unsigned long ulRenderBitVector)
 	DWORD dwColorVertexState = STATEMANAGER.GetRenderState(D3DRS_COLORVERTEX);
 	DWORD dwFogVertexMode = STATEMANAGER.GetRenderState(D3DRS_FOGVERTEXMODE);
 
-	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
+	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, TRUE);
 	STATEMANAGER.SetRenderState(D3DRS_COLORVERTEX, TRUE);
 
 	UINT uiCount;

@@ -2310,9 +2310,9 @@ class IDirect3DDevice9 : public IDirect3DResource9
 			if (pMaterial) *pMaterial = m_material;
 			return S_OK;
 		}
-		HRESULT SetLight(DWORD, const D3DLIGHT9*) { return S_OK; }
-		HRESULT GetLight(DWORD, D3DLIGHT9*) { return S_OK; }
-		HRESULT LightEnable(DWORD, BOOL) { return S_OK; }
+		HRESULT SetLight(DWORD Index, const D3DLIGHT9* pLight);
+		HRESULT GetLight(DWORD Index, D3DLIGHT9* pLight);
+		HRESULT LightEnable(DWORD Index, BOOL bEnable);
 		HRESULT SetRenderState(D3DRENDERSTATETYPE State, DWORD Value);
 		HRESULT GetRenderState(D3DRENDERSTATETYPE State, DWORD* pValue);
 		HRESULT SetTexture(DWORD Stage, IDirect3DBaseTexture9* pTexture);
@@ -2450,6 +2450,9 @@ class IDirect3DDevice9 : public IDirect3DResource9
 		DWORD m_lighting;
 		DWORD m_colorVertex;
 		DWORD m_ambient;
+		bool m_specularEnable;
+		D3DLIGHT9 m_lights[8];
+		bool m_lightEnabled[8];
 		bool m_fogEnable;
 		DWORD m_fogColor;
 		DWORD m_fogVertexMode;

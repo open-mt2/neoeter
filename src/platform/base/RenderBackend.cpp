@@ -6,6 +6,27 @@
 
 #include <Platform/RenderBackend.h>
 
+namespace
+{
+	int gs_lightingDisabledDepth = 0;
+}
+
+void Platform_PushLightingDisabled()
+{
+	++gs_lightingDisabledDepth;
+}
+
+void Platform_PopLightingDisabled()
+{
+	if (gs_lightingDisabledDepth > 0)
+		--gs_lightingDisabledDepth;
+}
+
+bool Platform_IsLightingDisabled()
+{
+	return gs_lightingDisabledDepth > 0;
+}
+
 #if defined(OPENMT2_RENDERER_GL)
 
 #include "backends/gl/GLRenderBackend.h"

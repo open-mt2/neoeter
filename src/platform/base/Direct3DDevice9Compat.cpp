@@ -53,6 +53,21 @@ namespace
 		std::memcpy(dst, &src, sizeof(float) * 16);
 	}
 
+	void CopyColor(float (&dst)[4], const D3DCOLORVALUE& src)
+	{
+		dst[0] = src.r;
+		dst[1] = src.g;
+		dst[2] = src.b;
+		dst[3] = src.a;
+	}
+
+	void CopyVector(float (&dst)[3], const D3DVECTOR& src)
+	{
+		dst[0] = src.x;
+		dst[1] = src.y;
+		dst[2] = src.z;
+	}
+
 } // namespace
 
 // =============================================================
@@ -258,6 +273,7 @@ RenderHandle IDirect3DSurface9::GetDepthStencil()
 IDirect3DDevice9::IDirect3DDevice9()
 	: m_pIndexBuffer(nullptr),
 	  m_textureFactor(0xFFFFFFFF), m_lighting(0), m_colorVertex(0), m_ambient(0),
+	  m_specularEnable(false),
 	  m_fogEnable(false), m_fogColor(0), m_fogVertexMode(D3DFOG_NONE), m_fogTableMode(D3DFOG_NONE),
 	  m_fogStart(0.0f), m_fogEnd(0.0f), m_fogDensity(1.0f), m_rangeFogEnable(false),
 	  m_inRenderTarget(false), m_fvf(D3DFVF_XYZ),
@@ -272,8 +288,10 @@ IDirect3DDevice9::IDirect3DDevice9()
 	std::memset(&m_material, 0, sizeof(m_material));
 	m_material.Diffuse.r = m_material.Diffuse.g = m_material.Diffuse.b = m_material.Diffuse.a = 1.0f;
 	m_material.Ambient.r = m_material.Ambient.g = m_material.Ambient.b = m_material.Ambient.a = 1.0f;
+	std::memset(m_lights, 0, sizeof(m_lights));
 	for (int i = 0; i < 8; ++i)
 	{
+		m_lightEnabled[i] = false;
 		m_boundTextures[i] = nullptr;
 		m_texTransformFlags[i] = D3DTTFF_DISABLE;
 		m_texCoordIndex[i] = (DWORD)i;
@@ -444,7 +462,34 @@ void IDirect3DDevice9::FillRenderState(RenderState& state) const
 	state.lighting = m_lighting;
 	state.colorVertex = m_colorVertex;
 	state.ambient = m_ambient;
+	state.specularEnable = m_specularEnable;
 	state.inRenderTarget = m_inRenderTarget;
+
+	state.material.power = m_material.Power;
+	CopyColor(state.material.ambient, m_material.Ambient);
+	CopyColor(state.material.diffuse, m_material.Diffuse);
+	CopyColor(state.material.specular, m_material.Specular);
+	CopyColor(state.material.emissive, m_material.Emissive);
+
+	for (uint32_t i = 0; i < kRenderMaxLights; ++i)
+	{
+		RenderLight& out = state.lights[i];
+		const D3DLIGHT9& in = m_lights[i];
+		out.enabled = m_lightEnabled[i];
+		out.type = static_cast<uint32_t>(in.Type);
+		CopyVector(out.position, in.Position);
+		CopyVector(out.direction, in.Direction);
+		CopyColor(out.ambient, in.Ambient);
+		CopyColor(out.diffuse, in.Diffuse);
+		CopyColor(out.specular, in.Specular);
+		out.range = in.Range;
+		out.falloff = in.Falloff;
+		out.theta = in.Theta;
+		out.phi = in.Phi;
+		out.attenuation[0] = in.Attenuation0;
+		out.attenuation[1] = in.Attenuation1;
+		out.attenuation[2] = in.Attenuation2;
+	}
 
 	for (uint32_t stage = 0; stage < kRenderMaxTextureStages; ++stage)
 	{
@@ -589,6 +634,9 @@ HRESULT IDirect3DDevice9::SetRenderState(D3DRENDERSTATETYPE State, DWORD Value)
 		case D3DRS_AMBIENT:
 			m_ambient = Value;
 			break;
+		case D3DRS_SPECULARENABLE:
+			m_specularEnable = (Value != 0);
+			break;
 		case D3DRS_FOGENABLE:
 			m_fogEnable = (Value != 0);
 			break;
@@ -668,6 +716,9 @@ HRESULT IDirect3DDevice9::GetRenderState(D3DRENDERSTATETYPE State, DWORD* pValue
 			break;
 		case D3DRS_AMBIENT:
 			*pValue = m_ambient;
+			break;
+		case D3DRS_SPECULARENABLE:
+			*pValue = m_specularEnable ? 1 : 0;
 			break;
 		case D3DRS_FOGENABLE:
 			*pValue = m_fogEnable ? 1 : 0;
@@ -886,6 +937,27 @@ HRESULT IDirect3DDevice9::GetSamplerState(DWORD Stage, D3DSAMPLERSTATETYPE Type,
 		}
 	}
 	*pValue = 0;
+	return S_OK;
+}
+
+HRESULT IDirect3DDevice9::SetLight(DWORD Index, const D3DLIGHT9* pLight)
+{
+	if (Index >= 8 || !pLight) return E_INVALIDARG;
+	m_lights[Index] = *pLight;
+	return S_OK;
+}
+
+HRESULT IDirect3DDevice9::GetLight(DWORD Index, D3DLIGHT9* pLight)
+{
+	if (Index >= 8 || !pLight) return E_INVALIDARG;
+	*pLight = m_lights[Index];
+	return S_OK;
+}
+
+HRESULT IDirect3DDevice9::LightEnable(DWORD Index, BOOL bEnable)
+{
+	if (Index >= 8) return E_INVALIDARG;
+	m_lightEnabled[Index] = (bEnable != 0);
 	return S_OK;
 }
 
