@@ -417,8 +417,6 @@ void CGrannyMaterialPalette::SetMaterialImagePointer(const char* c_szImageName, 
 			pkNewMtrl->Copy(*roMtrl.GetPointer());
 			pkNewMtrl->SetImagePointer(iStage, pImage);
 			roMtrl = pkNewMtrl;
-
-			return;
 		}
 	}
 }
@@ -440,8 +438,6 @@ void CGrannyMaterialPalette::SetMaterialData(const char* c_szMtrlName, const SMa
 				pkNewMtrl->SetImagePointer(iStage, c_rkMaterialData.pImage);
 				pkNewMtrl->SetSpecularInfo(c_rkMaterialData.isSpecularEnable, c_rkMaterialData.fSpecularPower, c_rkMaterialData.bSphereMapIndex);
 				roMtrl = pkNewMtrl;
-
-				return;
 			}
 		}
 	}
@@ -474,7 +470,6 @@ void CGrannyMaterialPalette::SetSpecularInfo(const char* c_szMtrlName, BOOL bEna
 			if (roMtrl->IsIn(c_szMtrlName, &iStage))
 			{
 				roMtrl->SetSpecularInfo(bEnable, fPower, 0);
-				return;
 			}
 		}
 	}
