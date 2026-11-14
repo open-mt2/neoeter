@@ -67,6 +67,26 @@ std::vector<std::string> ZIP::listFiles()
 	return result;
 }
 
+const char* ZIP::getContainerType() const
+{
+	return "ZIP";
+}
+
+bool ZIP::getFileSize(const std::string& fileName, std::size_t& size)
+{
+	std::string normalized = CEterPackManager::Instance().ConvertFileName(fileName);
+	auto it = fileList.find(normalized);
+	if (it == fileList.end())
+		return false;
+
+	zip_stat_t fileInfo;
+	if (zip_stat_index(zipFile, it->second, 0, &fileInfo) != 0)
+		return false;
+
+	size = static_cast<std::size_t>(fileInfo.size);
+	return true;
+}
+
 bool ZIP::fileExists(const std::string& fileName)
 {
 	std::string normalized = CEterPackManager::Instance().ConvertFileName(fileName);

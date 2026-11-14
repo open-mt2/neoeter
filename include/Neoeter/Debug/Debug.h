@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
 #include <utility>
 
 #include <SDL2/SDL.h>
@@ -21,6 +22,16 @@ namespace Neoeter::Debug
 	bool WantsKeyboard();
 	void ProcessEvent(const SDL_Event& event);
 	void Draw();
+
+	using PanelDrawFunction = std::function<void(bool* visible)>;
+
+	void AddPanelImpl(const char* menu, const char* name, PanelDrawFunction draw, bool visible);
+
+	template <typename Draw>
+	void AddPanel(const char* menu, const char* name, Draw&& draw, bool visible = false)
+	{
+		AddPanelImpl(menu, name, PanelDrawFunction(std::forward<Draw>(draw)), visible);
+	}
 
 	void AddRowImpl(const char* label, RowList::ValueProvider value);
 
@@ -64,6 +75,9 @@ namespace Neoeter::Debug
 	inline bool WantsKeyboard() { return false; }
 	inline void ProcessEvent(const SDL_Event&) {}
 	inline void Draw() {}
+
+	template <typename Draw>
+	inline void AddPanel(const char*, const char*, Draw&&, bool = false) {}
 
 	template <typename Provider>
 	inline void AddRow(const char*, Provider&&) {}

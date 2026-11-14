@@ -6,6 +6,7 @@
 #include <Platform/Platform.h>
 #endif
 
+#include <cstddef>
 #include <unordered_map>
 #include <list>
 #include <vector>
@@ -83,6 +84,19 @@ class CEterPackManager : public CSingleton<CEterPackManager>
 		typedef std::unordered_map<std::string, std::shared_ptr<FileProvider>> TFileMap;
 		typedef std::shared_ptr<std::vector<char>> TPackDataPtr;
 
+		struct SPackInfo
+		{
+				std::string name;
+				std::string container;
+				std::size_t fileCount;
+		};
+
+		struct SFileInfo
+		{
+				std::string name;
+				std::size_t size;
+		};
+
 	public:
 		CEterPackManager();
 		virtual ~CEterPackManager();
@@ -101,6 +115,8 @@ class CEterPackManager : public CSingleton<CEterPackManager>
 		std::string ConvertFileName(std::string fileName);
 
 		const TFileMap& GetFileMap();
+		std::vector<SPackInfo> GetPackInfos();
+		std::vector<SFileInfo> GetPackFiles(const std::string& packName);
 
 	protected:
 		bool CompareName(const char* c_szDirectoryName, DWORD iLength, const char* c_szFileName);

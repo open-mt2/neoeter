@@ -391,3 +391,58 @@ const CEterPackManager::TFileMap& CEterPackManager::GetFileMap()
 {
 	return this->m_FileMap;
 }
+
+std::vector<CEterPackManager::SPackInfo> CEterPackManager::GetPackInfos()
+{
+	FinderLock lock(m_csFinder);
+
+	std::unordered_map<const FileProvider*, std::size_t> fileCounts;
+	for (const auto& file : m_FileMap)
+		++fileCounts[file.second.get()];
+
+	std::vector<SPackInfo> packInfos;
+	packInfos.reserve(m_PackMap.size());
+
+	for (const auto& pack : m_PackMap)
+	{
+		if (!pack.second)
+			continue;
+
+		SPackInfo info;
+		info.name = pack.first;
+		info.container = pack.second->getContainerType();
+		info.fileCount = fileCounts[pack.second.get()];
+		packInfos.push_back(info);
+	}
+
+	std::sort(packInfos.begin(), packInfos.end(),
+			  [](const SPackInfo& left, const SPackInfo& right)
+			  { return left.name < right.name; });
+
+	return packInfos;
+}
+
+std::vector<CEterPackManager::SFileInfo> CEterPackManager::GetPackFiles(const std::string& packName)
+{
+	FinderLock lock(m_csFinder);
+
+	auto packIt = m_PackMap.find(packName);
+	if (packIt == m_PackMap.end() || !packIt->second)
+		return {};
+
+	std::vector<SFileInfo> files;
+	for (const std::string& fileName : packIt->second->listFiles())
+	{
+		SFileInfo info;
+		info.name = fileName;
+		if (!packIt->second->getFileSize(fileName, info.size))
+			info.size = 0;
+		files.push_back(info);
+	}
+
+	std::sort(files.begin(), files.end(),
+			  [](const SFileInfo& left, const SFileInfo& right)
+			  { return left.name < right.name; });
+
+	return files;
+}

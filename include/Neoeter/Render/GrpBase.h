@@ -204,6 +204,7 @@ class CGraphicBase
 		void UpdateViewMatrix();
 
 		void SetViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeight, float fMinZ, float fMaxZ);
+		static LPDIRECT3DDEVICE9 GetD3DDevice();
 		static void GetBackBufferSize(UINT* puWidth, UINT* puHeight);
 		static bool IsTLVertexClipping();
 		static bool IsFastTNL();

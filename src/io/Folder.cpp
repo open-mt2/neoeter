@@ -61,6 +61,27 @@ std::vector<std::string> Folder::listFiles()
 	return result;
 }
 
+const char* Folder::getContainerType() const
+{
+	return "FOLDER";
+}
+
+bool Folder::getFileSize(const std::string& fileName, std::size_t& size)
+{
+	std::string normalized = CEterPackManager::Instance().ConvertFileName(fileName);
+	auto mapIt = realPathMap.find(normalized);
+	if (mapIt == realPathMap.end())
+		return false;
+
+	std::error_code ec;
+	const std::uintmax_t fileSize = fs::file_size(mapIt->second, ec);
+	if (ec)
+		return false;
+
+	size = static_cast<std::size_t>(fileSize);
+	return true;
+}
+
 bool Folder::fileExists(const std::string& fileName)
 {
 	std::string normalized = CEterPackManager::Instance().ConvertFileName(fileName);

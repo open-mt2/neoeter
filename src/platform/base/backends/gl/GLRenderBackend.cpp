@@ -929,6 +929,12 @@ namespace eterbase
 				glGenFramebuffers(1, &m_framebuffer);
 		}
 
+		uintptr_t GLRenderBackend::GetNativeTexture(RenderHandle texture)
+		{
+			ResourceSlot* slot = Lookup(texture, ResourceKind::Texture);
+			return slot ? static_cast<uintptr_t>(slot->glName) : 0;
+		}
+
 		void GLRenderBackend::BindDefaultRenderTarget()
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);

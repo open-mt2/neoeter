@@ -355,6 +355,11 @@ void CGraphicBase::SetViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeig
 	ms_Viewport.MaxZ = fMaxZ;
 }
 
+LPDIRECT3DDEVICE9 CGraphicBase::GetD3DDevice()
+{
+	return ms_lpd3dDevice;
+}
+
 void CGraphicBase::GetTargetPosition(float* px, float* py, float* pz)
 {
 	*px = CCameraManager::Instance().GetCurrentCamera()->GetTarget().x;

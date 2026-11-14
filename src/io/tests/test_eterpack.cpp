@@ -166,6 +166,32 @@ int main()
 		printf("  [PASS] Direct file lookup & search mode switching\n");
 	}
 
+	{
+		const std::vector<CEterPackManager::SPackInfo> packInfos = packMgr.GetPackInfos();
+		TEST_ASSERT(packInfos.size() == 2);
+		TEST_ASSERT(packInfos[0].name == (tempRoot / "pack_folder").string());
+		TEST_ASSERT(packInfos[0].container == "FOLDER");
+		TEST_ASSERT(packInfos[0].fileCount == 1);
+		TEST_ASSERT(packInfos[1].name == (tempRoot / "sample_pack").string());
+		TEST_ASSERT(packInfos[1].container == "ZIP");
+		TEST_ASSERT(packInfos[1].fileCount == 2);
+
+		const std::vector<CEterPackManager::SFileInfo> folderFiles =
+			packMgr.GetPackFiles((tempRoot / "pack_folder").string());
+		TEST_ASSERT(folderFiles.size() == 1);
+		TEST_ASSERT(folderFiles[0].name == "d:/ymir work/item/weapon/sword_001.gr2");
+		TEST_ASSERT(folderFiles[0].size == swordContent.size());
+
+		const std::vector<CEterPackManager::SFileInfo> zipFiles =
+			packMgr.GetPackFiles((tempRoot / "sample_pack").string());
+		TEST_ASSERT(zipFiles.size() == 2);
+		TEST_ASSERT(zipFiles[0].name == "d:/ymir work/ui/window.dds");
+		TEST_ASSERT(zipFiles[0].size > 0);
+		TEST_ASSERT(zipFiles[1].name == "locale/en/locale_game.txt");
+		TEST_ASSERT(zipFiles[1].size > 0);
+		printf("  [PASS] Pack information and resource listing\n");
+	}
+
 	// Clean up temporary directory
 	fs::remove_all(tempRoot);
 

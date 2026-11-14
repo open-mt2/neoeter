@@ -202,6 +202,8 @@ class IRenderBackend
 		// Applies the mip/filter defaults a texture has before any sampler state.
 		virtual void FinalizeTexture(RenderHandle texture, uint32_t maxLevel) = 0;
 
+		virtual uintptr_t GetNativeTexture(RenderHandle texture) = 0;
+
 		// Render targets and frame (R6).
 		virtual void BindDefaultRenderTarget() = 0;
 		virtual void BindRenderTarget(RenderHandle colorTexture) = 0;

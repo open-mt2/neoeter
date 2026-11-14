@@ -49,6 +49,7 @@ namespace
 								   static_cast<const uint8_t*>(data) + size);
 			}
 			void FinalizeTexture(RenderHandle, uint32_t) override {}
+			uintptr_t GetNativeTexture(RenderHandle) override { return 0; }
 			void BindDefaultRenderTarget() override {}
 			void BindRenderTarget(RenderHandle) override {}
 			void BindDepthStencil(RenderHandle) override {}

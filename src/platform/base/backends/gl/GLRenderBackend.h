@@ -32,6 +32,7 @@ namespace eterbase
 										uint32_t width, uint32_t height, const void* data,
 										size_t size) override;
 				void FinalizeTexture(RenderHandle texture, uint32_t maxLevel) override;
+				uintptr_t GetNativeTexture(RenderHandle texture) override;
 
 				void BindDefaultRenderTarget() override;
 				void BindRenderTarget(RenderHandle colorTexture) override;
