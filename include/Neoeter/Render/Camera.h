@@ -41,10 +41,10 @@ class CCamera
 
 		void Wheel(int nWheelLen);
 		bool Drag(int nMouseX, int nMouseY, LPPOINT lpReturnPoint);
-		void DragRelative(int nDeltaX, int nDeltaY);
 
 		bool EndDrag();
 		void BeginDrag(int nMouseX, int nMouseY);
+		void GetDragAnchor(int* px, int* py) const;
 
 		bool IsDraging();
 

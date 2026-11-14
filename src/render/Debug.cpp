@@ -4,6 +4,7 @@
 #include <Neoeter/Debug/Debug.h>
 
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl2.h>
 
@@ -17,10 +18,19 @@ namespace Neoeter::Debug
 		bool gs_visible = false;
 		bool gs_initialized = false;
 		bool gs_hovered = false;
-		float gs_rectMinX = 0.0f;
-		float gs_rectMinY = 0.0f;
-		float gs_rectMaxX = 0.0f;
-		float gs_rectMaxY = 0.0f;
+		bool gs_anyItemActive = false;
+		std::vector<ImVec4> gs_windowRects;
+
+		bool IsInsideWindowRect(float x, float y)
+		{
+			for (const ImVec4& rect : gs_windowRects)
+			{
+				if (x >= rect.x && x < rect.z && y >= rect.y && y < rect.w)
+					return true;
+			}
+
+			return false;
+		}
 	}
 
 	void Initialize()
@@ -47,6 +57,9 @@ namespace Neoeter::Debug
 			ImGui::DestroyContext();
 			return;
 		}
+
+		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+		ImGui_ImplSDL2_SetMouseCaptureMode(ImGui_ImplSDL2_MouseCaptureMode_Disabled);
 
 		gs_initialized = true;
 	}
@@ -75,7 +88,11 @@ namespace Neoeter::Debug
 
 	bool WantsMouse()
 	{
-		return gs_visible && gs_initialized && ImGui::GetIO().WantCaptureMouse;
+		if (!gs_visible || !gs_initialized)
+			return false;
+
+		const ImVec2 mousePosition = ImGui::GetIO().MousePos;
+		return gs_anyItemActive || IsInsideWindowRect(mousePosition.x, mousePosition.y);
 	}
 
 	bool WantsMouseAt(int x, int y)
@@ -83,13 +100,10 @@ namespace Neoeter::Debug
 		if (!gs_visible || !gs_initialized)
 			return false;
 
-		if (ImGui::GetIO().WantCaptureMouse)
+		if (gs_anyItemActive && ImGui::IsMouseDown(ImGuiMouseButton_Left))
 			return true;
 
-		const float positionX = static_cast<float>(x);
-		const float positionY = static_cast<float>(y);
-
-		return positionX >= gs_rectMinX && positionX < gs_rectMaxX && positionY >= gs_rectMinY && positionY < gs_rectMaxY;
+		return IsInsideWindowRect(static_cast<float>(x), static_cast<float>(y));
 	}
 
 	bool WantsKeyboard()
@@ -130,13 +144,6 @@ namespace Neoeter::Debug
 		ImGui::Begin("Debug", &gs_visible);
 		gs_hovered = ImGui::IsWindowHovered();
 
-		const ImVec2 position = ImGui::GetWindowPos();
-		const ImVec2 size = ImGui::GetWindowSize();
-		gs_rectMinX = position.x;
-		gs_rectMinY = position.y;
-		gs_rectMaxX = position.x + size.x;
-		gs_rectMaxY = position.y + size.y;
-
 		for (std::size_t index = 0; index < gs_rows.Size(); ++index)
 			ImGui::Text("%s: %s", gs_rows.Label(index).c_str(), gs_rows.Value(index).c_str());
 
@@ -175,6 +182,25 @@ namespace Neoeter::Debug
 						ImGui::SetItemDefaultFocus();
 				}
 				ImGui::EndCombo();
+			}
+		}
+
+		gs_anyItemActive = ImGui::IsAnyItemActive();
+
+		gs_windowRects.clear();
+		ImGuiContext* pContext = ImGui::GetCurrentContext();
+		if (pContext)
+		{
+			for (ImGuiWindow* pWindow : pContext->Windows)
+			{
+				if (!pWindow->WasActive || pWindow->Hidden || pWindow->Size.x <= 0.0f || pWindow->Size.y <= 0.0f)
+					continue;
+
+				gs_windowRects.emplace_back(
+					pWindow->Pos.x,
+					pWindow->Pos.y,
+					pWindow->Pos.x + pWindow->Size.x,
+					pWindow->Pos.y + pWindow->Size.y);
 			}
 		}
 		ImGui::End();

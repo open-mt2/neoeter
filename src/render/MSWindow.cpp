@@ -4,6 +4,7 @@
 #include <Neoeter/Debug/Debug.h>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_syswm.h>
 #include <Platform/GLCompat.h>
 
 // Windows GL headers only ship the 1.1 subset; the constant comes from
@@ -207,10 +208,22 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, DWORD /*cs*/, DWORD 
 			return;
 
 #if defined(_WIN32) || defined(_WIN64)
-		int windowX = 0;
-		int windowY = 0;
-		SDL_GetWindowPosition(ms_pSDLWindow, &windowX, &windowY);
-		SDL_WarpMouseGlobal(windowX + x, windowY + y);
+		SDL_SysWMinfo info;
+		SDL_VERSION(&info.version);
+
+		if (SDL_GetWindowWMInfo(ms_pSDLWindow, &info))
+		{
+			POINT point = {x, y};
+			ClientToScreen(info.info.win.window, &point);
+			SetCursorPos(point.x, point.y);
+		}
+		else
+		{
+			int windowX = 0;
+			int windowY = 0;
+			SDL_GetWindowPosition(ms_pSDLWindow, &windowX, &windowY);
+			SDL_WarpMouseGlobal(windowX + x, windowY + y);
+		}
 #else
 		SDL_WarpMouseInWindow(ms_pSDLWindow, x, y);
 #endif
