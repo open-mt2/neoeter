@@ -2075,12 +2075,13 @@ typedef IDirect3DBaseTexture9* LPDIRECT3DBASETEXTURE9;
 class IDirect3DTexture9 : public IDirect3DBaseTexture9
 {
 	public:
-		IDirect3DTexture9(UINT w = 1, UINT h = 1, D3DFORMAT fmt = D3DFMT_A8R8G8B8, UINT levels = 0);
+		IDirect3DTexture9(UINT w = 1, UINT h = 1, D3DFORMAT fmt = D3DFMT_A8R8G8B8, UINT levels = 0, bool bDepthTexture = false);
 		~IDirect3DTexture9() override;
 
 		UINT GetWidth() const { return m_width; }
 		UINT GetHeight() const { return m_height; }
 		D3DFORMAT GetFormat() const { return m_format; }
+		bool IsDepthTexture() const { return m_bDepthTexture; }
 		void* GetData() { return m_data.data(); }
 		const void* GetData() const { return m_data.data(); }
 		size_t GetDataSize() const { return m_data.size(); }
@@ -2106,6 +2107,7 @@ class IDirect3DTexture9 : public IDirect3DBaseTexture9
 		D3DFORMAT m_format;
 		RenderHandle m_handle;
 		bool m_dirty;
+		bool m_bDepthTexture;
 		std::vector<BYTE> m_data;
 		std::map<UINT, std::vector<BYTE>> m_mipLevels;
 };
@@ -2276,6 +2278,8 @@ class IDirect3DDevice9 : public IDirect3DResource9
 			return S_OK;
 		}
 		HRESULT SetDepthStencilSurface(IDirect3DSurface9* pZStencilSurface);
+		HRESULT SetDepthTexture(IDirect3DTexture9* pDepthTexture);
+		HRESULT PostProcessDepthOfField(IDirect3DTexture9* pColorTexture, IDirect3DTexture9* pDepthTexture, const DepthOfFieldParams& params);
 		HRESULT BeginScene();
 		HRESULT EndScene();
 		HRESULT Clear(DWORD Count, const RECT* pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil);
@@ -2379,6 +2383,12 @@ class IDirect3DDevice9 : public IDirect3DResource9
 		{
 			if (!ppSurface) return E_INVALIDARG;
 			*ppSurface = new IDirect3DSurface9(Width, Height, nullptr, true, false);
+			return S_OK;
+		}
+		HRESULT CreateDepthTexture(UINT Width, UINT Height, IDirect3DTexture9** ppTexture)
+		{
+			if (!ppTexture) return E_INVALIDARG;
+			*ppTexture = new IDirect3DTexture9(Width, Height, D3DFMT_D24S8, 1, true);
 			return S_OK;
 		}
 		HRESULT SetStreamSource(UINT StreamNumber, IDirect3DVertexBuffer9* pStreamData, UINT OffsetInBytes, UINT Stride)

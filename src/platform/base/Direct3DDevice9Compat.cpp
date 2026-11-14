@@ -74,11 +74,14 @@ namespace
 // IDirect3DTexture9 Implementation
 // =============================================================
 
-IDirect3DTexture9::IDirect3DTexture9(UINT w, UINT h, D3DFORMAT fmt, UINT /*levels*/)
-	: m_width(w ? w : 1), m_height(h ? h : 1), m_format(fmt), m_handle{0, 0}, m_dirty(false)
+IDirect3DTexture9::IDirect3DTexture9(UINT w, UINT h, D3DFORMAT fmt, UINT /*levels*/, bool bDepthTexture)
+	: m_width(w ? w : 1), m_height(h ? h : 1), m_format(fmt), m_handle{0, 0}, m_dirty(false), m_bDepthTexture(bDepthTexture)
 {
-	size_t sz = GetLevelDataSize(0);
-	m_data.resize(sz ? sz : 4, 0);
+	if (!m_bDepthTexture)
+	{
+		size_t sz = GetLevelDataSize(0);
+		m_data.resize(sz ? sz : 4, 0);
+	}
 }
 
 IDirect3DTexture9::~IDirect3DTexture9()
@@ -92,9 +95,12 @@ IDirect3DTexture9::~IDirect3DTexture9()
 
 RenderHandle IDirect3DTexture9::GetTextureHandle()
 {
-	if (!m_handle.IsValid() && !m_data.empty())
+	if (!m_handle.IsValid())
 	{
-		UploadToBackend();
+		if (m_bDepthTexture)
+			m_handle = Backend().CreateDepthTexture(m_width, m_height);
+		else if (!m_data.empty())
+			UploadToBackend();
 	}
 	return m_handle;
 }
@@ -165,6 +171,8 @@ void IDirect3DTexture9::UploadLevelToBackend(UINT level, const BYTE* pBytes, siz
 
 void IDirect3DTexture9::Fill(const DWORD color)
 {
+	if (m_bDepthTexture)
+		return;
 	if (m_format == D3DFMT_DXT1 || m_format == D3DFMT_DXT3 || m_format == D3DFMT_DXT5)
 		return;
 	if (GetFormatBytesPerPixel(m_format) == 2)
@@ -191,6 +199,7 @@ void IDirect3DTexture9::Fill(const DWORD color)
 
 void IDirect3DTexture9::UploadToBackend()
 {
+	if (m_bDepthTexture) return;
 	if (m_data.empty()) return;
 	if (!m_handle.IsValid())
 	{
@@ -566,6 +575,31 @@ HRESULT IDirect3DDevice9::SetDepthStencilSurface(IDirect3DSurface9* pZStencilSur
 	Backend().BindDepthStencil(pZStencilSurface->GetDepthStencil());
 	m_inRenderTarget = true;
 	return S_OK;
+}
+
+HRESULT IDirect3DDevice9::SetDepthTexture(IDirect3DTexture9* pDepthTexture)
+{
+	if (!pDepthTexture || !pDepthTexture->IsDepthTexture())
+		return S_OK;
+
+	Backend().BindDepthTexture(pDepthTexture->GetTextureHandle());
+	m_inRenderTarget = true;
+	return S_OK;
+}
+
+HRESULT IDirect3DDevice9::PostProcessDepthOfField(IDirect3DTexture9* pColorTexture, IDirect3DTexture9* pDepthTexture, const DepthOfFieldParams& params)
+{
+	if (!pColorTexture || !pDepthTexture)
+		return E_INVALIDARG;
+
+	const bool bApplied = Backend().PostProcessDepthOfField(
+		pColorTexture->GetTextureHandle(),
+		pDepthTexture->GetTextureHandle(),
+		params,
+		m_viewport.Width,
+		m_viewport.Height);
+
+	return bApplied ? S_OK : E_FAIL;
 }
 
 HRESULT IDirect3DDevice9::Clear(DWORD /*Count*/, const RECT* /*pRects*/, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil)

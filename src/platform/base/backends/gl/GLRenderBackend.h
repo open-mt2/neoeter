@@ -26,6 +26,7 @@ namespace eterbase
 
 				RenderHandle CreateTexture() override;
 				RenderHandle CreateDepthStencil(uint32_t width, uint32_t height) override;
+				RenderHandle CreateDepthTexture(uint32_t width, uint32_t height) override;
 				void Destroy(RenderHandle handle) override;
 
 				void UploadTextureLevel(RenderHandle texture, uint32_t level, uint32_t format,
@@ -37,6 +38,10 @@ namespace eterbase
 				void BindDefaultRenderTarget() override;
 				void BindRenderTarget(RenderHandle colorTexture) override;
 				void BindDepthStencil(RenderHandle depthStencil) override;
+				void BindDepthTexture(RenderHandle depthTexture) override;
+				bool PostProcessDepthOfField(RenderHandle colorTexture, RenderHandle depthTexture,
+											 const DepthOfFieldParams& params,
+											 uint32_t width, uint32_t height) override;
 				void SetViewport(int32_t x, int32_t y, uint32_t width, uint32_t height) override;
 				void Clear(uint32_t flags, uint32_t color, float z, uint32_t stencil) override;
 
@@ -54,7 +59,8 @@ namespace eterbase
 				enum class ResourceKind : uint32_t
 				{
 					Texture = 1,
-					DepthStencil = 2
+					DepthStencil = 2,
+					DepthTexture = 3
 				};
 
 				struct ResourceSlot
@@ -68,11 +74,22 @@ namespace eterbase
 				ResourceSlot* Lookup(RenderHandle handle, ResourceKind kind);
 				void EnsureFramebuffer();
 				void EnsureCaps() const;
+				bool EnsureDepthOfFieldProgram();
 
 				std::vector<ResourceSlot> m_resources;
 				uint32_t m_framebuffer = 0;
 				mutable bool m_capsLoaded = false;
 				mutable RenderCaps m_caps{};
+				uint32_t m_dofProgram = 0;
+				bool m_dofProgramTried = false;
+				int m_dofSceneTexture = -1;
+				int m_dofDepthTexture = -1;
+				int m_dofTexelSize = -1;
+				int m_dofNearZ = -1;
+				int m_dofFarZ = -1;
+				int m_dofFocusDistance = -1;
+				int m_dofFocusRange = -1;
+				int m_dofBlurRadius = -1;
 		};
 
 	} // namespace gl

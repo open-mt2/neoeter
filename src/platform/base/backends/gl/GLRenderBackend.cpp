@@ -13,6 +13,7 @@
 #include <Platform/GLCompat.h>
 
 #include <algorithm>
+#include <cstdio>
 #include <cstring>
 
 #ifndef GL_COMPRESSED_RGB_S3TC_DXT1_EXT
@@ -689,7 +690,7 @@ namespace eterbase
 			for (auto& slot : m_resources)
 			{
 				if (!slot.used || !slot.glName) continue;
-				if (slot.kind == ResourceKind::Texture)
+				if (slot.kind == ResourceKind::Texture || slot.kind == ResourceKind::DepthTexture)
 				{
 					GLuint name = slot.glName;
 					glDeleteTextures(1, &name);
@@ -699,6 +700,11 @@ namespace eterbase
 					GLuint name = slot.glName;
 					glDeleteRenderbuffers(1, &name);
 				}
+			}
+			if (m_dofProgram)
+			{
+				glDeleteProgram(m_dofProgram);
+				m_dofProgram = 0;
 			}
 			if (m_framebuffer)
 			{
@@ -778,6 +784,34 @@ namespace eterbase
 			return RenderHandle{index + 1, slot.generation};
 		}
 
+		RenderHandle GLRenderBackend::CreateDepthTexture(uint32_t width, uint32_t height)
+		{
+			uint32_t index = 0;
+			while (index < m_resources.size() && m_resources[index].used) ++index;
+			if (index == m_resources.size()) m_resources.emplace_back();
+			ResourceSlot& slot = m_resources[index];
+			slot.used = true;
+			slot.kind = ResourceKind::DepthTexture;
+			slot.glName = 0;
+			++slot.generation;
+
+			GLuint name = 0;
+			glGenTextures(1, &name);
+			if (!name) return RenderHandle{0, 0};
+			glBindTexture(GL_TEXTURE_2D, name);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, (GLsizei)width, (GLsizei)height, 0,
+						 GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			slot.glName = name;
+
+			return RenderHandle{index + 1, slot.generation};
+		}
+
 		void GLRenderBackend::Destroy(RenderHandle handle)
 		{
 			if (!handle.IsValid() || handle.id > m_resources.size()) return;
@@ -786,7 +820,7 @@ namespace eterbase
 
 			if (slot.glName)
 			{
-				if (slot.kind == ResourceKind::Texture)
+				if (slot.kind == ResourceKind::Texture || slot.kind == ResourceKind::DepthTexture)
 				{
 					GLuint name = slot.glName;
 					glDeleteTextures(1, &name);
@@ -951,6 +985,8 @@ namespace eterbase
 
 			EnsureFramebuffer();
 			glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, slot->glName, 0);
 		}
 
@@ -962,6 +998,250 @@ namespace eterbase
 			EnsureFramebuffer();
 			glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, slot->glName);
+		}
+
+		void GLRenderBackend::BindDepthTexture(RenderHandle depthTexture)
+		{
+			ResourceSlot* slot = Lookup(depthTexture, ResourceKind::DepthTexture);
+			if (!slot) return;
+
+			EnsureFramebuffer();
+			glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, slot->glName, 0);
+		}
+
+		bool GLRenderBackend::EnsureDepthOfFieldProgram()
+		{
+			if (m_dofProgram) return true;
+			if (m_dofProgramTried) return false;
+			m_dofProgramTried = true;
+
+			static const char* s_vertexSource = R"GLSL(#version 120
+void main()
+{
+	gl_Position = gl_Vertex;
+	gl_TexCoord[0] = gl_MultiTexCoord0;
+}
+)GLSL";
+
+			static const char* s_fragmentSource = R"GLSL(#version 120
+uniform sampler2D uScene;
+uniform sampler2D uDepth;
+uniform vec2 uTexel;
+uniform float uNear;
+uniform float uFar;
+uniform float uFocus;
+uniform float uRange;
+uniform float uBlur;
+
+float LinearDepth(float d)
+{
+	return (uNear * uFar) / (uFar - d * (uFar - uNear));
+}
+
+void main()
+{
+	vec2 uv = gl_TexCoord[0].xy;
+	float viewZ = LinearDepth(texture2D(uDepth, uv).r);
+	float coc = clamp((abs(viewZ - uFocus) - uRange) / max(uRange, 1.0), 0.0, 1.0);
+	coc = coc * coc * (3.0 - 2.0 * coc);
+	vec3 color = texture2D(uScene, uv).rgb;
+
+	if (coc > 0.001 && uBlur > 0.001)
+	{
+		vec2 offset = uTexel * (coc * uBlur);
+		vec3 accum = color;
+		float weight = 1.0;
+
+		accum += texture2D(uScene, uv + vec2(0.5, 0.0) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(0.25, 0.433) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(-0.25, 0.433) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(-0.5, 0.0) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(-0.25, -0.433) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(0.25, -0.433) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(0.866, 0.5) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(0.0, 1.0) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(-0.866, 0.5) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(-0.866, -0.5) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(0.0, -1.0) * offset).rgb;
+		weight += 1.0;
+		accum += texture2D(uScene, uv + vec2(0.866, -0.5) * offset).rgb;
+		weight += 1.0;
+
+		color = accum / weight;
+	}
+
+	gl_FragColor = vec4(color, 1.0);
+}
+)GLSL";
+
+			GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+			glShaderSource(vertexShader, 1, &s_vertexSource, nullptr);
+			glCompileShader(vertexShader);
+
+			GLint compiled = 0;
+			glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &compiled);
+			if (!compiled)
+			{
+				char log[1024] = {};
+				glGetShaderInfoLog(vertexShader, (GLsizei)sizeof(log), nullptr, log);
+				std::fprintf(stderr, "[GL] DOF vertex shader: %s\n", log);
+				glDeleteShader(vertexShader);
+				return false;
+			}
+
+			GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+			glShaderSource(fragmentShader, 1, &s_fragmentSource, nullptr);
+			glCompileShader(fragmentShader);
+			glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &compiled);
+			if (!compiled)
+			{
+				char log[1024] = {};
+				glGetShaderInfoLog(fragmentShader, (GLsizei)sizeof(log), nullptr, log);
+				std::fprintf(stderr, "[GL] DOF fragment shader: %s\n", log);
+				glDeleteShader(vertexShader);
+				glDeleteShader(fragmentShader);
+				return false;
+			}
+
+			GLuint program = glCreateProgram();
+			glAttachShader(program, vertexShader);
+			glAttachShader(program, fragmentShader);
+			glLinkProgram(program);
+			glDeleteShader(vertexShader);
+			glDeleteShader(fragmentShader);
+
+			GLint linked = 0;
+			glGetProgramiv(program, GL_LINK_STATUS, &linked);
+			if (!linked)
+			{
+				char log[1024] = {};
+				glGetProgramInfoLog(program, (GLsizei)sizeof(log), nullptr, log);
+				std::fprintf(stderr, "[GL] DOF program: %s\n", log);
+				glDeleteProgram(program);
+				return false;
+			}
+
+			m_dofProgram = program;
+			m_dofSceneTexture = glGetUniformLocation(program, "uScene");
+			m_dofDepthTexture = glGetUniformLocation(program, "uDepth");
+			m_dofTexelSize = glGetUniformLocation(program, "uTexel");
+			m_dofNearZ = glGetUniformLocation(program, "uNear");
+			m_dofFarZ = glGetUniformLocation(program, "uFar");
+			m_dofFocusDistance = glGetUniformLocation(program, "uFocus");
+			m_dofFocusRange = glGetUniformLocation(program, "uRange");
+			m_dofBlurRadius = glGetUniformLocation(program, "uBlur");
+			return true;
+		}
+
+		bool GLRenderBackend::PostProcessDepthOfField(RenderHandle colorTexture, RenderHandle depthTexture,
+													  const DepthOfFieldParams& params,
+													  uint32_t width, uint32_t height)
+		{
+			if (!EnsureDepthOfFieldProgram()) return false;
+
+			const ResourceSlot* color = Lookup(colorTexture, ResourceKind::Texture);
+			const ResourceSlot* depth = Lookup(depthTexture, ResourceKind::DepthTexture);
+			if (!color || !depth || !color->glName || !depth->glName) return false;
+			if (!width || !height) return false;
+
+			GLint previousProgram = 0;
+			glGetIntegerv(GL_CURRENT_PROGRAM, &previousProgram);
+			GLint previousActiveTexture = GL_TEXTURE0;
+			glGetIntegerv(GL_ACTIVE_TEXTURE, &previousActiveTexture);
+			GLint previousTexture0 = 0;
+			GLint previousTexture1 = 0;
+			glActiveTexture(GL_TEXTURE0);
+			glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture0);
+			glActiveTexture(GL_TEXTURE1);
+			glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture1);
+
+			glPushAttrib(GL_ALL_ATTRIB_BITS);
+			glMatrixMode(GL_PROJECTION);
+			glPushMatrix();
+			glLoadIdentity();
+			glMatrixMode(GL_MODELVIEW);
+			glPushMatrix();
+			glLoadIdentity();
+			glMatrixMode(GL_TEXTURE);
+			glPushMatrix();
+			glLoadIdentity();
+			glMatrixMode(GL_MODELVIEW);
+
+			glDisable(GL_DEPTH_TEST);
+			glDepthMask(GL_FALSE);
+			glDisable(GL_BLEND);
+			glDisable(GL_ALPHA_TEST);
+			glDisable(GL_CULL_FACE);
+			glDisable(GL_LIGHTING);
+			glDisable(GL_FOG);
+			glDisable(GL_SCISSOR_TEST);
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+			glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+
+			glUseProgram(m_dofProgram);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, color->glName);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, depth->glName);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+			glUniform1i(m_dofSceneTexture, 0);
+			glUniform1i(m_dofDepthTexture, 1);
+			glUniform2f(m_dofTexelSize, 1.0f / (float)width, 1.0f / (float)height);
+			glUniform1f(m_dofNearZ, params.nearZ);
+			glUniform1f(m_dofFarZ, params.farZ);
+			glUniform1f(m_dofFocusDistance, params.focusDistance);
+			glUniform1f(m_dofFocusRange, params.focusRange);
+			glUniform1f(m_dofBlurRadius, params.blurRadius);
+
+			glBegin(GL_TRIANGLE_STRIP);
+			glTexCoord2f(0.0f, 1.0f);
+			glVertex2f(-1.0f, -1.0f);
+			glTexCoord2f(1.0f, 1.0f);
+			glVertex2f(1.0f, -1.0f);
+			glTexCoord2f(0.0f, 0.0f);
+			glVertex2f(-1.0f, 1.0f);
+			glTexCoord2f(1.0f, 0.0f);
+			glVertex2f(1.0f, 1.0f);
+			glEnd();
+
+			glUseProgram((GLuint)previousProgram);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, (GLuint)previousTexture0);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, (GLuint)previousTexture1);
+			glActiveTexture((GLenum)previousActiveTexture);
+
+			glMatrixMode(GL_TEXTURE);
+			glPopMatrix();
+			glMatrixMode(GL_MODELVIEW);
+			glPopMatrix();
+			glMatrixMode(GL_PROJECTION);
+			glPopMatrix();
+			glMatrixMode(GL_MODELVIEW);
+
+			glPopAttrib();
+			return true;
 		}
 
 		void GLRenderBackend::SetViewport(int32_t x, int32_t y, uint32_t width, uint32_t height)

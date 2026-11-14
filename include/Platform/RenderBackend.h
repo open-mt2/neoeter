@@ -79,6 +79,15 @@ struct RenderMaterial
 // A full fixed-function snapshot. It is a value type on purpose: the backend
 // must be able to derive its pipeline state from the snapshot alone (R3), and a
 // Vulkan backend will hash it into its PSO cache.
+struct DepthOfFieldParams
+{
+		float nearZ;
+		float farZ;
+		float focusDistance;
+		float focusRange;
+		float blurRadius;
+};
+
 struct RenderState
 {
 		struct TextureStage
@@ -192,6 +201,7 @@ class IRenderBackend
 		// Resources. Names are opaque and backend-owned (R2).
 		virtual RenderHandle CreateTexture() = 0;
 		virtual RenderHandle CreateDepthStencil(uint32_t width, uint32_t height) = 0;
+		virtual RenderHandle CreateDepthTexture(uint32_t width, uint32_t height) = 0;
 		virtual void Destroy(RenderHandle handle) = 0;
 
 		// Uploads one mip level. `format` is a D3DFORMAT value; the backend owns the
@@ -208,6 +218,10 @@ class IRenderBackend
 		virtual void BindDefaultRenderTarget() = 0;
 		virtual void BindRenderTarget(RenderHandle colorTexture) = 0;
 		virtual void BindDepthStencil(RenderHandle depthStencil) = 0;
+		virtual void BindDepthTexture(RenderHandle depthTexture) = 0;
+		virtual bool PostProcessDepthOfField(RenderHandle colorTexture, RenderHandle depthTexture,
+											 const DepthOfFieldParams& params,
+											 uint32_t width, uint32_t height) = 0;
 		virtual void SetViewport(int32_t x, int32_t y, uint32_t width, uint32_t height) = 0;
 		virtual void Clear(uint32_t flags, uint32_t color, float z, uint32_t stencil) = 0;
 

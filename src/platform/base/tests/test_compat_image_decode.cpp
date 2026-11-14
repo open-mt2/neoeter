@@ -36,6 +36,7 @@ namespace
 			RenderCaps Caps() const override { return RenderCaps{}; }
 			RenderHandle CreateTexture() override { return RenderHandle{1, 1}; }
 			RenderHandle CreateDepthStencil(uint32_t, uint32_t) override { return RenderHandle{2, 1}; }
+			RenderHandle CreateDepthTexture(uint32_t, uint32_t) override { return RenderHandle{3, 1}; }
 			void Destroy(RenderHandle) override {}
 			void UploadTextureLevel(RenderHandle, uint32_t level, uint32_t format, uint32_t width,
 									uint32_t height, const void* data, size_t size) override
@@ -53,6 +54,8 @@ namespace
 			void BindDefaultRenderTarget() override {}
 			void BindRenderTarget(RenderHandle) override {}
 			void BindDepthStencil(RenderHandle) override {}
+			void BindDepthTexture(RenderHandle) override {}
+			bool PostProcessDepthOfField(RenderHandle, RenderHandle, const DepthOfFieldParams&, uint32_t, uint32_t) override { return false; }
 			void SetViewport(int32_t, int32_t, uint32_t, uint32_t) override {}
 			void Clear(uint32_t, uint32_t, float, uint32_t) override {}
 			void BeginFrame() override {}
