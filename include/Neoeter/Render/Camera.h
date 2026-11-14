@@ -41,6 +41,7 @@ class CCamera
 
 		void Wheel(int nWheelLen);
 		bool Drag(int nMouseX, int nMouseY, LPPOINT lpReturnPoint);
+		void DragRelative(int nDeltaX, int nDeltaY);
 
 		bool EndDrag();
 		void BeginDrag(int nMouseX, int nMouseY);
@@ -48,6 +49,7 @@ class CCamera
 		bool IsDraging();
 
 		void SetResistance(float fResistance);
+		void SetMouseDragScale(float fScaleX, float fScaleY);
 
 	private:
 		const CCamera& operator=(const CCamera&); // 지원하지 않음
@@ -128,6 +130,10 @@ class CCamera
 		D3DXVECTOR3 m_v3AngularVelocity;
 
 		float m_fResistance;
+		float m_fMouseDragScaleX;
+		float m_fMouseDragScaleY;
+
+		void ApplyDragVelocity(float fNewPitchVelocity, float fNewRotationVelocity);
 
 	public:
 		//////////////////////////////////////////////////////////////////////////

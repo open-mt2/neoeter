@@ -13,6 +13,7 @@ namespace Neoeter::Debug
 	{
 		RowList gs_rows;
 		SliderList gs_sliders;
+		ComboList gs_combos;
 		bool gs_visible = false;
 		bool gs_initialized = false;
 		bool gs_hovered = false;
@@ -112,6 +113,11 @@ namespace Neoeter::Debug
 		gs_sliders.Add(label, minimum, maximum, std::move(value), std::move(setter));
 	}
 
+	void AddComboImpl(const char* label, ComboList::LabelsProvider labels, ComboList::ValueGetter value, ComboList::ValueSetter setter)
+	{
+		gs_combos.Add(label, std::move(labels), std::move(value), std::move(setter));
+	}
+
 	void Draw()
 	{
 		if (!gs_visible || !gs_initialized)
@@ -145,6 +151,31 @@ namespace Neoeter::Debug
 					gs_sliders.Maximum(index),
 					"%.2f"))
 				gs_sliders.SetValue(index, value);
+		}
+
+		for (std::size_t index = 0; index < gs_combos.Size(); ++index)
+		{
+			const std::vector<std::string> labels = gs_combos.Labels(index);
+			if (labels.empty())
+				continue;
+
+			int value = gs_combos.Value(index);
+			if (value < 0 || value >= static_cast<int>(labels.size()))
+				value = 0;
+
+			ImGui::SetNextItemWidth(180.0f);
+			if (ImGui::BeginCombo(gs_combos.Label(index).c_str(), labels[value].c_str()))
+			{
+				for (int item = 0; item < static_cast<int>(labels.size()); ++item)
+				{
+					const bool selected = item == value;
+					if (ImGui::Selectable(labels[item].c_str(), selected))
+						gs_combos.SetValue(index, item);
+					if (selected)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
 		}
 		ImGui::End();
 

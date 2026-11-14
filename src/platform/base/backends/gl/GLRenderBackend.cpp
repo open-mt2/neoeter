@@ -1075,8 +1075,10 @@ namespace eterbase
 				else
 				{
 					// 2D Orthographic Pipeline (UI with half-pixel texel offset)
+					const float uiWidth = proj[0] != 0.0f ? 2.0f / proj[0] : (float)state.viewportWidth;
+					const float uiHeight = proj[5] != 0.0f ? -2.0f / proj[5] : (float)state.viewportHeight;
 					glLoadIdentity();
-					glOrtho(-0.5, (double)state.viewportWidth - 0.5, (double)state.viewportHeight - 0.5, -0.5, -1000.0, 1000.0);
+					glOrtho(-0.5, (double)uiWidth - 0.5, (double)uiHeight - 0.5, -0.5, -1000.0, 1000.0);
 				}
 				applyClipYFlip();
 				glMatrixMode(GL_MODELVIEW);

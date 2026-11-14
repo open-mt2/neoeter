@@ -6,6 +6,10 @@
 #include <Neoeter/Platform/Base/Utils.h>
 #include <Neoeter/Render/Camera.h>
 
+#if defined(_WIN32)
+#include <SDL2/SDL.h>
+#endif
+
 const float c_fDefaultResistance = 0.3f;
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -36,7 +40,9 @@ void CCamera::SetTargetHeight(float fTarget)
 CCamera::CCamera() : m_isLock(false),
 					 m_fEyeGroundHeightRatio(0.3f),
 					 m_fTargetHeightLimitRatio(2.0f),
-					 m_fResistance(c_fDefaultResistance)
+					 m_fResistance(c_fDefaultResistance),
+					 m_fMouseDragScaleX(1.0f),
+					 m_fMouseDragScaleY(1.0f)
 {
 	m_fDistance = 1.0f;
 	m_eCameraState = CAMERA_STATE_NORMAL;
@@ -88,6 +94,12 @@ void CCamera::SetResistance(float fResistance)
 	m_fResistance = c_fDefaultResistance * fResistance;
 }
 
+void CCamera::SetMouseDragScale(float fScaleX, float fScaleY)
+{
+	m_fMouseDragScaleX = fScaleX;
+	m_fMouseDragScaleY = fScaleY;
+}
+
 void CCamera::Wheel(int nLen)
 {
 	if (IsLock())
@@ -100,6 +112,10 @@ void CCamera::BeginDrag(int nMouseX, int nMouseY)
 {
 	if (IsLock())
 		return;
+
+#if defined(_WIN32)
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+#endif
 
 	m_bDrag = true;
 	m_lMousePosX = nMouseX;
@@ -118,6 +134,10 @@ bool CCamera::IsDraging()
 
 bool CCamera::EndDrag()
 {
+#if defined(_WIN32)
+	SDL_SetRelativeMouseMode(SDL_FALSE);
+#endif
+
 	if (IsLock())
 		return false;
 
@@ -151,9 +171,27 @@ bool CCamera::Drag(int nMouseX, int nMouseY, LPPOINT lpReturnPoint)
 	long lMouseX = nMouseX;
 	long lMouseY = nMouseY;
 
-	float fNewPitchVelocity = (float)(lMouseY - m_lMousePosY) * m_fResistance;
-	float fNewRotationVelocity = (float)(lMouseX - m_lMousePosX) * m_fResistance;
+	ApplyDragVelocity(
+		(float)(lMouseY - m_lMousePosY) * m_fResistance * m_fMouseDragScaleY,
+		(float)(lMouseX - m_lMousePosX) * m_fResistance * m_fMouseDragScaleX);
 
+	lpReturnPoint->x = m_lMousePosX;
+	lpReturnPoint->y = m_lMousePosY;
+	return true;
+}
+
+void CCamera::DragRelative(int nDeltaX, int nDeltaY)
+{
+	if (IsLock() || !m_bDrag)
+		return;
+
+	ApplyDragVelocity(
+		(float)nDeltaY * m_fResistance * m_fMouseDragScaleY,
+		(float)nDeltaX * m_fResistance * m_fMouseDragScaleX);
+}
+
+void CCamera::ApplyDragVelocity(float fNewPitchVelocity, float fNewRotationVelocity)
+{
 	m_fPitchSum += fNewPitchVelocity;
 	m_fRollSum += fNewRotationVelocity;
 
@@ -166,10 +204,6 @@ bool CCamera::Drag(int nMouseX, int nMouseY, LPPOINT lpReturnPoint)
 
 	m_v3AngularVelocity.x = fNewRotationVelocity;
 	m_v3AngularVelocity.z = fNewPitchVelocity;
-
-	lpReturnPoint->x = m_lMousePosX;
-	lpReturnPoint->y = m_lMousePosY;
-	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////

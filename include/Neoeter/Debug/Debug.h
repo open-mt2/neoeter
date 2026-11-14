@@ -5,6 +5,7 @@
 
 #include <SDL2/SDL.h>
 
+#include <Neoeter/Debug/ComboList.h>
 #include <Neoeter/Debug/RowList.h>
 #include <Neoeter/Debug/SliderList.h>
 
@@ -41,6 +42,18 @@ namespace Neoeter::Debug
 			SliderList::ValueGetter(std::forward<Getter>(getter)),
 			SliderList::ValueSetter(std::forward<Setter>(setter)));
 	}
+
+	void AddComboImpl(const char* label, ComboList::LabelsProvider labels, ComboList::ValueGetter value, ComboList::ValueSetter setter);
+
+	template <typename Labels, typename Getter, typename Setter>
+	void AddCombo(const char* label, Labels&& labels, Getter&& getter, Setter&& setter)
+	{
+		AddComboImpl(
+			label,
+			ComboList::LabelsProvider(std::forward<Labels>(labels)),
+			ComboList::ValueGetter(std::forward<Getter>(getter)),
+			ComboList::ValueSetter(std::forward<Setter>(setter)));
+	}
 #else
 	inline void Initialize() {}
 	inline void Shutdown() {}
@@ -57,5 +70,8 @@ namespace Neoeter::Debug
 
 	template <typename Getter, typename Setter>
 	inline void AddSlider(const char*, float, float, Getter&&, Setter&&) {}
+
+	template <typename Labels, typename Getter, typename Setter>
+	inline void AddCombo(const char*, Labels&&, Getter&&, Setter&&) {}
 #endif
 }

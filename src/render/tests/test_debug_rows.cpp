@@ -85,6 +85,41 @@ int main()
 	TEST_ASSERT(emptySliders.Value(0) == 0.0f);
 	emptySliders.SetValue(0, 1.0f);
 
+	Neoeter::Debug::ComboList combos;
+	TEST_ASSERT(combos.Size() == 0);
+
+	int choice = 1;
+	int appliedChoice = -1;
+	combos.Add(
+		"Resolution",
+		[]
+		{ return std::vector<std::string>{"800 x 600", "1024 x 768"}; },
+		[&choice]
+		{ return choice; },
+		[&appliedChoice](int value)
+		{ appliedChoice = value; });
+
+	TEST_ASSERT(combos.Size() == 1);
+	TEST_ASSERT(combos.Label(0) == "Resolution");
+	TEST_ASSERT(combos.Labels(0).size() == 2);
+	TEST_ASSERT(combos.Labels(0)[1] == "1024 x 768");
+	TEST_ASSERT(combos.Value(0) == 1);
+
+	combos.SetValue(0, 0);
+	TEST_ASSERT(appliedChoice == 0);
+
+	Neoeter::Debug::ComboList emptyCombos;
+	emptyCombos.Add(
+		nullptr,
+		Neoeter::Debug::ComboList::LabelsProvider(),
+		Neoeter::Debug::ComboList::ValueGetter(),
+		Neoeter::Debug::ComboList::ValueSetter());
+	TEST_ASSERT(emptyCombos.Size() == 1);
+	TEST_ASSERT(emptyCombos.Label(0).empty());
+	TEST_ASSERT(emptyCombos.Labels(0).empty());
+	TEST_ASSERT(emptyCombos.Value(0) == 0);
+	emptyCombos.SetValue(0, 1);
+
 #if defined(NEOETER_DEBUG_UI)
 	int calls = 0;
 	Neoeter::Debug::AddRow("Registered", []
@@ -98,6 +133,13 @@ int main()
 		[]
 		{ return 0.5f; },
 		[](float) {});
+	Neoeter::Debug::AddCombo(
+		"Registered",
+		[]
+		{ return std::vector<std::string>{"First", "Second"}; },
+		[]
+		{ return 0; },
+		[](int) {});
 #endif
 
 	return 0;

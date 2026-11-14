@@ -21,6 +21,34 @@ static void* SDLGetProcAddress(const char* name)
 	return (void*)SDL_GL_GetProcAddress(name);
 }
 
+static void SDLSetFixedWindowSize(SDL_Window* window, int width, int height)
+{
+	int currentWidth = 0;
+	int currentHeight = 0;
+	SDL_GetWindowSize(window, &currentWidth, &currentHeight);
+
+	if (currentWidth == width && currentHeight == height)
+	{
+		SDL_SetWindowMinimumSize(window, width, height);
+		SDL_SetWindowMaximumSize(window, width, height);
+		SDL_SetWindowResizable(window, SDL_FALSE);
+		return;
+	}
+
+	SDL_SetWindowResizable(window, SDL_TRUE);
+
+	const int lowWidth = currentWidth < width ? currentWidth : width;
+	const int lowHeight = currentHeight < height ? currentHeight : height;
+	const int highWidth = currentWidth > width ? currentWidth : width;
+	const int highHeight = currentHeight > height ? currentHeight : height;
+
+	SDL_SetWindowMinimumSize(window, lowWidth, lowHeight);
+	SDL_SetWindowMaximumSize(window, highWidth, highHeight);
+	SDL_SetWindowSize(window, width, height);
+	SDL_SetWindowMinimumSize(window, width, height);
+	SDL_SetWindowMaximumSize(window, width, height);
+}
+
 HINSTANCE CMSWindow::ms_hInstance = NULL;
 
 LRESULT CMSWindow::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
@@ -175,9 +203,18 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, DWORD /*cs*/, DWORD 
 	Platform_SetWindowResolution(width, height);
 	Platform_SetWarpMouseCallback([](int x, int y)
 								  {
-		if (ms_pSDLWindow) {
-			SDL_WarpMouseInWindow(ms_pSDLWindow, x, y);
-		} });
+		if (!ms_pSDLWindow)
+			return;
+
+#if defined(_WIN32) || defined(_WIN64)
+		int windowX = 0;
+		int windowY = 0;
+		SDL_GetWindowPosition(ms_pSDLWindow, &windowX, &windowY);
+		SDL_WarpMouseGlobal(windowX + x, windowY + y);
+#else
+		SDL_WarpMouseInWindow(ms_pSDLWindow, x, y);
+#endif
+	});
 	SetRect(&m_rect, 0, 0, width, height);
 
 	Tracef("[SDL2] Created native game window (floating): %p ('%s', %dx%d, video driver: %s)\n",
@@ -228,10 +265,7 @@ bool CMSWindow::SetFullscreen(bool enabled, int width, int height)
 
 		if (width > 0 && height > 0)
 		{
-			SDL_SetWindowResizable(ms_pSDLWindow, SDL_FALSE);
-			SDL_SetWindowMinimumSize(ms_pSDLWindow, width, height);
-			SDL_SetWindowMaximumSize(ms_pSDLWindow, width, height);
-			SDL_SetWindowSize(ms_pSDLWindow, width, height);
+			SDLSetFixedWindowSize(ms_pSDLWindow, width, height);
 			SDL_SetWindowPosition(ms_pSDLWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 		}
 	}
@@ -379,10 +413,7 @@ void CMSWindow::AdjustSize(int width, int height)
 {
 	if (ms_pSDLWindow)
 	{
-		SDL_SetWindowResizable(ms_pSDLWindow, SDL_FALSE);
-		SDL_SetWindowMinimumSize(ms_pSDLWindow, width, height);
-		SDL_SetWindowMaximumSize(ms_pSDLWindow, width, height);
-		SDL_SetWindowSize(ms_pSDLWindow, width, height);
+		SDLSetFixedWindowSize(ms_pSDLWindow, width, height);
 		SDL_SetWindowPosition(ms_pSDLWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 	}
 	Platform_SetWindowResolution(width, height);
@@ -399,12 +430,13 @@ void CMSWindow::SetSize(int width, int height)
 {
 	if (ms_pSDLWindow)
 	{
-		SDL_SetWindowResizable(ms_pSDLWindow, SDL_FALSE);
-		SDL_SetWindowMinimumSize(ms_pSDLWindow, width, height);
-		SDL_SetWindowMaximumSize(ms_pSDLWindow, width, height);
-		SDL_SetWindowSize(ms_pSDLWindow, width, height);
-		SDL_SetWindowPosition(ms_pSDLWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+		int x = 0;
+		int y = 0;
+		SDL_GetWindowPosition(ms_pSDLWindow, &x, &y);
+		SDLSetFixedWindowSize(ms_pSDLWindow, width, height);
+		SDL_SetWindowPosition(ms_pSDLWindow, x, y);
 	}
+
 	Platform_SetWindowResolution(width, height);
 	SetRect(&m_rect, 0, 0, width, height);
 }
