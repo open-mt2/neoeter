@@ -52,6 +52,26 @@ void CGrannyModelInstance::SetParentModelInstance(const CGrannyModelInstance* c_
 {
 	mc_pParentInstance = c_pParentModelInstance;
 	m_iParentBoneIndex = iBone;
+	m_bUseAttachTransform = false;
+}
+
+void CGrannyModelInstance::SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, const char* c_szBoneName, const D3DXMATRIX* c_pAttachTransform)
+{
+	int iBoneIndex;
+	if (!c_pParentModelInstance->GetBoneIndexByName(c_szBoneName, &iBoneIndex))
+		return;
+
+	SetParentModelInstance(c_pParentModelInstance, iBoneIndex, c_pAttachTransform);
+}
+
+void CGrannyModelInstance::SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, int iBone, const D3DXMATRIX* c_pAttachTransform)
+{
+	SetParentModelInstance(c_pParentModelInstance, iBone);
+	if (c_pParentModelInstance && c_pAttachTransform)
+	{
+		m_bUseAttachTransform = true;
+		m_matAttachTransform = *c_pAttachTransform;
+	}
 }
 
 bool CGrannyModelInstance::IsEmpty()
@@ -89,6 +109,7 @@ void CGrannyModelInstance::__Initialize()
 	m_pModel = NULL;
 	mc_pParentInstance = NULL;
 	m_iParentBoneIndex = 0;
+	m_bUseAttachTransform = false;
 
 	m_pgrnModelInstance = NULL;
 

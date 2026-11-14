@@ -63,6 +63,7 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 		void SetMotionAtEnd();
 
 		void AttachModelInstance(int iDstModelInstance, const char* c_szBoneName, int iSrcModelInstance);
+		void AttachModelInstance(int iDstModelInstance, const char* c_szBoneName, int iSrcModelInstance, const D3DXMATRIX* c_pAttachTransform);
 		void AttachModelInstance(int iDstModelInstance, const char* c_szBoneName, CGraphicThingInstance& rsrcInstance, int iSrcModelInstance);
 		void DetachModelInstance(int iDstModelInstance, CGraphicThingInstance& rSrcInstance, int SrcModelInstance);
 		bool FindBoneIndex(int iModelInstance, const char* c_szBoneName, int* iRetBone);

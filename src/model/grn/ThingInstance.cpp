@@ -289,6 +289,24 @@ void CGraphicThingInstance::AttachModelInstance(int iDstModelInstance, const cha
 	pDstLODController->AttachModelInstance(pSrcLODController, c_szBoneName);
 }
 
+void CGraphicThingInstance::AttachModelInstance(int iDstModelInstance, const char* c_szBoneName, int iSrcModelInstance, const D3DXMATRIX* c_pAttachTransform)
+{
+	if (!CheckModelInstanceIndex(iSrcModelInstance))
+	{
+		TraceError("CGraphicThingInstance::AttachModelInstance(iDstModelInstance=%d, c_szBoneName=%s, iSrcModelInstance=%d)", iDstModelInstance, c_szBoneName, iSrcModelInstance);
+		return;
+	}
+	if (!CheckModelInstanceIndex(iDstModelInstance))
+	{
+		TraceError("CGraphicThingInstance::AttachModelInstance(iDstModelInstance=%d, c_szBoneName=%s, iSrcModelInstance=%d)", iDstModelInstance, c_szBoneName, iSrcModelInstance);
+		return;
+	}
+
+	CGrannyLODController* pSrcLODController = m_LODControllerVector[iSrcModelInstance];
+	CGrannyLODController* pDstLODController = m_LODControllerVector[iDstModelInstance];
+	pDstLODController->AttachModelInstance(pSrcLODController, c_szBoneName, c_pAttachTransform);
+}
+
 void CGraphicThingInstance::AttachModelInstance(int iDstModelInstance, const char* c_szBoneName, CGraphicThingInstance& rSrcInstance, int iSrcModelInstance)
 {
 	if (!CheckModelInstanceIndex(iDstModelInstance))

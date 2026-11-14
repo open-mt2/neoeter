@@ -232,7 +232,7 @@ class CGrannyLODController : public CGraphicBase
 		void DestroyDeviceObjects();
 
 		void AddModel(CGraphicThing* pThing, int iSrcModel, CGrannyLODController* pSkelLODController = NULL);
-		void AttachModelInstance(CGrannyLODController* pSrcLODController, const char* c_szBoneName);
+		void AttachModelInstance(CGrannyLODController* pSrcLODController, const char* c_szBoneName, const D3DXMATRIX* c_pAttachTransform = NULL);
 		void DetachModelInstance(CGrannyLODController* pSrcLODController);
 		void SetLODLimits(float fNearLOD, float fFarLOD);
 		void SetLODLevel(BYTE bLODLevel);
@@ -289,6 +289,8 @@ class CGrannyLODController : public CGraphicBase
 		{
 				CGrannyLODController* pkLODController;
 				std::string strBoneName;
+				bool bUseAttachTransform;
+				D3DXMATRIX matAttachTransform;
 		} TAttachingModelData;
 
 		std::vector<TAttachingModelData> m_AttachedModelDataVector;

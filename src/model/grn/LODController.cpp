@@ -298,7 +298,7 @@ void CGrannyLODController::__ReserveSharedDeformableVertexBuffer(DWORD deformabl
 	m_pkSharedDeformableVertexBuffer = __AllocDeformVertexBuffer(deformableVertexCount);
 }
 
-void CGrannyLODController::AttachModelInstance(CGrannyLODController* pSrcLODController, const char* c_szBoneName)
+void CGrannyLODController::AttachModelInstance(CGrannyLODController* pSrcLODController, const char* c_szBoneName, const D3DXMATRIX* c_pAttachTransform)
 {
 	CGrannyModelInstance* pSrcInstance = pSrcLODController->GetModelInstance();
 	if (!pSrcInstance)
@@ -307,7 +307,7 @@ void CGrannyLODController::AttachModelInstance(CGrannyLODController* pSrcLODCont
 	CGrannyModelInstance* pDestInstance = GetModelInstance();
 	if (pDestInstance)
 	{
-		pSrcInstance->SetParentModelInstance(pDestInstance, c_szBoneName);
+		pSrcInstance->SetParentModelInstance(pDestInstance, c_szBoneName, c_pAttachTransform);
 	}
 
 	if (!pSrcLODController->GetModelInstance())
@@ -334,6 +334,9 @@ void CGrannyLODController::AttachModelInstance(CGrannyLODController* pSrcLODCont
 	TAttachingModelData AttachingModelData;
 	AttachingModelData.pkLODController = pSrcLODController;
 	AttachingModelData.strBoneName = c_szBoneName;
+	AttachingModelData.bUseAttachTransform = (c_pAttachTransform != NULL);
+	if (c_pAttachTransform)
+		AttachingModelData.matAttachTransform = *c_pAttachTransform;
 	m_AttachedModelDataVector.push_back(AttachingModelData);
 }
 
@@ -580,7 +583,8 @@ void CGrannyLODController::RefreshAttachedModelInstance()
 			continue;
 		}
 
-		pSrcInstance->SetParentModelInstance(m_pCurrentModelInstance, rModelData.strBoneName.c_str());
+		const D3DXMATRIX* c_pAttachTransform = rModelData.bUseAttachTransform ? &rModelData.matAttachTransform : NULL;
+		pSrcInstance->SetParentModelInstance(m_pCurrentModelInstance, rModelData.strBoneName.c_str(), c_pAttachTransform);
 	}
 }
 

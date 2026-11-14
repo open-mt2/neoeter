@@ -142,6 +142,13 @@ void CGrannyModelInstance::UpdateWorldPose()
 
 	const float* pAttachBoneMatrix = (mc_pParentInstance) ? mc_pParentInstance->GetBoneMatrixPointer(m_iParentBoneIndex) : NULL;
 
+	D3DXMATRIX matAttachTransform;
+	if (pAttachBoneMatrix && m_bUseAttachTransform)
+	{
+		D3DXMatrixMultiply(&matAttachTransform, &m_matAttachTransform, (const D3DXMATRIX*)pAttachBoneMatrix);
+		pAttachBoneMatrix = (const float*)&matAttachTransform;
+	}
+
 	GrannySampleModelAnimationsAccelerated(m_pgrnModelInstance, pgrnSkeleton->BoneCount, pAttachBoneMatrix, pgrnLocalPose, __GetWorldPosePtr());
 	/*
 	GrannySampleModelAnimations(m_pgrnModelInstance, 0, pgrnSkeleton->BoneCount, pgrnLocalPose);

@@ -108,6 +108,8 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		bool GetBoneIndexByName(const char* c_szBoneName, int* pBoneIndex) const;
 		void SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, const char* c_szBoneName);
 		void SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, int iBone);
+		void SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, const char* c_szBoneName, const D3DXMATRIX* c_pAttachTransform);
+		void SetParentModelInstance(const CGrannyModelInstance* c_pParentModelInstance, int iBone, const D3DXMATRIX* c_pAttachTransform);
 
 		// Collision Detection
 		bool Intersect(const D3DXMATRIX* c_pMatrix, float* pu, float* pv, float* pt);
@@ -173,6 +175,8 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		// Attaching Data
 		const CGrannyModelInstance* mc_pParentInstance;
 		int m_iParentBoneIndex;
+		bool m_bUseAttachTransform;
+		D3DXMATRIX m_matAttachTransform;
 
 		// Game Data
 		float m_fLocalTime;
