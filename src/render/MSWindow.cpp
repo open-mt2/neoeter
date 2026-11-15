@@ -204,30 +204,30 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, DWORD /*cs*/, DWORD 
 	Platform_SetWindowResolution(width, height);
 	Platform_SetWarpMouseCallback([](int x, int y)
 								  {
-		if (!ms_pSDLWindow)
-			return;
+									  if (!ms_pSDLWindow)
+										  return;
 
 #if defined(_WIN32) || defined(_WIN64)
-		SDL_SysWMinfo info;
-		SDL_VERSION(&info.version);
+									  SDL_SysWMinfo info;
+									  SDL_VERSION(&info.version);
 
-		if (SDL_GetWindowWMInfo(ms_pSDLWindow, &info))
-		{
-			POINT point = {x, y};
-			ClientToScreen(info.info.win.window, &point);
-			SetCursorPos(point.x, point.y);
-		}
-		else
-		{
-			int windowX = 0;
-			int windowY = 0;
-			SDL_GetWindowPosition(ms_pSDLWindow, &windowX, &windowY);
-			SDL_WarpMouseGlobal(windowX + x, windowY + y);
-		}
+									  if (SDL_GetWindowWMInfo(ms_pSDLWindow, &info))
+									  {
+										  POINT point = {x, y};
+										  ClientToScreen(info.info.win.window, &point);
+										  SetCursorPos(point.x, point.y);
+									  }
+									  else
+									  {
+										  int windowX = 0;
+										  int windowY = 0;
+										  SDL_GetWindowPosition(ms_pSDLWindow, &windowX, &windowY);
+										  SDL_WarpMouseGlobal(windowX + x, windowY + y);
+									  }
 #else
-		SDL_WarpMouseInWindow(ms_pSDLWindow, x, y);
+									  SDL_WarpMouseInWindow(ms_pSDLWindow, x, y);
 #endif
-	});
+								  });
 	SetRect(&m_rect, 0, 0, width, height);
 
 	Tracef("[SDL2] Created native game window (floating): %p ('%s', %dx%d, video driver: %s)\n",
