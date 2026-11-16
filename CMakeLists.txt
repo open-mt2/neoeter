@@ -10,6 +10,8 @@ include(NeoeterOptions)
 set(NEOETER_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories("${NEOETER_INCLUDE_DIR}")
 
+enable_testing()
+
 add_subdirectory("external/miniaudio" "${CMAKE_BINARY_DIR}/external/miniaudio")
 
 set(NEOETER_PACKAGES
@@ -39,8 +41,7 @@ endforeach()
 include(NeoeterAliases)
 include(NeoeterInstall)
 
-if(BUILD_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
-    enable_testing()
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
     add_subdirectory(tests)
 endif()
 

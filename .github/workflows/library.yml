@@ -2,8 +2,6 @@ name: library
 
 on:
   push:
-    branches: [main]
-    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
@@ -37,6 +35,41 @@ jobs:
         run: |
           clang-format --version
           clang-format --dry-run --Werror $(git ls-files '*.cpp' '*.h' '*.c' '*.cc')
+
+  test:
+    name: Test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            cmake \
+            ninja-build \
+            pkg-config \
+            libsdl2-dev \
+            libfreetype-dev \
+            libfontconfig1-dev \
+            liblzo2-dev \
+            libzip-dev \
+            zlib1g-dev \
+            libgl-dev \
+            libegl-dev \
+            libjpeg-dev
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
+
+      - name: Build
+        run: cmake --build build --parallel "$(nproc)"
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
 
   build:
     name: Build library
