@@ -11,6 +11,13 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 option(NEOETER_BUILD_TESTS "Build Neoeter tests" ON)
 option(NEOETER_STANDALONE "Build Neoeter on its own (not as part of the devkit)" OFF)
 
+# The packages gate their test directories on BUILD_TESTS. It is only defined
+# here when Neoeter is the top-level project, so a parent build keeps control of
+# whether engine tests are compiled.
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(BUILD_TESTS ${NEOETER_BUILD_TESTS})
+endif()
+
 if(NEOETER_STANDALONE)
     include(FetchContent)
 endif()
