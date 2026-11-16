@@ -30,6 +30,9 @@ static std::string CurrentText()
 int main()
 {
 	CIME::Clear();
+	// SDL_TEXTINPUT reaches the buffer only while an edit line has capture.
+	TestIME capture;
+	capture.EnableCaptureInput();
 	TEST_ASSERT(CurrentText().empty());
 	TEST_ASSERT(CIME::GetCompLen() == 0);
 
