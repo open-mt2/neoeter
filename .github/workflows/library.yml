@@ -2,8 +2,6 @@ name: library
 
 on:
   push:
-    branches: [main]
-    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
@@ -40,7 +38,6 @@ jobs:
 
   test:
     name: Test
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
 
