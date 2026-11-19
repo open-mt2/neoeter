@@ -731,36 +731,13 @@ void CScreen::End()
 	STATEMANAGER.EndScene();
 }
 
-#if defined(__GNUC__) || defined(__clang__)
-__attribute__((weak)) bool g_isBrowserMode = false;
-__attribute__((weak)) RECT g_rcBrowser = {0, 0, 0, 0};
-#else
-extern bool g_isBrowserMode;
-extern RECT g_rcBrowser;
-#endif
-
 void CScreen::Show(HWND hWnd)
 {
 	assert(ms_lpd3dDevice != NULL);
 
-	if (g_isBrowserMode)
-	{
-		RECT rcTop = {0, 0, (LONG)ms_d3dPresentParameter.BackBufferWidth, g_rcBrowser.top};
-		RECT rcBottom = {0, g_rcBrowser.bottom, (LONG)ms_d3dPresentParameter.BackBufferWidth, (LONG)ms_d3dPresentParameter.BackBufferHeight};
-		RECT rcLeft = {0, g_rcBrowser.top, g_rcBrowser.left, g_rcBrowser.bottom};
-		RECT rcRight = {g_rcBrowser.right, g_rcBrowser.top, (LONG)ms_d3dPresentParameter.BackBufferWidth, g_rcBrowser.bottom};
-
-		ms_lpd3dDevice->Present(&rcTop, &rcTop, hWnd, NULL);
-		ms_lpd3dDevice->Present(&rcBottom, &rcBottom, hWnd, NULL);
-		ms_lpd3dDevice->Present(&rcLeft, &rcLeft, hWnd, NULL);
-		ms_lpd3dDevice->Present(&rcRight, &rcRight, hWnd, NULL);
-	}
-	else
-	{
-		HRESULT hr = ms_lpd3dDevice->Present(NULL, NULL, hWnd, NULL);
-		if (D3DERR_DEVICELOST == hr)
-			RestoreDevice();
-	}
+	HRESULT hr = ms_lpd3dDevice->Present(NULL, NULL, hWnd, NULL);
+	if (D3DERR_DEVICELOST == hr)
+		RestoreDevice();
 
 #if defined(OPENMT2_SDL_WINDOW)
 	if (CMSWindow::ms_pSDLWindow)

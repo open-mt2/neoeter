@@ -41,10 +41,6 @@ class CGraphicDevice : public CGraphicBase
 		EDeviceState GetDeviceState();
 		bool Reset();
 
-		void EnableWebBrowserMode(const RECT& c_rcWebPage);
-		void DisableWebBrowserMode();
-		void MoveWebBrowserRect(const RECT& c_rcWebPage);
-
 		bool ResizeBackBuffer(UINT uWidth, UINT uHeight);
 		void RegisterWarningString(UINT uiMsg, const char* c_szString);
 

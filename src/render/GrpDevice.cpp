@@ -11,10 +11,6 @@ bool GRAPHICS_CAPS_HALF_SIZE_IMAGE = false;
 bool GRAPHICS_CAPS_CAN_NOT_TEXTURE_ADDRESS_BORDER = false;
 bool GRAPHICS_CAPS_SOFTWARE_TILING = false;
 
-D3DPRESENT_PARAMETERS g_kD3DPP;
-bool g_isBrowserMode = false;
-RECT g_rcBrowser;
-
 CGraphicDevice::CGraphicDevice()
 	: m_uBackBufferCount(0)
 {
@@ -55,58 +51,6 @@ void CGraphicDevice::__WarningMessage(HWND hWnd, UINT uiMsg)
 	if (m_kMap_strWarningMessage.end() == m_kMap_strWarningMessage.find(uiMsg))
 		return;
 	MessageBox(hWnd, m_kMap_strWarningMessage[uiMsg].c_str(), "Warning", MB_OK | MB_TOPMOST);
-}
-
-void CGraphicDevice::MoveWebBrowserRect(const RECT& c_rcWebPage)
-{
-	g_rcBrowser = c_rcWebPage;
-}
-
-void CGraphicDevice::EnableWebBrowserMode(const RECT& c_rcWebPage)
-{
-	if (!ms_lpd3dDevice)
-		return;
-
-	D3DPRESENT_PARAMETERS& rkD3DPP = ms_d3dPresentParameter;
-
-	g_isBrowserMode = true;
-
-	if (D3DSWAPEFFECT_COPY == rkD3DPP.SwapEffect)
-		return;
-
-	g_kD3DPP = rkD3DPP;
-	g_rcBrowser = c_rcWebPage;
-
-	// rkD3DPP.Windowed=TRUE;
-	rkD3DPP.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	rkD3DPP.BackBufferCount = 0;
-	rkD3DPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-
-	IDirect3DDevice9& rkD3DDev = *ms_lpd3dDevice;
-	HRESULT hr = rkD3DDev.Reset(&rkD3DPP);
-	if (FAILED(hr))
-		return;
-
-	STATEMANAGER.SetDefaultState();
-}
-
-void CGraphicDevice::DisableWebBrowserMode()
-{
-	if (!ms_lpd3dDevice)
-		return;
-
-	D3DPRESENT_PARAMETERS& rkD3DPP = ms_d3dPresentParameter;
-
-	g_isBrowserMode = false;
-
-	rkD3DPP = g_kD3DPP;
-
-	IDirect3DDevice9& rkD3DDev = *ms_lpd3dDevice;
-	HRESULT hr = rkD3DDev.Reset(&rkD3DPP);
-	if (FAILED(hr))
-		return;
-
-	STATEMANAGER.SetDefaultState();
 }
 
 bool CGraphicDevice::ResizeBackBuffer(UINT uWidth, UINT uHeight)
