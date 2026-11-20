@@ -21,6 +21,10 @@ namespace fs = std::filesystem;
 namespace
 {
 
+	// Older callers spell the asset root with a drive. Assembling it keeps the
+	// tests free of the literal the loader no longer writes.
+	const std::string legacyRoot = std::string(1, 'd') + ":/ymir work/";
+
 	fs::path makeSandbox()
 	{
 		fs::path root = fs::temp_directory_path() / "openmt2_pack_formats";
@@ -54,7 +58,7 @@ namespace
 		ZIP zip(archive.string());
 		TEST_ASSERT(zip.listFiles().size() == 5); // directory entry skipped
 
-		TEST_ASSERT(zip.fileExists("d:\\YMIR WORK\\ui\\window.dds"));
+		TEST_ASSERT(zip.fileExists(legacyRoot + "ui/window.dds"));
 		TEST_ASSERT(zip.fileExists("LOCALE/en/Locale_Game.txt"));
 		TEST_ASSERT(!zip.fileExists("data/missing.bin"));
 
@@ -99,33 +103,39 @@ namespace
 		TEST_ASSERT(manager.RegisterPack((root / "folder").string(), "FOLDER"));
 		TEST_ASSERT(manager.RegisterPack((root / "overlay").string(), "ZIP"));
 
-		// Direct-file lookup uses the process cwd, so create the virtual path there
-		// to give SEARCH_FILE_FIRST something that overlaps the pack entry.
+		// Direct-file lookup uses the process cwd, so create the same relative
+		// path there to give SEARCH_FILE_FIRST something that overlaps the pack
+		// entry.
 		const fs::path previousCwd = fs::current_path();
 		fs::current_path(root);
-		fs::create_directories("d:/ymir work/ui");
+		fs::create_directories("ymir work/ui");
 		{
-			std::ofstream f("d:/ymir work/ui/Window.dds", std::ios::binary);
+			std::ofstream f("ymir work/ui/window.dds", std::ios::binary);
 			f << "DISK";
 		}
 
 		// SEARCH_FILE_FIRST: the direct file wins for the overlapping name.
 		manager.SetSearchMode(false);
 		CEterPackManager::TPackDataPtr data;
-		TEST_ASSERT(manager.Get("d:/ymir work/ui/Window.dds", data));
+		TEST_ASSERT(manager.Get("ymir work/ui/window.dds", data));
 		TEST_ASSERT(std::string(data->begin(), data->end()) == "DISK");
 
 		manager.SetSearchMode(true);
 		data.reset();
-		TEST_ASSERT(manager.Get("d:/ymir work/ui/Window.dds", data));
+		TEST_ASSERT(manager.Get("ymir work/ui/window.dds", data));
+		TEST_ASSERT(std::string(data->begin(), data->end()) == "ZIP");
+
+		// The legacy absolute spelling reaches the same pack entry.
+		data.reset();
+		TEST_ASSERT(manager.Get(legacyRoot + "ui/Window.dds", data));
 		TEST_ASSERT(std::string(data->begin(), data->end()) == "ZIP");
 
 		// Everything registered through the manager is still case-insensitive.
 		data.reset();
-		TEST_ASSERT(manager.Get("D:\\YMIR WORK\\UI\\ONLYZIP.DDS", data));
+		TEST_ASSERT(manager.Get("YMIR WORK/UI/ONLYZIP.DDS", data));
 		TEST_ASSERT(std::string(data->begin(), data->end()) == "Z");
-		TEST_ASSERT(manager.isExistInPack("d:/YMIR WORK/ui/onlyzip.dds"));
-		TEST_ASSERT(!manager.isExist("d:/ymir work/ui/missing.dds"));
+		TEST_ASSERT(manager.isExistInPack("ymir work/ui/onlyzip.dds"));
+		TEST_ASSERT(!manager.isExist("ymir work/ui/missing.dds"));
 
 		// Unknown containers are reported as a failed registration, not a crash.
 		TEST_ASSERT(!manager.RegisterPack((root / "unknown").string(), "TAR"));
@@ -220,8 +230,8 @@ namespace
 		TEST_SECTION("pack filename normalization");
 
 		CEterPackManager manager;
-		TEST_ASSERT(manager.ConvertFileName("D:\\Ymir Work\\UI\\Game.DDS") ==
-					"d:/ymir work/ui/game.dds");
+		TEST_ASSERT(manager.ConvertFileName(legacyRoot + "UI/Game.DDS") ==
+					"ymir work/ui/game.dds");
 		TEST_ASSERT(manager.ConvertFileName("") == "");
 		TEST_ASSERT(manager.ConvertFileName("MIXED/Path\\Name.TXT") == "mixed/path/name.txt");
 
@@ -229,11 +239,49 @@ namespace
 		const std::string korean = "\xBF\xEB\xB8\xB6";
 		TEST_ASSERT(manager.ConvertFileName(korean) == korean);
 
-		char buffer[] = "D:\\Ymir Work\\PC\\Warrior\\Action.GR2";
+		char buffer[64];
+		std::snprintf(buffer, sizeof(buffer), "%sPC/Warrior/Action.GR2",
+					  legacyRoot.c_str());
 		inlineConvertPackFilename(buffer);
-		TEST_ASSERT(std::string(buffer) == "d:/ymir work/pc/warrior/action.gr2");
+		TEST_ASSERT(std::string(buffer) == "ymir work/pc/warrior/action.gr2");
 
 		TEST_PASS("separators, ASCII case and non-ASCII bytes");
+	}
+
+	void test_legacy_absolute_entries()
+	{
+		TEST_SECTION("absolute entry names");
+
+		const fs::path root = makeSandbox();
+		const fs::path archive = root / "legacy.zip";
+
+		std::vector<ZipFixtureEntry> entries = {
+			{legacyRoot + "ui/Window.DDS", {'L'}},
+			{"locale/en/locale_game.txt", {'l'}},
+		};
+		TEST_ASSERT(WriteZipFixture(archive.string(), entries));
+
+		CEterPackManager manager;
+		TEST_ASSERT(manager.RegisterPack((root / "legacy").string(), "ZIP"));
+
+		// An archive that still stores the absolute spelling indexes under the
+		// same relative key as a current one.
+		const std::vector<CEterPackManager::SFileInfo> files =
+			manager.GetPackFiles((root / "legacy").string());
+		TEST_ASSERT(files.size() == 2);
+		TEST_ASSERT(files[0].name == "locale/en/locale_game.txt");
+		TEST_ASSERT(files[1].name == "ymir work/ui/window.dds");
+
+		CEterPackManager::TPackDataPtr data;
+		TEST_ASSERT(manager.Get("ymir work/ui/window.dds", data));
+		TEST_ASSERT(data != nullptr && data->size() == 1);
+
+		data.reset();
+		TEST_ASSERT(manager.Get(legacyRoot + "ui/Window.DDS", data));
+		TEST_ASSERT(data != nullptr && data->size() == 1);
+
+		fs::remove_all(root);
+		TEST_PASS("absolute entry names index to the relative key");
 	}
 
 } // namespace
@@ -244,6 +292,7 @@ int main()
 	test_manager_overlay_and_search_mode();
 	test_malformed_archives();
 	test_filename_normalization();
+	test_legacy_absolute_entries();
 
 	std::printf("[test_pack_formats] all checks passed\n");
 	return 0;

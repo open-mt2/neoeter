@@ -37,11 +37,6 @@ void Folder::ListFiles(const std::string& directory, const std::string& relative
 		{
 			std::string normalizedPath = CEterPackManager::Instance().ConvertFileName(currentRelativePath);
 
-			if (normalizedPath.rfind("ymir work/", 0) == 0)
-			{
-				normalizedPath = "d:/" + normalizedPath;
-			}
-
 			this->fileList.insert(normalizedPath);
 			this->realPathMap[normalizedPath] = fullPath;
 		}
@@ -95,18 +90,9 @@ bool Folder::getFile(const std::string& fileName, std::shared_ptr<std::vector<ch
 	std::string diskPath;
 	auto mapIt = realPathMap.find(normalized);
 	if (mapIt != realPathMap.end())
-	{
 		diskPath = mapIt->second;
-	}
 	else
-	{
-		std::string realFileName = normalized;
-		const std::string ymirPrefix = "d:/";
-		if (realFileName.rfind(ymirPrefix, 0) == 0)
-			realFileName = realFileName.substr(ymirPrefix.length());
-
-		diskPath = this->folderPath + "/" + realFileName;
-	}
+		diskPath = this->folderPath + "/" + normalized;
 
 	// Try to open the file
 	std::ifstream file(diskPath, std::ios::binary);

@@ -103,9 +103,6 @@ static std::vector<std::string> FindCaseInsensitiveDirs(const std::string& path)
 #include <Neoeter/IO/Folder.h>
 #include <Neoeter/IO/ZIP.h>
 
-#define PATH_ABSOLUTE_YMIRWORK1 "d:/ymir work/"
-#define PATH_ABSOLUTE_YMIRWORK2 "d:\\ymir work\\"
-
 static std::string NormalizeSeparators(const std::string& path)
 {
 	std::string res = path;
@@ -117,7 +114,9 @@ static std::string NormalizeSeparators(const std::string& path)
 	return res;
 }
 
-// StringPath std::string 버전
+// Names are relative to the pack root. Older data and callers still spell the
+// asset root as an absolute Windows path, so that one prefix is dropped here,
+// on indexing and on lookup alike.
 std::string CEterPackManager::ConvertFileName(std::string fileName)
 {
 	std::string convertedFileName = fileName;
@@ -128,6 +127,10 @@ std::string CEterPackManager::ConvertFileName(std::string fileName)
 		if (convertedFileName[i] == '\\')
 			convertedFileName[i] = '/';
 	}
+
+	static const std::string legacyRoot = "d:/ymir work/";
+	if (convertedFileName.rfind(legacyRoot, 0) == 0)
+		convertedFileName.replace(0, legacyRoot.length(), "ymir work/");
 
 	return convertedFileName;
 }

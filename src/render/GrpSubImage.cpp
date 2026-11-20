@@ -4,7 +4,7 @@
 #include <Neoeter/Render/GrpSubImage.h>
 #include <Neoeter/Render/ResourceManager.h>
 
-char CGraphicSubImage::m_SearchPath[256] = "D:/Ymir Work/UI/";
+char CGraphicSubImage::m_SearchPath[256] = "ymir work/ui/";
 
 CGraphicSubImage::TType CGraphicSubImage::Type()
 {

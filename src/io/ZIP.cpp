@@ -41,11 +41,6 @@ ZIP::ZIP(const std::string& archivePath)
 
 		fileName = CEterPackManager::Instance().ConvertFileName(fileName);
 
-		if (fileName.rfind("ymir work/", 0) == 0)
-		{
-			fileName = "d:/" + fileName;
-		}
-
 		fileList.insert({fileName, fileData.index});
 	}
 }

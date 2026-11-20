@@ -14,7 +14,7 @@ namespace
 	void setup_shared_texture_material(granny_material* pMaterial, granny_material_map* pMap, granny_material* pMapMaterial, granny_texture* pTexture)
 	{
 		std::memset(pTexture, 0, sizeof(*pTexture));
-		pTexture->FromFileName = "d:/ymir work/pc/warrior/warrior_4-1.dds";
+		pTexture->FromFileName = "ymir work/pc/warrior/warrior_4-1.dds";
 
 		std::memset(pMapMaterial, 0, sizeof(*pMapMaterial));
 		pMapMaterial->Texture = pTexture;

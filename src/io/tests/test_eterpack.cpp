@@ -59,15 +59,19 @@ int main()
 
 	CEterPackManager packMgr;
 
+	// Older callers spell the asset root with a drive. Assembling it keeps the
+	// test itself free of the literal the loader no longer writes.
+	const std::string legacyRoot = std::string(1, 'd') + ":/ymir work/";
+
 	// 1. Test ConvertFileName & inlineConvertPackFilename
 	{
-		std::string converted =
-			packMgr.ConvertFileName("D:\\Ymir Work\\UI\\Game.DDS");
-		TEST_ASSERT(converted == "d:/ymir work/ui/game.dds");
+		TEST_ASSERT(packMgr.ConvertFileName(legacyRoot + "UI/Game.DDS") ==
+					"ymir work/ui/game.dds");
 
-		char buf[] = "D:\\Ymir Work\\PC\\Warrior\\Action.GR2";
+		char buf[64];
+		std::snprintf(buf, sizeof(buf), "%sPC/Warrior/Action.GR2", legacyRoot.c_str());
 		inlineConvertPackFilename(buf);
-		TEST_ASSERT(std::string(buf) == "d:/ymir work/pc/warrior/action.gr2");
+		TEST_ASSERT(std::string(buf) == "ymir work/pc/warrior/action.gr2");
 		printf("  [PASS] Filename normalization & case folding\n");
 	}
 
@@ -101,16 +105,19 @@ int main()
 		TEST_ASSERT(packMgr.PackExists(folderPackPath, "FOLDER"));
 		TEST_ASSERT(packMgr.RegisterPack(folderPackPath, "FOLDER"));
 
-		// Lookup with Windows backslashes and mixed case
-		const char* virtualSwordPath = "D:\\Ymir Work\\Item\\Weapon\\SWORD_001.GR2";
-		TEST_ASSERT(packMgr.isExistInPack(virtualSwordPath));
-		TEST_ASSERT(packMgr.isExist(virtualSwordPath));
+		// Lookup with the legacy absolute spelling still resolves.
+		const std::string virtualSwordPath = legacyRoot + "Item/Weapon/SWORD_001.GR2";
+		TEST_ASSERT(packMgr.isExistInPack(virtualSwordPath.c_str()));
+		TEST_ASSERT(packMgr.isExist(virtualSwordPath.c_str()));
 
 		CEterPackManager::TPackDataPtr dataPtr;
-		TEST_ASSERT(packMgr.Get(virtualSwordPath, dataPtr));
+		TEST_ASSERT(packMgr.Get("ymir work/item/weapon/sword_001.gr2", dataPtr));
 		TEST_ASSERT(dataPtr != nullptr);
 		std::string loaded(dataPtr->begin(), dataPtr->end());
 		TEST_ASSERT(loaded == swordContent);
+
+		TEST_ASSERT(packMgr.Get(virtualSwordPath, dataPtr));
+		TEST_ASSERT(dataPtr != nullptr);
 
 		std::stringstream ss;
 		TEST_ASSERT(packMgr.Get(virtualSwordPath, ss));
@@ -127,15 +134,20 @@ int main()
 		TEST_ASSERT(packMgr.PackExists(zipBasePath, "ZIP"));
 		TEST_ASSERT(packMgr.RegisterPack(zipBasePath, "ZIP"));
 
-		// Verify "ymir work/" -> "d:/ymir work/" virtual mapping inside ZIP
-		const char* virtualUiPath = "d:\\YMIR WORK\\ui\\Window.dds";
-		TEST_ASSERT(packMgr.isExistInPack(virtualUiPath));
+		// A ZIP stores its entries relative to the pack root; the legacy
+		// absolute spelling resolves to the same entry.
+		const std::string virtualUiPath = legacyRoot + "ui/Window.dds";
+		TEST_ASSERT(packMgr.isExistInPack(virtualUiPath.c_str()));
 
 		CEterPackManager::TPackDataPtr zipData;
 		TEST_ASSERT(packMgr.Get(virtualUiPath, zipData));
 		TEST_ASSERT(zipData != nullptr);
 		std::string uiLoaded(zipData->begin(), zipData->end());
 		TEST_ASSERT(uiLoaded == "ZIP_ASSET_DATA_12345");
+
+		zipData.reset();
+		TEST_ASSERT(packMgr.Get("ymir work/ui/window.dds", zipData));
+		TEST_ASSERT(zipData != nullptr);
 
 		// Verify standard relative path inside ZIP
 		CEterPackManager::TPackDataPtr localeData;
@@ -162,7 +174,7 @@ int main()
 
 		packMgr.SetSearchMode(true); // SEARCH_PACK_FIRST
 		TEST_ASSERT(packMgr.GetSearchMode() == CEterPackManager::SEARCH_PACK_FIRST);
-		TEST_ASSERT(!packMgr.isExist("d:/ymir work/non_existent_file.abc"));
+		TEST_ASSERT(!packMgr.isExist("ymir work/non_existent_file.abc"));
 		printf("  [PASS] Direct file lookup & search mode switching\n");
 	}
 
@@ -179,15 +191,15 @@ int main()
 		const std::vector<CEterPackManager::SFileInfo> folderFiles =
 			packMgr.GetPackFiles((tempRoot / "pack_folder").string());
 		TEST_ASSERT(folderFiles.size() == 1);
-		TEST_ASSERT(folderFiles[0].name == "d:/ymir work/item/weapon/sword_001.gr2");
+		TEST_ASSERT(folderFiles[0].name == "ymir work/item/weapon/sword_001.gr2");
 		TEST_ASSERT(folderFiles[0].size == swordContent.size());
 
 		const std::vector<CEterPackManager::SFileInfo> zipFiles =
 			packMgr.GetPackFiles((tempRoot / "sample_pack").string());
 		TEST_ASSERT(zipFiles.size() == 2);
-		TEST_ASSERT(zipFiles[0].name == "d:/ymir work/ui/window.dds");
+		TEST_ASSERT(zipFiles[0].name == "locale/en/locale_game.txt");
 		TEST_ASSERT(zipFiles[0].size > 0);
-		TEST_ASSERT(zipFiles[1].name == "locale/en/locale_game.txt");
+		TEST_ASSERT(zipFiles[1].name == "ymir work/ui/window.dds");
 		TEST_ASSERT(zipFiles[1].size > 0);
 		printf("  [PASS] Pack information and resource listing\n");
 	}

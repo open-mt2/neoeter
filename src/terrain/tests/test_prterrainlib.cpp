@@ -226,7 +226,7 @@ namespace
 		assert(textureSet.GetTextureCount() == 1); // Eraser texture
 
 		bool added = textureSet.AddTexture(
-			"d:/ymir work/terrain/grass.dds",
+			"ymir work/terrain/grass.dds",
 			2.0f,
 			3.0f,
 			0.5f,
@@ -239,7 +239,7 @@ namespace
 		assert(textureSet.GetTextureCount() == 2);
 
 		TTerrainTexture& tex = textureSet.GetTexture(1);
-		assert(tex.stFilename == "d:/ymir work/terrain/grass.dds");
+		assert(tex.stFilename == "ymir work/terrain/grass.dds");
 		assert(std::fabs(tex.UScale - 2.0f) < 1e-4f);
 		assert(std::fabs(tex.VScale - 3.0f) < 1e-4f);
 		assert(std::fabs(tex.UOffset - 0.5f) < 1e-4f);
@@ -256,7 +256,7 @@ namespace
 
 		// Duplicate rejection
 		bool dupAdded = textureSet.AddTexture(
-			"d:/ymir work/terrain/grass.dds",
+			"ymir work/terrain/grass.dds",
 			1.0f, 1.0f, 0.0f, 0.0f, true, 0, 0, 1.0f);
 		assert(!dupAdded);
 		assert(textureSet.GetTextureCount() == 2);
@@ -272,7 +272,7 @@ namespace
 		assert(loaded);
 		assert(loadedSet.GetTextureCount() == 2);
 		TTerrainTexture& loadedTex = loadedSet.GetTexture(1);
-		assert(loadedTex.stFilename == "d:/ymir work/terrain/grass.dds");
+		assert(loadedTex.stFilename == "ymir work/terrain/grass.dds");
 		assert(std::fabs(loadedTex.UScale - 2.0f) < 1e-4f);
 		assert(std::fabs(loadedTex.VScale - 3.0f) < 1e-4f);
 

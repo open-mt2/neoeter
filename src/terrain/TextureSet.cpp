@@ -27,7 +27,7 @@ void CTextureSet::Create()
 {
 	if (CResourceManager::InstancePtr())
 	{
-		CResource* pResource = CResourceManager::Instance().GetResourcePointer("d:/ymir work/special/error.tga");
+		CResource* pResource = CResourceManager::Instance().GetResourcePointer("ymir work/special/error.tga");
 		m_ErrorTexture.ImageInstance.SetImagePointer(static_cast<CGraphicImage*>(pResource));
 	}
 	AddEmptyTexture(); // 지우개 텍스춰를 처음에 추가 해야 함

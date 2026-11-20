@@ -38,6 +38,11 @@ inline void inlineConvertPackFilename(char* name)
 			*p = static_cast<char>(tolower(static_cast<unsigned char>(*p)));
 		p++;
 	}
+
+	static const char legacyRoot[] = "d:/ymir work/";
+	const size_t legacyLength = sizeof(legacyRoot) - 1;
+	if (strncmp(name, legacyRoot, legacyLength) == 0)
+		memmove(name, name + 3, strlen(name + 3) + 1);
 }
 
 #endif
