@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include <Platform/Platform.h>
+#include <Neoeter/Platform/Platform.h>
 #include <Neoeter/Platform/Base/Singleton.h>
 #include <Neoeter/Model/SpeedTree/SpeedTreeRTCompat.h>
 #include <Neoeter/Model/SpeedTree/SpeedTreeWrapper.h>

@@ -2,8 +2,8 @@
 #ifndef __INC_PRTERRAINLIB_TERRAIN_H__
 #define __INC_PRTERRAINLIB_TERRAIN_H__
 
-#include <Platform/Platform.h>
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/Platform.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 #include <Neoeter/Image/TGAImage.h>
 
 #include "TextureSet.h"

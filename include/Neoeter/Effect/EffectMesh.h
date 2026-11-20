@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Platform/Platform.h>
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/Platform.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 
 #include <Neoeter/Render/GrpScreen.h>
 #include <Neoeter/Render/Resource.h>

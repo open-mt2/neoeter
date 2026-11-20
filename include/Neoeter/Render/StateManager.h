@@ -41,7 +41,7 @@
 #pragma once
 
 // T4.1: one D3D9 vocabulary on every target.
-#include "Platform/DirectXMathCompat.h"
+#include "Neoeter/Platform/DirectXMathCompat.h"
 
 #include <vector>
 

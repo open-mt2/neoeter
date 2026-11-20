@@ -32,7 +32,7 @@
 
 #include <Neoeter/Model/SpeedTree/SpeedTreeMaterial.h>
 #include <Neoeter/Model/SpeedTree/SpeedTreeRTCompat.h>
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 #include <vector>
 
 #include <Neoeter/Render/GrpObjectInstance.h>

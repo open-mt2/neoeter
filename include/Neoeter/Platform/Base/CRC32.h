@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <cstddef>
 #else
-#include <Platform/Platform.h>
+#include <Neoeter/Platform/Platform.h>
 #endif
 
 uint32_t GetCRC32(const char* buffer, size_t count);

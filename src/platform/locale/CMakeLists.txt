@@ -50,7 +50,7 @@ set(ETERLOCALE_HEADERS
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Locale/StdAfx.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Locale/StringCodec.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Locale/StringCodec_Vietnamese.h
-    ${NEOETER_INCLUDE_DIR}/Platform/Platform.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Platform.h
 )
 
 add_library(neoeter_platform_locale STATIC

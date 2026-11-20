@@ -77,8 +77,8 @@ set(MILESLIB_HEADERS
     ${NEOETER_INCLUDE_DIR}/Neoeter/Audio/SoundManagerStream.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Audio/StdAfx.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Audio/Type.h
-    ${NEOETER_INCLUDE_DIR}/Platform/DirectXMathCompat.h
-    ${NEOETER_INCLUDE_DIR}/Platform/Platform.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/DirectXMathCompat.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Platform.h
 )
 
 add_library(neoeter_audio STATIC

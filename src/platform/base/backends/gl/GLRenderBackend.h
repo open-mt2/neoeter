@@ -7,7 +7,7 @@
 // the D3D9 vocabulary of the snapshot into the fixed-function GL calls the
 // pre-seam renderer issued, in the same order.
 
-#include <Platform/RenderBackend.h>
+#include <Neoeter/Platform/RenderBackend.h>
 
 #include <vector>
 

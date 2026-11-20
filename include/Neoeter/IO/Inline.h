@@ -1,7 +1,7 @@
 #ifndef __INC_ETERPACK_INLINE_H__
 #define __INC_ETERPACK_INLINE_H__
 
-#include <Platform/Platform.h>
+#include <Neoeter/Platform/Platform.h>
 #include <cstring>
 #include <cctype>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 // T4.1: one D3D9 vocabulary on every target.
-#include "Platform/DirectXMathCompat.h"
+#include "Neoeter/Platform/DirectXMathCompat.h"
 #include <string>
 
 typedef int32_t (*PFNCONFIRMDEVICE)(D3DCAPS9& rkD3DCaps, uint32_t uBehavior, D3DFORMAT eD3DFmt);

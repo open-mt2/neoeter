@@ -5,7 +5,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
-#include <Platform/GLCompat.h>
+#include <Neoeter/Platform/GLCompat.h>
 
 // Windows GL headers only ship the 1.1 subset; the constant comes from
 // glext.h, which the loader work (T1.4) adds.

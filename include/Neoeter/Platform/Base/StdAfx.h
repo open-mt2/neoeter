@@ -21,7 +21,7 @@
 #include <imagehlp.h>
 #include <time.h>
 #else
-#include <Platform/Platform.h>
+#include <Neoeter/Platform/Platform.h>
 #include <cassert>
 #include <cstdio>
 #include <ctime>

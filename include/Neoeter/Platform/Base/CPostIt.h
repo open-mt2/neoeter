@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <cstddef>
 #else
-#include <Platform/Platform.h>
+#include <Neoeter/Platform/Platform.h>
 #endif
 
 // _CPostItMemoryBlock is defined in CPostIt.cpp

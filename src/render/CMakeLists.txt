@@ -65,7 +65,7 @@ if(NOT NEOETER_DEBUG_UI)
 endif()
 file(GLOB ETERLIB_HEADERS CONFIGURE_DEPENDS
     "${NEOETER_INCLUDE_DIR}/Neoeter/Render/*.h"
-    "${NEOETER_INCLUDE_DIR}/Platform/*.h"
+    "${NEOETER_INCLUDE_DIR}/Neoeter/Platform/*.h"
 )
 
 add_library(neoeter_render STATIC

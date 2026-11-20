@@ -12,8 +12,8 @@ cmake --build build --parallel
 ```
 
 Consumers link the `Neoeter::*` CMake targets and include headers as
-`<Neoeter/<Role>/...>`. The shared D3D9 compatibility shim stays
-`<Platform/...>`.
+`<Neoeter/<Role>/...>`. The shared D3D9 compatibility shim is
+`<Neoeter/Platform/...>`.
 
 ## Documentation
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Platform/Platform.h>
+#include <Neoeter/Platform/Platform.h>
 #include <Neoeter/Model/Grn/GrannyCompat.h>
 
 #ifdef __cplusplus

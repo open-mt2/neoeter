@@ -3,8 +3,8 @@
 #define __TERRAIN_TYPES_H__
 
 #include <cmath>
-#include <Platform/Platform.h>
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/Platform.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 
 #include <Neoeter/Render/GrpVertexBuffer.h>
 #include <Neoeter/Render/GrpIndexBuffer.h>

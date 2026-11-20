@@ -4,7 +4,7 @@
 // game-facing contract (DirectInput scan codes + edge events); the SDL
 // translation lives in Input.cpp.
 
-#include <Platform/Platform.h>
+#include <Neoeter/Platform/Platform.h>
 
 class CInputKeyboard
 {

@@ -8,7 +8,7 @@
 #pragma comment(lib, "imm32.lib")
 struct INPUTCONTEXT;
 #else
-#include "Platform/Platform.h"
+#include "Neoeter/Platform/Platform.h"
 struct INPUTCONTEXT;
 #endif
 

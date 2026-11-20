@@ -4,8 +4,8 @@
 
 #include <string>
 #include <vector>
-#include <Platform/Platform.h>
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/Platform.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 #include <Neoeter/Render/GrpImageInstance.h>
 
 typedef struct STerrainTexture

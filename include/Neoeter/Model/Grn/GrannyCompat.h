@@ -7,8 +7,8 @@
 // math, animation control blending, mesh bone binding, and CPU vertex skinning
 // for EterGrnLib without requiring the proprietary 32-bit granny2.dll SDK.
 
-#include <Platform/Platform.h>
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/Platform.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 
 #include <cmath>
 #include <cstdint>

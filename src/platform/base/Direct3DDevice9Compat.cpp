@@ -5,7 +5,7 @@
 // records D3D9 state and hands the backend value snapshots (R3); handles are
 // opaque (R2) and all drawing goes through IRenderBackend::Draw (R4).
 
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 
 // Force link ImageLoaderCompat.cpp from static libEterBase.a
 void* g_pfnForceLinkImageLoader[] = {
@@ -15,7 +15,7 @@ void* g_pfnForceLinkImageLoader[] = {
 // The renderer, not the platform, selects this translation unit (R8): the GL
 // compatibility facade is the Windows path too (T1.5).
 #if defined(OPENMT2_RENDERER_GL)
-#include <Platform/RenderBackend.h>
+#include <Neoeter/Platform/RenderBackend.h>
 #include <algorithm>
 #include <cstring>
 

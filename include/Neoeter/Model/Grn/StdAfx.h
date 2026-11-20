@@ -4,8 +4,8 @@
 #pragma warning(disable : 4786) // character 255 넘어가는거 끄기
 #endif
 
-#include <Platform/Platform.h>
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/Platform.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 #include "GrannyCompat.h"
 
 #include <Neoeter/Platform/Base/Utils.h>

@@ -4,7 +4,7 @@
 // #if maze. Only the GL backend exists today; OPENMT2_RENDERER_GL is defined by
 // the build for that configuration.
 
-#include <Platform/RenderBackend.h>
+#include <Neoeter/Platform/RenderBackend.h>
 
 namespace
 {

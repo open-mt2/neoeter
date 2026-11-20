@@ -100,11 +100,11 @@ set(ETERBASE_HEADERS
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/Poly/Poly.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/Poly/Symbol.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/Poly/SymTable.h
-    ${NEOETER_INCLUDE_DIR}/Platform/Platform.h
-    ${NEOETER_INCLUDE_DIR}/Platform/GLCompat.h
-    ${NEOETER_INCLUDE_DIR}/Platform/RenderBackend.h
-    ${NEOETER_INCLUDE_DIR}/Platform/stb_image.h
-    ${NEOETER_INCLUDE_DIR}/Platform/stb_image_write.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Platform.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/GLCompat.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/RenderBackend.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/stb_image.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/stb_image_write.h
 )
 
 add_library(neoeter_platform_base STATIC

@@ -47,7 +47,7 @@ set(ETERIMAGELIB_HEADERS
     ${NEOETER_INCLUDE_DIR}/Neoeter/Image/Image.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Image/StdAfx.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Image/TGAImage.h
-    ${NEOETER_INCLUDE_DIR}/Platform/Platform.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Platform.h
 )
 
 add_library(neoeter_image STATIC

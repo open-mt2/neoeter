@@ -10,7 +10,7 @@
 #include <cstddef>
 #include <assert.h>
 #else
-#include <Platform/Platform.h>
+#include <Neoeter/Platform/Platform.h>
 #include <cassert>
 #include <cstdio>
 #include <cstdarg>

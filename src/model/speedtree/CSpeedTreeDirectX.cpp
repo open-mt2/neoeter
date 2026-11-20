@@ -1,6 +1,6 @@
 #include <Neoeter/Model/SpeedTree/StdAfx.h>
 #include <Neoeter/Model/SpeedTree/CSpeedTreeDirectX.h>
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 #include <Neoeter/Model/SpeedTree/VertexShaders.h>
 #include <Neoeter/Platform/Base/Timer.h>
 #include <Neoeter/Render/StateManager.h>

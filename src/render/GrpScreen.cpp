@@ -6,7 +6,7 @@
 // T1.9: the window and the renderer are SDL2 + GL on every target (T1.2,
 // T1.4), so this translation unit needs them on Windows too.
 #include <SDL2/SDL.h>
-#include <Platform/GLCompat.h>
+#include <Neoeter/Platform/GLCompat.h>
 #include <Neoeter/Render/MSWindow.h>
 
 uint32_t CScreen::ms_diffuseColor = 0xffffffff;

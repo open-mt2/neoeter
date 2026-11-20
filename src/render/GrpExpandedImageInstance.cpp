@@ -1,7 +1,7 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Platform/Base/CRC32.h>
 #if defined(OPENMT2_PLATFORM_LINUX)
-#include <Platform/GLCompat.h>
+#include <Neoeter/Platform/GLCompat.h>
 #endif
 #include <Neoeter/Render/GrpExpandedImageInstance.h>
 #include <Neoeter/Render/StateManager.h>

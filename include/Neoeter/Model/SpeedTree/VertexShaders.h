@@ -1,5 +1,5 @@
 #pragma once
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 #include <Neoeter/Model/SpeedTree/SpeedTreeConfig.h>
 #include <map>
 #include <string>

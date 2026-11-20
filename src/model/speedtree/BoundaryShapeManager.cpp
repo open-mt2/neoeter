@@ -22,7 +22,7 @@
 //	Preprocessor
 #include <Neoeter/Model/SpeedTree/StdAfx.h>
 
-#include <Platform/Platform.h>
+#include <Neoeter/Platform/Platform.h>
 #include <Neoeter/Platform/Base/Random.h>
 #include <Neoeter/Model/SpeedTree/BoundaryShapeManager.h>
 

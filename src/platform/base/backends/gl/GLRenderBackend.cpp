@@ -9,8 +9,8 @@
 
 #include "GLRenderBackend.h"
 
-#include <Platform/DirectXMathCompat.h>
-#include <Platform/GLCompat.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/GLCompat.h>
 
 #include <algorithm>
 #include <cstdio>

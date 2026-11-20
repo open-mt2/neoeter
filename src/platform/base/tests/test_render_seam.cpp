@@ -2,8 +2,8 @@
 
 #include <cstring>
 
-#include <Platform/DirectXMathCompat.h>
-#include <Platform/RenderBackend.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/RenderBackend.h>
 
 // T1.7 — renderer seam contract.
 //

@@ -26,7 +26,7 @@
 // T4.1: the DirectX SDK is gone. D3D9 (and the D3DX helpers the client uses)
 // come from the compatibility header, which the Windows build selects with
 // USE_PLATFORM_D3D_COMPAT; the platform libraries are linked by CMake.
-#include "Platform/DirectXMathCompat.h"
+#include "Neoeter/Platform/DirectXMathCompat.h"
 
 #pragma warning(disable : 4201)
 #include <mmsystem.h>
@@ -40,8 +40,8 @@
 #include <winsock.h>
 #endif
 #else
-#include "Platform/Platform.h"
-#include "Platform/DirectXMathCompat.h"
+#include "Neoeter/Platform/Platform.h"
+#include "Neoeter/Platform/DirectXMathCompat.h"
 #endif
 
 #include <stdio.h>

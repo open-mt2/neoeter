@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 #include <Neoeter/Render/StateManager.h>
 
 ///////////////////////////////////////////////////////////////////////

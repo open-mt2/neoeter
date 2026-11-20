@@ -6,7 +6,7 @@
 // ImageLoaderCompat.cpp. It is only instantiated here so the rest of the tree
 // stays free of the implementation macros.
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <Platform/stb_image_write.h>
+#include <Neoeter/Platform/stb_image_write.h>
 
 bool Platform_SaveImageTGA(const char* path, int width, int height, const void* bgraPixels)
 {

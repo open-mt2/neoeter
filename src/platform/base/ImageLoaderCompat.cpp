@@ -6,7 +6,7 @@
 #define STBI_NO_STDIO
 #define STBI_NO_LINEAR
 #define STBI_NO_HDR
-#include <Platform/stb_image.h>
+#include <Neoeter/Platform/stb_image.h>
 
 namespace
 {

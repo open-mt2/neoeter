@@ -62,7 +62,7 @@ set(ETERPACK_HEADERS
     ${NEOETER_INCLUDE_DIR}/Neoeter/IO/Inline.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/IO/StdAfx.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/IO/ZIP.h
-    ${NEOETER_INCLUDE_DIR}/Platform/Platform.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Platform.h
 )
 
 add_library(neoeter_io STATIC

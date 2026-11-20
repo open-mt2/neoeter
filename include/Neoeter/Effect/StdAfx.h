@@ -4,8 +4,8 @@
 #pragma warning(disable : 4702)
 #endif
 
-#include <Platform/Platform.h>
-#include <Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/Platform.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
 
 #include <Neoeter/Platform/Base/StdAfx.h>
 #include <Neoeter/Platform/Base/Utils.h>

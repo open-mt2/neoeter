@@ -1,4 +1,4 @@
-#include <Platform/GLCompat.h>
+#include <Neoeter/Platform/GLCompat.h>
 
 #if defined(_WIN32)
 

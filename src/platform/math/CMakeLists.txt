@@ -49,8 +49,8 @@ set(SPHERELIB_HEADERS
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Math/spherepack.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Math/StdAfx.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Math/vector.h
-    ${NEOETER_INCLUDE_DIR}/Platform/Platform.h
-    ${NEOETER_INCLUDE_DIR}/Platform/DirectXMathCompat.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Platform.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/DirectXMathCompat.h
 )
 
 add_library(neoeter_platform_math STATIC

@@ -6,9 +6,9 @@
 #include <vector>
 
 #ifdef _WIN32
-#include "Platform/DirectXMathCompat.h"
+#include "Neoeter/Platform/DirectXMathCompat.h"
 #else
-#include "Platform/DirectXMathCompat.h"
+#include "Neoeter/Platform/DirectXMathCompat.h"
 #endif
 
 template <typename T>

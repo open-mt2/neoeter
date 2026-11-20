@@ -12,7 +12,7 @@
 
 #include <Neoeter/Render/Input.h>
 
-#include <Platform/Platform.h>
+#include <Neoeter/Platform/Platform.h>
 
 #include <SDL2/SDL.h>
 

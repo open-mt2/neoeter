@@ -4,8 +4,8 @@
 #include <cstring>
 #include <vector>
 
-#include <Platform/DirectXMathCompat.h>
-#include <Platform/RenderBackend.h>
+#include <Neoeter/Platform/DirectXMathCompat.h>
+#include <Neoeter/Platform/RenderBackend.h>
 
 // The D3DX compat shim must decode non-DDS images (TGA/JPG/BMP) on every
 // target that uses the GL renderer, not only on Linux. On Windows the decode was
