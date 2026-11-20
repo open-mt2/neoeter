@@ -37,7 +37,7 @@ class CEffectMeshInstance : public CEffectElementBaseInstance
 		bool OnUpdate(float fElapsedTime);
 		void OnRender();
 
-		BOOL isActive();
+		int32_t isActive();
 
 	protected:
 		CEffectMeshScript* m_pMeshScript;

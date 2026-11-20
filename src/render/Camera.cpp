@@ -392,7 +392,7 @@ void CCamera::MoveAlongCross(float fDistance)
 	SetViewMatrix();
 }
 
-void CCamera::MoveAlongUp(FLOAT fDistance)
+void CCamera::MoveAlongUp(float fDistance)
 {
 	if (IsLock())
 		return;

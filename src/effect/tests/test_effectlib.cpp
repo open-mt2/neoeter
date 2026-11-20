@@ -100,7 +100,7 @@ namespace
 		c3 += c3;
 		assert((c3.m_dwColor & 0x000000ff) == 0x20);
 
-		DWORD dwRaw = c3;
+		uint32_t dwRaw = c3;
 		assert(dwRaw == c3.m_dwColor);
 
 		std::printf("[PASS] test_type_and_time_events\n");
@@ -213,7 +213,7 @@ namespace
 	{
 		public:
 			void Setup(float duration, float maxRange, const D3DXCOLOR& ambient,
-					   const D3DXCOLOR& diffuse, BOOL loop, int loopCount)
+					   const D3DXCOLOR& diffuse, int32_t loop, int loopCount)
 			{
 				m_fDuration = duration;
 				m_fMaxRange = maxRange;
@@ -298,7 +298,7 @@ namespace
 		psData.BuildDecorator(&particle);
 
 		// Update particle
-		BOOL alive = particle.Update(0.1f, 0.0f);
+		int32_t alive = particle.Update(0.1f, 0.0f);
 		assert(alive == TRUE);
 
 		// Velocity should be affected by air resistance and gravity
@@ -337,7 +337,7 @@ namespace
 
 		// Effect Manager lifecycle
 		CEffectManager effectMgr;
-		BOOL registered = effectMgr.RegisterEffect(scriptPath, true, false);
+		int32_t registered = effectMgr.RegisterEffect(scriptPath, true, false);
 		assert(registered);
 
 		int effectIndex = effectMgr.CreateEffect(

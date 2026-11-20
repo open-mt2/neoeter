@@ -24,7 +24,7 @@ int CFileLoaderThread::Create(void* arg)
 	return true;
 }
 
-UINT CFileLoaderThread::Run(void* arg)
+uint32_t CFileLoaderThread::Run(void* arg)
 {
 	if (!Setup())
 		return 0;
@@ -33,7 +33,7 @@ UINT CFileLoaderThread::Run(void* arg)
 }
 
 /* Static */
-UINT CALLBACK CFileLoaderThread::EntryPoint(void* pThis)
+uint32_t CALLBACK CFileLoaderThread::EntryPoint(void* pThis)
 {
 	CFileLoaderThread* pThread = (CFileLoaderThread*)pThis;
 	return pThread->Run(pThread->Arg());
@@ -49,7 +49,7 @@ void CFileLoaderThread::Destroy()
 	}
 }
 
-UINT CFileLoaderThread::Setup()
+uint32_t CFileLoaderThread::Setup()
 {
 	m_hSemaphore = CreateSemaphore(NULL,  // no security attributes
 								   0,	  // initial count
@@ -66,7 +66,7 @@ void CFileLoaderThread::Shutdown()
 	if (!m_hSemaphore)
 		return;
 
-	BOOL bRet;
+	int32_t bRet;
 
 	m_bShutdowned = true;
 
@@ -78,11 +78,11 @@ void CFileLoaderThread::Shutdown()
 	WaitForSingleObject(m_hThread, 10000); // 쓰레드가 종료 되기를 10초 기다림
 }
 
-UINT CFileLoaderThread::Execute(void* /*pvArg*/)
+uint32_t CFileLoaderThread::Execute(void* /*pvArg*/)
 {
 	while (!m_bShutdowned)
 	{
-		DWORD dwWaitResult;
+		uint32_t dwWaitResult;
 
 		dwWaitResult = WaitForSingleObject(m_hSemaphore, INFINITE);
 

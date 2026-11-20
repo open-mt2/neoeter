@@ -23,7 +23,7 @@ class CParticleSystemData : public CEffectElementBase
 		void BuildDecorator(CParticleInstance* pInstance);
 
 	protected:
-		BOOL OnLoadScript(CTextFileLoader& rTextFileLoader);
+		int32_t OnLoadScript(CTextFileLoader& rTextFileLoader);
 
 		void OnClear();
 		bool OnIsData();

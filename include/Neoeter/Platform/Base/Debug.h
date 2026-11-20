@@ -3,15 +3,17 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
+#include <cstdint>
+#include <cstddef>
 #else
 #include <Platform/Platform.h>
 #endif
 
-extern void SetLogLevel(UINT uLevel);
-extern void Log(UINT uLevel, const char* c_szMsg);
-extern void Logn(UINT uLevel, const char* c_szMsg);
-extern void Logf(UINT uLevel, const char* c_szFormat, ...);
-extern void Lognf(UINT uLevel, const char* c_szFormat, ...);
+extern void SetLogLevel(uint32_t uLevel);
+extern void Log(uint32_t uLevel, const char* c_szMsg);
+extern void Logn(uint32_t uLevel, const char* c_szMsg);
+extern void Logf(uint32_t uLevel, const char* c_szFormat, ...);
+extern void Lognf(uint32_t uLevel, const char* c_szFormat, ...);
 
 extern void Trace(const char* c_szMsg);
 extern void Tracen(const char* c_szMsg);

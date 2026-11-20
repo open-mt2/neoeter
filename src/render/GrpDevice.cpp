@@ -41,19 +41,19 @@ void CGraphicDevice::__Initialize()
 	__InitializePDTVertexBufferList();
 }
 
-void CGraphicDevice::RegisterWarningString(UINT uiMsg, const char* c_szString)
+void CGraphicDevice::RegisterWarningString(uint32_t uiMsg, const char* c_szString)
 {
 	m_kMap_strWarningMessage[uiMsg] = c_szString;
 }
 
-void CGraphicDevice::__WarningMessage(HWND hWnd, UINT uiMsg)
+void CGraphicDevice::__WarningMessage(HWND hWnd, uint32_t uiMsg)
 {
 	if (m_kMap_strWarningMessage.end() == m_kMap_strWarningMessage.find(uiMsg))
 		return;
 	MessageBox(hWnd, m_kMap_strWarningMessage[uiMsg].c_str(), "Warning", MB_OK | MB_TOPMOST);
 }
 
-bool CGraphicDevice::ResizeBackBuffer(UINT uWidth, UINT uHeight)
+bool CGraphicDevice::ResizeBackBuffer(uint32_t uWidth, uint32_t uHeight)
 {
 	if (!ms_lpd3dDevice)
 		return false;
@@ -69,7 +69,7 @@ bool CGraphicDevice::ResizeBackBuffer(UINT uWidth, UINT uHeight)
 
 		IDirect3DDevice9& rkD3DDev = *ms_lpd3dDevice;
 
-		HRESULT hr = rkD3DDev.Reset(&rkD3DPP);
+		int32_t hr = rkD3DDev.Reset(&rkD3DPP);
 		if (FAILED(hr))
 		{
 			return false;
@@ -86,13 +86,13 @@ bool CGraphicDevice::ResizeBackBuffer(UINT uWidth, UINT uHeight)
 	return true;
 }
 
-DWORD CGraphicDevice::CreatePNTStreamVertexShader()
+uint32_t CGraphicDevice::CreatePNTStreamVertexShader()
 {
 	assert(ms_lpd3dDevice != NULL);
 	return D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 }
 
-DWORD CGraphicDevice::CreatePNT2StreamVertexShader()
+uint32_t CGraphicDevice::CreatePNT2StreamVertexShader()
 {
 	assert(ms_lpd3dDevice != NULL);
 	return D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1 | D3DFVF_TEX2;
@@ -103,7 +103,7 @@ CGraphicDevice::EDeviceState CGraphicDevice::GetDeviceState()
 	if (!ms_lpd3dDevice)
 		return DEVICESTATE_NULL;
 
-	HRESULT hr;
+	int32_t hr;
 
 	if (FAILED(hr = ms_lpd3dDevice->TestCooperativeLevel()))
 	{
@@ -121,7 +121,7 @@ CGraphicDevice::EDeviceState CGraphicDevice::GetDeviceState()
 
 bool CGraphicDevice::Reset()
 {
-	HRESULT hr;
+	int32_t hr;
 
 	if (FAILED(hr = ms_lpd3dDevice->Reset(&ms_d3dPresentParameter)))
 		return false;
@@ -129,9 +129,9 @@ bool CGraphicDevice::Reset()
 	return true;
 }
 
-static DWORD s_MaxTextureWidth, s_MaxTextureHeight;
+static uint32_t s_MaxTextureWidth, s_MaxTextureHeight;
 
-BOOL EL3D_ConfirmDevice(D3DCAPS9& rkD3DCaps, UINT uBehavior, D3DFORMAT /*eD3DFmt*/)
+int32_t EL3D_ConfirmDevice(D3DCAPS9& rkD3DCaps, uint32_t uBehavior, D3DFORMAT /*eD3DFmt*/)
 {
 	// PUREDEVICE는 GetTransform / GetViewport 등이 되지 않는다.
 	if (uBehavior & D3DCREATE_PUREDEVICE)
@@ -167,12 +167,12 @@ BOOL EL3D_ConfirmDevice(D3DCAPS9& rkD3DCaps, UINT uBehavior, D3DFORMAT /*eD3DFmt
 	return TRUE;
 }
 
-DWORD GetMaxTextureWidth()
+uint32_t GetMaxTextureWidth()
 {
 	return s_MaxTextureWidth;
 }
 
-DWORD GetMaxTextureHeight()
+uint32_t GetMaxTextureHeight()
 {
 	return s_MaxTextureHeight;
 }
@@ -185,16 +185,16 @@ bool CGraphicDevice::__IsInDriverBlackList(D3D_CAdapterInfo& rkD3DAdapterInfo)
 	const size_t driverLength = strnlen(rkD3DAdapterIdentifier.Driver, sizeof(szSrcDriver) - 1);
 	memcpy(szSrcDriver, rkD3DAdapterIdentifier.Driver, driverLength);
 	szSrcDriver[driverLength] = '\0';
-	DWORD dwSrcHighVersion = rkD3DAdapterIdentifier.DriverVersion.QuadPart >> 32;
-	DWORD dwSrcLowVersion = rkD3DAdapterIdentifier.DriverVersion.QuadPart & 0xffffffff;
+	uint32_t dwSrcHighVersion = rkD3DAdapterIdentifier.DriverVersion.QuadPart >> 32;
+	uint32_t dwSrcLowVersion = rkD3DAdapterIdentifier.DriverVersion.QuadPart & 0xffffffff;
 
 	bool ret = false;
 
 	FILE* fp = fopen("grpblk.txt", "r");
 	if (fp)
 	{
-		DWORD dwChkHighVersion;
-		DWORD dwChkLowVersion;
+		uint32_t dwChkHighVersion;
+		uint32_t dwChkLowVersion;
 
 		char szChkDriver[256];
 
@@ -392,9 +392,9 @@ RETRY:
 		return CREATE_GET_DEVICE_CAPS2;
 	}
 
-	// Tracef("vertex shader version : %X\n",(DWORD)ms_d3dCaps.VertexShaderVersion);
+	// Tracef("vertex shader version : %X\n",(uint32_t)ms_d3dCaps.VertexShaderVersion);
 
-	SetViewport(0, 0, static_cast<DWORD>(iHres), static_cast<DWORD>(iVres), 0.0f, 1.0f);
+	SetViewport(0, 0, static_cast<uint32_t>(iHres), static_cast<uint32_t>(iVres), 0.0f, 1.0f);
 	ms_lpd3dDevice->SetViewport(&ms_Viewport);
 
 	m_pStateManager = new CStateManager(ms_lpd3dDevice);
@@ -435,7 +435,7 @@ RETRY:
 	if (!__CreatePDTVertexBufferList())
 		return false;
 
-	DWORD dwTexMemSize = GetAvailableTextureMemory();
+	uint32_t dwTexMemSize = GetAvailableTextureMemory();
 
 	if (dwTexMemSize < 64 * 1024 * 1024)
 		ms_isLowTextureMemory = true;
@@ -472,13 +472,13 @@ RETRY:
 
 void CGraphicDevice::__InitializePDTVertexBufferList()
 {
-	for (UINT i = 0; i < PDT_VERTEXBUFFER_NUM; ++i)
+	for (uint32_t i = 0; i < PDT_VERTEXBUFFER_NUM; ++i)
 		ms_alpd3dPDTVB[i] = NULL;
 }
 
 void CGraphicDevice::__DestroyPDTVertexBufferList()
 {
-	for (UINT i = 0; i < PDT_VERTEXBUFFER_NUM; ++i)
+	for (uint32_t i = 0; i < PDT_VERTEXBUFFER_NUM; ++i)
 	{
 		if (ms_alpd3dPDTVB[i])
 		{
@@ -490,7 +490,7 @@ void CGraphicDevice::__DestroyPDTVertexBufferList()
 
 bool CGraphicDevice::__CreatePDTVertexBufferList()
 {
-	for (UINT i = 0; i < PDT_VERTEXBUFFER_NUM; ++i)
+	for (uint32_t i = 0; i < PDT_VERTEXBUFFER_NUM; ++i)
 	{
 		if (FAILED(
 				ms_lpd3dDevice->CreateVertexBuffer(
@@ -507,13 +507,13 @@ bool CGraphicDevice::__CreatePDTVertexBufferList()
 
 void CGraphicDevice::__InitializeDefaultIndexBufferList()
 {
-	for (UINT i = 0; i < DEFAULT_IB_NUM; ++i)
+	for (uint32_t i = 0; i < DEFAULT_IB_NUM; ++i)
 		ms_alpd3dDefIB[i] = NULL;
 }
 
 void CGraphicDevice::__DestroyDefaultIndexBufferList()
 {
-	for (UINT i = 0; i < DEFAULT_IB_NUM; ++i)
+	for (uint32_t i = 0; i < DEFAULT_IB_NUM; ++i)
 		if (ms_alpd3dDefIB[i])
 		{
 			ms_alpd3dDefIB[i]->Release();
@@ -521,24 +521,24 @@ void CGraphicDevice::__DestroyDefaultIndexBufferList()
 		}
 }
 
-bool CGraphicDevice::__CreateDefaultIndexBuffer(UINT eDefIB, UINT uIdxCount, const WORD* c_awIndices)
+bool CGraphicDevice::__CreateDefaultIndexBuffer(uint32_t eDefIB, uint32_t uIdxCount, const uint16_t* c_awIndices)
 {
 	assert(ms_alpd3dDefIB[eDefIB] == NULL);
 
 	if (FAILED(
 			ms_lpd3dDevice->CreateIndexBuffer(
-				sizeof(WORD) * uIdxCount,
+				sizeof(uint16_t) * uIdxCount,
 				D3DUSAGE_WRITEONLY,
 				D3DFMT_INDEX16,
 				D3DPOOL_MANAGED,
 				&ms_alpd3dDefIB[eDefIB],
 				NULL))) return false;
 
-	WORD* dstIndices;
-	if (FAILED(ms_alpd3dDefIB[eDefIB]->Lock(0, 0, (VOID**)&dstIndices, 0)))
+	uint16_t* dstIndices;
+	if (FAILED(ms_alpd3dDefIB[eDefIB]->Lock(0, 0, (void**)&dstIndices, 0)))
 		return false;
 
-	memcpy(dstIndices, c_awIndices, sizeof(WORD) * uIdxCount);
+	memcpy(dstIndices, c_awIndices, sizeof(uint16_t) * uIdxCount);
 
 	ms_alpd3dDefIB[eDefIB]->Unlock();
 
@@ -547,11 +547,11 @@ bool CGraphicDevice::__CreateDefaultIndexBuffer(UINT eDefIB, UINT uIdxCount, con
 
 bool CGraphicDevice::__CreateDefaultIndexBufferList()
 {
-	static const WORD c_awLineIndices[2] = {
+	static const uint16_t c_awLineIndices[2] = {
 		0,
 		1,
 	};
-	static const WORD c_awLineTriIndices[6] = {
+	static const uint16_t c_awLineTriIndices[6] = {
 		0,
 		1,
 		0,
@@ -559,7 +559,7 @@ bool CGraphicDevice::__CreateDefaultIndexBufferList()
 		1,
 		2,
 	};
-	static const WORD c_awLineRectIndices[8] = {
+	static const uint16_t c_awLineRectIndices[8] = {
 		0,
 		1,
 		0,
@@ -569,7 +569,7 @@ bool CGraphicDevice::__CreateDefaultIndexBufferList()
 		2,
 		3,
 	};
-	static const WORD c_awLineCubeIndices[24] = {
+	static const uint16_t c_awLineCubeIndices[24] = {
 		0,
 		1,
 		0,
@@ -595,12 +595,12 @@ bool CGraphicDevice::__CreateDefaultIndexBufferList()
 		6,
 		7,
 	};
-	static const WORD c_awFillTriIndices[3] = {
+	static const uint16_t c_awFillTriIndices[3] = {
 		0,
 		1,
 		2,
 	};
-	static const WORD c_awFillRectIndices[6] = {
+	static const uint16_t c_awFillRectIndices[6] = {
 		0,
 		2,
 		1,
@@ -608,7 +608,7 @@ bool CGraphicDevice::__CreateDefaultIndexBufferList()
 		3,
 		1,
 	};
-	static const WORD c_awFillCubeIndices[36] = {
+	static const uint16_t c_awFillCubeIndices[36] = {
 		0,
 		1,
 		2,
@@ -665,7 +665,7 @@ bool CGraphicDevice::__CreateDefaultIndexBufferList()
 	return true;
 }
 
-void CGraphicDevice::InitBackBufferCount(UINT uBackBufferCount)
+void CGraphicDevice::InitBackBufferCount(uint32_t uBackBufferCount)
 {
 	m_uBackBufferCount = uBackBufferCount;
 }

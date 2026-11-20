@@ -52,7 +52,7 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		void DestroyDeviceObjects();
 
 		// Update & Render
-		void Update(DWORD dwAniFPS);
+		void Update(uint32_t dwAniFPS);
 		void UpdateLocalTime(float fElapsedTime);
 		void UpdateTransform(D3DXMATRIX* pMatrix, float fSecondsElapsed);
 
@@ -76,7 +76,7 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		CGrannyModel* GetModel();
 		void SetMaterialImagePointer(const char* c_szImageName, CGraphicImage* pImage);
 		void SetMaterialData(const char* c_szImageName, const SMaterialData& c_rkMaterialData);
-		void SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower);
+		void SetSpecularInfo(const char* c_szMtrlName, int32_t bEnable, float fPower);
 
 		void SetMainModelPointer(CGrannyModel* pkModel, CGraphicVertexBuffer* pkSharedDefromableVertexBuffer);
 		void SetLinkedModelPointer(CGrannyModel* pkModel, CGraphicVertexBuffer* pkSharedDefromableVertexBuffer, CGrannyModelInstance** ppkSkeletonInst);
@@ -96,8 +96,8 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		float GetNextTime();
 
 		// WORK
-		DWORD GetDeformableVertexCount();
-		DWORD GetVertexCount();
+		uint32_t GetDeformableVertexCount();
+		uint32_t GetVertexCount();
 
 		// END_OF_WORK
 
@@ -182,7 +182,7 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		float m_fLocalTime;
 		float m_fSecondsElapsed;
 
-		DWORD m_dwOldUpdateFrame;
+		uint32_t m_dwOldUpdateFrame;
 
 		CGrannyMaterialPalette m_kMtrlPal;
 

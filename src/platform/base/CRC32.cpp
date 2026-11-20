@@ -68,9 +68,9 @@ static unsigned long CRCTable[256] =
 	DO8(buf, i);     \
 	DO8(buf, i + 8);
 
-DWORD GetCRC32(const char* buf, size_t len)
+uint32_t GetCRC32(const char* buf, size_t len)
 {
-	DWORD crc = 0xffffffff;
+	uint32_t crc = 0xffffffff;
 
 	for (; len >= 16; len -= 16)
 	{
@@ -98,9 +98,9 @@ static inline unsigned char crc_case_byte(unsigned char c)
 	return (c >= 'A' && c <= 'Z') ? static_cast<unsigned char>(c + ('a' - 'A')) : c;
 }
 
-DWORD GetCaseCRC32(const char* buf, size_t len)
+uint32_t GetCaseCRC32(const char* buf, size_t len)
 {
-	DWORD crc = 0xffffffff;
+	uint32_t crc = 0xffffffff;
 
 	for (size_t i = 0; i < len; ++i)
 	{
@@ -113,21 +113,21 @@ DWORD GetCaseCRC32(const char* buf, size_t len)
 
 #if defined(_WIN32)
 
-DWORD GetHFILECRC32(HANDLE hFile)
+uint32_t GetHFILECRC32(HANDLE hFile)
 {
-	DWORD dwRetCRC32 = 0;
+	uint32_t dwRetCRC32 = 0;
 
-	DWORD dwFileSize = GetFileSize(hFile, NULL);
+	uint32_t dwFileSize = GetFileSize(hFile, NULL);
 
-	DWORD dataOffset = 0;
-	DWORD mapSize = dwFileSize;
+	uint32_t dataOffset = 0;
+	uint32_t mapSize = dwFileSize;
 
 	SYSTEM_INFO SysInfo;
 	GetSystemInfo(&SysInfo);
 
-	DWORD dwSysGran = SysInfo.dwAllocationGranularity;
-	DWORD dwFileMapStart = (dataOffset / dwSysGran) * dwSysGran;
-	DWORD dwMapViewSize = (dataOffset % dwSysGran) + mapSize;
+	uint32_t dwSysGran = SysInfo.dwAllocationGranularity;
+	uint32_t dwFileMapStart = (dataOffset / dwSysGran) * dwSysGran;
+	uint32_t dwMapViewSize = (dataOffset % dwSysGran) + mapSize;
 
 	HANDLE hFM = CreateFileMapping(hFile,
 								   NULL,
@@ -156,7 +156,7 @@ DWORD GetHFILECRC32(HANDLE hFile)
 	return dwRetCRC32;
 }
 
-DWORD GetFileCRC32(const char* c_szFileName)
+uint32_t GetFileCRC32(const char* c_szFileName)
 {
 	HANDLE hFile = CreateFile(c_szFileName,
 							  GENERIC_READ,
@@ -169,12 +169,12 @@ DWORD GetFileCRC32(const char* c_szFileName)
 	if (INVALID_HANDLE_VALUE == hFile)
 		return 0;
 
-	DWORD dwRetCRC32 = GetHFILECRC32(hFile);
+	uint32_t dwRetCRC32 = GetHFILECRC32(hFile);
 	CloseHandle(hFile);
 	return dwRetCRC32;
 }
 
-DWORD GetFileSize(const char* c_szFileName)
+uint32_t GetFileSize(const char* c_szFileName)
 {
 	HANDLE hFile = CreateFile(c_szFileName,
 							  GENERIC_READ,
@@ -187,14 +187,14 @@ DWORD GetFileSize(const char* c_szFileName)
 	if (INVALID_HANDLE_VALUE == hFile)
 		return 0;
 
-	DWORD dwSize = GetFileSize(hFile, NULL);
+	uint32_t dwSize = GetFileSize(hFile, NULL);
 	CloseHandle(hFile);
 	return dwSize;
 }
 
 #else
 
-DWORD GetHFILECRC32(HANDLE hFile)
+uint32_t GetHFILECRC32(HANDLE hFile)
 {
 	int fd = (int)(intptr_t)hFile;
 	struct stat st;
@@ -205,27 +205,27 @@ DWORD GetHFILECRC32(HANDLE hFile)
 	if (p == MAP_FAILED)
 		return 0;
 
-	DWORD crc = GetCRC32((const char*)p, st.st_size);
+	uint32_t crc = GetCRC32((const char*)p, st.st_size);
 	munmap(p, st.st_size);
 	return crc;
 }
 
-DWORD GetFileCRC32(const char* c_szFileName)
+uint32_t GetFileCRC32(const char* c_szFileName)
 {
 	int fd = open(c_szFileName, O_RDONLY);
 	if (fd < 0)
 		return 0;
-	DWORD crc = GetHFILECRC32((HANDLE)(intptr_t)fd);
+	uint32_t crc = GetHFILECRC32((HANDLE)(intptr_t)fd);
 	close(fd);
 	return crc;
 }
 
-DWORD GetFileSize(const char* c_szFileName)
+uint32_t GetFileSize(const char* c_szFileName)
 {
 	struct stat st;
 	if (stat(c_szFileName, &st) != 0)
 		return 0;
-	return (DWORD)st.st_size;
+	return (uint32_t)st.st_size;
 }
 
 #endif

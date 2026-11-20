@@ -251,7 +251,7 @@ class CCamera
 		static float CAMERA_MAX_DISTANCE;
 };
 
-typedef std::map<BYTE, CCamera*> TCameraMap;
+typedef std::map<uint8_t, CCamera*> TCameraMap;
 
 class CCameraManager : public CSingleton<CCameraManager>
 {

@@ -76,8 +76,8 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		const D3DXMATRIX& GetWorldMatrix() { return m_worldMatrix; }
 
 		// Portal
-		void SetPortal(DWORD dwIndex, int iID);
-		int GetPortal(DWORD dwIndex);
+		void SetPortal(uint32_t dwIndex, int iID);
+		int GetPortal(uint32_t dwIndex);
 
 		// Initialize
 		void Initialize();
@@ -120,7 +120,7 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		D3DXVECTOR3 m_v3BBoxMin, m_v3BBoxMax;
 
 		// Portal
-		BYTE m_abyPortalID[PORTAL_ID_MAX_NUM];
+		uint8_t m_abyPortalID[PORTAL_ID_MAX_NUM];
 
 		// Culling
 		CCullingManager::CullingHandle m_CullingHandle;
@@ -141,8 +141,8 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 
 		// using in WorldEditor
 	public:
-		DWORD GetCollisionInstanceCount();
-		CBaseCollisionInstance* GetCollisionInstanceData(DWORD dwIndex);
+		uint32_t GetCollisionInstanceCount();
+		CBaseCollisionInstance* GetCollisionInstanceData(uint32_t dwIndex);
 
 		// Height Data
 	public:

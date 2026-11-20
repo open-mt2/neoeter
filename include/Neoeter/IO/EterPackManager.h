@@ -2,6 +2,8 @@
 
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
 #include <windows.h>
+#include <cstdint>
+#include <cstddef>
 #else
 #include <Platform/Platform.h>
 #endif
@@ -119,7 +121,7 @@ class CEterPackManager : public CSingleton<CEterPackManager>
 		std::vector<SFileInfo> GetPackFiles(const std::string& packName);
 
 	protected:
-		bool CompareName(const char* c_szDirectoryName, DWORD iLength, const char* c_szFileName);
+		bool CompareName(const char* c_szDirectoryName, uint32_t iLength, const char* c_szFileName);
 		bool GetFromPack(const std::string& fileName, TPackDataPtr& dataPtr);
 		bool GetFromFile(const std::string& fileName, TPackDataPtr& dataPtr);
 

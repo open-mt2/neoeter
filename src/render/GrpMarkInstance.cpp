@@ -17,7 +17,7 @@ const std::string& CGraphicMarkInstance::GetImageFileName()
 	return m_stImageFileName;
 }
 
-void CGraphicMarkInstance::CreateSystem(UINT uCapacity)
+void CGraphicMarkInstance::CreateSystem(uint32_t uCapacity)
 {
 	ms_kPool.Create(uCapacity);
 }
@@ -53,13 +53,13 @@ void CGraphicMarkInstance::OnRender()
 	CGraphicImage* pImage = m_roImage.GetPointer();
 	CGraphicTexture* pTexture = pImage->GetTexturePointer();
 
-	UINT uColCount = pImage->GetWidth() / MARK_WIDTH;
+	uint32_t uColCount = pImage->GetWidth() / MARK_WIDTH;
 
 	if (uColCount == 0)
 		return;
 
-	UINT uCol = m_uIndex % uColCount;
-	UINT uRow = m_uIndex / uColCount;
+	uint32_t uCol = m_uIndex % uColCount;
+	uint32_t uRow = m_uIndex / uColCount;
 
 	RECT kRect;
 	kRect.left = uCol * MARK_WIDTH;
@@ -134,7 +134,7 @@ void CGraphicMarkInstance::SetScale(float fScale)
 	m_fScale = fScale;
 }
 
-void CGraphicMarkInstance::SetIndex(UINT uIndex)
+void CGraphicMarkInstance::SetIndex(uint32_t uIndex)
 {
 	m_uIndex = uIndex;
 }
@@ -208,18 +208,18 @@ bool CGraphicMarkInstance::operator==(const CGraphicMarkInstance& rhs) const
 	return (m_roImage.GetPointer() == rhs.m_roImage.GetPointer());
 }
 
-DWORD CGraphicMarkInstance::Type()
+uint32_t CGraphicMarkInstance::Type()
 {
-	static DWORD s_dwType = GetCRC32("CGraphicMarkInstance", strlen("CGraphicMarkInstance"));
+	static uint32_t s_dwType = GetCRC32("CGraphicMarkInstance", strlen("CGraphicMarkInstance"));
 	return (s_dwType);
 }
 
-BOOL CGraphicMarkInstance::IsType(DWORD dwType)
+int32_t CGraphicMarkInstance::IsType(uint32_t dwType)
 {
 	return OnIsType(dwType);
 }
 
-BOOL CGraphicMarkInstance::OnIsType(DWORD dwType)
+int32_t CGraphicMarkInstance::OnIsType(uint32_t dwType)
 {
 	if (CGraphicMarkInstance::Type() == dwType)
 		return TRUE;

@@ -119,8 +119,8 @@ void CBlockTexture::InvalidateRect(const RECT& c_rsrcRect)
 	};
 	// END_OF_DIBBAR_LONGSIZE_BUGFIX
 
-	DWORD* pdwSrc;
-	pdwSrc = (DWORD*)m_pDIB->GetPointer();
+	uint32_t* pdwSrc;
+	pdwSrc = (uint32_t*)m_pDIB->GetPointer();
 	pdwSrc += dstRect.left + dstRect.top * m_pDIB->GetWidth();
 
 	D3DLOCKED_RECT lockedRect;
@@ -132,9 +132,9 @@ void CBlockTexture::InvalidateRect(const RECT& c_rsrcRect)
 
 	int iclipWidth = clipRect.right - clipRect.left;
 	int iclipHeight = clipRect.bottom - clipRect.top;
-	DWORD* pdwDst = (DWORD*)lockedRect.pBits;
-	DWORD dwDstWidth = lockedRect.Pitch >> 2;
-	DWORD dwSrcWidth = m_pDIB->GetWidth();
+	uint32_t* pdwDst = (uint32_t*)lockedRect.pBits;
+	uint32_t dwDstWidth = lockedRect.Pitch >> 2;
+	uint32_t dwSrcWidth = m_pDIB->GetWidth();
 	for (int i = 0; i < iclipHeight; ++i)
 	{
 		for (int i = 0; i < iclipWidth; ++i)
@@ -151,7 +151,7 @@ void CBlockTexture::InvalidateRect(const RECT& c_rsrcRect)
 	m_lpd3dTexture->UnlockRect(0);
 }
 
-bool CBlockTexture::Create(CGraphicDib* pDIB, const RECT& c_rRect, DWORD dwWidth, DWORD dwHeight)
+bool CBlockTexture::Create(CGraphicDib* pDIB, const RECT& c_rRect, uint32_t dwWidth, uint32_t dwHeight)
 {
 	if (FAILED(ms_lpd3dDevice->CreateTexture(dwWidth, dwHeight, 0, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_lpd3dTexture, NULL)))
 	{

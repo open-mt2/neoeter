@@ -7,7 +7,7 @@
 #include <Neoeter/Platform/Base/Utils.h>
 #include <Neoeter/Platform/Locale/Arabic.h>
 
-extern DWORD GetDefaultCodePage();
+extern uint32_t GetDefaultCodePage();
 
 const float c_fFontFeather = 0.5f;
 
@@ -35,7 +35,7 @@ int CGraphicTextInstance::Hyperlink_GetText(char* buf, int len)
 	return Ymir_WideCharToMultiByte(codePage, 0, gs_hyperlinkText.c_str(), gs_hyperlinkText.length(), buf, len, NULL, NULL);
 }
 
-int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture* pFontTexture, WORD codePage, wchar_t text, DWORD dwColor)
+int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture* pFontTexture, uint16_t codePage, wchar_t text, uint32_t dwColor)
 {
 	CGraphicFontTexture::TCharacterInfomation* pInsCharInfo = pFontTexture->GetCharacterInfomation(codePage, text);
 
@@ -52,7 +52,7 @@ int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture* pFontTexture, WOR
 	return 0;
 }
 
-void CGraphicTextInstance::__GetTextPos(DWORD index, float* x, float* y)
+void CGraphicTextInstance::__GetTextPos(uint32_t index, float* x, float* y)
 {
 	index = min(index, m_pCharInfoVector.size());
 
@@ -60,7 +60,7 @@ void CGraphicTextInstance::__GetTextPos(DWORD index, float* x, float* y)
 	float sy = 0;
 	float fFontMaxHeight = 0;
 
-	for (DWORD i = 0; i < index; ++i)
+	for (uint32_t i = 0; i < index; ++i)
 	{
 		if (sx + float(m_pCharInfoVector[i]->width) > m_fLimitWidth)
 		{
@@ -137,9 +137,9 @@ void CGraphicTextInstance::Update()
 	if (!pFontTexture)
 		return;
 
-	UINT defCodePage = GetDefaultCodePage();
+	uint32_t defCodePage = GetDefaultCodePage();
 
-	UINT dataCodePage = defCodePage; // 아랍 및 베트남 내부 데이터를 UTF8 을 사용하려 했으나 실패
+	uint32_t dataCodePage = defCodePage; // 아랍 및 베트남 내부 데이터를 UTF8 을 사용하려 했으나 실패
 
 	CGraphicFontTexture::TCharacterInfomation* pSpaceInfo = pFontTexture->GetCharacterInfomation(dataCodePage, ' ');
 
@@ -160,7 +160,7 @@ void CGraphicTextInstance::Update()
 	int wTextMax = (end - begin) * 2;
 	wchar_t* wText = (wchar_t*)_alloca(sizeof(wchar_t) * wTextMax);
 
-	DWORD dwColor = m_dwTextColor;
+	uint32_t dwColor = m_dwTextColor;
 
 	/* wstring end */
 	while (begin < end)
@@ -486,7 +486,7 @@ void CGraphicTextInstance::Render(RECT* pClipRect)
 	float fStanX = m_v3Position.x;
 	float fStanY = m_v3Position.y + 1.0f;
 
-	UINT defCodePage = GetDefaultCodePage();
+	uint32_t defCodePage = GetDefaultCodePage();
 
 	if (defCodePage == CP_ARABIC)
 	{
@@ -526,12 +526,12 @@ void CGraphicTextInstance::Render(RECT* pClipRect)
 			break;
 	}
 
-	// WORD FillRectIndices[6] = { 0, 2, 1, 2, 3, 1 };
+	// uint16_t FillRectIndices[6] = { 0, 2, 1, 2, 3, 1 };
 
 	STATEMANAGER.SaveRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	STATEMANAGER.SaveRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	DWORD dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
-	DWORD dwLighting = STATEMANAGER.GetRenderState(D3DRS_LIGHTING);
+	uint32_t dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
+	uint32_t dwLighting = STATEMANAGER.GetRenderState(D3DRS_LIGHTING);
 	STATEMANAGER.SetRenderState(D3DRS_FOGENABLE, FALSE);
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
 
@@ -892,7 +892,7 @@ void CGraphicTextInstance::Render(RECT* pClipRect)
 	}
 }
 
-void CGraphicTextInstance::CreateSystem(UINT uCapacity)
+void CGraphicTextInstance::CreateSystem(uint32_t uCapacity)
 {
 	ms_kPool.Create(uCapacity);
 }
@@ -933,7 +933,7 @@ void CGraphicTextInstance::HideOutLine()
 	m_isOutline = false;
 }
 
-void CGraphicTextInstance::SetColor(DWORD color)
+void CGraphicTextInstance::SetColor(uint32_t color)
 {
 	if (m_dwTextColor != color)
 	{
@@ -950,7 +950,7 @@ void CGraphicTextInstance::SetColor(float r, float g, float b, float a)
 	SetColor(D3DXCOLOR(r, g, b, a));
 }
 
-void CGraphicTextInstance::SetOutLineColor(DWORD color)
+void CGraphicTextInstance::SetOutLineColor(uint32_t color)
 {
 	m_dwOutLineColor = color;
 }
@@ -1042,13 +1042,13 @@ const std::string& CGraphicTextInstance::GetValueStringReference()
 	return m_stText;
 }
 
-WORD CGraphicTextInstance::GetTextLineCount()
+uint16_t CGraphicTextInstance::GetTextLineCount()
 {
 	CGraphicFontTexture::TCharacterInfomation* pCurCharInfo;
 	CGraphicFontTexture::TPCharacterInfomationVector::iterator itor;
 
 	float fx = 0.0f;
-	WORD wLineCount = 1;
+	uint16_t wLineCount = 1;
 	for (itor = m_pCharInfoVector.begin(); itor != m_pCharInfoVector.end(); ++itor)
 	{
 		pCurCharInfo = *itor;

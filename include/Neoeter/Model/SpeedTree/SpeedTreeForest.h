@@ -54,7 +54,7 @@
 class CSpeedTreeForest : public CSingleton<CSpeedTreeForest>
 {
 	public:
-		typedef std::map<DWORD, CSpeedTreeWrapper*> TTreeMap;
+		typedef std::map<uint32_t, CSpeedTreeWrapper*> TTreeMap;
 
 	public:
 		CSpeedTreeForest();
@@ -62,11 +62,11 @@ class CSpeedTreeForest : public CSingleton<CSpeedTreeForest>
 
 		void ClearMainTree();
 
-		BOOL GetMainTree(DWORD dwCRC, CSpeedTreeWrapper** ppMainTree, const char* c_pszFileName);
-		CSpeedTreeWrapper* GetMainTree(DWORD dwCRC);
-		void DeleteMainTree(DWORD dwCRC);
+		int32_t GetMainTree(uint32_t dwCRC, CSpeedTreeWrapper** ppMainTree, const char* c_pszFileName);
+		CSpeedTreeWrapper* GetMainTree(uint32_t dwCRC);
+		void DeleteMainTree(uint32_t dwCRC);
 
-		CSpeedTreeWrapper* CreateInstance(float x, float y, float z, DWORD dwTreeCRC, const char* c_pszTreeName);
+		CSpeedTreeWrapper* CreateInstance(float x, float y, float z, uint32_t dwTreeCRC, const char* c_pszTreeName);
 		void DeleteInstance(CSpeedTreeWrapper* pTree);
 
 		void UpdateSystem(float fCurrentTime);

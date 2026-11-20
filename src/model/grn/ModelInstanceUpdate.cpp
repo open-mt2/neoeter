@@ -3,21 +3,21 @@
 #include <Neoeter/Model/Grn/ModelInstance.h>
 #include <Neoeter/Model/Grn/Model.h>
 
-void CGrannyModelInstance::Update(DWORD dwAniFPS)
+void CGrannyModelInstance::Update(uint32_t dwAniFPS)
 {
 	if (!dwAniFPS)
 		return;
 
-	const DWORD c_dwCurUpdateFrame = (DWORD)(GetLocalTime() * ANIFPS_MAX);
-	const DWORD ANIFPS_STEP = ANIFPS_MAX / dwAniFPS;
+	const uint32_t c_dwCurUpdateFrame = (uint32_t)(GetLocalTime() * ANIFPS_MAX);
+	const uint32_t ANIFPS_STEP = ANIFPS_MAX / dwAniFPS;
 	if (c_dwCurUpdateFrame > ANIFPS_STEP && c_dwCurUpdateFrame / ANIFPS_STEP == m_dwOldUpdateFrame / ANIFPS_STEP)
 		return;
 
 	m_dwOldUpdateFrame = c_dwCurUpdateFrame;
 
-	// DWORD t1=timeGetTime();
+	// uint32_t t1=timeGetTime();
 	GrannySetModelClock(m_pgrnModelInstance, GetLocalTime());
-	// DWORD t2=timeGetTime();
+	// uint32_t t2=timeGetTime();
 
 #ifdef __PERFORMANCE_CHECKER__
 	{

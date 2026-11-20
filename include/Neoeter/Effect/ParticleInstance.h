@@ -28,7 +28,7 @@ class CParticleInstance
 		const D3DXVECTOR3& GetVelocity() const { return m_v3Velocity; }
 		float GetLifeTime() const { return m_fLastLifeTime; }
 
-		BOOL Update(float fElapsedTime, float fAngle);
+		int32_t Update(float fElapsedTime, float fAngle);
 		// virtual void Transform(const D3DXMATRIX * c_matLocal, const float c_fZRotation)=0;
 		// virtual void Transform(const D3DXMATRIX * c_matLocal = NULL)=0;
 
@@ -60,9 +60,9 @@ class CParticleInstance
 		DWORDCOLOR m_dcColor;
 #endif
 
-		BYTE m_byTextureAnimationType;
+		uint8_t m_byTextureAnimationType;
 		float m_fLastFrameTime;
-		BYTE m_byFrameIndex;
+		uint8_t m_byFrameIndex;
 
 		float m_fLifeTime;
 		float m_fLastLifeTime;

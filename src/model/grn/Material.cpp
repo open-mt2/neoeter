@@ -113,7 +113,7 @@ bool CGrannyMaterial::IsIn(const char* c_szImageName, int* piStage)
 	return false;
 }
 
-void CGrannyMaterial::SetSpecularInfo(BOOL bFlag, float fPower, BYTE uSphereMapIndex)
+void CGrannyMaterial::SetSpecularInfo(int32_t bFlag, float fPower, uint8_t uSphereMapIndex)
 {
 	m_fSpecularPower = fPower;
 	m_bSphereMapIndex = uSphereMapIndex;
@@ -178,7 +178,7 @@ const CGraphicTexture* CGrannyMaterial::GetOpacityTexture() const
 	return m_roImage[1].GetPointer()->GetTexturePointer();
 }
 
-BOOL CGrannyMaterial::__IsSpecularEnable() const
+int32_t CGrannyMaterial::__IsSpecularEnable() const
 {
 	return m_bSpecularEnable;
 }
@@ -360,7 +360,7 @@ void CGrannyMaterial::__RestoreSpecularRenderState()
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ALPHAOP);
 }
 
-void CGrannyMaterial::CreateSphereMap(UINT uMapIndex, const char* c_szSphereMapImageFileName)
+void CGrannyMaterial::CreateSphereMap(uint32_t uMapIndex, const char* c_szSphereMapImageFileName)
 {
 	CResourceManager& rkResMgr = CResourceManager::Instance();
 	CGraphicImage* pImage = (CGraphicImage*)rkResMgr.GetResourcePointer(c_szSphereMapImageFileName);
@@ -369,7 +369,7 @@ void CGrannyMaterial::CreateSphereMap(UINT uMapIndex, const char* c_szSphereMapI
 
 void CGrannyMaterial::DestroySphereMap()
 {
-	for (UINT uMapIndex = 0; uMapIndex < SPHEREMAP_NUM; ++uMapIndex)
+	for (uint32_t uMapIndex = 0; uMapIndex < SPHEREMAP_NUM; ++uMapIndex)
 		ms_akSphereMapInstance[uMapIndex].Destroy();
 }
 
@@ -396,7 +396,7 @@ void CGrannyMaterialPalette::Clear()
 	m_mtrlVector.clear();
 }
 
-CGrannyMaterial& CGrannyMaterialPalette::GetMaterialRef(DWORD mtrlIndex)
+CGrannyMaterial& CGrannyMaterialPalette::GetMaterialRef(uint32_t mtrlIndex)
 {
 	assert(mtrlIndex < m_mtrlVector.size());
 	return *m_mtrlVector[mtrlIndex].GetPointer();
@@ -404,8 +404,8 @@ CGrannyMaterial& CGrannyMaterialPalette::GetMaterialRef(DWORD mtrlIndex)
 
 void CGrannyMaterialPalette::SetMaterialImagePointer(const char* c_szImageName, CGraphicImage* pImage)
 {
-	DWORD size = m_mtrlVector.size();
-	DWORD i;
+	uint32_t size = m_mtrlVector.size();
+	uint32_t i;
 	for (i = 0; i < size; ++i)
 	{
 		CGrannyMaterial::TRef& roMtrl = m_mtrlVector[i];
@@ -456,10 +456,10 @@ void CGrannyMaterialPalette::SetMaterialData(const char* c_szMtrlName, const SMa
 	}
 }
 
-void CGrannyMaterialPalette::SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower)
+void CGrannyMaterialPalette::SetSpecularInfo(const char* c_szMtrlName, int32_t bEnable, float fPower)
 {
-	DWORD size = m_mtrlVector.size();
-	DWORD i;
+	uint32_t size = m_mtrlVector.size();
+	uint32_t i;
 	if (c_szMtrlName)
 	{
 		for (i = 0; i < size; ++i)
@@ -487,10 +487,10 @@ void CGrannyMaterialPalette::SetSpecularInfo(const char* c_szMtrlName, BOOL bEna
 	}
 }
 
-DWORD CGrannyMaterialPalette::RegisterMaterial(granny_material* pgrnMaterial)
+uint32_t CGrannyMaterialPalette::RegisterMaterial(granny_material* pgrnMaterial)
 {
-	DWORD size = m_mtrlVector.size();
-	DWORD i;
+	uint32_t size = m_mtrlVector.size();
+	uint32_t i;
 	for (i = 0; i < size; ++i)
 	{
 		CGrannyMaterial::TRef& roMtrl = m_mtrlVector[i];
@@ -505,7 +505,7 @@ DWORD CGrannyMaterialPalette::RegisterMaterial(granny_material* pgrnMaterial)
 	return size;
 }
 
-DWORD CGrannyMaterialPalette::GetMaterialCount() const
+uint32_t CGrannyMaterialPalette::GetMaterialCount() const
 {
 	return m_mtrlVector.size();
 }

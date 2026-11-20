@@ -12,7 +12,7 @@ class CMSWindow
 		virtual ~CMSWindow();
 
 		void Destroy();
-		bool Create(const char* c_szName, int brush = BLACK_BRUSH, DWORD cs = 0, DWORD ws = WS_OVERLAPPEDWINDOW, HICON hIcon = NULL, int iCursorResource = 32512, int width = 0, int height = 0);
+		bool Create(const char* c_szName, int brush = BLACK_BRUSH, uint32_t cs = 0, uint32_t ws = WS_OVERLAPPEDWINDOW, HICON hIcon = NULL, int iCursorResource = 32512, int width = 0, int height = 0);
 
 		void Show();
 		void Hide();
@@ -50,8 +50,8 @@ class CMSWindow
 		static SDL_Renderer* GetSDLRenderer() { return ms_pSDLRenderer; }
 		static SDL_GLContext GetGLContext() { return ms_pGLContext; }
 
-		virtual LRESULT WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
-		virtual void OnSize(WPARAM wParam, LPARAM lParam);
+		virtual intptr_t WindowProcedure(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		virtual void OnSize(uintptr_t wParam, intptr_t lParam);
 
 	protected:
 		HWND m_hWnd;

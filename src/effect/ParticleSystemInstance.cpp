@@ -28,7 +28,7 @@ void CParticleSystemInstance::Delete(CParticleSystemInstance* pkPSInst)
 	ms_kPool.Free(pkPSInst);
 }
 
-DWORD CParticleSystemInstance::GetEmissionCount()
+uint32_t CParticleSystemInstance::GetEmissionCount()
 {
 	return m_dwCurrentEmissionCount;
 }
@@ -464,7 +464,7 @@ void CParticleSystemInstance::OnSetDataPointer(CEffectElementBase* pElement)
 
 	assert(m_kVct_pkImgInst.empty());
 	m_kVct_pkImgInst.reserve(m_pParticleProperty->m_ImageVector.size());
-	for (DWORD i = 0; i < m_pParticleProperty->m_ImageVector.size(); ++i)
+	for (uint32_t i = 0; i < m_pParticleProperty->m_ImageVector.size(); ++i)
 	{
 		CGraphicImage* pImage = m_pParticleProperty->m_ImageVector[i];
 

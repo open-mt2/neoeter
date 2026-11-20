@@ -16,8 +16,8 @@ class CTargaResource : public CResource
 		CTargaResource(const char* c_pszFileName);
 		virtual ~CTargaResource();
 
-		DWORD* GetMemPtr();
-		void GetRect(DWORD& w, DWORD& h);
+		uint32_t* GetMemPtr();
+		void GetRect(uint32_t& w, uint32_t& h);
 
 		TGA_HEADER& GetTgaHeader();
 

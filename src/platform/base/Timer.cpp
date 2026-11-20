@@ -5,44 +5,44 @@
 #pragma comment(lib, "winmm.lib")
 #endif
 
-static DWORD gs_dwBaseTime = 0;
-static DWORD gs_dwServerTime = 0;
-static DWORD gs_dwClientTime = 0;
-static DWORD gs_dwFrameTime = 0;
+static uint32_t gs_dwBaseTime = 0;
+static uint32_t gs_dwServerTime = 0;
+static uint32_t gs_dwClientTime = 0;
+static uint32_t gs_dwFrameTime = 0;
 
-BOOL ELTimer_Init()
+int32_t ELTimer_Init()
 {
 	gs_dwBaseTime = timeGetTime();
 	return 1;
 }
 
-DWORD ELTimer_GetMSec()
+uint32_t ELTimer_GetMSec()
 {
 	return timeGetTime() - gs_dwBaseTime;
 }
 
-VOID ELTimer_SetServerMSec(DWORD dwServerTime)
+void ELTimer_SetServerMSec(uint32_t dwServerTime)
 {
 	gs_dwServerTime = dwServerTime;
 	gs_dwClientTime = CTimer::instance().GetCurrentMillisecond();
 }
 
-DWORD ELTimer_GetServerMSec()
+uint32_t ELTimer_GetServerMSec()
 {
 	return CTimer::instance().GetCurrentMillisecond() - gs_dwClientTime + gs_dwServerTime;
 }
 
-DWORD ELTimer_GetFrameMSec()
+uint32_t ELTimer_GetFrameMSec()
 {
 	return gs_dwFrameTime;
 }
 
-DWORD ELTimer_GetServerFrameMSec()
+uint32_t ELTimer_GetServerFrameMSec()
 {
 	return ELTimer_GetFrameMSec() - gs_dwClientTime + gs_dwServerTime;
 }
 
-VOID ELTimer_SetFrameMSec()
+void ELTimer_SetFrameMSec()
 {
 	gs_dwFrameTime = ELTimer_GetMSec();
 }
@@ -83,7 +83,7 @@ void CTimer::Advance()
 	}
 	else
 	{
-		DWORD currentTime = ELTimer_GetMSec();
+		uint32_t currentTime = ELTimer_GetMSec();
 
 		if (m_dwCurrentTime == 0)
 			m_dwCurrentTime = currentTime;
@@ -106,7 +106,7 @@ float CTimer::GetCurrentSecond()
 	return m_fCurrentTime;
 }
 
-DWORD CTimer::GetCurrentMillisecond()
+uint32_t CTimer::GetCurrentMillisecond()
 {
 	if (m_bUseRealTime)
 		return ELTimer_GetMSec();
@@ -119,7 +119,7 @@ float CTimer::GetElapsedSecond()
 	return GetElapsedMilliecond() / 1000.0f;
 }
 
-DWORD CTimer::GetElapsedMilliecond()
+uint32_t CTimer::GetElapsedMilliecond()
 {
 	if (!m_bUseRealTime)
 		return 16 + (m_index & 1);

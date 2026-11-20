@@ -4,16 +4,16 @@
 
 #if !defined(_WIN32)
 int MultiByteToWideChar(
-	UINT CodePage,
-	DWORD dwFlags,
+	uint32_t CodePage,
+	uint32_t dwFlags,
 	LPCSTR lpMultiByteStr,
 	int cbMultiByte,
 	LPWSTR lpWideCharStr,
 	int cchWideChar);
 
 int WideCharToMultiByte(
-	UINT CodePage,
-	DWORD dwFlags,
+	uint32_t CodePage,
+	uint32_t dwFlags,
 	LPCWSTR lpWideCharStr,
 	int cchWideChar,
 	LPSTR lpMultiByteStr,
@@ -23,8 +23,8 @@ int WideCharToMultiByte(
 #endif
 
 int Ymir_WideCharToMultiByte(
-	UINT CodePage,
-	DWORD dwFlags,
+	uint32_t CodePage,
+	uint32_t dwFlags,
 	LPCWSTR lpWideCharStr,
 	int cchWideChar,
 	LPSTR lpMultiByteStr,
@@ -33,8 +33,8 @@ int Ymir_WideCharToMultiByte(
 	LPBOOL lpUsedDefaultChar);
 
 int Ymir_MultiByteToWideChar(
-	UINT CodePage,
-	DWORD dwFlags,
+	uint32_t CodePage,
+	uint32_t dwFlags,
 	LPCSTR lpMultiByteStr,
 	int cbMultiByte,
 	LPWSTR lpWideCharStr,

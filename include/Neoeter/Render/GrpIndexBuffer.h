@@ -34,7 +34,7 @@ class CGraphicIndexBuffer : public CGraphicBase
 
 	protected:
 		LPDIRECT3DINDEXBUFFER9 m_lpd3dIdxBuf;
-		DWORD m_dwBufferSize;
+		uint32_t m_dwBufferSize;
 		D3DFORMAT m_d3dFmt;
 		int m_iidxCount;
 };

@@ -41,7 +41,7 @@ void CFileBase::Close()
 	}
 }
 
-BOOL CFileBase::Create(const char* filename, EFileMode mode)
+int32_t CFileBase::Create(const char* filename, EFileMode mode)
 {
 	Destroy();
 
@@ -49,7 +49,7 @@ BOOL CFileBase::Create(const char* filename, EFileMode mode)
 	m_filename[MAX_PATH] = '\0';
 
 #if defined(_WIN32)
-	DWORD dwMode, dwShareMode = FILE_SHARE_READ;
+	uint32_t dwMode, dwShareMode = FILE_SHARE_READ;
 
 	if (mode == FILEMODE_WRITE)
 	{
@@ -83,7 +83,7 @@ BOOL CFileBase::Create(const char* filename, EFileMode mode)
 	{
 		struct stat st;
 		if (fstat(fd, &st) == 0)
-			m_dwSize = (DWORD)st.st_size;
+			m_dwSize = (uint32_t)st.st_size;
 		else
 			m_dwSize = 0;
 
@@ -96,12 +96,12 @@ BOOL CFileBase::Create(const char* filename, EFileMode mode)
 #endif
 }
 
-DWORD CFileBase::Size()
+uint32_t CFileBase::Size()
 {
 	return (m_dwSize);
 }
 
-void CFileBase::SeekCur(DWORD size)
+void CFileBase::SeekCur(uint32_t size)
 {
 #if defined(_WIN32)
 	SetFilePointer(m_hFile, size, NULL, FILE_CURRENT);
@@ -110,7 +110,7 @@ void CFileBase::SeekCur(DWORD size)
 #endif
 }
 
-void CFileBase::Seek(DWORD offset)
+void CFileBase::Seek(uint32_t offset)
 {
 	if (offset > m_dwSize)
 		offset = m_dwSize;
@@ -122,20 +122,20 @@ void CFileBase::Seek(DWORD offset)
 #endif
 }
 
-DWORD CFileBase::GetPosition()
+uint32_t CFileBase::GetPosition()
 {
 #if defined(_WIN32)
 	return SetFilePointer(m_hFile, 0, NULL, FILE_CURRENT);
 #else
-	return (DWORD)lseek((int)(intptr_t)m_hFile, 0, SEEK_CUR);
+	return (uint32_t)lseek((int)(intptr_t)m_hFile, 0, SEEK_CUR);
 #endif
 }
 
-BOOL CFileBase::Write(const void* src, int bytes)
+int32_t CFileBase::Write(const void* src, int bytes)
 {
 #if defined(_WIN32)
 	DWORD dwUseless;
-	BOOL ret = WriteFile(m_hFile, src, bytes, &dwUseless, NULL);
+	int32_t ret = WriteFile(m_hFile, src, bytes, &dwUseless, NULL);
 
 	if (!ret)
 		return false;
@@ -149,12 +149,12 @@ BOOL CFileBase::Write(const void* src, int bytes)
 
 	struct stat st;
 	if (fstat((int)(intptr_t)m_hFile, &st) == 0)
-		m_dwSize = (DWORD)st.st_size;
+		m_dwSize = (uint32_t)st.st_size;
 	return TRUE;
 #endif
 }
 
-BOOL CFileBase::Read(void* dest, int bytes)
+int32_t CFileBase::Read(void* dest, int bytes)
 {
 #if defined(_WIN32)
 	DWORD dwUseless;
@@ -165,7 +165,7 @@ BOOL CFileBase::Read(void* dest, int bytes)
 #endif
 }
 
-BOOL CFileBase::IsNull()
+int32_t CFileBase::IsNull()
 {
 	return !m_hFile ? true : false;
 }

@@ -29,7 +29,7 @@ class CEmitterProperty
 
 		void Clear();
 
-		DWORD GetMaxEmissionCount()
+		uint32_t GetMaxEmissionCount()
 		{
 			return m_dwMaxEmissionCount;
 		}
@@ -39,7 +39,7 @@ class CEmitterProperty
 			return m_fCycleLength;
 		}
 
-		BOOL isCycleLoop()
+		int32_t isCycleLoop()
 		{
 			return m_bCycleLoopFlag;
 		}
@@ -49,9 +49,9 @@ class CEmitterProperty
 			return m_iLoopCount;
 		}
 
-		BYTE GetEmitterShape();
-		BYTE GetEmitterAdvancedType();
-		BOOL isEmitFromEdge();
+		uint8_t GetEmitterShape();
+		uint8_t GetEmitterAdvancedType();
+		int32_t isEmitFromEdge();
 
 		void GetEmittingSize(float fTime, float* pfValue);
 		void GetEmittingAngularVelocity(float fTime, float* pfValue);
@@ -67,15 +67,15 @@ class CEmitterProperty
 
 		/////
 
-		DWORD m_dwMaxEmissionCount;
+		uint32_t m_dwMaxEmissionCount;
 
 		float m_fCycleLength;
-		BOOL m_bCycleLoopFlag;
+		int32_t m_bCycleLoopFlag;
 		int m_iLoopCount;
 
-		BYTE m_byEmitterShape;
-		BYTE m_byEmitterAdvancedType;
-		BOOL m_bEmitFromEdgeFlag;
+		uint8_t m_byEmitterShape;
+		uint8_t m_byEmitterAdvancedType;
+		int32_t m_bEmitFromEdgeFlag;
 		D3DXVECTOR3 m_v3EmittingSize;
 		float m_fEmittingRadius;
 

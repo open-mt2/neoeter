@@ -22,13 +22,13 @@ class CResourceManager : public CSingleton<CResourceManager>
 		void BeginThreadLoading();
 		void EndThreadLoading();
 
-		CResource* InsertResourcePointer(DWORD dwFileCRC, CResource* pResource);
-		CResource* FindResourcePointer(DWORD dwFileCRC);
+		CResource* InsertResourcePointer(uint32_t dwFileCRC, CResource* pResource);
+		CResource* FindResourcePointer(uint32_t dwFileCRC);
 		CResource* GetResourcePointer(const char* c_szFileName);
 		CResource* GetTypeResourcePointer(const char* c_szFileName, int iType = -1);
 
 		// 추가
-		bool isResourcePointerData(DWORD dwFileCRC);
+		bool isResourcePointerData(uint32_t dwFileCRC);
 
 		void RegisterResourceNewFunctionPointer(const char* c_szFileExt, CResource* (*pResNewFunc)(const char* c_szFileName));
 		void RegisterResourceNewFunctionByTypePointer(int iType, CResource* (*pNewFunc)(const char* c_szFileName));
@@ -48,14 +48,14 @@ class CResourceManager : public CSingleton<CResourceManager>
 		void __DestroyResourceMap();
 		void __DestroyCacheMap();
 
-		DWORD __GetFileCRC(const char* c_szFileName, const char** c_pszLowerFile = NULL);
+		uint32_t __GetFileCRC(const char* c_szFileName, const char** c_pszLowerFile = NULL);
 
 	protected:
-		typedef std::map<DWORD, CResource*> TResourcePointerMap;
+		typedef std::map<uint32_t, CResource*> TResourcePointerMap;
 		typedef std::map<std::string, CResource* (*)(const char*)> TResourceNewFunctionPointerMap;
 		typedef std::map<int, CResource* (*)(const char*)> TResourceNewFunctionByTypePointerMap;
-		typedef std::map<CResource*, DWORD> TResourceDeletingMap;
-		typedef std::map<DWORD, std::string> TResourceRequestMap;
+		typedef std::map<CResource*, uint32_t> TResourceDeletingMap;
+		typedef std::map<uint32_t, std::string> TResourceRequestMap;
 		typedef std::map<long, CResource*> TResourceRefDecreaseWaitingMap;
 
 	protected:

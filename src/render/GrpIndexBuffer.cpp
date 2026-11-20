@@ -53,7 +53,7 @@ bool CGraphicIndexBuffer::Copy(int bufSize, const void* srcIndices)
 {
 	assert(m_lpd3dIdxBuf != NULL);
 
-	BYTE* dstIndices;
+	uint8_t* dstIndices;
 	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (void**)&dstIndices, 0)))
 		return false;
 
@@ -71,7 +71,7 @@ bool CGraphicIndexBuffer::Create(int faceCount, TFace* faces)
 	if (!Create(idxCount, D3DFMT_INDEX16))
 		return false;
 
-	WORD* dstIndices;
+	uint16_t* dstIndices;
 	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (void**)&dstIndices, 0)))
 		return false;
 
@@ -105,7 +105,7 @@ bool CGraphicIndexBuffer::Create(int idxCount, D3DFORMAT d3dFmt)
 	Destroy();
 
 	m_iidxCount = idxCount;
-	m_dwBufferSize = sizeof(WORD) * idxCount;
+	m_dwBufferSize = sizeof(uint16_t) * idxCount;
 	m_d3dFmt = d3dFmt;
 
 	return CreateDeviceObjects();

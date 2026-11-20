@@ -18,5 +18,5 @@ class CMSApplication : public CMSWindow
 	protected:
 		void ClearWindowClass();
 
-		LRESULT WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
+		intptr_t WindowProcedure(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
 };

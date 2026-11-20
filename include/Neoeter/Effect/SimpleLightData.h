@@ -18,7 +18,7 @@ class CLightData : public CEffectElementBase
 
 		void GetRange(float fTime, float& rRange);
 		float GetDuration();
-		BOOL isLoop()
+		int32_t isLoop()
 		{
 			return m_bLoopFlag;
 		}
@@ -32,7 +32,7 @@ class CLightData : public CEffectElementBase
 		void OnClear();
 		bool OnIsData();
 
-		BOOL OnLoadScript(CTextFileLoader& rTextFileLoader);
+		int32_t OnLoadScript(CTextFileLoader& rTextFileLoader);
 
 	protected:
 		float m_fMaxRange;
@@ -42,7 +42,7 @@ class CLightData : public CEffectElementBase
 		D3DXCOLOR m_cAmbient;
 		D3DXCOLOR m_cDiffuse;
 
-		BOOL m_bLoopFlag;
+		int32_t m_bLoopFlag;
 		int m_iLoopCount;
 
 		float m_fAttenuation0;

@@ -25,12 +25,12 @@ void CScreenFilter::Render()
 	STATEMANAGER.RestoreTransform(D3DTS_PROJECTION);
 }
 
-void CScreenFilter::SetEnable(BOOL /*bFlag*/)
+void CScreenFilter::SetEnable(int32_t /*bFlag*/)
 {
 	m_bEnable = FALSE;
 }
 
-void CScreenFilter::SetBlendType(BYTE bySrcType, BYTE byDestType)
+void CScreenFilter::SetBlendType(uint8_t bySrcType, uint8_t byDestType)
 {
 	m_bySrcType = bySrcType;
 	m_byDestType = byDestType;

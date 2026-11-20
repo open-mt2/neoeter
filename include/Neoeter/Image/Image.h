@@ -3,6 +3,8 @@
 
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
 #include <windows.h>
+#include <cstdint>
+#include <cstddef>
 #else
 #include <Platform/Platform.h>
 #endif
@@ -12,16 +14,16 @@
 #pragma pack(1)
 struct TGA_HEADER
 {
-		char idLen;		   // 0
-		char palType;	   // 파레트있으면 1, 없음 0
-		char imgType;	   // 파레트있으면 1, 없음 2
-		WORD colorBegin;   // 0
-		WORD colorCount;   // 파레트 있으면 256, 없음 0
-		char palEntrySize; // 파레트 있으면 24, 없음 0
-		WORD left;
-		WORD top;
-		WORD width;
-		WORD height;
+		char idLen;			 // 0
+		char palType;		 // 파레트있으면 1, 없음 0
+		char imgType;		 // 파레트있으면 1, 없음 2
+		uint16_t colorBegin; // 0
+		uint16_t colorCount; // 파레트 있으면 256, 없음 0
+		char palEntrySize;	 // 파레트 있으면 24, 없음 0
+		uint16_t left;
+		uint16_t top;
+		uint16_t width;
+		uint16_t height;
 		char colorBits;
 		char desc;
 };
@@ -44,13 +46,13 @@ class CImage
 
 		virtual void Create(int width, int height);
 
-		void Clear(DWORD color = 0);
+		void Clear(uint32_t color = 0);
 
 		int GetWidth() const;
 		int GetHeight() const;
 
-		DWORD* GetBasePointer();
-		DWORD* GetLinePointer(int line);
+		uint32_t* GetBasePointer();
+		uint32_t* GetLinePointer(int line);
 
 		void PutImage(int x, int y, CImage* pImage);
 		void FlipTopToBottom();
@@ -65,7 +67,7 @@ class CImage
 		void Initialize();
 
 	protected:
-		DWORD* m_pdwColors;
+		uint32_t* m_pdwColors;
 		int m_width;
 		int m_height;
 

@@ -191,7 +191,7 @@ void GetOldIndexingName(char* szName, int Index)
 	strcat(szName, Temp);
 }
 
-void GetIndexingName(char* szName, DWORD Index)
+void GetIndexingName(char* szName, uint32_t Index)
 {
 	sprintf(szName + strlen(szName), "%u", Index);
 }
@@ -273,8 +273,8 @@ bool GetLocalFileName(const char* c_szGlobalPath,
 	if (strGlobalPath.length() >= strFullPathFileName.length())
 		return false;
 
-	DWORD length = std::min(strGlobalPath.length(), strFullPathFileName.length());
-	for (DWORD dwPos = 0; dwPos < length; ++dwPos)
+	uint32_t length = std::min(strGlobalPath.length(), strFullPathFileName.length());
+	for (uint32_t dwPos = 0; dwPos < length; ++dwPos)
 	{
 		if (strGlobalPath[dwPos] != strFullPathFileName[dwPos])
 			return false;
@@ -295,7 +295,7 @@ void GetWorkingFolder(std::string& strFileName)
 
 void StringLowers(char* String)
 {
-	for (DWORD i = 0; i < strlen(String); ++i)
+	for (uint32_t i = 0; i < strlen(String); ++i)
 	{
 		String[i] = korean_tolower(String[i]);
 	}
@@ -303,7 +303,7 @@ void StringLowers(char* String)
 
 void StringPath(std::string& rString)
 {
-	for (DWORD i = 0; i < rString.length(); ++i)
+	for (uint32_t i = 0; i < rString.length(); ++i)
 	{
 		if (rString[i] == '\\')
 			rString[i] = '/';
@@ -314,7 +314,7 @@ void StringPath(std::string& rString)
 
 void StringPath(char* pString)
 {
-	for (DWORD i = 0; i < strlen(pString); ++i)
+	for (uint32_t i = 0; i < strlen(pString); ++i)
 	{
 		if (pString[i] == '\\')
 			pString[i] = '/';
@@ -325,7 +325,7 @@ void StringPath(char* pString)
 
 void StringPath(const char* c_szSrc, char* szDest)
 {
-	for (DWORD i = 0; i < strlen(c_szSrc); ++i)
+	for (uint32_t i = 0; i < strlen(c_szSrc); ++i)
 	{
 		if (c_szSrc[i] == '\\')
 			szDest[i] = '/';
@@ -339,7 +339,7 @@ void StringPath(const char* c_szSrc, std::string& rString)
 	rString = "";
 	rString.resize(strlen(c_szSrc));
 
-	for (DWORD i = 0; i < strlen(c_szSrc); ++i)
+	for (uint32_t i = 0; i < strlen(c_szSrc); ++i)
 	{
 		if (c_szSrc[i] == '\\')
 			rString[i] = '/';
@@ -573,7 +573,7 @@ bool SplitLine(const char* c_szLine, const char* c_szDelimeter,
 
 	std::string strLine = c_szLine;
 
-	DWORD basePos = 0;
+	uint32_t basePos = 0;
 
 	do {
 		int beginPos = strLine.find_first_not_of(c_szDelimeter, basePos);
@@ -642,10 +642,10 @@ PCHAR* CommandLineToArgv(PCHAR CmdLine, int* _argc)
 {
 	PCHAR* argv;
 	PCHAR _argv;
-	ULONG len;
-	ULONG argc;
-	CHAR a;
-	ULONG i, j;
+	uint32_t len;
+	uint32_t argc;
+	char a;
+	uint32_t i, j;
 
 	BOOLEAN in_QM;
 	BOOLEAN in_TEXT;
@@ -654,7 +654,7 @@ PCHAR* CommandLineToArgv(PCHAR CmdLine, int* _argc)
 	len = strlen(CmdLine);
 	i = ((len + 2) / 2) * sizeof(PVOID) + sizeof(PVOID);
 
-	argv = (PCHAR*)GlobalAlloc(GMEM_FIXED, i + (len + 2) * sizeof(CHAR));
+	argv = (PCHAR*)GlobalAlloc(GMEM_FIXED, i + (len + 2) * sizeof(char));
 
 	_argv = (PCHAR)(((PUCHAR)argv) + i);
 

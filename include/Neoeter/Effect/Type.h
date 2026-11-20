@@ -37,7 +37,7 @@ typedef struct _FVF_PT
 typedef struct _FVF_PDT
 {
 		float x, y, z;
-		DWORD color;
+		uint32_t color;
 		float tu, tv;
 } FVF_PDT;
 
@@ -45,7 +45,7 @@ typedef struct _FVF_PDT
 #define D3DFVF_PDT (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 #endif
 
-inline FVF_PDT _FVF_PDT(float x, float y, float z, DWORD dif, float u, float v)
+inline FVF_PDT _FVF_PDT(float x, float y, float z, uint32_t dif, float u, float v)
 {
 	FVF_PDT result;
 	result.x = x;
@@ -139,7 +139,7 @@ class CTimeEvent
 
 struct DWORDCOLOR
 {
-		DWORD m_dwColor;
+		uint32_t m_dwColor;
 
 		DWORDCOLOR() : m_dwColor(0)
 		{
@@ -157,12 +157,12 @@ struct DWORDCOLOR
 
 		DWORDCOLOR& operator*=(float f)
 		{
-			DWORD idx = DWORD(f * 256);
+			uint32_t idx = uint32_t(f * 256);
 			m_dwColor =
-				(((DWORD)(((m_dwColor & AG_MASK) >> 8) * idx)) & AG_MASK) + ((DWORD)(((m_dwColor & RB_MASK) * idx) >> 8) & RB_MASK);
+				(((uint32_t)(((m_dwColor & AG_MASK) >> 8) * idx)) & AG_MASK) + ((uint32_t)(((m_dwColor & RB_MASK) * idx) >> 8) & RB_MASK);
 			// m_dwColor =
-			//	((DWORD)((m_dwColor & AG_MASK) * f) & AG_MASK)
-			//	+((DWORD)((m_dwColor & RB_MASK) * f) & RB_MASK);
+			//	((uint32_t)((m_dwColor & AG_MASK) * f) & AG_MASK)
+			//	+((uint32_t)((m_dwColor & RB_MASK) * f) & RB_MASK);
 			return *this;
 		}
 		DWORDCOLOR& operator+=(const DWORDCOLOR& r)
@@ -170,7 +170,7 @@ struct DWORDCOLOR
 			m_dwColor += r.m_dwColor;
 			return *this;
 		}
-		operator DWORD()
+		operator uint32_t()
 		{
 			return m_dwColor;
 		}
@@ -213,8 +213,8 @@ __forceinline bool operator<(const float& lhs, const CTimeEvent<T>& rhs)
 typedef CTimeEvent<char> TTimeEventTypeCharacter;
 typedef CTimeEvent<short> TTimeEventTypeShort;
 typedef CTimeEvent<float> TTimeEventTypeFloat;
-typedef CTimeEvent<WORD> TTimeEventTypeWord;
-typedef CTimeEvent<DWORD> TTimeEventTypeDoubleWord;
+typedef CTimeEvent<uint16_t> TTimeEventTypeWord;
+typedef CTimeEvent<uint32_t> TTimeEventTypeDoubleWord;
 typedef CTimeEvent<DWORDCOLOR> TTimeEventTypeColor;
 typedef CTimeEvent<D3DXVECTOR2> TTimeEventTypeVector2;
 typedef CTimeEvent<D3DXVECTOR3> TTimeEventTypeVector3;
@@ -274,7 +274,7 @@ __forceinline void GetTimeEventBlendValue(float fElapsedTime, std::vector<CTimeE
 	}
 }
 
-extern BOOL GetTokenTimeEventFloat(CTextFileLoader& rTextFileLoader, const char* c_szKey, TTimeEventTableFloat* pTimeEventTableFloat);
+extern int32_t GetTokenTimeEventFloat(CTextFileLoader& rTextFileLoader, const char* c_szKey, TTimeEventTableFloat* pTimeEventTableFloat);
 // extern void InsertItemTimeEventFloat(TTimeEventTableFloat * pTable, float fTime, float fValue);
 
 template <typename T>

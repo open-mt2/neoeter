@@ -28,7 +28,7 @@ void CVertexShader::Destroy()
 	}
 }
 
-bool CVertexShader::CreateFromDiskFile(const char* c_szFileName, const DWORD* c_pdwVertexDecl)
+bool CVertexShader::CreateFromDiskFile(const char* c_szFileName, const uint32_t* c_pdwVertexDecl)
 {
 	Destroy();
 

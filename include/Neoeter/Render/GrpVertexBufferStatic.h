@@ -10,5 +10,5 @@ class CStaticVertexBuffer : public CGraphicVertexBuffer
 
 		using CGraphicVertexBuffer::Create;
 
-		bool Create(int vtxCount, DWORD fvf, bool isManaged = true);
+		bool Create(int vtxCount, uint32_t fvf, bool isManaged = true);
 };

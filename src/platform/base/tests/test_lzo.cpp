@@ -37,7 +37,7 @@ int main()
 	printf("  [PASS] Decompressed data matches original data byte-for-byte.\n");
 
 	// 2. Encrypted LZO compression & decompression
-	DWORD teaKey[4] = {0xDEADBEEF, 0xCAFEBABE, 0x01234567, 0x89ABCDEF};
+	uint32_t teaKey[4] = {0xDEADBEEF, 0xCAFEBABE, 0x01234567, 0x89ABCDEF};
 	CLZObject encCompObj;
 	bool encCompResult = lzo.CompressEncryptedMemory(encCompObj, rawData.data(), rawSize, teaKey);
 	assert(encCompResult == true);

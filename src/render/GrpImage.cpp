@@ -1,8 +1,8 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/GrpImage.h>
 
-CGraphicImage::CGraphicImage(const char* c_szFileName, DWORD dwFilter) : CResource(c_szFileName),
-																		 m_dwFilter(dwFilter)
+CGraphicImage::CGraphicImage(const char* c_szFileName, uint32_t dwFilter) : CResource(c_szFileName),
+																			m_dwFilter(dwFilter)
 {
 	m_rect.bottom = m_rect.right = m_rect.top = m_rect.left = 0;
 }

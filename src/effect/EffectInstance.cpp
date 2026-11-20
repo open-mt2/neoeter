@@ -59,7 +59,7 @@ void CEffectInstance::UpdateSound()
 
 struct FEffectUpdator
 {
-		BOOL isAlive;
+		int32_t isAlive;
 		float fElapsedTime;
 		FEffectUpdator(float fElapsedTime)
 			: isAlive(FALSE), fElapsedTime(fElapsedTime)
@@ -129,7 +129,7 @@ void CEffectInstance::SetGlobalMatrix(const D3DXMATRIX& c_rmatGlobal)
 	m_matGlobal = c_rmatGlobal;
 }
 
-BOOL CEffectInstance::isAlive()
+int32_t CEffectInstance::isAlive()
 {
 	return m_isAlive;
 }
@@ -205,7 +205,7 @@ void CEffectInstance::SetEffectDataPointer(CEffectData* pEffectData)
 	if (m_fBoundingSphereRadius > 0.0f)
 		CGraphicObjectInstance::RegisterBoundingSphere();
 
-	DWORD i;
+	uint32_t i;
 
 	for (i = 0; i < pEffectData->GetParticleCount(); ++i)
 	{

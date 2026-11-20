@@ -21,7 +21,7 @@ class CNetworkStream
 
 		bool Connect(const CNetworkAddress& c_rkNetAddr, int limitSec = 3);
 		bool Connect(const char* c_szAddr, int port, int limitSec = 3);
-		bool Connect(DWORD dwAddr, int port, int limitSec = 3);
+		bool Connect(uint32_t dwAddr, int port, int limitSec = 3);
 		void Disconnect();
 
 		bool Peek(int len);
@@ -83,7 +83,7 @@ class CNetworkStream
 		CNetworkAddress m_addr;
 
 		// Sequence
-		DWORD m_iSequence;
+		uint32_t m_iSequence;
 		bool m_bUseSequence;
-		std::vector<BYTE> m_kVec_bSequenceTable;
+		std::vector<uint8_t> m_kVec_bSequenceTable;
 };

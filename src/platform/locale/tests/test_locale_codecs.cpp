@@ -10,7 +10,7 @@ namespace
 {
 
 	// Round-trip a byte string through wide characters and back.
-	void roundtrip(UINT codePage, const char* input, int inputLength, const char* label)
+	void roundtrip(uint32_t codePage, const char* input, int inputLength, const char* label)
 	{
 		wchar_t wide[256] = {};
 		int wideLength = MultiByteToWideChar(codePage, 0, input, inputLength, wide,

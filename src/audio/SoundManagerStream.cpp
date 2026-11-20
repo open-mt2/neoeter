@@ -32,7 +32,7 @@ void CSoundManagerStream::Destroy()
 	CSoundBase::Destroy();
 }
 
-bool CSoundManagerStream::SetInstance(DWORD dwIndex, const char* filename)
+bool CSoundManagerStream::SetInstance(uint32_t dwIndex, const char* filename)
 {
 	if (!CheckInstanceIndex(dwIndex))
 		return false;
@@ -47,7 +47,7 @@ bool CSoundManagerStream::SetInstance(DWORD dwIndex, const char* filename)
 	return true;
 }
 
-CSoundInstanceStream* CSoundManagerStream::GetInstance(DWORD dwIndex)
+CSoundInstanceStream* CSoundManagerStream::GetInstance(uint32_t dwIndex)
 {
 	if (!CheckInstanceIndex(dwIndex))
 		return NULL;
@@ -55,9 +55,9 @@ CSoundInstanceStream* CSoundManagerStream::GetInstance(DWORD dwIndex)
 	return &m_Instances[dwIndex];
 }
 
-bool CSoundManagerStream::CheckInstanceIndex(DWORD dwIndex)
+bool CSoundManagerStream::CheckInstanceIndex(uint32_t dwIndex)
 {
-	if (dwIndex >= DWORD(MUSIC_INSTANCE_MAX_NUM))
+	if (dwIndex >= uint32_t(MUSIC_INSTANCE_MAX_NUM))
 		return false;
 
 	return true;

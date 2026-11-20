@@ -50,13 +50,13 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 
 		bool CheckModelInstanceIndex(int iModelInstance);
 		bool CheckModelThingIndex(int iModelThing);
-		bool CheckMotionThingIndex(DWORD dwMotionKey);
-		bool GetMotionThingPointer(DWORD dwKey, CGraphicThing** ppMotion);
+		bool CheckMotionThingIndex(uint32_t dwMotionKey);
+		bool GetMotionThingPointer(uint32_t dwKey, CGraphicThing** ppMotion);
 		bool IsMotionThing();
 
 		void RegisterModelThing(int iModelThing, CGraphicThing* pModelThing);
 		void RegisterLODThing(int iModelThing, CGraphicThing* pModelThing);
-		void RegisterMotionThing(DWORD dwMotionKey, CGraphicThing* pMotionThing);
+		void RegisterMotionThing(uint32_t dwMotionKey, CGraphicThing* pMotionThing);
 
 		bool SetModelInstance(int iDstModelInstance, int iSrcModelThing, int iSrcModel, int iSkelInstance = DONTUSEVALUE);
 		void SetEndStopMotion();
@@ -72,9 +72,9 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 		void ResetLocalTime();
 		void InsertDelay(float fDelay);
 
-		void SetMaterialImagePointer(UINT ePart, const char* c_szImageName, CGraphicImage* pImage);
-		void SetMaterialData(UINT ePart, const char* c_szImageName, SMaterialData kMaterialData);
-		void SetSpecularInfo(UINT ePart, const char* c_szMtrlName, BOOL bEnable, float fPower);
+		void SetMaterialImagePointer(uint32_t ePart, const char* c_szImageName, CGraphicImage* pImage);
+		void SetMaterialData(uint32_t ePart, const char* c_szImageName, SMaterialData kMaterialData);
+		void SetSpecularInfo(uint32_t ePart, const char* c_szMtrlName, int32_t bEnable, float fPower);
 
 		void __SetLocalTime(float fLocalTime); // Only Used by Tools
 		float GetLastLocalTime();
@@ -82,7 +82,7 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 		float GetSecondElapsed();
 		float GetAverageSecondElapsed();
 
-		BYTE GetLODLevel(DWORD dwModelInstance);
+		uint8_t GetLODLevel(uint32_t dwModelInstance);
 		float GetHeight();
 
 		void RenderWithOneTexture();
@@ -90,22 +90,22 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 		void BlendRenderWithOneTexture();
 		void BlendRenderWithTwoTexture();
 
-		DWORD GetLODControllerCount() const;
-		CGrannyLODController* GetLODControllerPointer(DWORD dwModelIndex) const;
-		CGrannyLODController* GetLODControllerPointer(DWORD dwModelIndex);
+		uint32_t GetLODControllerCount() const;
+		CGrannyLODController* GetLODControllerPointer(uint32_t dwModelIndex) const;
+		CGrannyLODController* GetLODControllerPointer(uint32_t dwModelIndex);
 
 		void ReloadTexture();
 
 	public:
 		CGraphicThing* GetBaseThingPtr();
 
-		bool SetMotion(DWORD dwMotionKey, float blendTime = 0.0f, int loopCount = 0, float speedRatio = 1.0f);
-		bool ChangeMotion(DWORD dwMotionKey, int loopCount = 0, float speedRatio = 1.0f);
+		bool SetMotion(uint32_t dwMotionKey, float blendTime = 0.0f, int loopCount = 0, float speedRatio = 1.0f);
+		bool ChangeMotion(uint32_t dwMotionKey, int loopCount = 0, float speedRatio = 1.0f);
 		bool Intersect(float* pu, float* pv, float* pt);
 		void GetBoundBox(D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax);
-		BOOL GetBoundBox(DWORD dwModelInstanceIndex, D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax);
-		BOOL GetBoneMatrix(DWORD dwModelInstanceIndex, DWORD dwBoneIndex, D3DXMATRIX** ppMatrix);
-		BOOL GetCompositeBoneMatrix(DWORD dwModelInstanceIndex, DWORD dwBoneIndex, D3DXMATRIX** ppMatrix);
+		int32_t GetBoundBox(uint32_t dwModelInstanceIndex, D3DXVECTOR3* vtMin, D3DXVECTOR3* vtMax);
+		int32_t GetBoneMatrix(uint32_t dwModelInstanceIndex, uint32_t dwBoneIndex, D3DXMATRIX** ppMatrix);
+		int32_t GetCompositeBoneMatrix(uint32_t dwModelInstanceIndex, uint32_t dwBoneIndex, D3DXMATRIX** ppMatrix);
 		void UpdateTransform(D3DXMATRIX* pMatrix, float fSecondsElapsed = 0.0f, int iModelInstanceIndex = 0);
 		void ProjectShadow(const CGraphicShadowTexture& c_rShadowTexture);
 
@@ -139,7 +139,7 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 
 		std::vector<CGrannyLODController*> m_LODControllerVector;
 		std::vector<TModelThingSet> m_modelThingSetVector;
-		std::map<DWORD, CGraphicThing::TRef*> m_roMotionThingMap;
+		std::map<uint32_t, CGraphicThing::TRef*> m_roMotionThingMap;
 
 	protected:
 		virtual void OnUpdateCollisionData(const CStaticCollisionDataVector* pscdVector);
@@ -147,7 +147,7 @@ class CGraphicThingInstance : public CGraphicObjectInstance
 		virtual bool OnGetObjectHeight(float fX, float fY, float* pfHeight);
 
 	public:
-		static void CreateSystem(UINT uCapacity);
+		static void CreateSystem(uint32_t uCapacity);
 		static void DestroySystem();
 
 		static CGraphicThingInstance* New();

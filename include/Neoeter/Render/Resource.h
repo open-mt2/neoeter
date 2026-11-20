@@ -6,7 +6,7 @@
 class CResource : public CReferenceObject
 {
 	public:
-		typedef DWORD TType;
+		typedef uint32_t TType;
 
 		enum EState
 		{
@@ -41,7 +41,7 @@ class CResource : public CReferenceObject
 		bool IsEmpty() const;
 		bool IsType(TType type);
 
-		DWORD GetLoadCostMilliSecond() { return m_dwLoadCostMiliiSecond; }
+		uint32_t GetLoadCostMilliSecond() { return m_dwLoadCostMiliiSecond; }
 		// const char *	GetFileName() const			{ return m_pszFileName;				}
 		const char* GetFileName() const { return m_stFileName.c_str(); }
 		const std::string& GetFileNameString() const { return m_stFileName; }
@@ -61,7 +61,7 @@ class CResource : public CReferenceObject
 	protected:
 		std::string m_stFileName;
 		// char *			m_pszFileName;
-		DWORD m_dwLoadCostMiliiSecond;
+		uint32_t m_dwLoadCostMiliiSecond;
 		EState me_state;
 
 	protected:

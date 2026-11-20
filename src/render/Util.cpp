@@ -29,7 +29,7 @@ bool LoadTextData(const char* c_szFileName, CTokenMap& rstTokenMap)
 	CTokenVector stTokenVector;
 	textFileLoader.Bind(motionData->size(), motionData->data());
 
-	for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
+	for (uint32_t i = 0; i < textFileLoader.GetLineCount(); ++i)
 	{
 		if (!textFileLoader.SplitLine(i, &stTokenVector))
 			continue;
@@ -54,7 +54,7 @@ bool LoadMultipleTextData(const char* c_szFileName, CTokenVectorMap& rstTokenVec
 	if (!CEterPackManager::Instance().Get(c_szFileName, modelData))
 		return false;
 
-	DWORD i;
+	uint32_t i;
 	CTokenVector stTokenVector;
 
 	textFileLoader.Bind(modelData->size(), modelData->data());
@@ -87,7 +87,7 @@ bool LoadMultipleTextData(const char* c_szFileName, CTokenVectorMap& rstTokenVec
 					break;
 				}
 
-				for (DWORD j = 0; j < stSubTokenVector.size(); ++j)
+				for (uint32_t j = 0; j < stSubTokenVector.size(); ++j)
 				{
 					stTokenVector.push_back(stSubTokenVector[j]);
 				}
@@ -136,14 +136,14 @@ D3DXCOLOR TokenToColor(CTokenVector& rVector)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 static std::string gs_fontFace = "";
-static DWORD gs_codePage = 0;
+static uint32_t gs_codePage = 0;
 
-int CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* /*textMetric*/, DWORD /*dwWord*/, LPARAM lParam)
+int CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* /*textMetric*/, uint32_t /*dwWord*/, intptr_t lParam)
 {
 	return stricmp((const char*)lParam, plogFont->lfFaceName);
 }
 
-int GetCharsetFromCodePage(WORD codePage)
+int GetCharsetFromCodePage(uint16_t codePage)
 {
 	switch (codePage)
 	{
@@ -178,7 +178,7 @@ int GetCharsetFromCodePage(WORD codePage)
 	}
 }
 
-const char* GetFontFaceFromCodePageNT(WORD codePage)
+const char* GetFontFaceFromCodePageNT(uint16_t codePage)
 {
 	switch (codePage)
 	{
@@ -204,7 +204,7 @@ const char* GetFontFaceFromCodePageNT(WORD codePage)
 			return "Arial";
 	}
 }
-const char* GetFontFaceFromCodePage9x(WORD codePage)
+const char* GetFontFaceFromCodePage9x(uint16_t codePage)
 {
 	switch (codePage)
 	{
@@ -231,7 +231,7 @@ const char* GetFontFaceFromCodePage9x(WORD codePage)
 	}
 }
 
-DWORD GetDefaultCodePage()
+uint32_t GetDefaultCodePage()
 {
 	return gs_codePage;
 }
@@ -241,7 +241,7 @@ const char* GetDefaultFontFace()
 	return gs_fontFace.c_str();
 }
 
-const char* GetFontFaceFromCodePage(WORD codePage)
+const char* GetFontFaceFromCodePage(uint16_t codePage)
 {
 	LOGFONT logFont;
 
@@ -253,7 +253,7 @@ const char* GetFontFaceFromCodePage(WORD codePage)
 
 	HDC hDC = GetDC(NULL);
 
-	if (EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)fontFace, 0) == 0)
+	if (EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (intptr_t)fontFace, 0) == 0)
 	{
 		ReleaseDC(NULL, hDC);
 		return fontFace;
@@ -261,7 +261,7 @@ const char* GetFontFaceFromCodePage(WORD codePage)
 
 	fontFace = GetFontFaceFromCodePageNT(codePage);
 
-	if (EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)fontFace, 0) == 0)
+	if (EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (intptr_t)fontFace, 0) == 0)
 	{
 		ReleaseDC(NULL, hDC);
 		return fontFace;
@@ -277,7 +277,7 @@ void SetDefaultFontFace(const char* fontFace)
 	gs_fontFace = fontFace;
 }
 
-bool SetDefaultCodePage(DWORD codePage)
+bool SetDefaultCodePage(uint32_t codePage)
 {
 	gs_codePage = codePage;
 

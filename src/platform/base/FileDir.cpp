@@ -27,7 +27,7 @@ void CDir::Destroy()
 	Initialize();
 }
 
-bool CDir::Create(const char* c_szFilter, const char* c_szPath, BOOL bCheckedExtension)
+bool CDir::Create(const char* c_szFilter, const char* c_szPath, int32_t bCheckedExtension)
 {
 	Destroy();
 

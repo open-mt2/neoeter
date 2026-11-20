@@ -18,38 +18,38 @@ class CMappedFile : public CFileBase
 		CMappedFile();
 		virtual ~CMappedFile();
 
-		void Link(DWORD dwBufSize, const void* c_pvBufData);
+		void Link(uint32_t dwBufSize, const void* c_pvBufData);
 
-		BOOL Create(const char* filename);
-		BOOL Create(const char* filename, const void** dest, int offset, int size);
+		int32_t Create(const char* filename);
+		int32_t Create(const char* filename, const void** dest, int offset, int size);
 		LPCVOID Get();
 		void Destroy();
-		int Seek(DWORD offset, int iSeekType = SEEK_TYPE_BEGIN);
+		int Seek(uint32_t offset, int iSeekType = SEEK_TYPE_BEGIN);
 		int Map(const void** dest, int offset = 0, int size = 0);
-		DWORD Size();
-		DWORD GetPosition();
-		BOOL Read(void* dest, int bytes);
-		DWORD GetSeekPosition();
+		uint32_t Size();
+		uint32_t GetPosition();
+		int32_t Read(void* dest, int bytes);
+		uint32_t GetSeekPosition();
 		void BindLZObject(CLZObject* pLZObj);
 		void BindLZObjectWithBufferedSize(CLZObject* pLZObj);
-		BYTE* AppendDataBlock(const void* pBlock, DWORD dwBlockSize);
+		uint8_t* AppendDataBlock(const void* pBlock, uint32_t dwBlockSize);
 
-		BYTE* GetCurrentSeekPoint();
+		uint8_t* GetCurrentSeekPoint();
 
 	private:
 		void Unmap(LPCVOID data);
 
 	private:
-		BYTE* m_pbBufLinkData;
-		DWORD m_dwBufLinkSize;
+		uint8_t* m_pbBufLinkData;
+		uint32_t m_dwBufLinkSize;
 
-		BYTE* m_pbAppendResultDataBlock;
-		DWORD m_dwAppendResultDataSize;
+		uint8_t* m_pbAppendResultDataBlock;
+		uint32_t m_dwAppendResultDataSize;
 
-		DWORD m_seekPosition;
+		uint32_t m_seekPosition;
 		[[maybe_unused]] HANDLE m_hFM;
-		DWORD m_dataOffset;
-		DWORD m_mapSize;
+		uint32_t m_dataOffset;
+		uint32_t m_mapSize;
 		LPVOID m_lpMapData;
 		LPVOID m_lpData;
 

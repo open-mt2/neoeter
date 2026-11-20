@@ -55,7 +55,7 @@ void CSkyObjectQuad::SetTransition(const unsigned char& c_rucNumVertex,
 								   const float& c_rfGreen,
 								   const float& c_rfBlue,
 								   const float& c_rfAlpha,
-								   DWORD dwDuration)
+								   uint32_t dwDuration)
 {
 	if (c_rucNumVertex > 3)
 		return;
@@ -195,7 +195,7 @@ void CSkyObject::TSkyObjectFace::StartTransition()
 bool CSkyObject::TSkyObjectFace::Update()
 {
 	bool bResult = false;
-	for (DWORD dwi = 0; dwi < m_SkyObjectQuadVector.size(); ++dwi)
+	for (uint32_t dwi = 0; dwi < m_SkyObjectQuadVector.size(); ++dwi)
 		bResult = m_SkyObjectQuadVector[dwi].Update() || bResult;
 	return bResult;
 }
@@ -238,7 +238,7 @@ void CSkyBox::SetSkyBoxScale(const D3DXVECTOR3& c_rv3Scale)
 	D3DXMatrixScaling(&m_matWorld, m_fScaleX, m_fScaleY, m_fScaleZ);
 }
 
-void CSkyBox::SetGradientLevel(BYTE byUpper, BYTE byLower)
+void CSkyBox::SetGradientLevel(uint8_t byUpper, uint8_t byLower)
 {
 	m_ucVirticalGradientLevelUpper = byUpper;
 	m_ucVirticalGradientLevelLower = byLower;
@@ -319,7 +319,7 @@ void CSkyBox::SetSkyObjectQuadVertical(TSkyObjectQuadVector* pSkyObjectQuadVecto
 {
 	TPDTVertex aPDTVertex;
 
-	DWORD dwIndex = 0;
+	uint32_t dwIndex = 0;
 
 	pSkyObjectQuadVector->clear();
 	pSkyObjectQuadVector->resize(m_ucVirticalGradientLevelUpper + m_ucVirticalGradientLevelLower);
@@ -553,10 +553,10 @@ void CSkyBox::Refresh()
 	SetSkyObjectQuadHorizon(&m_FaceCloud.m_SkyObjectQuadVector, v3QuadPoints);
 }
 
-void CSkyBox::SetCloudColor(const TGradientColor& c_rColor, const TGradientColor& c_rNextColor, const DWORD& dwTransitionTime)
+void CSkyBox::SetCloudColor(const TGradientColor& c_rColor, const TGradientColor& c_rNextColor, const uint32_t& dwTransitionTime)
 {
 	TSkyObjectFace& aFaceCloud = m_FaceCloud;
-	for (DWORD dwk = 0; dwk < aFaceCloud.m_SkyObjectQuadVector.size(); ++dwk)
+	for (uint32_t dwk = 0; dwk < aFaceCloud.m_SkyObjectQuadVector.size(); ++dwk)
 	{
 		CSkyObjectQuad& aSkyObjectQuad = aFaceCloud.m_SkyObjectQuadVector[dwk];
 
@@ -882,7 +882,7 @@ void CSkyBox::RenderCloud()
 	m_matTextureCloud._31 = m_fCloudPositionU;
 	m_matTextureCloud._32 = m_fCloudPositionV;
 
-	DWORD dwCurTime = CTimer::Instance().GetCurrentMillisecond();
+	uint32_t dwCurTime = CTimer::Instance().GetCurrentMillisecond();
 
 	m_fCloudPositionU += m_fCloudScrollSpeedU * (float)(dwCurTime - m_dwlastTime) * 0.001f;
 	if (m_fCloudPositionU >= 1.0f)

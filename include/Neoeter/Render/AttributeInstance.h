@@ -11,7 +11,7 @@ class CAttributeInstance
 		virtual ~CAttributeInstance();
 
 		void Clear();
-		BOOL IsEmpty() const;
+		int32_t IsEmpty() const;
 
 		const char* GetDataFileName() const;
 
@@ -22,10 +22,10 @@ class CAttributeInstance
 
 		bool Picking(const D3DXVECTOR3& v, const D3DXVECTOR3& dir, float& out_x, float& out_y);
 
-		BOOL IsInHeight(float fx, float fy);
-		BOOL GetHeight(float fx, float fy, float* pfHeight);
+		int32_t IsInHeight(float fx, float fy);
+		int32_t GetHeight(float fx, float fy, float* pfHeight);
 
-		BOOL IsHeightData() const;
+		int32_t IsHeightData() const;
 
 	protected:
 		void SetGlobalMatrix(const D3DXMATRIX& c_rmatGlobal);
@@ -42,21 +42,21 @@ class CAttributeInstance
 		CAttributeData::TRef m_roAttributeData;
 
 		/*
-		BOOL m_isHeightCached;
+		int32_t m_isHeightCached;
 		struct SHeightCacheData
 		{
 			float fxMin;
 			float fyMin;
 			float fxMax;
 			float fyMax;
-			DWORD dwxStep;
-			DWORD dwyStep;
+			uint32_t dwxStep;
+			uint32_t dwyStep;
 			std::vector<float> kVec_fHeight;
 		} m_kHeightCacheData;
 		*/
 
 	public:
-		static void CreateSystem(UINT uCapacity);
+		static void CreateSystem(uint32_t uCapacity);
 		static void DestroySystem();
 
 		static CAttributeInstance* New();

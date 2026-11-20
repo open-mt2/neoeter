@@ -6,7 +6,7 @@
 #include <iconv.h>
 #include <cerrno>
 
-static const char* GetIconvEncoding(UINT codePage)
+static const char* GetIconvEncoding(uint32_t codePage)
 {
 	switch (codePage)
 	{
@@ -47,8 +47,8 @@ static const char* GetIconvEncoding(UINT codePage)
 }
 
 int MultiByteToWideChar(
-	UINT CodePage,
-	DWORD dwFlags,
+	uint32_t CodePage,
+	uint32_t dwFlags,
 	LPCSTR lpMultiByteStr,
 	int cbMultiByte,
 	LPWSTR lpWideCharStr,
@@ -139,8 +139,8 @@ int MultiByteToWideChar(
 }
 
 int WideCharToMultiByte(
-	UINT CodePage,
-	DWORD dwFlags,
+	uint32_t CodePage,
+	uint32_t dwFlags,
 	LPCWSTR lpWideCharStr,
 	int cchWideChar,
 	LPSTR lpMultiByteStr,
@@ -238,8 +238,8 @@ int WideCharToMultiByte(
 #endif
 
 int Ymir_WideCharToMultiByte(
-	UINT CodePage,
-	DWORD dwFlags,
+	uint32_t CodePage,
+	uint32_t dwFlags,
 	LPCWSTR lpWideCharStr,
 	int cchWideChar,
 	LPSTR lpMultiByteStr,
@@ -258,8 +258,8 @@ int Ymir_WideCharToMultiByte(
 }
 
 int Ymir_MultiByteToWideChar(
-	UINT CodePage,
-	DWORD dwFlags,
+	uint32_t CodePage,
+	uint32_t dwFlags,
 	LPCSTR lpMultiByteStr,
 	int cbMultiByte,
 	LPWSTR lpWideCharStr,

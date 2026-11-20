@@ -44,7 +44,7 @@ void CSoundManager2D::Destroy()
 
 ISoundInstance* CSoundManager2D::GetInstance(const char* c_pszFileName)
 {
-	DWORD dwFileCRC = GetFileCRC(c_pszFileName);
+	uint32_t dwFileCRC = GetFileCRC(c_pszFileName);
 	TSoundDataMap::iterator itor = ms_dataMap.find(dwFileCRC);
 
 	CSoundData* pkSoundData;
@@ -56,10 +56,10 @@ ISoundInstance* CSoundManager2D::GetInstance(const char* c_pszFileName)
 
 	assert(pkSoundData != NULL);
 
-	static DWORD k = 0;
+	static uint32_t k = 0;
 
-	DWORD start = k++;
-	DWORD end = start + INSTANCE_MAX_COUNT;
+	uint32_t start = k++;
+	uint32_t end = start + INSTANCE_MAX_COUNT;
 
 	while (start < end)
 	{

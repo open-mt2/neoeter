@@ -6,7 +6,7 @@
 #include <Neoeter/Platform/Base/Singleton.h>
 #include <Neoeter/Platform/Base/Timer.h>
 
-const DWORD DEBUG_STRING_MAX_LEN = 1024;
+const uint32_t DEBUG_STRING_MAX_LEN = 1024;
 
 static int isLogFile = false;
 HWND g_PopupHwnd = NULL;
@@ -56,26 +56,26 @@ class CLogFile : public CSingleton<CLogFile>
 
 static CLogFile gs_logfile;
 
-static UINT gs_uLevel = 0;
+static uint32_t gs_uLevel = 0;
 
-void SetLogLevel(UINT uLevel)
+void SetLogLevel(uint32_t uLevel)
 {
 	gs_uLevel = uLevel;
 }
 
-void Log(UINT uLevel, const char* c_szMsg)
+void Log(uint32_t uLevel, const char* c_szMsg)
 {
 	if (uLevel >= gs_uLevel)
 		Trace(c_szMsg);
 }
 
-void Logn(UINT uLevel, const char* c_szMsg)
+void Logn(uint32_t uLevel, const char* c_szMsg)
 {
 	if (uLevel >= gs_uLevel)
 		Tracen(c_szMsg);
 }
 
-void Logf(UINT uLevel, const char* c_szFormat, ...)
+void Logf(uint32_t uLevel, const char* c_szFormat, ...)
 {
 	if (uLevel < gs_uLevel)
 		return;
@@ -96,7 +96,7 @@ void Logf(UINT uLevel, const char* c_szFormat, ...)
 		LogFile(szBuf);
 }
 
-void Lognf(UINT uLevel, const char* c_szFormat, ...)
+void Lognf(uint32_t uLevel, const char* c_szFormat, ...)
 {
 	if (uLevel < gs_uLevel)
 		return;

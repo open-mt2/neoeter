@@ -235,11 +235,11 @@ class CGrannyLODController : public CGraphicBase
 		void AttachModelInstance(CGrannyLODController* pSrcLODController, const char* c_szBoneName, const D3DXMATRIX* c_pAttachTransform = NULL);
 		void DetachModelInstance(CGrannyLODController* pSrcLODController);
 		void SetLODLimits(float fNearLOD, float fFarLOD);
-		void SetLODLevel(BYTE bLODLevel);
-		BYTE GetLODLevel() { return m_bLODLevel; }
+		void SetLODLevel(uint8_t bLODLevel);
+		uint8_t GetLODLevel() { return m_bLODLevel; }
 		void SetMaterialImagePointer(const char* c_szImageName, CGraphicImage* pImage);
 		void SetMaterialData(const char* c_szImageName, const SMaterialData& c_rkMaterialData);
-		void SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower);
+		void SetSpecularInfo(const char* c_szMtrlName, int32_t bEnable, float fPower);
 
 		void RenderWithOneTexture();
 		void RenderWithTwoTexture();
@@ -269,7 +269,7 @@ class CGrannyLODController : public CGraphicBase
 		void ChangeMotionPointer(const CGrannyMotion* c_pMotion, int iLoopCount, float speedRatio);
 		void SetMotionAtEnd();
 
-		BOOL isModelInstance();
+		int32_t isModelInstance();
 		CGrannyModelInstance* GetModelInstance();
 		bool HaveBlendThing() { return 0 != GetModelInstance() ? GetModelInstance()->HaveBlendThing() : false; } // NOTE: GetModelInstance() == 0일 때 클라 크래쉬나는 문제 수정(2012. 05. 07)
 
@@ -277,11 +277,11 @@ class CGrannyLODController : public CGraphicBase
 		void SetCurrentModelInstance(CGrannyModelInstance* pgrnModelInstance);
 		void RefreshAttachedModelInstance();
 
-		void __ReserveSharedDeformableVertexBuffer(DWORD deformableVertexCount);
+		void __ReserveSharedDeformableVertexBuffer(uint32_t deformableVertexCount);
 
 	protected:
 		float m_fLODDistance;
-		DWORD m_dwLODAniFPS;
+		uint32_t m_dwLODAniFPS;
 
 		//// Attaching Link Data
 		// Data of Parent Side
@@ -297,7 +297,7 @@ class CGrannyLODController : public CGraphicBase
 		// Data of Child Side
 		CGrannyLODController* m_pAttachedParentModel;
 
-		BYTE m_bLODLevel;
+		uint8_t m_bLODLevel;
 		CGrannyModelInstance* m_pCurrentModelInstance;
 
 		// WORK

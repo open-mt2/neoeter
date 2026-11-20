@@ -18,34 +18,34 @@ static class LZOFreeMemoryMgr
 	public:
 		~LZOFreeMemoryMgr()
 		{
-			std::vector<BYTE*>::iterator i;
+			std::vector<uint8_t*>::iterator i;
 			for (i = m_freeVector.begin(); i != m_freeVector.end(); ++i)
 				delete *i;
 
 			m_freeVector.clear();
 		}
-		BYTE* Alloc(unsigned capacity)
+		uint8_t* Alloc(unsigned capacity)
 		{
 			assert(capacity > 0);
 			if (capacity < REUSING_CAPACITY)
 			{
 				if (!m_freeVector.empty())
 				{
-					BYTE* freeMem = m_freeVector.back();
+					uint8_t* freeMem = m_freeVector.back();
 					m_freeVector.pop_back();
 
 					dbg_printf("lzo.reuse_alloc\t%p(%d) free\n", freeMem, capacity);
 					return freeMem;
 				}
-				BYTE* newMem = new BYTE[REUSING_CAPACITY];
+				uint8_t* newMem = new uint8_t[REUSING_CAPACITY];
 				dbg_printf("lzo.reuse_alloc\t%p(%d) real\n", newMem, capacity);
 				return newMem;
 			}
-			BYTE* newMem = new BYTE[capacity];
+			uint8_t* newMem = new uint8_t[capacity];
 			dbg_printf("lzo.real_alloc\t%p(%d)\n", newMem, capacity);
 			return newMem;
 		}
-		void Free(BYTE* ptr, unsigned capacity)
+		void Free(uint8_t* ptr, unsigned capacity)
 		{
 			assert(ptr != NULL);
 			assert(capacity > 0);
@@ -61,10 +61,10 @@ static class LZOFreeMemoryMgr
 		}
 
 	private:
-		std::vector<BYTE*> m_freeVector;
+		std::vector<uint8_t*> m_freeVector;
 } gs_freeMemMgr;
 
-DWORD CLZObject::ms_dwFourCC = MAKEFOURCC('M', 'C', 'O', 'Z');
+uint32_t CLZObject::ms_dwFourCC = MAKEFOURCC('M', 'C', 'O', 'Z');
 
 CLZObject::CLZObject() { Initialize(); }
 
@@ -94,31 +94,31 @@ void CLZObject::Clear()
 
 CLZObject::~CLZObject() { Clear(); }
 
-DWORD CLZObject::GetSize()
+uint32_t CLZObject::GetSize()
 {
 	assert(m_pHeader);
 
 	if (m_bCompressed)
 	{
 		if (m_pHeader->dwEncryptSize)
-			return sizeof(THeader) + sizeof(DWORD) + m_pHeader->dwEncryptSize;
+			return sizeof(THeader) + sizeof(uint32_t) + m_pHeader->dwEncryptSize;
 		else
-			return sizeof(THeader) + sizeof(DWORD) + m_pHeader->dwCompressedSize;
+			return sizeof(THeader) + sizeof(uint32_t) + m_pHeader->dwCompressedSize;
 	}
 	else
 		return m_pHeader->dwRealSize;
 }
 
-void CLZObject::BeginCompress(const void* pvIn, UINT uiInLen)
+void CLZObject::BeginCompress(const void* pvIn, uint32_t uiInLen)
 {
-	m_pbIn = (const BYTE*)pvIn;
+	m_pbIn = (const uint8_t*)pvIn;
 
 	// sizeof(SHeader) +
 	// 암호화를 위한 fourCC 4바이트
 	// 압축된 후 만들어질 수 있는 최대 용량 +
 	// 암호화를 위한 8 바이트
 	m_dwBufferSize =
-		sizeof(THeader) + sizeof(DWORD) + (uiInLen + uiInLen / 64 + 16 + 3) + 8;
+		sizeof(THeader) + sizeof(uint32_t) + (uiInLen + uiInLen / 64 + 16 + 3) + 8;
 
 	m_pbBuffer = gs_freeMemMgr.Alloc(m_dwBufferSize);
 	memset(m_pbBuffer, 0, m_dwBufferSize);
@@ -130,17 +130,17 @@ void CLZObject::BeginCompress(const void* pvIn, UINT uiInLen)
 	m_pHeader->dwRealSize = uiInLen;
 }
 
-void CLZObject::BeginCompressInBuffer(const void* pvIn, UINT uiInLen,
+void CLZObject::BeginCompressInBuffer(const void* pvIn, uint32_t uiInLen,
 									  void* /*pvOut*/)
 {
-	m_pbIn = (const BYTE*)pvIn;
+	m_pbIn = (const uint8_t*)pvIn;
 
 	// sizeof(SHeader) +
 	// 암호화를 위한 fourCC 4바이트
 	// 압축된 후 만들어질 수 있는 최대 용량 +
 	// 암호화를 위한 8 바이트
 	m_dwBufferSize =
-		sizeof(THeader) + sizeof(DWORD) + (uiInLen + uiInLen / 64 + 16 + 3) + 8;
+		sizeof(THeader) + sizeof(uint32_t) + (uiInLen + uiInLen / 64 + 16 + 3) + 8;
 
 	m_pbBuffer = gs_freeMemMgr.Alloc(m_dwBufferSize);
 	memset(m_pbBuffer, 0, m_dwBufferSize);
@@ -156,17 +156,17 @@ void CLZObject::BeginCompressInBuffer(const void* pvIn, UINT uiInLen,
 bool CLZObject::Compress()
 {
 	lzo_uint iOutLen = 0;
-	BYTE* pbBuffer;
+	uint8_t* pbBuffer;
 
 	pbBuffer = m_pbBuffer + sizeof(THeader);
-	*(DWORD*)pbBuffer = ms_dwFourCC;
-	pbBuffer += sizeof(DWORD);
+	*(uint32_t*)pbBuffer = ms_dwFourCC;
+	pbBuffer += sizeof(uint32_t);
 
 #if defined(LZO1X_999_MEM_COMPRESS)
-	int r = lzo1x_999_compress((BYTE*)m_pbIn, m_pHeader->dwRealSize, pbBuffer,
+	int r = lzo1x_999_compress((uint8_t*)m_pbIn, m_pHeader->dwRealSize, pbBuffer,
 							   &iOutLen, CLZO::Instance().GetWorkMemory());
 #else
-	int r = lzo1x_1_compress((BYTE*)m_pbIn, m_pHeader->dwRealSize, pbBuffer,
+	int r = lzo1x_1_compress((uint8_t*)m_pbIn, m_pHeader->dwRealSize, pbBuffer,
 							 &iOutLen, CLZO::Instance().GetWorkMemory());
 #endif
 
@@ -176,7 +176,7 @@ bool CLZObject::Compress()
 		return false;
 	}
 
-	m_pHeader->dwCompressedSize = static_cast<DWORD>(iOutLen);
+	m_pHeader->dwCompressedSize = static_cast<uint32_t>(iOutLen);
 	m_bCompressed = true;
 	return true;
 }
@@ -192,7 +192,7 @@ bool CLZObject::BeginDecompress(const void* pvIn)
 	}
 
 	m_pHeader = pHeader;
-	m_pbIn = (const BYTE*)pvIn + (sizeof(THeader) + sizeof(DWORD));
+	m_pbIn = (const uint8_t*)pvIn + (sizeof(THeader) + sizeof(uint32_t));
 
 	/*
 	static unsigned sum = 0;
@@ -260,7 +260,7 @@ class DecryptBuffer
 		char m_local_buf[LOCAL_BUF_SIZE];
 };
 
-bool CLZObject::Decompress(DWORD* pdwKey)
+bool CLZObject::Decompress(uint32_t* pdwKey)
 {
 	lzo_uint uiSize = 0;
 	int r;
@@ -269,17 +269,17 @@ bool CLZObject::Decompress(DWORD* pdwKey)
 	{
 		DecryptBuffer buf(m_pHeader->dwEncryptSize);
 
-		BYTE* pbDecryptedBuffer = (BYTE*)buf.GetBufferPtr();
+		uint8_t* pbDecryptedBuffer = (uint8_t*)buf.GetBufferPtr();
 
 		__Decrypt(pdwKey, pbDecryptedBuffer);
 
-		if (*(DWORD*)pbDecryptedBuffer != ms_dwFourCC)
+		if (*(uint32_t*)pbDecryptedBuffer != ms_dwFourCC)
 		{
 			TraceError("LZObject: key incorrect");
 			return false;
 		}
 
-		if (LZO_E_OK != (r = lzo1x_decompress(pbDecryptedBuffer + sizeof(DWORD),
+		if (LZO_E_OK != (r = lzo1x_decompress(pbDecryptedBuffer + sizeof(uint32_t),
 											  m_pHeader->dwCompressedSize,
 											  m_pbBuffer, &uiSize, NULL)))
 		{
@@ -311,7 +311,7 @@ bool CLZObject::Decompress(DWORD* pdwKey)
 	return true;
 }
 
-bool CLZObject::Encrypt(DWORD* pdwKey)
+bool CLZObject::Encrypt(uint32_t* pdwKey)
 {
 	if (!m_bCompressed)
 	{
@@ -319,9 +319,9 @@ bool CLZObject::Encrypt(DWORD* pdwKey)
 		return false;
 	}
 
-	BYTE* pbBuffer = m_pbBuffer + sizeof(THeader);
+	uint8_t* pbBuffer = m_pbBuffer + sizeof(THeader);
 	m_pHeader->dwEncryptSize =
-		// TEA works on 32-bit words. DWORD is unsigned long on Windows x64 (LLP64),
+		// TEA works on 32-bit words. uint32_t is unsigned long on Windows x64 (LLP64),
 		// a distinct type from uint32_t although the same width (T0.3 width audit).
 		tea_encrypt(reinterpret_cast<uint32_t*>(pbBuffer),
 					reinterpret_cast<const uint32_t*>(pbBuffer),
@@ -330,18 +330,18 @@ bool CLZObject::Encrypt(DWORD* pdwKey)
 	return true;
 }
 
-bool CLZObject::__Decrypt(DWORD* key, BYTE* data)
+bool CLZObject::__Decrypt(uint32_t* key, uint8_t* data)
 {
 	assert(m_pbBuffer);
 
 	tea_decrypt(reinterpret_cast<uint32_t*>(data),
-				reinterpret_cast<const uint32_t*>(m_pbIn - sizeof(DWORD)),
+				reinterpret_cast<const uint32_t*>(m_pbIn - sizeof(uint32_t)),
 				reinterpret_cast<const uint32_t*>(key),
 				m_pHeader->dwEncryptSize);
 	return true;
 }
 
-void CLZObject::AllocBuffer(DWORD dwSrcSize)
+void CLZObject::AllocBuffer(uint32_t dwSrcSize)
 {
 	if (m_pbBuffer && !m_bInBuffer)
 		gs_freeMemMgr.Free(m_pbBuffer, m_dwBufferSize);
@@ -350,7 +350,7 @@ void CLZObject::AllocBuffer(DWORD dwSrcSize)
 	m_dwBufferSize = dwSrcSize;
 }
 /*
-void CLZObject::CopyBuffer(const char* pbSrc, DWORD dwSrcSize)
+void CLZObject::CopyBuffer(const char* pbSrc, uint32_t dwSrcSize)
 {
 		AllocBuffer(dwSrcSize);
 		memcpy(m_pbBuffer, pbSrc, dwSrcSize);
@@ -366,9 +366,9 @@ CLZO::CLZO() : m_pWorkMem(NULL)
 	}
 
 #if defined(LZO1X_999_MEM_COMPRESS)
-	m_pWorkMem = (BYTE*)malloc(LZO1X_999_MEM_COMPRESS);
+	m_pWorkMem = (uint8_t*)malloc(LZO1X_999_MEM_COMPRESS);
 #else
-	m_pWorkMem = (BYTE*)malloc(LZO1X_1_MEM_COMPRESS);
+	m_pWorkMem = (uint8_t*)malloc(LZO1X_1_MEM_COMPRESS);
 #endif
 
 	if (NULL == m_pWorkMem)
@@ -387,14 +387,14 @@ CLZO::~CLZO()
 	}
 }
 
-bool CLZO::CompressMemory(CLZObject& rObj, const void* pIn, UINT uiInLen)
+bool CLZO::CompressMemory(CLZObject& rObj, const void* pIn, uint32_t uiInLen)
 {
 	rObj.BeginCompress(pIn, uiInLen);
 	return rObj.Compress();
 }
 
 bool CLZO::CompressEncryptedMemory(CLZObject& rObj, const void* pIn,
-								   UINT uiInLen, DWORD* pdwKey)
+								   uint32_t uiInLen, uint32_t* pdwKey)
 {
 	rObj.BeginCompress(pIn, uiInLen);
 
@@ -409,7 +409,7 @@ bool CLZO::CompressEncryptedMemory(CLZObject& rObj, const void* pIn,
 	return false;
 }
 
-bool CLZO::Decompress(CLZObject& rObj, const BYTE* pbBuf, DWORD* pdwKey)
+bool CLZO::Decompress(CLZObject& rObj, const uint8_t* pbBuf, uint32_t* pdwKey)
 {
 	if (!rObj.BeginDecompress(pbBuf))
 		return false;
@@ -420,4 +420,4 @@ bool CLZO::Decompress(CLZObject& rObj, const BYTE* pbBuf, DWORD* pdwKey)
 	return true;
 }
 
-BYTE* CLZO::GetWorkMemory() { return m_pWorkMem; }
+uint8_t* CLZO::GetWorkMemory() { return m_pWorkMem; }

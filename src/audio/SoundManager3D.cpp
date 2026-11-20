@@ -126,7 +126,7 @@ void CSoundManager3D::SetListenerVelocity(float fDistanceX, float fDistanceY, fl
 
 int CSoundManager3D::SetInstance(const char* c_pszFileName)
 {
-	DWORD dwFileCRC = GetFileCRC(c_pszFileName);
+	uint32_t dwFileCRC = GetFileCRC(c_pszFileName);
 	TSoundDataMap::iterator itor = ms_dataMap.find(dwFileCRC);
 
 	CSoundData* pkSoundData;
@@ -138,10 +138,10 @@ int CSoundManager3D::SetInstance(const char* c_pszFileName)
 
 	assert(pkSoundData != NULL);
 
-	static DWORD k = 0;
+	static uint32_t k = 0;
 
-	DWORD start = k++;
-	DWORD end = start + INSTANCE_MAX_COUNT;
+	uint32_t start = k++;
+	uint32_t end = start + INSTANCE_MAX_COUNT;
 
 	while (start < end)
 	{
@@ -161,7 +161,7 @@ int CSoundManager3D::SetInstance(const char* c_pszFileName)
 
 		++start;
 
-		// 설마 DWORD 한계값을 넘어갈리야 없겠지만.. 그래도.. 혹시나.. - [levites]
+		// 설마 uint32_t 한계값을 넘어갈리야 없겠지만.. 그래도.. 혹시나.. - [levites]
 		if (start > 50000)
 		{
 			start = 0;
@@ -172,7 +172,7 @@ int CSoundManager3D::SetInstance(const char* c_pszFileName)
 	return -1;
 }
 
-ISoundInstance* CSoundManager3D::GetInstance(DWORD dwIndex)
+ISoundInstance* CSoundManager3D::GetInstance(uint32_t dwIndex)
 {
 	if (dwIndex >= INSTANCE_MAX_COUNT)
 	{

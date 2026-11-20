@@ -8,8 +8,8 @@
 class CGraphicImageInstance
 {
 	public:
-		static DWORD Type();
-		BOOL IsType(DWORD dwType);
+		static uint32_t Type();
+		int32_t IsType(uint32_t dwType);
 
 	public:
 		CGraphicImageInstance();
@@ -41,7 +41,7 @@ class CGraphicImageInstance
 		virtual void OnRender();
 		virtual void OnSetImagePointer();
 
-		virtual BOOL OnIsType(DWORD dwType);
+		virtual int32_t OnIsType(uint32_t dwType);
 
 	protected:
 		D3DXCOLOR m_DiffuseColor;
@@ -50,7 +50,7 @@ class CGraphicImageInstance
 		CGraphicImage::TRef m_roImage;
 
 	public:
-		static void CreateSystem(UINT uCapacity);
+		static void CreateSystem(uint32_t uCapacity);
 		static void DestroySystem();
 
 		static CGraphicImageInstance* New();

@@ -19,9 +19,9 @@ void D3DXVECTOR3ToPixelPosition(const D3DXVECTOR3& c_rv3Src, D3DXVECTOR3* pv3Dst
 	pv3Dst->z = +c_rv3Src.z;
 }
 
-UINT CGraphicBase::ms_iD3DAdapterInfo = 0;
-UINT CGraphicBase::ms_iD3DDevInfo = 0;
-UINT CGraphicBase::ms_iD3DModeInfo = 0;
+uint32_t CGraphicBase::ms_iD3DAdapterInfo = 0;
+uint32_t CGraphicBase::ms_iD3DDevInfo = 0;
+uint32_t CGraphicBase::ms_iD3DModeInfo = 0;
 D3D_CDisplayModeAutoDetector CGraphicBase::ms_kD3DDetector;
 
 HWND CGraphicBase::ms_hWnd;
@@ -33,20 +33,20 @@ ID3DXMatrixStack* CGraphicBase::ms_lpd3dMatStack = NULL;
 D3DPRESENT_PARAMETERS CGraphicBase::ms_d3dPresentParameter;
 D3DVIEWPORT9 CGraphicBase::ms_Viewport;
 
-HRESULT CGraphicBase::ms_hLastResult = S_OK;
+int32_t CGraphicBase::ms_hLastResult = S_OK;
 
 int CGraphicBase::ms_iWidth;
 int CGraphicBase::ms_iHeight;
 
-DWORD CGraphicBase::ms_faceCount = 0;
+uint32_t CGraphicBase::ms_faceCount = 0;
 
 D3DCAPS9 CGraphicBase::ms_d3dCaps;
 
-DWORD CGraphicBase::ms_dwD3DBehavior = 0;
+uint32_t CGraphicBase::ms_dwD3DBehavior = 0;
 
-DWORD CGraphicBase::ms_ptVS = 0;
-DWORD CGraphicBase::ms_pntVS = 0;
-DWORD CGraphicBase::ms_pnt2VS = 0;
+uint32_t CGraphicBase::ms_ptVS = 0;
+uint32_t CGraphicBase::ms_pntVS = 0;
+uint32_t CGraphicBase::ms_pnt2VS = 0;
 
 D3DXMATRIX CGraphicBase::ms_matIdentity;
 
@@ -70,9 +70,9 @@ float CGraphicBase::ms_fNearY;
 float CGraphicBase::ms_fFarY;
 float CGraphicBase::ms_fAspect;
 
-DWORD CGraphicBase::ms_dwWavingEndTime;
+uint32_t CGraphicBase::ms_dwWavingEndTime;
 int CGraphicBase::ms_iWavingPower;
-DWORD CGraphicBase::ms_dwFlashingEndTime;
+uint32_t CGraphicBase::ms_dwFlashingEndTime;
 D3DXCOLOR CGraphicBase::ms_FlashingColor;
 
 // Terrain picking용 Ray... CCamera 이용하는 버전.. 기존의 Ray와 통합 필요...
@@ -129,13 +129,13 @@ bool CGraphicBase::IsTLVertexClipping()
 	return false;
 }
 
-void CGraphicBase::GetBackBufferSize(UINT* puWidth, UINT* puHeight)
+void CGraphicBase::GetBackBufferSize(uint32_t* puWidth, uint32_t* puHeight)
 {
 	*puWidth = ms_d3dPresentParameter.BackBufferWidth;
 	*puHeight = ms_d3dPresentParameter.BackBufferHeight;
 }
 
-void CGraphicBase::SetDefaultIndexBuffer(UINT eDefIB)
+void CGraphicBase::SetDefaultIndexBuffer(uint32_t eDefIB)
 {
 	if (eDefIB >= DEFAULT_IB_NUM)
 		return;
@@ -143,17 +143,17 @@ void CGraphicBase::SetDefaultIndexBuffer(UINT eDefIB)
 	STATEMANAGER.SetIndices(ms_alpd3dDefIB[eDefIB], 0);
 }
 
-bool CGraphicBase::SetPDTStream(SPDTVertex* pVertices, UINT uVtxCount)
+bool CGraphicBase::SetPDTStream(SPDTVertex* pVertices, uint32_t uVtxCount)
 {
 	return SetPDTStream((SPDTVertexRaw*)pVertices, uVtxCount);
 }
 
-bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, UINT uVtxCount)
+bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, uint32_t uVtxCount)
 {
 	if (!uVtxCount)
 		return false;
 
-	static DWORD s_dwVBPos = 0;
+	static uint32_t s_dwVBPos = 0;
 
 	if (s_dwVBPos >= PDT_VERTEXBUFFER_NUM)
 		s_dwVBPos = 0;
@@ -181,14 +181,14 @@ bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, UINT uVtxCount)
 	return true;
 }
 
-DWORD CGraphicBase::GetAvailableTextureMemory()
+uint32_t CGraphicBase::GetAvailableTextureMemory()
 {
 	assert(ms_lpd3dDevice != NULL && "CGraphicBase::GetAvailableTextureMemory - D3DDevice is EMPTY");
 
-	static DWORD s_dwNextUpdateTime = 0;
-	static DWORD s_dwTexMemSize = 0; // ms_lpd3dDevice->GetAvailableTextureMem();
+	static uint32_t s_dwNextUpdateTime = 0;
+	static uint32_t s_dwTexMemSize = 0; // ms_lpd3dDevice->GetAvailableTextureMem();
 
-	DWORD dwCurTime = ELTimer_GetMSec();
+	uint32_t dwCurTime = ELTimer_GetMSec();
 	if (s_dwNextUpdateTime < dwCurTime)
 	{
 		s_dwNextUpdateTime = dwCurTime + 5000;
@@ -345,7 +345,7 @@ void CGraphicBase::UpdatePipeLineMatrix()
 	UpdateViewMatrix();
 }
 
-void CGraphicBase::SetViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeight, float fMinZ, float fMaxZ)
+void CGraphicBase::SetViewport(uint32_t dwX, uint32_t dwY, uint32_t dwWidth, uint32_t dwHeight, float fMinZ, float fMaxZ)
 {
 	ms_Viewport.X = dwX;
 	ms_Viewport.Y = dwY;
@@ -456,16 +456,16 @@ void CGraphicBase::PopMatrix()
 	ms_lpd3dMatStack->Pop();
 }
 
-DWORD CGraphicBase::GetColor(float r, float g, float b, float a)
+uint32_t CGraphicBase::GetColor(float r, float g, float b, float a)
 {
-	BYTE argb[4] =
+	uint8_t argb[4] =
 		{
-			(BYTE)(255.0f * b),
-			(BYTE)(255.0f * g),
-			(BYTE)(255.0f * r),
-			(BYTE)(255.0f * a)};
+			(uint8_t)(255.0f * b),
+			(uint8_t)(255.0f * g),
+			(uint8_t)(255.0f * r),
+			(uint8_t)(255.0f * a)};
 
-	return *((DWORD*)argb);
+	return *((uint32_t*)argb);
 }
 
 void CGraphicBase::InitScreenEffect()
@@ -488,7 +488,7 @@ void CGraphicBase::SetScreenEffectFlashing(float fDuringTime, const D3DXCOLOR& c
 	ms_FlashingColor = c_rColor;
 }
 
-DWORD CGraphicBase::GetFaceCount()
+uint32_t CGraphicBase::GetFaceCount()
 {
 	return ms_faceCount;
 }
@@ -498,7 +498,7 @@ void CGraphicBase::ResetFaceCount()
 	ms_faceCount = 0;
 }
 
-HRESULT CGraphicBase::GetLastResult()
+int32_t CGraphicBase::GetLastResult()
 {
 	return ms_hLastResult;
 }

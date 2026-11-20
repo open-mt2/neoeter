@@ -42,10 +42,10 @@ class CGraphicTextInstance
 		void ShowOutLine();
 		void HideOutLine();
 
-		void SetColor(DWORD color);
+		void SetColor(uint32_t color);
 		void SetColor(float r, float g, float b, float a = 1.0f);
 
-		void SetOutLineColor(DWORD color);
+		void SetOutLineColor(uint32_t color);
 		void SetOutLineColor(float r, float g, float b, float a = 1.0f);
 
 		void SetHorizonalAlign(int hAlign);
@@ -63,15 +63,15 @@ class CGraphicTextInstance
 
 		void GetTextSize(int* pRetWidth, int* pRetHeight);
 		const std::string& GetValueStringReference();
-		WORD GetTextLineCount();
+		uint16_t GetTextLineCount();
 
 		int PixelPositionToCharacterPosition(int iPixelPosition);
 		int GetHorizontalAlign();
 
 	protected:
 		void __Initialize();
-		int __DrawCharacter(CGraphicFontTexture* pFontTexture, WORD codePage, wchar_t text, DWORD dwColor);
-		void __GetTextPos(DWORD index, float* x, float* y);
+		int __DrawCharacter(CGraphicFontTexture* pFontTexture, uint16_t codePage, wchar_t text, uint32_t dwColor);
+		void __GetTextPos(uint32_t index, float* x, float* y);
 		int __GetTextTag(const wchar_t* src, int maxLen, int& tagLen, std::wstring& extraInfo);
 
 	protected:
@@ -85,16 +85,16 @@ class CGraphicTextInstance
 		};
 
 	protected:
-		DWORD m_dwTextColor;
-		DWORD m_dwOutLineColor;
+		uint32_t m_dwTextColor;
+		uint32_t m_dwOutLineColor;
 
-		WORD m_textWidth;
-		WORD m_textHeight;
+		uint16_t m_textWidth;
+		uint16_t m_textHeight;
 
-		BYTE m_hAlign;
-		BYTE m_vAlign;
+		uint8_t m_hAlign;
+		uint8_t m_vAlign;
 
-		WORD m_iMax;
+		uint16_t m_iMax;
 		float m_fLimitWidth;
 
 		bool m_isCursor;
@@ -115,11 +115,11 @@ class CGraphicTextInstance
 
 		CGraphicText::TRef m_roText;
 		CGraphicFontTexture::TPCharacterInfomationVector m_pCharInfoVector;
-		std::vector<DWORD> m_dwColorInfoVector;
+		std::vector<uint32_t> m_dwColorInfoVector;
 		std::vector<SHyperlink> m_hyperlinkVector;
 
 	public:
-		static void CreateSystem(UINT uCapacity);
+		static void CreateSystem(uint32_t uCapacity);
 		static void DestroySystem();
 
 		static CGraphicTextInstance* New();

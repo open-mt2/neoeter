@@ -183,11 +183,11 @@ namespace NEffectUpdateDecorator
 	class CTextureAnimationCWDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationCWDecorator>
 	{
 		public:
-			CTextureAnimationCWDecorator(float fFrameTime, DWORD n, BYTE* pIdx) : n(n), fLastFrameTime(fFrameTime), fFrameTime(fFrameTime), pIdx(pIdx) {}
+			CTextureAnimationCWDecorator(float fFrameTime, uint32_t n, uint8_t* pIdx) : n(n), fLastFrameTime(fFrameTime), fFrameTime(fFrameTime), pIdx(pIdx) {}
 			virtual ~CTextureAnimationCWDecorator() {}
 
 		protected:
-			virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationCWDecorator(fFrameTime, n, (BYTE*)((unsigned char*)pi + ((BYTE*)pIdx - (BYTE*)pfi))); }
+			virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationCWDecorator(fFrameTime, n, (uint8_t*)((unsigned char*)pi + ((uint8_t*)pIdx - (uint8_t*)pfi))); }
 			virtual void __Excute(const CDecoratorData& d)
 			{
 				fLastFrameTime -= d.fElapsedTime;
@@ -198,19 +198,19 @@ namespace NEffectUpdateDecorator
 						*pIdx = 0;
 				}
 			}
-			DWORD n;
+			uint32_t n;
 			float fLastFrameTime;
 			float fFrameTime;
-			BYTE* pIdx;
+			uint8_t* pIdx;
 	};
 	class CTextureAnimationCCWDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationCCWDecorator>
 	{
 		public:
-			CTextureAnimationCCWDecorator(float fFrameTime, BYTE n, BYTE* pIdx) : n(n), fLastFrameTime(fFrameTime), fFrameTime(fFrameTime), pIdx(pIdx) {}
+			CTextureAnimationCCWDecorator(float fFrameTime, uint8_t n, uint8_t* pIdx) : n(n), fLastFrameTime(fFrameTime), fFrameTime(fFrameTime), pIdx(pIdx) {}
 			virtual ~CTextureAnimationCCWDecorator() {}
 
 		protected:
-			virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationCCWDecorator(fFrameTime, n, (BYTE*)((unsigned char*)pi + ((BYTE*)pIdx - (BYTE*)pfi))); }
+			virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationCCWDecorator(fFrameTime, n, (uint8_t*)((unsigned char*)pi + ((uint8_t*)pIdx - (uint8_t*)pfi))); }
 			virtual void __Excute(const CDecoratorData& d)
 			{
 				fLastFrameTime -= d.fElapsedTime;
@@ -219,36 +219,36 @@ namespace NEffectUpdateDecorator
 					fLastFrameTime += fFrameTime;
 
 					if (--(*pIdx) >= n && n != 0) // Because variable is unsigned..
-						*pIdx = BYTE(n - 1);
+						*pIdx = uint8_t(n - 1);
 				}
 			}
-			BYTE n;
+			uint8_t n;
 			float fLastFrameTime;
 			float fFrameTime;
-			BYTE* pIdx;
+			uint8_t* pIdx;
 	};
 	class CTextureAnimationRandomDecorator : public CBaseDecorator, public CPooledObject<CTextureAnimationRandomDecorator>
 	{
 		public:
-			CTextureAnimationRandomDecorator(float fFrameTime, BYTE n, BYTE* pIdx) : n(n), fLastFrameTime(fFrameTime), fFrameTime(fFrameTime), pIdx(pIdx) {}
+			CTextureAnimationRandomDecorator(float fFrameTime, uint8_t n, uint8_t* pIdx) : n(n), fLastFrameTime(fFrameTime), fFrameTime(fFrameTime), pIdx(pIdx) {}
 			virtual ~CTextureAnimationRandomDecorator() {}
 
 		protected:
-			virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationRandomDecorator(fFrameTime, n, (BYTE*)((unsigned char*)pi + ((BYTE*)pIdx - (BYTE*)pfi))); }
+			virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) { return new CTextureAnimationRandomDecorator(fFrameTime, n, (uint8_t*)((unsigned char*)pi + ((uint8_t*)pIdx - (uint8_t*)pfi))); }
 			virtual void __Excute(const CDecoratorData& d)
 			{
 				fLastFrameTime -= d.fElapsedTime;
 				if (fLastFrameTime < 0.0f && n != 0)
 				{
-					*pIdx = (BYTE)random_range(0, n - 1);
+					*pIdx = (uint8_t)random_range(0, n - 1);
 				}
 				while (fLastFrameTime < 0.0f)
 					fLastFrameTime += fFrameTime;
 			}
-			BYTE n;
+			uint8_t n;
 			float fLastFrameTime;
 			float fFrameTime;
-			BYTE* pIdx;
+			uint8_t* pIdx;
 	};
 
 	class CAirResistanceDecorator : public CBaseDecorator, public CPooledObject<CAirResistanceDecorator>

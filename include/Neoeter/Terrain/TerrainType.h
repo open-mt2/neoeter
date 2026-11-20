@@ -23,8 +23,8 @@ typedef struct
 
 typedef struct
 {
-		DWORD TileCount[MAXTERRAINTEXTURES];
-		DWORD PatchTileCount[TERRAIN_PATCHCOUNT * TERRAIN_PATCHCOUNT][MAXTERRAINTEXTURES];
+		uint32_t TileCount[MAXTERRAINTEXTURES];
+		uint32_t PatchTileCount[TERRAIN_PATCHCOUNT * TERRAIN_PATCHCOUNT][MAXTERRAINTEXTURES];
 		TTerainSplat Splats[MAXTERRAINTEXTURES];
 		bool m_bNeedsUpdate;
 } TTerrainSplatPatch;

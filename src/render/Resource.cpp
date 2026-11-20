@@ -42,7 +42,7 @@ void CResource::Load()
 
 	const char* c_szFileName = GetFileName();
 
-	DWORD dwStart = ELTimer_GetMSec();
+	uint32_t dwStart = ELTimer_GetMSec();
 	CEterPackManager::TPackDataPtr fileData;
 
 	// Tracenf("Load %s", c_szFileName);

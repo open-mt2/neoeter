@@ -71,7 +71,7 @@ bool CSoundInstance2D::IsDone() const
 	return AIL_sample_status(m_sample) == SMP_DONE;
 }
 
-void CSoundInstance2D::Play(int iLoopCount, DWORD dwPlayCycleTimeLimit) const
+void CSoundInstance2D::Play(int iLoopCount, uint32_t dwPlayCycleTimeLimit) const
 {
 	AIL_set_sample_loop_count(m_sample, iLoopCount);
 	AIL_start_sample(m_sample);

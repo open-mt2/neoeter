@@ -176,7 +176,7 @@ void CGrannyModelInstance::__DestroyMeshMatrices()
 	m_meshMatrices = NULL;
 }
 
-DWORD CGrannyModelInstance::GetDeformableVertexCount()
+uint32_t CGrannyModelInstance::GetDeformableVertexCount()
 {
 	if (!m_pModel)
 		return 0;
@@ -184,7 +184,7 @@ DWORD CGrannyModelInstance::GetDeformableVertexCount()
 	return m_pModel->GetDeformVertexCount();
 }
 
-DWORD CGrannyModelInstance::GetVertexCount()
+uint32_t CGrannyModelInstance::GetVertexCount()
 {
 	if (!m_pModel)
 		return 0;
@@ -280,8 +280,8 @@ void CGrannyModelInstance::ReloadTexture()
 	/*
 		assert(m_pModel != NULL);
 		const CGrannyMaterialPalette & c_rGrannyMaterialPalette = m_pModel->GetMaterialPalette();
-		DWORD dwMaterialCount = c_rGrannyMaterialPalette.GetMaterialCount();
-		for (DWORD dwMtrIndex = 0; dwMtrIndex < dwMaterialCount; ++dwMtrIndex)
+		uint32_t dwMaterialCount = c_rGrannyMaterialPalette.GetMaterialCount();
+		for (uint32_t dwMtrIndex = 0; dwMtrIndex < dwMaterialCount; ++dwMtrIndex)
 		{
 			const CGrannyMaterial & c_rGrannyMaterial = c_rGrannyMaterialPalette.GetMaterialRef(dwMtrIndex);
 			CGraphicImage * pImageStage0 = c_rGrannyMaterial.GetImagePointer(0);

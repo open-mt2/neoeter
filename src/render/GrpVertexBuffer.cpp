@@ -9,7 +9,7 @@ int CGraphicVertexBuffer::GetVertexStride() const
 	return retSize;
 }
 
-DWORD CGraphicVertexBuffer::GetFlexibleVertexFormat() const
+uint32_t CGraphicVertexBuffer::GetFlexibleVertexFormat() const
 {
 	return m_dwFVF;
 }
@@ -30,7 +30,7 @@ bool CGraphicVertexBuffer::LockRange(unsigned count, void** pretVertices) const
 	if (!m_lpd3dVB)
 		return false;
 
-	DWORD dwLockSize = GetVertexStride() * count;
+	uint32_t dwLockSize = GetVertexStride() * count;
 	if (FAILED(m_lpd3dVB->Lock(0, dwLockSize, pretVertices, m_dwLockFlag)))
 		return false;
 
@@ -42,7 +42,7 @@ bool CGraphicVertexBuffer::Lock(void** pretVertices) const
 	if (!m_lpd3dVB)
 		return false;
 
-	DWORD dwLockSize = GetVertexStride() * GetVertexCount();
+	uint32_t dwLockSize = GetVertexStride() * GetVertexCount();
 	if (FAILED(m_lpd3dVB->Lock(0, dwLockSize, pretVertices, m_dwLockFlag)))
 		return false;
 
@@ -128,7 +128,7 @@ void CGraphicVertexBuffer::DestroyDeviceObjects()
 	safe_release(m_lpd3dVB);
 }
 
-bool CGraphicVertexBuffer::Create(int vtxCount, DWORD fvf, DWORD usage, D3DPOOL d3dPool)
+bool CGraphicVertexBuffer::Create(int vtxCount, uint32_t fvf, uint32_t usage, D3DPOOL d3dPool)
 {
 	assert(ms_lpd3dDevice != NULL);
 	assert(vtxCount > 0);

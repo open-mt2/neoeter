@@ -15,7 +15,7 @@ struct INPUTCONTEXT;
 class IIMEEventSink
 {
 	public:
-		virtual bool OnWM_CHAR(WPARAM wParam, LPARAM lParam) = 0;
+		virtual bool OnWM_CHAR(uintptr_t wParam, intptr_t lParam) = 0;
 		virtual void OnUpdate() = 0;
 
 		virtual void OnChangeCodePage() = 0;
@@ -58,15 +58,15 @@ class CIME
 		// Candidate List
 		int GetCandidateCount();
 		int GetCandidatePageCount();
-		int GetCandidate(DWORD index, std::string& rstrText);
+		int GetCandidate(uint32_t index, std::string& rstrText);
 		int GetCandidateSelection();
 
 		// Reading Information
 		int GetReading(std::string& rstrText);
 		int GetReadingError();
 
-		void SetInputMode(DWORD dwMode);
-		DWORD GetInputMode();
+		void SetInputMode(uint32_t dwMode);
+		uint32_t GetInputMode();
 
 		bool IsIMEEnabled();
 		void EnableIME(bool bEnable = true);
@@ -103,12 +103,12 @@ class CIME
 		static void OnSDLTextEditing(const char* utf8, int start, int length);
 		static void OnSDLTextInput(const char* utf8);
 
-		LRESULT WMInputLanguage(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
-		LRESULT WMStartComposition(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
-		LRESULT WMComposition(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
-		LRESULT WMEndComposition(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
-		LRESULT WMNotify(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
-		LRESULT WMChar(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
+		intptr_t WMInputLanguage(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMStartComposition(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMComposition(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMEndComposition(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMNotify(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMChar(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
 
 	protected:
 		void IncCurPos();
@@ -119,13 +119,13 @@ class CIME
 	protected:
 		static void CheckInputLocale();
 		static void CheckToggleState();
-		static void SetSupportLevel(DWORD dwImeLevel);
+		static void SetSupportLevel(uint32_t dwImeLevel);
 
 		void InsertString(wchar_t* szString, int iSize);
 
 		void OnChar(wchar_t c);
 
-		UINT GetCodePageFromLang(LANGID langid);
+		uint32_t GetCodePageFromLang(LANGID langid);
 		void ResultProcess(HIMC hImc);
 		void CompositionProcessBuilding(HIMC hImc);
 		void CompositionProcess(HIMC hImc);
@@ -135,24 +135,24 @@ class CIME
 
 		bool IsMax(const wchar_t* wInput, int len);
 
-		DWORD GetImeId(UINT uIndex = 0);
+		uint32_t GetImeId(uint32_t uIndex = 0);
 		bool GetReadingWindowOrientation();
 		static void SetupImeApi();
 
 		static INPUTCONTEXT*(WINAPI* _ImmLockIMC)(HIMC);
-		static BOOL(WINAPI* _ImmUnlockIMC)(HIMC);
+		static int32_t(WINAPI* _ImmUnlockIMC)(HIMC);
 		static LPVOID(WINAPI* _ImmLockIMCC)(HIMCC);
-		static BOOL(WINAPI* _ImmUnlockIMCC)(HIMCC);
+		static int32_t(WINAPI* _ImmUnlockIMCC)(HIMCC);
 
-		static UINT(WINAPI* _GetReadingString)(HIMC, UINT, LPWSTR, PINT, BOOL*, PUINT);
-		static BOOL(WINAPI* _ShowReadingWindow)(HIMC, BOOL);
+		static uint32_t(WINAPI* _GetReadingString)(HIMC, uint32_t, LPWSTR, PINT, int32_t*, PUINT);
+		static int32_t(WINAPI* _ShowReadingWindow)(HIMC, int32_t);
 
 	protected:
 		HIMC m_hOrgIMC;
 		int m_max;
 		int m_userMax;
 
-		BOOL m_bOnlyNumberMode;
+		int32_t m_bOnlyNumberMode;
 
 		std::vector<wchar_t> m_exceptKey;
 
@@ -175,22 +175,22 @@ class CIME
 
 		static HINSTANCE ms_hImm32Dll;
 		static HINSTANCE ms_hCurrentImeDll;
-		static DWORD ms_dwImeState;
+		static uint32_t ms_dwImeState;
 
-		static DWORD ms_adwId[2];
+		static uint32_t ms_adwId[2];
 
 		// IME Level
-		static DWORD ms_dwIMELevel;
-		static DWORD ms_dwIMELevelSaved;
+		static uint32_t ms_dwIMELevel;
+		static uint32_t ms_dwIMELevelSaved;
 
 		// Candidate List
 		static bool ms_bCandidateList;
-		static DWORD ms_dwCandidateCount;
+		static uint32_t ms_dwCandidateCount;
 		static bool ms_bVerticalCandidate;
 		static int ms_iCandListIndexBase;
-		static WCHAR ms_wszCandidate[CIME::MAX_CANDLIST][MAX_CANDIDATE_LENGTH];
-		static DWORD ms_dwCandidateSelection;
-		static DWORD ms_dwCandidatePageSize;
+		static wchar_t ms_wszCandidate[CIME::MAX_CANDLIST][MAX_CANDIDATE_LENGTH];
+		static uint32_t ms_dwCandidateSelection;
+		static uint32_t ms_dwCandidatePageSize;
 
 		// Reading Information
 		static bool ms_bReadingInformation;
@@ -219,6 +219,6 @@ class CIME
 		static int ms_ulbegin;
 		static int ms_ulend;
 
-		static UINT ms_uOutputCodePage;
-		static UINT ms_uInputCodePage;
+		static uint32_t ms_uOutputCodePage;
+		static uint32_t ms_uInputCodePage;
 };

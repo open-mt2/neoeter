@@ -5,7 +5,7 @@
 class CGraphicExpandedImageInstance : public CGraphicImageInstance
 {
 	public:
-		static DWORD Type();
+		static uint32_t Type();
 		static void DeleteExpandedImageInstance(CGraphicExpandedImageInstance* pkInstance)
 		{
 			pkInstance->Destroy();
@@ -40,7 +40,7 @@ class CGraphicExpandedImageInstance : public CGraphicImageInstance
 		void OnRender();
 		void OnSetImagePointer();
 
-		BOOL OnIsType(DWORD dwType);
+		int32_t OnIsType(uint32_t dwType);
 
 	protected:
 		float m_fDepth;
@@ -51,7 +51,7 @@ class CGraphicExpandedImageInstance : public CGraphicImageInstance
 		int m_iRenderingMode;
 
 	public:
-		static void CreateSystem(UINT uCapacity);
+		static void CreateSystem(uint32_t uCapacity);
 		static void DestroySystem();
 
 		static CGraphicExpandedImageInstance* New();

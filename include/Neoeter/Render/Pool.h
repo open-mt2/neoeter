@@ -52,7 +52,7 @@ class CDynamicPool
 			m_kVct_pkFree.clear();
 		}
 
-		void Create(UINT uCapacity)
+		void Create(uint32_t uCapacity)
 		{
 			m_uInitCapacity = uCapacity;
 			m_kVct_pkData.reserve(uCapacity);
@@ -85,7 +85,7 @@ class CDynamicPool
 			m_kVct_pkFree = m_kVct_pkData;
 		}
 
-		DWORD GetCapacity()
+		uint32_t GetCapacity()
 		{
 			return m_kVct_pkData.size();
 		}
@@ -114,8 +114,8 @@ class CDynamicPool
 		std::vector<T*> m_kVct_pkData;
 		std::vector<T*> m_kVct_pkFree;
 
-		UINT m_uInitCapacity;
-		UINT m_uUsedCapacity;
+		uint32_t m_uInitCapacity;
+		uint32_t m_uUsedCapacity;
 };
 
 template <typename T>
@@ -161,7 +161,7 @@ class CDynamicPoolEx
 			m_kVct_pkFree.clear();
 		}
 
-		void Create(UINT uCapacity)
+		void Create(uint32_t uCapacity)
 		{
 			m_uInitCapacity = uCapacity;
 			m_kVct_pkData.reserve(uCapacity);
@@ -194,7 +194,7 @@ class CDynamicPoolEx
 			m_kVct_pkFree = m_kVct_pkData;
 		}
 
-		DWORD GetCapacity()
+		uint32_t GetCapacity()
 		{
 			return m_kVct_pkData.size();
 		}
@@ -227,8 +227,8 @@ class CDynamicPoolEx
 		std::vector<T*> m_kVct_pkData;
 		std::vector<T*> m_kVct_pkFree;
 
-		UINT m_uInitCapacity;
-		UINT m_uUsedCapacity;
+		uint32_t m_uInitCapacity;
+		uint32_t m_uUsedCapacity;
 };
 
 template <class T>

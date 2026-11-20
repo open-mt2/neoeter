@@ -10,7 +10,7 @@
 class CGraphicFontTexture : public CGraphicTexture
 {
 	public:
-		typedef std::pair<WORD, wchar_t> TCharacterKey;
+		typedef std::pair<uint16_t, wchar_t> TCharacterKey;
 
 		typedef struct SCharacterInfomation
 		{
@@ -36,12 +36,12 @@ class CGraphicFontTexture : public CGraphicTexture
 		bool CreateDeviceObjects();
 		void DestroyDeviceObjects();
 
-		bool CheckTextureIndex(DWORD dwTexture);
-		void SelectTexture(DWORD dwTexture);
+		bool CheckTextureIndex(uint32_t dwTexture);
+		void SelectTexture(uint32_t dwTexture);
 
 		bool UpdateTexture();
 
-		TCharacterInfomation* GetCharacterInfomation(WORD codePage, wchar_t keyValue);
+		TCharacterInfomation* GetCharacterInfomation(uint16_t codePage, wchar_t keyValue);
 		TCharacterInfomation* UpdateCharacterInfomation(TCharacterKey code);
 
 		bool IsEmpty() const;
@@ -51,12 +51,12 @@ class CGraphicFontTexture : public CGraphicTexture
 
 		bool AppendTexture();
 
-		HFONT GetFont(WORD codePage);
+		HFONT GetFont(uint16_t codePage);
 
 	protected:
 		typedef std::vector<CGraphicImageTexture*> TGraphicImageTexturePointerVector;
 		typedef std::map<TCharacterKey, TCharacterInfomation> TCharacterInfomationMap;
-		typedef std::map<WORD, HFONT> TFontMap;
+		typedef std::map<uint16_t, HFONT> TFontMap;
 
 	protected:
 		CGraphicDib m_dib;
@@ -75,7 +75,7 @@ class CGraphicFontTexture : public CGraphicTexture
 		int m_step;
 		bool m_isDirty;
 
-		TCHAR m_fontName[LF_FACESIZE];
-		LONG m_fontSize;
+		char m_fontName[LF_FACESIZE];
+		int32_t m_fontSize;
 		bool m_bItalic;
 };

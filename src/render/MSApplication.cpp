@@ -7,10 +7,10 @@
 #include <SDL2/SDL.h>
 
 #ifndef MAKELPARAM
-#define MAKELPARAM(l, h) ((LPARAM)(((WORD)(((DWORD_PTR)(l)) & 0xffff)) | ((DWORD)((WORD)(((DWORD_PTR)(h)) & 0xffff))) << 16))
+#define MAKELPARAM(l, h) ((intptr_t)(((uint16_t)(((uintptr_t)(l)) & 0xffff)) | ((uint32_t)((uint16_t)(((uintptr_t)(h)) & 0xffff))) << 16))
 #endif
 #ifndef MAKEWPARAM
-#define MAKEWPARAM(l, h) ((WPARAM)(((WORD)(((DWORD_PTR)(l)) & 0xffff)) | ((DWORD)((WORD)(((DWORD_PTR)(h)) & 0xffff))) << 16))
+#define MAKEWPARAM(l, h) ((uintptr_t)(((uint16_t)(((uintptr_t)(l)) & 0xffff)) | ((uint32_t)((uint16_t)(((uintptr_t)(h)) & 0xffff))) << 16))
 #endif
 
 static void SDL_QuitCallback(int /*exitCode*/)
@@ -23,7 +23,7 @@ static void SDL_QuitCallback(int /*exitCode*/)
 	SDL_PushEvent(&quitEvent);
 }
 
-static WPARAM SDLKeycodeToVK(SDL_Keycode key, SDL_Scancode scancode = SDL_SCANCODE_UNKNOWN)
+static uintptr_t SDLKeycodeToVK(SDL_Keycode key, SDL_Scancode scancode = SDL_SCANCODE_UNKNOWN)
 {
 	if (scancode == SDL_SCANCODE_DELETE || key == SDLK_DELETE)
 		return VK_DELETE;
@@ -150,7 +150,7 @@ static WPARAM SDLKeycodeToVK(SDL_Keycode key, SDL_Scancode scancode = SDL_SCANCO
 				return 'A' + (key - SDLK_a);
 			if (key >= SDLK_0 && key <= SDLK_9)
 				return '0' + (key - SDLK_0);
-			return (WPARAM)key;
+			return (uintptr_t)key;
 	}
 }
 
@@ -269,7 +269,7 @@ bool CMSApplication::MessageProcess()
 		else if (event.type == SDL_MOUSEBUTTONDOWN)
 		{
 			Platform_SetCursorPos(event.button.x, event.button.y);
-			UINT uMsg = WM_LBUTTONDOWN;
+			uint32_t uMsg = WM_LBUTTONDOWN;
 			if (event.button.button == SDL_BUTTON_RIGHT)
 				uMsg = WM_RBUTTONDOWN;
 			else if (event.button.button == SDL_BUTTON_MIDDLE)
@@ -279,7 +279,7 @@ bool CMSApplication::MessageProcess()
 		else if (event.type == SDL_MOUSEBUTTONUP)
 		{
 			Platform_SetCursorPos(event.button.x, event.button.y);
-			UINT uMsg = WM_LBUTTONUP;
+			uint32_t uMsg = WM_LBUTTONUP;
 			if (event.button.button == SDL_BUTTON_RIGHT)
 				uMsg = WM_RBUTTONUP;
 			else if (event.button.button == SDL_BUTTON_MIDDLE)
@@ -293,7 +293,7 @@ bool CMSApplication::MessageProcess()
 		}
 		else if (event.type == SDL_KEYDOWN)
 		{
-			WPARAM vKey = SDLKeycodeToVK(event.key.keysym.sym, event.key.keysym.scancode);
+			uintptr_t vKey = SDLKeycodeToVK(event.key.keysym.sym, event.key.keysym.scancode);
 			WindowProcedure(m_hWnd, WM_KEYDOWN, vKey, 0);
 
 			if (event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE || event.key.keysym.sym == SDLK_BACKSPACE)
@@ -322,7 +322,7 @@ bool CMSApplication::MessageProcess()
 		}
 		else if (event.type == SDL_KEYUP)
 		{
-			WPARAM vKey = SDLKeycodeToVK(event.key.keysym.sym, event.key.keysym.scancode);
+			uintptr_t vKey = SDLKeycodeToVK(event.key.keysym.sym, event.key.keysym.scancode);
 			WindowProcedure(m_hWnd, WM_KEYUP, vKey, 0);
 		}
 
@@ -343,7 +343,7 @@ bool CMSApplication::MessageProcess()
 	return true;
 }
 
-LRESULT CMSApplication::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
+intptr_t CMSApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam)
 {
 	switch (uiMsg)
 	{

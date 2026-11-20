@@ -10,7 +10,7 @@
 
 CDynamicPool<CGraphicImageInstance> CGraphicImageInstance::ms_kPool;
 
-void CGraphicImageInstance::CreateSystem(UINT uCapacity)
+void CGraphicImageInstance::CreateSystem(uint32_t uCapacity)
 {
 	ms_kPool.Create(uCapacity);
 }
@@ -190,18 +190,18 @@ bool CGraphicImageInstance::operator==(const CGraphicImageInstance& rhs) const
 	return (m_roImage.GetPointer() == rhs.m_roImage.GetPointer());
 }
 
-DWORD CGraphicImageInstance::Type()
+uint32_t CGraphicImageInstance::Type()
 {
-	static DWORD s_dwType = GetCRC32("CGraphicImageInstance", strlen("CGraphicImageInstance"));
+	static uint32_t s_dwType = GetCRC32("CGraphicImageInstance", strlen("CGraphicImageInstance"));
 	return (s_dwType);
 }
 
-BOOL CGraphicImageInstance::IsType(DWORD dwType)
+int32_t CGraphicImageInstance::IsType(uint32_t dwType)
 {
 	return OnIsType(dwType);
 }
 
-BOOL CGraphicImageInstance::OnIsType(DWORD dwType)
+int32_t CGraphicImageInstance::OnIsType(uint32_t dwType)
 {
 	if (CGraphicImageInstance::Type() == dwType)
 		return TRUE;

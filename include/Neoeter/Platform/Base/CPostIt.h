@@ -3,6 +3,8 @@
 
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
 #include <windows.h>
+#include <cstdint>
+#include <cstddef>
 #else
 #include <Platform/Platform.h>
 #endif
@@ -32,7 +34,7 @@ class CPostIt
 		/**
 		 * @brief	CPostIt class에서 보유하고 있는 데이타를 클립보드에 저장한다.
 		 */
-		BOOL Flush(void);
+		int32_t Flush(void);
 
 		/**
 		 * @brief	CPostIt class에서 보유하고 있는 데이타 및 클립보드에 있는 내용을
@@ -47,14 +49,14 @@ class CPostIt
 		 * @param [in]	lpszData	: 불러올 데이타의 버퍼
 		 * @param [in]	nSize		: lpszData 버퍼의 최대사이즈
 		 */
-		BOOL Get(LPCSTR lpszKeyName, LPSTR lpszData, DWORD nSize);
+		int32_t Get(LPCSTR lpszKeyName, LPSTR lpszData, uint32_t nSize);
 
 		/**
 		 * @brief	저장할 데이타를 넣는다.
 		 * @param [in]	lpBuffer	: 저장할 데이타. "KEY=DATA" 식의 내용을
 		 * 넣는다.
 		 */
-		BOOL Set(LPCSTR lpszData);
+		int32_t Set(LPCSTR lpszData);
 
 		/**
 		 * @brief	저장할 데이타를 넣는다.
@@ -63,15 +65,15 @@ class CPostIt
 		 * @param [in]	lpszData	: 저장할 데이타. "DATA" 식의 내용을
 		 * 넣는다.
 		 */
-		BOOL Set(LPCSTR lpszKeyName, LPCSTR lpszData);
+		int32_t Set(LPCSTR lpszKeyName, LPCSTR lpszData);
 
 		/**
-		 * @brief	저장할 데이타(DWORD)를 넣는다.
+		 * @brief	저장할 데이타(uint32_t)를 넣는다.
 		 * @param [in]	lpBuffer	: 저장할 데이타. "KEY=DATA" 식의
 		 * 데이타를 넣는다.
-		 * @param [in]	dwValue		: 저장할 데이타. (DWORD)
+		 * @param [in]	dwValue		: 저장할 데이타. (uint32_t)
 		 */
-		BOOL Set(LPCSTR lpszKeyName, DWORD dwValue);
+		int32_t Set(LPCSTR lpszKeyName, uint32_t dwValue);
 
 		/**
 		 * @brief	CPostIt class를 복사한다. (클래스 constructor에 이름 인자가 있기
@@ -79,15 +81,15 @@ class CPostIt
 		 * @param [in]	pPostIt		: Destination class
 		 * @param [in]	lpszKeyName	: Destination class's new app-name
 		 */
-		BOOL CopyTo(CPostIt* pPostIt, LPCSTR lpszKeyName);
+		int32_t CopyTo(CPostIt* pPostIt, LPCSTR lpszKeyName);
 
 	protected:
-		BOOL Init(LPCSTR szAppName);
+		int32_t Init(LPCSTR szAppName);
 		void Destroy(void);
 
 	protected:
-		BOOL m_bModified;
-		CHAR m_szClipFormatName[_MAX_PATH];
+		int32_t m_bModified;
+		char m_szClipFormatName[_MAX_PATH];
 		_CPostItMemoryBlock* m_pMemoryBlock;
 };
 

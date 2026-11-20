@@ -35,7 +35,7 @@ LPVOID CSoundData::Get()
 		return (m_data);
 }
 
-ULONG CSoundData::GetSize()
+uint32_t CSoundData::GetSize()
 {
 	return m_size;
 }
@@ -47,17 +47,17 @@ void CSoundData::Release()
 	m_dwAccessTime = ELTimer_GetMSec();
 }
 
-DWORD CSoundData::GetPlayTime()
+uint32_t CSoundData::GetPlayTime()
 {
 	return m_dwPlayTime;
 }
 
-void CSoundData::SetPlayTime(DWORD dwPlayTime)
+void CSoundData::SetPlayTime(uint32_t dwPlayTime)
 {
 	m_dwPlayTime = dwPlayTime;
 }
 
-DWORD CSoundData::GetAccessTime()
+uint32_t CSoundData::GetAccessTime()
 {
 	return m_dwAccessTime;
 }
@@ -90,14 +90,14 @@ bool CSoundData::ReadFromDisk()
 		case AILFILETYPE_ADPCM_WAV: // 3D 사운드는 decompress 해야 함.
 		{
 			AIL_WAV_info(s + 1, &info);
-			AIL_decompress_ADPCM(&info, &m_data, (U32*)&m_size); // ULONG == U32 width on LLP64
+			AIL_decompress_ADPCM(&info, &m_data, (U32*)&m_size); // uint32_t == U32 width on LLP64
 			AIL_mem_free_lock(s);
 		}
 		break;
 
 		case AILFILETYPE_MPEG_L3_AUDIO:
 		{
-			AIL_decompress_ASI(s + 1, *((S32*)s), m_filename, &m_data, (U32*)&m_size, 0); // LLP64: ULONG vs U32
+			AIL_decompress_ASI(s + 1, *((S32*)s), m_filename, &m_data, (U32*)&m_size, 0); // LLP64: uint32_t vs U32
 			AIL_mem_free_lock(s);
 		}
 		break;
@@ -111,7 +111,7 @@ bool CSoundData::ReadFromDisk()
 	return true;
 }
 
-bool CSoundData::isSlotIndex(DWORD dwIndex)
+bool CSoundData::isSlotIndex(uint32_t dwIndex)
 {
 	if (dwIndex >= SOUND_FILE_MAX_NUM)
 		return false;

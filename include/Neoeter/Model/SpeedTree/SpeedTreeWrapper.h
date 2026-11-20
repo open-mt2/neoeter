@@ -85,8 +85,8 @@ class CSpeedTreeWrapper : public CGraphicObjectInstance
 
 		// Collision Data
 	protected:
-		UINT GetCollisionObjectCount();
-		void GetCollisionObject(UINT nIndex, CSpeedTreeRT::ECollisionObjectType& eType, float* pPosition, float* pDimensions);
+		uint32_t GetCollisionObjectCount();
+		void GetCollisionObject(uint32_t nIndex, CSpeedTreeRT::ECollisionObjectType& eType, float* pPosition, float* pDimensions);
 		virtual void OnUpdateCollisionData(const CStaticCollisionDataVector* pscdVector);
 		virtual void OnUpdateHeighInstance(CAttributeInstance* pAttributeInstance) {}
 		virtual bool OnGetObjectHeight(float fX, float fY, float* pfHeight) { return false; }
@@ -112,7 +112,7 @@ class CSpeedTreeWrapper : public CGraphicObjectInstance
 		virtual ~CSpeedTreeWrapper();
 
 		// geometry
-		bool LoadTree(const char* pszSptFile, const BYTE* c_pbBlock, unsigned int uiBlockSize, unsigned int nSeed = 1, float fSize = -1.0f, float fSizeVariance = -1.0f);
+		bool LoadTree(const char* pszSptFile, const uint8_t* c_pbBlock, unsigned int uiBlockSize, unsigned int nSeed = 1, float fSize = -1.0f, float fSizeVariance = -1.0f);
 		const float* GetBoundingBox(void) const { return m_afBoundingBox; }
 
 		// rendering

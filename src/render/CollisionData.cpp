@@ -62,7 +62,7 @@ CBaseCollisionInstance* CBaseCollisionInstance::BuildCollisionInstance(const CSt
 			PlaneData.v3QuadPosition[3].x = +fHalfWidth;
 			PlaneData.v3QuadPosition[3].y = +fHalfLength;
 			PlaneData.v3QuadPosition[3].z = 0.0f;
-			for (DWORD i = 0; i < 4; ++i)
+			for (uint32_t i = 0; i < 4; ++i)
 				D3DXVec3TransformCoord(&PlaneData.v3QuadPosition[i], &PlaneData.v3QuadPosition[i], &matTransform);
 			D3DXVECTOR3 v3Line0 = PlaneData.v3QuadPosition[1] - PlaneData.v3QuadPosition[0];
 			D3DXVECTOR3 v3Line1 = PlaneData.v3QuadPosition[2] - PlaneData.v3QuadPosition[0];

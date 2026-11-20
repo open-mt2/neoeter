@@ -3,6 +3,8 @@
 
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
 #include <windows.h>
+#include <cstdint>
+#include <cstddef>
 #else
 #include <Platform/Platform.h>
 #endif
@@ -70,9 +72,9 @@
 	assert(!str)
 
 #ifndef MAKEFOURCC
-#define MAKEFOURCC(ch0, ch1, ch2, ch3)                \
-	((DWORD)(BYTE)(ch0) | ((DWORD)(BYTE)(ch1) << 8) | \
-	 ((DWORD)(BYTE)(ch2) << 16) | ((DWORD)(BYTE)(ch3) << 24))
+#define MAKEFOURCC(ch0, ch1, ch2, ch3)                            \
+	((uint32_t)(uint8_t)(ch0) | ((uint32_t)(uint8_t)(ch1) << 8) | \
+	 ((uint32_t)(uint8_t)(ch2) << 16) | ((uint32_t)(uint8_t)(ch3) << 24))
 #endif // defined(MAKEFOURCC)
 
 #ifndef IS_SET
@@ -96,7 +98,7 @@ extern void GetFilePathNameExtension(const char* c_szFile, int len, std::string*
 extern void GetFileExtension(const char* c_szFile, int len, std::string* pstExt);
 extern void GetFileNameParts(const char* c_szFile, int len, char* pszPath, char* pszName, char* pszExt);
 extern void GetOldIndexingName(char* szName, int Index);
-extern void GetIndexingName(char* szName, DWORD Index);
+extern void GetIndexingName(char* szName, uint32_t Index);
 extern void stl_lowers(std::string& rstRet);
 extern void GetOnlyFileName(const char* sz_Name, std::string& strFileName);
 extern void GetOnlyPathName(const char* sz_Name, std::string& OnlyPathName);

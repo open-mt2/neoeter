@@ -30,7 +30,7 @@ CParticleProperty* CParticleSystemData::GetParticlePropertyPointer()
 	return &m_ParticleProperty;
 }
 
-BOOL CParticleSystemData::OnLoadScript(CTextFileLoader& rTextFileLoader)
+int32_t CParticleSystemData::OnLoadScript(CTextFileLoader& rTextFileLoader)
 {
 	{
 		CTextFileLoader::CGotoChild GotoChild(&rTextFileLoader, "emitterproperty");
@@ -263,7 +263,7 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader& rTextFileLoader)
 				c.g = fG;
 				c.b = fB;
 				c.a = fA;
-				t.m_Value.m_dwColor = /*(DWORD)*/ (DWORD)c;
+				t.m_Value.m_dwColor = /*(uint32_t)*/ (uint32_t)c;
 				m_ParticleProperty.m_TimeEventColor.push_back(t);
 			}
 		}
@@ -277,7 +277,7 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader& rTextFileLoader)
 		if (!rTextFileLoader.GetTokenVector("texturefiles", &pTextureVector))
 			return FALSE;
 
-		for (DWORD i = 0; i < pTextureVector->size(); ++i)
+		for (uint32_t i = 0; i < pTextureVector->size(); ++i)
 		{
 			std::string strTextureFileName = pTextureVector->at(i).c_str();
 
@@ -376,7 +376,7 @@ void CParticleSystemData::BuildDecorator(CParticleInstance* pInstance)
 		}
 	}
 
-	BYTE byRotationType = m_ParticleProperty.m_byRotationType;
+	uint8_t byRotationType = m_ParticleProperty.m_byRotationType;
 
 	if (m_ParticleProperty.m_fRotationSpeed == 0.0f && byRotationType != CParticleProperty::ROTATION_TYPE_TIME_EVENT)
 	{

@@ -261,7 +261,7 @@ bool CGrannyModel::LoadMeshs()
 	return true;
 }
 
-BOOL CGrannyModel::CheckMeshIndex(int iIndex) const
+int32_t CGrannyModel::CheckMeshIndex(int iIndex) const
 {
 	if (iIndex < 0)
 		return FALSE;

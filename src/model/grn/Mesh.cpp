@@ -239,7 +239,7 @@ bool CGrannyMesh::LoadMaterials(CGrannyMaterialPalette& rkMtrlPal)
 	for (int m = 0; m < mtrlCount; ++m)
 	{
 		granny_material* pgrnMaterial = m_pgrnMesh->MaterialBindings[m].Material;
-		DWORD mtrlIndex = rkMtrlPal.RegisterMaterial(pgrnMaterial);
+		uint32_t mtrlIndex = rkMtrlPal.RegisterMaterial(pgrnMaterial);
 		m_mtrlIndexVector.push_back(mtrlIndex);
 		bHaveBlendThing |= rkMtrlPal.GetMaterialRef(mtrlIndex).GetType() == CGrannyMaterial::TYPE_BLEND_PNT;
 	}

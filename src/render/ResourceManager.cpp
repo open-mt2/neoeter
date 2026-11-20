@@ -27,7 +27,7 @@ void CResourceManager::LoadStaticCache(const char* c_szFileName)
 		return;
 	}
 
-	DWORD dwCacheKey = GetCRC32(c_szFileName, strlen(c_szFileName));
+	uint32_t dwCacheKey = GetCRC32(c_szFileName, strlen(c_szFileName));
 	TResourcePointerMap::iterator f = m_pCacheMap.find(dwCacheKey);
 	if (m_pCacheMap.end() != f)
 		return;
@@ -42,7 +42,7 @@ void CResourceManager::ProcessBackgroundLoading()
 
 	while (itor != m_RequestMap.end())
 	{
-		DWORD dwFileCRC = itor->first;
+		uint32_t dwFileCRC = itor->first;
 		std::string& stFileName = itor->second;
 
 		if (isResourcePointerData(dwFileCRC) ||
@@ -60,7 +60,7 @@ void CResourceManager::ProcessBackgroundLoading()
 		// break; // NOTE: 여기서 break 하면 천천히 로딩 된다.
 	}
 
-	DWORD dwCurrentTime = ELTimer_GetMSec();
+	uint32_t dwCurrentTime = ELTimer_GetMSec();
 
 	CFileLoaderThread::TData pData;
 	while (ms_loadingThread.Fetch(pData))
@@ -112,7 +112,7 @@ void CResourceManager::PushBackgroundLoadingSet(std::set<std::string>& LoadingSe
 
 	while (itor != LoadingSet.end())
 	{
-		DWORD dwFileCRC = __GetFileCRC(itor->c_str());
+		uint32_t dwFileCRC = __GetFileCRC(itor->c_str());
 
 		if (isResourcePointerData(dwFileCRC))
 		{
@@ -185,7 +185,7 @@ void CResourceManager::RegisterResourceNewFunctionByTypePointer(int iType, CReso
 	m_pResNewFuncByTypeMap[iType] = pNewFunc;
 }
 
-CResource* CResourceManager::InsertResourcePointer(DWORD dwFileCRC, CResource* pResource)
+CResource* CResourceManager::InsertResourcePointer(uint32_t dwFileCRC, CResource* pResource)
 {
 	TResourcePointerMap::iterator itor = m_pResMap.find(dwFileCRC);
 
@@ -227,7 +227,7 @@ CResource* CResourceManager::GetTypeResourcePointer(const char* c_szFileName, in
 	}
 
 	const char* c_pszFile;
-	DWORD dwFileCRC = __GetFileCRC(c_szFileName, &c_pszFile);
+	uint32_t dwFileCRC = __GetFileCRC(c_szFileName, &c_pszFile);
 	CResource* pResource = FindResourcePointer(dwFileCRC);
 
 	if (pResource) // 이미 리소스가 있으면 리턴 한다.
@@ -277,7 +277,7 @@ CResource* CResourceManager::GetResourcePointer(const char* c_szFileName)
 	}
 
 	const char* c_pszFile;
-	DWORD dwFileCRC = __GetFileCRC(c_szFileName, &c_pszFile);
+	uint32_t dwFileCRC = __GetFileCRC(c_szFileName, &c_pszFile);
 	CResource* pResource = FindResourcePointer(dwFileCRC);
 
 	if (pResource) // 이미 리소스가 있으면 리턴 한다.
@@ -318,7 +318,7 @@ CResource* CResourceManager::GetResourcePointer(const char* c_szFileName)
 	return pResource;
 }
 
-CResource* CResourceManager::FindResourcePointer(DWORD dwFileCRC)
+CResource* CResourceManager::FindResourcePointer(uint32_t dwFileCRC)
 {
 	TResourcePointerMap::iterator itor = m_pResMap.find(dwFileCRC);
 
@@ -328,7 +328,7 @@ CResource* CResourceManager::FindResourcePointer(DWORD dwFileCRC)
 	return itor->second;
 }
 
-bool CResourceManager::isResourcePointerData(DWORD dwFileCRC)
+bool CResourceManager::isResourcePointerData(uint32_t dwFileCRC)
 {
 	TResourcePointerMap::iterator itor = m_pResMap.find(dwFileCRC);
 
@@ -338,7 +338,7 @@ bool CResourceManager::isResourcePointerData(DWORD dwFileCRC)
 	return (itor->second)->IsData();
 }
 
-DWORD CResourceManager::__GetFileCRC(const char* c_szFileName, const char** c_ppszLowerFileName)
+uint32_t CResourceManager::__GetFileCRC(const char* c_szFileName, const char** c_ppszLowerFileName)
 {
 	static char s_szFullPathFileName[MAX_PATH];
 	const char* src = c_szFileName;
@@ -367,7 +367,7 @@ typedef struct SDumpData
 {
 		const char* filename;
 		float KB;
-		DWORD cost;
+		uint32_t cost;
 } TDumpData;
 
 bool DumpKBCompare(const TDumpData& lhs, const TDumpData& rhs)
@@ -475,7 +475,7 @@ bool CResourceManager::IsFileExist(const char* c_szFileName)
 
 void CResourceManager::Update()
 {
-	DWORD CurrentTime = ELTimer_GetMSec();
+	uint32_t CurrentTime = ELTimer_GetMSec();
 	CResource* pResource;
 	int Count = 0;
 
@@ -507,7 +507,7 @@ void CResourceManager::Update()
 
 void CResourceManager::ReserveDeletingResource(CResource* pResource)
 {
-	DWORD dwCurrentTime = ELTimer_GetMSec();
+	uint32_t dwCurrentTime = ELTimer_GetMSec();
 	m_ResourceDeletingMap.insert(TResourceDeletingMap::value_type(pResource, dwCurrentTime + c_Deleting_Wait_Time));
 }
 

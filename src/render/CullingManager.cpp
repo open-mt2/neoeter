@@ -94,7 +94,7 @@ void CCullingManager::Update()
 	// TODO : update each object
 	// 하지말고 각자 하게 해보자
 
-	// DWORD time = ELTimer_GetMSec();
+	// uint32_t time = ELTimer_GetMSec();
 	// Reset();
 
 	m_Factory->Process();
@@ -103,7 +103,7 @@ void CCullingManager::Update()
 
 void CCullingManager::Process()
 {
-	// DWORD time = ELTimer_GetMSec();
+	// uint32_t time = ELTimer_GetMSec();
 	// Frustum f;
 	UpdateViewMatrix();
 	UpdateProjMatrix();

@@ -18,7 +18,7 @@ void CGrannyModelInstance::SetMaterialData(const char* c_szImageName, const SMat
 	m_kMtrlPal.SetMaterialData(c_szImageName, c_rkMaterialData);
 }
 
-void CGrannyModelInstance::SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower)
+void CGrannyModelInstance::SetSpecularInfo(const char* c_szMtrlName, int32_t bEnable, float fPower)
 {
 	m_kMtrlPal.SetSpecularInfo(c_szMtrlName, bEnable, fPower);
 }

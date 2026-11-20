@@ -10,9 +10,9 @@
 
 FILE* fException;
 
-BOOL CALLBACK EnumerateLoadedModulesProc(PCSTR ModuleName, ULONG ModuleBase, ULONG ModuleSize, PVOID UserContext)
+int32_t CALLBACK EnumerateLoadedModulesProc(PCSTR ModuleName, uint32_t ModuleBase, uint32_t ModuleSize, PVOID UserContext)
 {
-	DWORD offset = *((DWORD*)UserContext);
+	uint32_t offset = *((uint32_t*)UserContext);
 
 	if (offset >= ModuleBase && offset <= ModuleBase + ModuleSize)
 	{
@@ -25,7 +25,7 @@ BOOL CALLBACK EnumerateLoadedModulesProc(PCSTR ModuleName, ULONG ModuleBase, ULO
 
 #if defined(_WIN64)
 // 64-bit builds get the DWORD64 variant of the module walk (D10).
-BOOL CALLBACK EnumerateLoadedModulesProc64(PCSTR ModuleName, DWORD64 ModuleBase, DWORD64 ModuleSize, PVOID UserContext)
+int32_t CALLBACK EnumerateLoadedModulesProc64(PCSTR ModuleName, DWORD64 ModuleBase, DWORD64 ModuleSize, PVOID UserContext)
 {
 	DWORD64 offset = *((DWORD64*)UserContext);
 

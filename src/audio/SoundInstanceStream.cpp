@@ -42,7 +42,7 @@ bool CSoundInstanceStream::IsData() const
 	return false;
 }
 
-void CSoundInstanceStream::Play(int count, DWORD dwPlayCycleTimeLimit) const
+void CSoundInstanceStream::Play(int count, uint32_t dwPlayCycleTimeLimit) const
 {
 	if (!IsData())
 		return;

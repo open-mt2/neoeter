@@ -13,7 +13,7 @@ class CSoundManager : public CSingleton<CSoundManager>
 		CSoundManager();
 		virtual ~CSoundManager();
 
-		BOOL Create();
+		int32_t Create();
 		void Destroy();
 
 		void SetPosition(float fx, float fy, float fz);
@@ -39,7 +39,7 @@ class CSoundManager : public CSingleton<CSoundManager>
 		void PlaySound3D(float fx, float fy, float fz, const char* c_szFileName, int iPlayCount = 1);
 		void StopSound3D(int iIndex);
 		int PlayAmbienceSound3D(float fx, float fy, float fz, const char* c_szFileName, int iPlayCount = 1);
-		void PlayCharacterSound3D(float fx, float fy, float fz, const char* c_szFileName, BOOL bCheckFrequency = FALSE);
+		void PlayCharacterSound3D(float fx, float fy, float fz, const char* c_szFileName, int32_t bCheckFrequency = FALSE);
 		void SetSoundVolume3D(int iIndex, float fVolume);
 		void UpdateAmbienceSound3D(int iIndex, float fx, float fy, float fz);
 		void StopAllSound3D();
@@ -54,10 +54,10 @@ class CSoundManager : public CSingleton<CSoundManager>
 		void BeginStartupMusicFadeIn(float seconds);
 
 		// Sound Node
-		void UpdateSoundData(DWORD dwcurFrame, const NSound::TSoundDataVector* c_pSoundDataVector);
-		void UpdateSoundData(float fx, float fy, float fz, DWORD dwcurFrame, const NSound::TSoundDataVector* c_pSoundDataVector);
-		void UpdateSoundInstance(float fx, float fy, float fz, DWORD dwcurFrame, const NSound::TSoundInstanceVector* c_pSoundInstanceVector, BOOL bCheckFrequency = FALSE);
-		void UpdateSoundInstance(DWORD dwcurFrame, const NSound::TSoundInstanceVector* c_pSoundInstanceVector);
+		void UpdateSoundData(uint32_t dwcurFrame, const NSound::TSoundDataVector* c_pSoundDataVector);
+		void UpdateSoundData(float fx, float fy, float fz, uint32_t dwcurFrame, const NSound::TSoundDataVector* c_pSoundDataVector);
+		void UpdateSoundInstance(float fx, float fy, float fz, uint32_t dwcurFrame, const NSound::TSoundInstanceVector* c_pSoundInstanceVector, int32_t bCheckFrequency = FALSE);
+		void UpdateSoundInstance(uint32_t dwcurFrame, const NSound::TSoundInstanceVector* c_pSoundInstanceVector);
 
 	protected:
 		enum EMusicState
@@ -70,28 +70,28 @@ class CSoundManager : public CSingleton<CSoundManager>
 		};
 		typedef struct SMusicInstance
 		{
-				DWORD dwMusicFileNameCRC;
+				uint32_t dwMusicFileNameCRC;
 				EMusicState MusicState;
 				float fVolume;
 				float fLimitVolume;
 				float fVolumeSpeed;
 		} TMusicInstance;
 
-		void PlayMusic(DWORD dwIndex, const char* c_szFileName, float fVolume, float fVolumeSpeed);
-		void StopMusic(DWORD dwIndex);
-		BOOL GetMusicIndex(const char* c_szFileName, DWORD* pdwIndex);
+		void PlayMusic(uint32_t dwIndex, const char* c_szFileName, float fVolume, float fVolumeSpeed);
+		void StopMusic(uint32_t dwIndex);
+		int32_t GetMusicIndex(const char* c_szFileName, uint32_t* pdwIndex);
 
 	protected:
 		float __ConvertGradeVolumeToApplyVolume(int nVolumeGrade);
 		float __ConvertRatioVolumeToApplyVolume(float fVolumeRatio);
 		void __SetMusicVolume(float fVolume);
 		float __GetStartupMusicFadeFactor();
-		BOOL GetSoundInstance2D(const char* c_szSoundFileName, ISoundInstance** ppInstance);
-		BOOL GetSoundInstance3D(const char* c_szFileName, ISoundInstance** ppInstance);
+		int32_t GetSoundInstance2D(const char* c_szSoundFileName, ISoundInstance** ppInstance);
+		int32_t GetSoundInstance3D(const char* c_szFileName, ISoundInstance** ppInstance);
 
 	protected:
-		BOOL m_bInitialized;
-		BOOL m_isSoundDisable;
+		int32_t m_bInitialized;
+		int32_t m_isSoundDisable;
 
 		float m_fxPosition;
 		float m_fyPosition;
@@ -105,9 +105,9 @@ class CSoundManager : public CSingleton<CSoundManager>
 		float m_fBackupMusicVolume;
 		float m_fBackupSoundVolume;
 
-		BOOL m_bStartupMusicFade;
-		BOOL m_bStartupMusicFadeJustFinished;
-		DWORD m_dwStartupMusicFadeStart;
+		int32_t m_bStartupMusicFade;
+		int32_t m_bStartupMusicFadeJustFinished;
+		uint32_t m_dwStartupMusicFadeStart;
 		float m_fStartupMusicFadeSeconds;
 
 		TMusicInstance m_MusicInstances[CSoundManagerStream::MUSIC_INSTANCE_MAX_NUM];

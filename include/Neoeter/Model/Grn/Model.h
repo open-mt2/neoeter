@@ -54,7 +54,7 @@ class CGrannyModel : public CReferenceObject
 		bool LoadIndices();
 		void Initialize();
 
-		BOOL CheckMeshIndex(int iIndex) const;
+		int32_t CheckMeshIndex(int iIndex) const;
 		void AppendMeshNode(CGrannyMesh::EType eMeshType, CGrannyMaterial::EType eMtrlType, int iMesh);
 
 	protected:
@@ -94,7 +94,7 @@ class CGrannyModel : public CReferenceObject
 		bool __LoadVertices();
 
 	protected:
-		DWORD m_dwFvF;
+		uint32_t m_dwFvF;
 		// New members to support PNT2 type models
 		//////////////////////////////////////////////////////////////////////////
 };

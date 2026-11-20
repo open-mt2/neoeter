@@ -116,7 +116,7 @@ int main()
 	TEST_SECTION("D3DXGetImageInfoFromFileInMemory reads the real TGA size");
 	{
 		D3DXIMAGE_INFO info;
-		TEST_ASSERT(SUCCEEDED(D3DXGetImageInfoFromFileInMemory(tga.data(), (UINT)tga.size(), &info)));
+		TEST_ASSERT(SUCCEEDED(D3DXGetImageInfoFromFileInMemory(tga.data(), (uint32_t)tga.size(), &info)));
 		TEST_ASSERT(info.Width == 3);
 		TEST_ASSERT(info.Height == 2);
 		TEST_ASSERT(info.Format == D3DFMT_A8R8G8B8);
@@ -127,7 +127,7 @@ int main()
 	{
 		IDirect3DTexture9* texture = nullptr;
 		TEST_ASSERT(SUCCEEDED(D3DXCreateTextureFromFileInMemoryEx(
-			nullptr, tga.data(), (UINT)tga.size(), 3, 2, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8,
+			nullptr, tga.data(), (uint32_t)tga.size(), 3, 2, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8,
 			D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0xffff00ff, nullptr, nullptr, &texture)));
 		TEST_ASSERT(texture != nullptr);
 		TEST_ASSERT(texture->GetWidth() == 3);
@@ -164,7 +164,7 @@ int main()
 		const std::vector<unsigned char> junk(64, 0x7f);
 		IDirect3DTexture9* texture = nullptr;
 		TEST_ASSERT(FAILED(D3DXCreateTextureFromFileInMemoryEx(
-			nullptr, junk.data(), (UINT)junk.size(), 64, 64, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8,
+			nullptr, junk.data(), (uint32_t)junk.size(), 64, 64, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8,
 			D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0xffff00ff, nullptr, nullptr, &texture)));
 		TEST_ASSERT(texture == nullptr);
 		TEST_PASS("E_FAIL, no texture handed out");

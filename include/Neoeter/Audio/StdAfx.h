@@ -7,6 +7,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <cstdint>
+#include <cstddef>
 #else
 #include "Platform/Platform.h"
 #endif

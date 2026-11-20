@@ -79,12 +79,12 @@ void CLightManager::SetCenterPosition(const D3DXVECTOR3& c_rv3Position)
 	m_v3CenterPosition = c_rv3Position;
 }
 
-void CLightManager::SetLimitLightCount(DWORD dwLightCount)
+void CLightManager::SetLimitLightCount(uint32_t dwLightCount)
 {
 	m_dwLimitLightCount = dwLightCount;
 }
 
-void CLightManager::SetSkipIndex(DWORD dwSkipIndex)
+void CLightManager::SetSkipIndex(uint32_t dwSkipIndex)
 {
 	m_dwSkipIndex = dwSkipIndex;
 }
@@ -127,7 +127,7 @@ void CLightManager::FlushLight()
 	// NOTE - 거리로 정렬된 라이트를 Limit 갯수 만큼 제한해서 켜준다.
 	STATEMANAGER.SaveRenderState(D3DRS_LIGHTING, TRUE);
 
-	for (DWORD k = 0; k < min(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
+	for (uint32_t k = 0; k < min(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
 	{
 		m_LightSortVector[k]->Update();
 		m_LightSortVector[k]->SetDeviceLight(TRUE);
@@ -138,7 +138,7 @@ void CLightManager::RestoreLight()
 {
 	STATEMANAGER.RestoreRenderState(D3DRS_LIGHTING);
 
-	for (DWORD k = 0; k < min(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
+	for (uint32_t k = 0; k < min(m_dwLimitLightCount, m_LightSortVector.size()); ++k)
 		m_LightSortVector[k]->SetDeviceLight(FALSE);
 }
 
@@ -161,7 +161,7 @@ void CLightManager::ReleaseLightID(TLightID LightID)
 
 void CLightManager::Update()
 {
-	// static DWORD s_dwStartTime = ELTimer_GetMSec();
+	// static uint32_t s_dwStartTime = ELTimer_GetMSec();
 	// ms_fCurTime = float(ELTimer_GetMSec() - s_dwStartTime) / 1000.0f;
 	ms_fCurTime = CTimer::Instance().GetCurrentSecond();
 }
@@ -198,7 +198,7 @@ void CLight::Clear()
 	Initialize();
 }
 
-void CLight::SetDeviceLight(BOOL bActive)
+void CLight::SetDeviceLight(int32_t bActive)
 {
 	if (bActive && m_isEdited)
 	{

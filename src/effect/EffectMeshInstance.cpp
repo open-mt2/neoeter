@@ -22,7 +22,7 @@ void CEffectMeshInstance::Delete(CEffectMeshInstance* pkMeshInstance)
 	ms_kPool.Free(pkMeshInstance);
 }
 
-BOOL CEffectMeshInstance::isActive()
+int32_t CEffectMeshInstance::isActive()
 {
 	if (!CEffectElementBaseInstance::isActive())
 		return FALSE;
@@ -30,7 +30,7 @@ BOOL CEffectMeshInstance::isActive()
 	if (!m_MeshFrameController.isActive())
 		return FALSE;
 
-	for (DWORD j = 0; j < m_TextureInstanceVector.size(); ++j)
+	for (uint32_t j = 0; j < m_TextureInstanceVector.size(); ++j)
 	{
 		int iCurrentFrame = m_MeshFrameController.GetCurrentFrame();
 		if (m_TextureInstanceVector[j].TextureFrameController.isActive(iCurrentFrame))
@@ -48,7 +48,7 @@ bool CEffectMeshInstance::OnUpdate(float fElapsedTime)
 	if (m_MeshFrameController.isActive())
 		m_MeshFrameController.Update(fElapsedTime);
 
-	for (DWORD j = 0; j < m_TextureInstanceVector.size(); ++j)
+	for (uint32_t j = 0; j < m_TextureInstanceVector.size(); ++j)
 	{
 		int iCurrentFrame = m_MeshFrameController.GetCurrentFrame();
 		if (m_TextureInstanceVector[j].TextureFrameController.isActive(iCurrentFrame))
@@ -65,7 +65,7 @@ void CEffectMeshInstance::OnRender()
 
 	CEffectMesh* pEffectMesh = m_roMesh.GetPointer();
 
-	for (DWORD i = 0; i < pEffectMesh->GetMeshCount(); ++i)
+	for (uint32_t i = 0; i < pEffectMesh->GetMeshCount(); ++i)
 	{
 		assert(i < m_TextureInstanceVector.size());
 
@@ -141,7 +141,7 @@ void CEffectMeshInstance::OnRender()
 		m_matWorld = m_matWorld * *mc_pmatLocal;
 		STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matWorld);
 
-		BYTE byType;
+		uint8_t byType;
 		D3DXCOLOR Color(1.0f, 1.0f, 1.0f, 1.0f);
 		if (m_pMeshScript->GetColorOperationType(i, &byType))
 			STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP, byType);
@@ -159,7 +159,7 @@ void CEffectMeshInstance::OnRender()
 		assert(m_MeshFrameController.GetCurrentFrame() < pMeshData->EffectFrameDataVector.size());
 		CEffectMesh::TEffectFrameData& rFrameData = pMeshData->EffectFrameDataVector[m_MeshFrameController.GetCurrentFrame()];
 
-		DWORD dwcurTextureFrame = rTextureFrameController.GetCurrentFrame();
+		uint32_t dwcurTextureFrame = rTextureFrameController.GetCurrentFrame();
 		if (dwcurTextureFrame < m_TextureInstanceVector[i].TextureInstanceVector.size())
 		{
 			CGraphicImageInstance* pImageInstance = m_TextureInstanceVector[i].TextureInstanceVector[dwcurTextureFrame];
@@ -167,7 +167,7 @@ void CEffectMeshInstance::OnRender()
 		}
 
 		Color.a = fAlpha * rFrameData.fVisibility;
-		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, DWORD(Color));
+		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, uint32_t(Color));
 		STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_TEX1);
 		STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLELIST,
 									 rFrameData.dwIndexCount / 3,
@@ -200,7 +200,7 @@ void CEffectMeshInstance::OnSetDataPointer(CEffectElementBase* pElement)
 
 	m_TextureInstanceVector.clear();
 	m_TextureInstanceVector.resize(m_pEffectMesh->GetMeshCount());
-	for (DWORD j = 0; j < m_TextureInstanceVector.size(); ++j)
+	for (uint32_t j = 0; j < m_TextureInstanceVector.size(); ++j)
 	{
 		CEffectMeshScript::TMeshData* pMeshData;
 		if (!m_pMeshScript->GetMeshDataPointer(j, &pMeshData))

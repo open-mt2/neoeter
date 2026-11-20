@@ -256,11 +256,11 @@ bool CNetworkStream::Connect(const CNetworkAddress& c_rkNetAddr, int limitSec)
 	return true;	
 }
 
-bool CNetworkStream::Connect(DWORD dwAddr, int port, int limitSec)
+bool CNetworkStream::Connect(uint32_t dwAddr, int port, int limitSec)
 {
 	char szAddr[256];
 	{
-		BYTE ip[4];
+		uint8_t ip[4];
 		ip[0]=dwAddr&0xff;dwAddr>>=8;
 		ip[1]=dwAddr&0xff;dwAddr>>=8;
 		ip[2]=dwAddr&0xff;dwAddr>>=8;
@@ -309,13 +309,13 @@ bool CNetworkStream::Peek(int size, char * pDestBuf)
 
 
 #ifdef _PACKETDUMP
-const char * GetSendHeaderName(BYTE header)
+const char * GetSendHeaderName(uint8_t header)
 {
 	static bool b = false;
 	static std::string stringList[UCHAR_MAX+1];
 	if (b==false)
 	{
-		for (DWORD i = 0; i < UCHAR_MAX+1; i++)
+		for (uint32_t i = 0; i < UCHAR_MAX+1; i++)
 		{
 			char buf[10];
 			sprintf(buf,"%d",i);
@@ -396,13 +396,13 @@ const char * GetSendHeaderName(BYTE header)
 	return stringList[header].c_str();
 }
 
-const char * GetRecvHeaderName(BYTE header)
+const char * GetRecvHeaderName(uint8_t header)
 {
 	static bool b = false;
 	static std::string stringList[UCHAR_MAX+1];
 	if (b==false)
 	{
-		for (DWORD i = 0; i < UCHAR_MAX+1; i++)
+		for (uint32_t i = 0; i < UCHAR_MAX+1; i++)
 		{
 			char buf[10];
 			sprintf(buf,"%d",i);
@@ -599,9 +599,9 @@ bool CNetworkStream::Send(int size, const char * pSrcBuf)
 	{
 		if (IsSecurityMode())
 		{
-			m_sendBufInputPos += TEA_Encrypt((DWORD *) (m_sendBuf + m_sendBufInputPos),
-											 (DWORD *) (m_sendBuf + m_sendBufInputPos),
-											 (const DWORD *) gs_szTeaKey,
+			m_sendBufInputPos += TEA_Encrypt((uint32_t *) (m_sendBuf + m_sendBufInputPos),
+											 (uint32_t *) (m_sendBuf + m_sendBufInputPos),
+											 (const uint32_t *) gs_szTeaKey,
 											 size);
 		}
 		else
@@ -651,9 +651,9 @@ bool CNetworkStream::SendSequence()
 	if (!m_bUseSequence)
 		return true;
 
-	BYTE bSeq = m_kVec_bSequenceTable[m_iSequence++];
+	uint8_t bSeq = m_kVec_bSequenceTable[m_iSequence++];
 
-	bool bRet = Send(sizeof(BYTE), &bSeq);
+	bool bRet = Send(sizeof(uint8_t), &bSeq);
 	if (m_iSequence == SEQUENCE_TABLE_SIZE)
 		m_iSequence = 0;
 
@@ -693,7 +693,7 @@ void CNetworkStream::OnConnectFailure()
 
 #define SEQUENCE_TABLE_SIZE 32768
 
-static BYTE s_bSequenceTable[SEQUENCE_TABLE_SIZE] =
+static uint8_t s_bSequenceTable[SEQUENCE_TABLE_SIZE] =
 {
 	0xaf,0xca,0x8a,0xcf,0x48,0xa7,0x54,0xc7,0xd7,0xdf,0x1,0x25,0x72,0xf7,0x6f,0x84,
 	0xbc,0x37,0x46,0xe3,0x24,0xda,0xa1,0xc8,0xee,0x36,0x7c,0x33,0x2f,0x98,0x76,0x5e,
@@ -2773,7 +2773,7 @@ CNetworkStream::CNetworkStream()
 	m_iSequence = 0;
 	m_bUseSequence = false;
 	m_kVec_bSequenceTable.resize(SEQUENCE_TABLE_SIZE);
-	memcpy(&m_kVec_bSequenceTable[0], s_bSequenceTable, sizeof(BYTE) * SEQUENCE_TABLE_SIZE);
+	memcpy(&m_kVec_bSequenceTable[0], s_bSequenceTable, sizeof(uint8_t) * SEQUENCE_TABLE_SIZE);
 }
 
 CNetworkStream::~CNetworkStream()

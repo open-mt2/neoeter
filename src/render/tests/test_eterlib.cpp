@@ -48,8 +48,8 @@ namespace
 	class TestWorkerThread : public CThread
 	{
 		public:
-			UINT Setup() override { return 1; }
-			UINT Execute(void* arg) override
+			uint32_t Setup() override { return 1; }
+			uint32_t Execute(void* arg) override
 			{
 				int* counter = static_cast<int*>(arg);
 				*counter = 999;

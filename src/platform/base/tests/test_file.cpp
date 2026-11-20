@@ -17,10 +17,10 @@ int main()
 	// 1. Write file with CFileBase
 	{
 		CFileBase file;
-		BOOL created = file.Create(testPath, CFileBase::FILEMODE_WRITE);
+		int32_t created = file.Create(testPath, CFileBase::FILEMODE_WRITE);
 		assert(created == TRUE);
 
-		BOOL written = file.Write(sampleData, sampleLen);
+		int32_t written = file.Write(sampleData, sampleLen);
 		assert(written == TRUE);
 		file.Close();
 	}
@@ -29,12 +29,12 @@ int main()
 	// 2. Read back with CFileBase
 	{
 		CFileBase file;
-		BOOL opened = file.Create(testPath, CFileBase::FILEMODE_READ);
+		int32_t opened = file.Create(testPath, CFileBase::FILEMODE_READ);
 		assert(opened == TRUE);
 		assert(static_cast<int>(file.Size()) == sampleLen);
 
 		char readBuffer[128] = {0};
-		BOOL readOk = file.Read(readBuffer, sampleLen);
+		int32_t readOk = file.Read(readBuffer, sampleLen);
 		assert(readOk == TRUE);
 		assert(memcmp(readBuffer, sampleData, sampleLen) == 0);
 		file.Close();
@@ -45,7 +45,7 @@ int main()
 	{
 		CMappedFile mapped;
 		const void* pMappedData = nullptr;
-		BOOL mapCreated = mapped.Create(testPath, &pMappedData, 0, 0);
+		int32_t mapCreated = mapped.Create(testPath, &pMappedData, 0, 0);
 		assert(mapCreated == TRUE);
 		assert(pMappedData != nullptr);
 		assert(static_cast<int>(mapped.Size()) == sampleLen);

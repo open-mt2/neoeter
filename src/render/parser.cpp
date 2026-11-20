@@ -6,14 +6,14 @@ using namespace script;
 #define ishan(ch) (((ch) & 0xE0) > 0x90)
 #define isnhspace(ch) (!ishan(ch) && isspace(ch))
 
-extern DWORD GetDefaultCodePage();
+extern uint32_t GetDefaultCodePage();
 
 const char* LocaleString_FindChar(const char* base, int len, char test)
 {
 	if (!base)
 		return NULL;
 
-	DWORD codePage = GetDefaultCodePage();
+	uint32_t codePage = GetDefaultCodePage();
 
 	int pos = 0;
 	while (pos < len)
@@ -42,7 +42,7 @@ const char* LocaleString_FindChar(const char* base, int len, char test)
 
 int LocaleString_RightTrim(char* base, int len)
 {
-	DWORD codePage = GetDefaultCodePage();
+	uint32_t codePage = GetDefaultCodePage();
 
 	int pos = len;
 
@@ -79,7 +79,7 @@ void OLD_rtrim(char* base)
 	if (!base)
 		return;
 
-	DWORD codePage = GetDefaultCodePage();
+	uint32_t codePage = GetDefaultCodePage();
 
 	if (949 == codePage || 936 == codePage)
 	{
@@ -117,7 +117,7 @@ void OLD_rtrim(char* base)
 	}
 }
 
-const char* LocaleString_Skip(DWORD codePage, const char* cur)
+const char* LocaleString_Skip(uint32_t codePage, const char* cur)
 {
 	int loopCount = 0;
 
@@ -161,7 +161,7 @@ bool Group::GetArg(const char* c_arg_base, int arg_len, TArgList& argList)
 
 	bool isValue = false;
 
-	DWORD codePage = GetDefaultCodePage();
+	uint32_t codePage = GetDefaultCodePage();
 
 	while (pos < arg_len)
 	{
@@ -288,7 +288,7 @@ bool Group::Create(const std::string& stSource)
 	int str_len = stSource.length();
 	int str_pos = 0;
 
-	DWORD codePage = GetDefaultCodePage();
+	uint32_t codePage = GetDefaultCodePage();
 
 	char box_data[1024 + 1];
 

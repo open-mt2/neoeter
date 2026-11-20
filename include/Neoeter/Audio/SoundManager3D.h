@@ -22,7 +22,7 @@ class CSoundManager3D : public CSoundBase
 
 		int GetEmptyInstanceIndex();
 		int SetInstance(const char* c_szFileName);
-		ISoundInstance* GetInstance(DWORD dwIndex);
+		ISoundInstance* GetInstance(uint32_t dwIndex);
 
 		void SetListenerDirection(float fxDir, float fyDir, float fzDir, float fxUp, float fyUp, float fzUp);
 		void SetListenerPosition(float x, float y, float z);

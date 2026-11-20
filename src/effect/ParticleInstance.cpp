@@ -67,7 +67,7 @@ D3DXVECTOR3 CBaseParticleInstance::GetCenterApproximation()
 		);
 }*/
 
-BOOL CParticleInstance::Update(float fElapsedTime, float fAngle)
+int32_t CParticleInstance::Update(float fElapsedTime, float fAngle)
 {
 	m_fLastLifeTime -= fElapsedTime;
 	if (m_fLastLifeTime < 0.0f)
@@ -277,7 +277,7 @@ void CParticleInstance::Transform(const D3DXMATRIX* c_matLocal, const float c_fZ
 #ifdef WORLD_EDITOR
 	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, m_Color);
 #else
-	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, (DWORD)m_dcColor);
+	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, (uint32_t)m_dcColor);
 #endif
 
 	/////

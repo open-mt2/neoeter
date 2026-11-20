@@ -53,7 +53,7 @@ class CSkyObjectQuad
 						   const float& c_rfGreen,
 						   const float& c_rfBlue,
 						   const float& c_rfAlpha,
-						   DWORD dwDuration);
+						   uint32_t dwDuration);
 
 		void SetVertex(const unsigned char& c_rucNumVertex, const TPDTVertex& c_rPDTVertex);
 
@@ -127,7 +127,7 @@ class CSkyObject : public CScreen
 		float m_fCloudScrollSpeedU, m_fCloudScrollSpeedV;
 		float m_fCloudPositionU, m_fCloudPositionV;
 
-		DWORD m_dwlastTime;
+		uint32_t m_dwlastTime;
 
 		// 스카이 박스 이미지...
 		TGraphicImageInstanceMap m_GraphicImageInstanceMap;
@@ -161,14 +161,14 @@ class CSkyBox : public CSkyObject
 		void Unload();
 
 		void SetSkyBoxScale(const D3DXVECTOR3& c_rv3Scale);
-		void SetGradientLevel(BYTE byUpper, BYTE byLower);
+		void SetGradientLevel(uint8_t byUpper, uint8_t byLower);
 		void SetFaceTexture(const char* c_szFileName, int iFaceIndex);
 		void SetCloudTexture(const char* c_szFileName);
 		void SetCloudScale(const D3DXVECTOR2& c_rv2CloudScale);
 		void SetCloudHeight(float fHeight);
 		void SetCloudTextureScale(const D3DXVECTOR2& c_rv2CloudTextureScale);
 		void SetCloudScrollSpeed(const D3DXVECTOR2& c_rv2CloudScrollSpeed);
-		void SetCloudColor(const TGradientColor& c_rColor, const TGradientColor& c_rNextColor, const DWORD& dwTransitionTime);
+		void SetCloudColor(const TGradientColor& c_rColor, const TGradientColor& c_rNextColor, const uint32_t& dwTransitionTime);
 		void Refresh();
 		void SetSkyColor(const TVectorGradientColor& c_rColorVector, const TVectorGradientColor& c_rNextColorVector, long lTransitionTime);
 		void StartTransition();

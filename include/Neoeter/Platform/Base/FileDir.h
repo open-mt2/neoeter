@@ -3,6 +3,8 @@
 
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
 #include <windows.h>
+#include <cstdint>
+#include <cstddef>
 #else
 #include <Platform/Platform.h>
 #endif
@@ -14,7 +16,7 @@ class CDir
 		virtual ~CDir();
 
 		void Destroy();
-		bool Create(const char* c_szFilter, const char* c_szPath = "", BOOL bCheckedExtension = FALSE);
+		bool Create(const char* c_szFilter, const char* c_szPath = "", int32_t bCheckedExtension = FALSE);
 
 	protected:
 		virtual bool OnFolder(const char* c_szFilter, const char* c_szPath, const char* c_szName) = 0;

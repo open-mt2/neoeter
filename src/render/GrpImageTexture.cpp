@@ -61,7 +61,7 @@ bool CGraphicImageTexture::CreateDeviceObjects()
 	return true;
 }
 
-bool CGraphicImageTexture::Create(UINT width, UINT height, D3DFORMAT d3dFmt, DWORD dwFilter)
+bool CGraphicImageTexture::Create(uint32_t width, uint32_t height, D3DFORMAT d3dFmt, uint32_t dwFilter)
 {
 	assert(ms_lpd3dDevice != NULL);
 	Destroy();
@@ -89,7 +89,7 @@ void CGraphicImageTexture::CreateFromTexturePointer(const CGraphicTexture* c_pSr
 	m_bEmpty = false;
 }
 
-bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage& image, const BYTE* /*c_pbBuf*/)
+bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage& image, const uint8_t* /*c_pbBuf*/)
 {
 	int mipmapCount = image.m_dwMipMapCount == 0 ? 1 : image.m_dwMipMapCount;
 
@@ -105,11 +105,11 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage& image, const BYTE* /*c_p
 	else
 		format = D3DFMT_DXT1;
 
-	UINT uTexBias = 0;
+	uint32_t uTexBias = 0;
 	if (IsLowTextureMemory())
 		uTexBias = 1;
 
-	UINT uMinMipMapIndex = 0;
+	uint32_t uMinMipMapIndex = 0;
 	if (uTexBias > 0)
 	{
 		if (mipmapCount > uTexBias)
@@ -128,7 +128,7 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage& image, const BYTE* /*c_p
 		return false;
 	}
 
-	for (DWORD i = 0; i < mipmapCount; ++i)
+	for (uint32_t i = 0; i < mipmapCount; ++i)
 	{
 		D3DLOCKED_RECT lockedRect;
 
@@ -138,7 +138,7 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage& image, const BYTE* /*c_p
 		}
 		else
 		{
-			image.Copy(i + uMinMipMapIndex, (BYTE*)lockedRect.pBits, lockedRect.Pitch);
+			image.Copy(i + uMinMipMapIndex, (uint8_t*)lockedRect.pBits, lockedRect.Pitch);
 			lpd3dTexture->UnlockRect(i);
 		}
 	}
@@ -154,8 +154,8 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage& image, const BYTE* /*c_p
 		else
 			format = D3DFMT_A1R5G5B5;
 
-		UINT imgWidth = image.m_nWidth;
-		UINT imgHeight = image.m_nHeight;
+		uint32_t imgWidth = image.m_nWidth;
+		uint32_t imgHeight = image.m_nHeight;
 
 		extern bool GRAPHICS_CAPS_HALF_SIZE_IMAGE;
 
@@ -202,7 +202,7 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage& image, const BYTE* /*c_p
 	return true;
 }
 
-bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void* c_pvBuf, D3DFORMAT d3dFmt, DWORD dwFilter)
+bool CGraphicImageTexture::CreateFromMemoryFile(uint32_t bufSize, const void* c_pvBuf, D3DFORMAT d3dFmt, uint32_t dwFilter)
 {
 	assert(ms_lpd3dDevice != NULL);
 	assert(m_lpd3dTexture == NULL);
@@ -210,9 +210,9 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void* c_pvBu
 	static CDXTCImage image;
 
 	// Check whether the file is a DDS
-	if (image.LoadHeaderFromMemory((const BYTE*)c_pvBuf, bufSize))
+	if (image.LoadHeaderFromMemory((const uint8_t*)c_pvBuf, bufSize))
 	{
-		return (CreateDDSTexture(image, (const BYTE*)c_pvBuf));
+		return (CreateDDSTexture(image, (const uint8_t*)c_pvBuf));
 	}
 	else
 	{
@@ -247,7 +247,7 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void* c_pvBu
 				break;
 		}
 
-		UINT uTexBias = 0;
+		uint32_t uTexBias = 0;
 
 		extern bool GRAPHICS_CAPS_HALF_SIZE_IMAGE;
 		if (GRAPHICS_CAPS_HALF_SIZE_IMAGE)
@@ -302,7 +302,7 @@ void CGraphicImageTexture::SetFileName(const char* c_szFileName)
 	m_stFileName = c_szFileName;
 }
 
-bool CGraphicImageTexture::CreateFromDiskFile(const char* c_szFileName, D3DFORMAT d3dFmt, DWORD dwFilter)
+bool CGraphicImageTexture::CreateFromDiskFile(const char* c_szFileName, D3DFORMAT d3dFmt, uint32_t dwFilter)
 {
 	Destroy();
 

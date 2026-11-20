@@ -67,12 +67,12 @@ bool CSoundInstance3D::IsDone() const
 	return AIL_3D_sample_status(m_sample) == SMP_DONE;
 }
 
-void CSoundInstance3D::Play(int iLoopCount, DWORD dwPlayCycleTimeLimit) const
+void CSoundInstance3D::Play(int iLoopCount, uint32_t dwPlayCycleTimeLimit) const
 {
 	if (!m_pSoundData)
 		return;
 
-	DWORD dwCurTime = ELTimer_GetMSec();
+	uint32_t dwCurTime = ELTimer_GetMSec();
 
 	if (dwCurTime - m_pSoundData->GetPlayTime() < dwPlayCycleTimeLimit)
 		return;

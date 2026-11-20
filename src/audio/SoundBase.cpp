@@ -55,12 +55,12 @@ void CSoundBase::Initialize()
 	ms_dataMap.clear();
 }
 
-DWORD CSoundBase::GetFileCRC(const char* filename)
+uint32_t CSoundBase::GetFileCRC(const char* filename)
 {
 	return GetCRC32(filename, strlen(filename));
 }
 
-CSoundData* CSoundBase::AddFile(DWORD dwFileCRC, const char* filename)
+CSoundData* CSoundBase::AddFile(uint32_t dwFileCRC, const char* filename)
 {
 	CSoundData* pSoundData = new CSoundData;
 	pSoundData->Assign(filename);

@@ -83,7 +83,7 @@ bool CGraphicSubImage::OnLoad(int iSize, const void* c_pvBuf)
 
 	textFileLoader.Bind(iSize, c_pvBuf);
 
-	for (DWORD i = 0; i < textFileLoader.GetLineCount(); ++i)
+	for (uint32_t i = 0; i < textFileLoader.GetLineCount(); ++i)
 	{
 		if (!textFileLoader.SplitLine(i, &stTokenVector))
 			continue;

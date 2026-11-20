@@ -18,17 +18,17 @@ class CTransitor
 		CTransitor() {}
 		~CTransitor() {}
 
-		void SetActive(BOOL bActive = TRUE)
+		void SetActive(int32_t bActive = TRUE)
 		{
 			m_bActivated = bActive;
 		}
 
-		BOOL isActive()
+		int32_t isActive()
 		{
 			return m_bActivated;
 		}
 
-		BOOL isActiveTime(float fcurTime)
+		int32_t isActiveTime(float fcurTime)
 		{
 			if (fcurTime >= m_fEndTime)
 				return FALSE;
@@ -36,12 +36,12 @@ class CTransitor
 			return TRUE;
 		}
 
-		DWORD GetID()
+		uint32_t GetID()
 		{
 			return m_dwID;
 		}
 
-		void SetID(DWORD dwID)
+		void SetID(uint32_t dwID)
 		{
 			m_dwID = dwID;
 		}
@@ -59,7 +59,7 @@ class CTransitor
 			m_fEndTime = fStartTime + fBlendTime;
 		}
 
-		BOOL GetValue(float fcurTime, T* pValue)
+		int32_t GetValue(float fcurTime, T* pValue)
 		{
 			if (fcurTime <= m_fStartTime)
 				return FALSE;
@@ -70,9 +70,9 @@ class CTransitor
 		}
 
 	protected:
-		DWORD m_dwID; // Public Transitor ID
+		uint32_t m_dwID; // Public Transitor ID
 
-		BOOL m_bActivated; // Have been started to blend?
+		int32_t m_bActivated; // Have been started to blend?
 		float m_fStartTime;
 		float m_fEndTime;
 
@@ -100,16 +100,16 @@ extern D3DXCOLOR TokenToColor(CTokenVector& rVector);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern int CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* textMetric, DWORD dwWord, LPARAM lParam);
-extern int GetCharsetFromCodePage(WORD codePage);
-extern const char* GetFontFaceFromCodePageNT(WORD codePage);
-extern const char* GetFontFaceFromCodePage9x(WORD codePage);
-extern DWORD GetDefaultCodePage();
+extern int CALLBACK EnumFontFamExProc(CONST LOGFONT* plogFont, CONST TEXTMETRIC* textMetric, uint32_t dwWord, intptr_t lParam);
+extern int GetCharsetFromCodePage(uint16_t codePage);
+extern const char* GetFontFaceFromCodePageNT(uint16_t codePage);
+extern const char* GetFontFaceFromCodePage9x(uint16_t codePage);
+extern uint32_t GetDefaultCodePage();
 extern const char* GetDefaultFontFace();
-extern const char* GetFontFaceFromCodePage(WORD codePage);
+extern const char* GetFontFaceFromCodePage(uint16_t codePage);
 extern void SetDefaultFontFace(const char* fontFace);
-extern bool SetDefaultCodePage(DWORD codePage);
+extern bool SetDefaultCodePage(uint32_t codePage);
 extern void base64_decode(const char* str, char* resultStr);
 
-extern DWORD GetMaxTextureWidth();
-extern DWORD GetMaxTextureHeight();
+extern uint32_t GetMaxTextureWidth();
+extern uint32_t GetMaxTextureHeight();

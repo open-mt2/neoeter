@@ -44,7 +44,7 @@ CSoundManager::~CSoundManager()
 {
 }
 
-BOOL CSoundManager::Create()
+int32_t CSoundManager::Create()
 {
 	if (!ms_SoundManager2D.Initialize())
 	{
@@ -180,19 +180,19 @@ void CSoundManager::Update()
 	}
 }
 
-void CSoundManager::UpdateSoundData(DWORD dwcurTime, const NSound::TSoundDataVector* c_pSoundDataVector)
+void CSoundManager::UpdateSoundData(uint32_t dwcurTime, const NSound::TSoundDataVector* c_pSoundDataVector)
 {
 	assert(!"CSoundManager::UpdateSoundData");
 }
 
-void CSoundManager::UpdateSoundData(float fx, float fy, float fz, DWORD dwcurTime, const NSound::TSoundDataVector* c_pSoundDataVector)
+void CSoundManager::UpdateSoundData(float fx, float fy, float fz, uint32_t dwcurTime, const NSound::TSoundDataVector* c_pSoundDataVector)
 {
 	assert(!"CSoundManager::UpdateSoundData");
 }
 
-void CSoundManager::UpdateSoundInstance(float fx, float fy, float fz, DWORD dwcurFrame, const NSound::TSoundInstanceVector* c_pSoundInstanceVector, BOOL bCheckFrequency)
+void CSoundManager::UpdateSoundInstance(float fx, float fy, float fz, uint32_t dwcurFrame, const NSound::TSoundInstanceVector* c_pSoundInstanceVector, int32_t bCheckFrequency)
 {
-	for (DWORD i = 0; i < c_pSoundInstanceVector->size(); ++i)
+	for (uint32_t i = 0; i < c_pSoundInstanceVector->size(); ++i)
 	{
 		const NSound::TSoundInstance& c_rSoundInstance = c_pSoundInstanceVector->at(i);
 		if (c_rSoundInstance.dwFrame == dwcurFrame)
@@ -203,9 +203,9 @@ void CSoundManager::UpdateSoundInstance(float fx, float fy, float fz, DWORD dwcu
 	}
 }
 
-void CSoundManager::UpdateSoundInstance(DWORD dwcurFrame, const NSound::TSoundInstanceVector* c_pSoundInstanceVector)
+void CSoundManager::UpdateSoundInstance(uint32_t dwcurFrame, const NSound::TSoundInstanceVector* c_pSoundInstanceVector)
 {
-	for (DWORD i = 0; i < c_pSoundInstanceVector->size(); ++i)
+	for (uint32_t i = 0; i < c_pSoundInstanceVector->size(); ++i)
 	{
 		const NSound::TSoundInstance& c_rSoundInstance = c_pSoundInstanceVector->at(i);
 
@@ -329,7 +329,7 @@ float CSoundManager::GetMusicVolume()
 	return m_fMusicVolume;
 }
 
-BOOL CSoundManager::GetSoundInstance2D(const char* c_szSoundFileName, ISoundInstance** ppInstance)
+int32_t CSoundManager::GetSoundInstance2D(const char* c_szSoundFileName, ISoundInstance** ppInstance)
 {
 	*ppInstance = ms_SoundManager2D.GetInstance(c_szSoundFileName);
 
@@ -339,7 +339,7 @@ BOOL CSoundManager::GetSoundInstance2D(const char* c_szSoundFileName, ISoundInst
 	return TRUE;
 }
 
-BOOL CSoundManager::GetSoundInstance3D(const char* c_szFileName, ISoundInstance** ppInstance)
+int32_t CSoundManager::GetSoundInstance3D(const char* c_szFileName, ISoundInstance** ppInstance)
 {
 	int iIndex = ms_SoundManager3D.SetInstance(c_szFileName);
 
@@ -411,7 +411,7 @@ int CSoundManager::PlayAmbienceSound3D(float fx, float fy, float fz, const char*
 	return iIndex;
 }
 
-void CSoundManager::PlayCharacterSound3D(float fx, float fy, float fz, const char* c_szFileName, BOOL bCheckFrequency)
+void CSoundManager::PlayCharacterSound3D(float fx, float fy, float fz, const char* c_szFileName, int32_t bCheckFrequency)
 {
 	if (0.0f == GetSoundVolume())
 		return;
@@ -507,7 +507,7 @@ void CSoundManager::FadeInMusic(const char* c_szFileName, float fVolumeSpeed)
 {
 	Tracef("[Audio] FadeInMusic %s speed %.3f\n", c_szFileName, fVolumeSpeed);
 
-	DWORD dwIndex;
+	uint32_t dwIndex;
 	if (GetMusicIndex(c_szFileName, &dwIndex))
 	{
 		m_MusicInstances[dwIndex].MusicState = MUSIC_STATE_FADE_IN;
@@ -542,7 +542,7 @@ void CSoundManager::FadeLimitOutMusic(const char* c_szFileName, float fLimitVolu
 {
 	// Tracenf("FadeLimitOutMusic: %s", c_szFileName);
 
-	DWORD dwIndex;
+	uint32_t dwIndex;
 	if (!GetMusicIndex(c_szFileName, &dwIndex))
 	{
 		Tracenf("FadeOutMusic: %s - ERROR NOT EXIST", c_szFileName);
@@ -567,7 +567,7 @@ void CSoundManager::FadeOutMusic(const char* c_szFileName, float fVolumeSpeed)
 {
 	// Tracenf("FadeOutMusic: %s", c_szFileName);
 
-	DWORD dwIndex;
+	uint32_t dwIndex;
 	if (!GetMusicIndex(c_szFileName, &dwIndex))
 	{
 		Tracenf("FadeOutMusic: %s - ERROR NOT EXIST", c_szFileName);
@@ -620,7 +620,7 @@ void CSoundManager::RestoreVolume()
 	SetSoundVolume(m_fBackupSoundVolume);
 }
 
-void CSoundManager::PlayMusic(DWORD dwIndex, const char* c_szFileName, float fVolume, float fVolumeSpeed)
+void CSoundManager::PlayMusic(uint32_t dwIndex, const char* c_szFileName, float fVolume, float fVolumeSpeed)
 {
 	if (dwIndex >= CSoundManagerStream::MUSIC_INSTANCE_MAX_NUM)
 		return;
@@ -651,7 +651,7 @@ void CSoundManager::PlayMusic(DWORD dwIndex, const char* c_szFileName, float fVo
 	rMusicInstance.dwMusicFileNameCRC = GetCaseCRC32(strFileName.c_str(), strFileName.length());
 }
 
-void CSoundManager::StopMusic(DWORD dwIndex)
+void CSoundManager::StopMusic(uint32_t dwIndex)
 {
 	if (dwIndex >= CSoundManagerStream::MUSIC_INSTANCE_MAX_NUM)
 		return;
@@ -669,11 +669,11 @@ void CSoundManager::StopMusic(DWORD dwIndex)
 	rMusicInstance.dwMusicFileNameCRC = 0;
 }
 
-BOOL CSoundManager::GetMusicIndex(const char* c_szFileName, DWORD* pdwIndex)
+int32_t CSoundManager::GetMusicIndex(const char* c_szFileName, uint32_t* pdwIndex)
 {
 	std::string strFileName;
 	StringPath(c_szFileName, strFileName);
-	DWORD dwCRC = GetCaseCRC32(strFileName.c_str(), strFileName.length());
+	uint32_t dwCRC = GetCaseCRC32(strFileName.c_str(), strFileName.length());
 
 	for (int i = 0; i < CSoundManagerStream::MUSIC_INSTANCE_MAX_NUM; ++i)
 	{
@@ -707,10 +707,10 @@ float CSoundManager::__GetStartupMusicFadeFactor()
 	if (FALSE == m_bStartupMusicFade)
 		return 1.0f;
 
-	DWORD dwNow = ELTimer_GetMSec();
+	uint32_t dwNow = ELTimer_GetMSec();
 	if (0 == m_dwStartupMusicFadeStart)
 	{
-		BOOL bMusicActive = FALSE;
+		int32_t bMusicActive = FALSE;
 		for (int i = 0; i < CSoundManagerStream::MUSIC_INSTANCE_MAX_NUM; ++i)
 		{
 			if (MUSIC_STATE_OFF != m_MusicInstances[i].MusicState)

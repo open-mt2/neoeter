@@ -11,10 +11,10 @@ class CTextFileLoader
 	public:
 		typedef struct SGroupNode
 		{
-				static DWORD GenNameKey(const char* c_szGroupName, UINT uGroupNameLen);
+				static uint32_t GenNameKey(const char* c_szGroupName, uint32_t uGroupNameLen);
 
 				void SetGroupName(const std::string& c_rstGroupName);
-				bool IsGroupNameKey(DWORD dwGroupNameKey);
+				bool IsGroupNameKey(uint32_t dwGroupNameKey);
 
 				const std::string& GetGroupName();
 
@@ -22,10 +22,10 @@ class CTextFileLoader
 				bool IsExistTokenVector(const std::string& c_rstGroupName);
 				void InsertTokenVector(const std::string& c_rstGroupName, const CTokenVector& c_rkVct_stToken);
 
-				DWORD m_dwGroupNameKey;
+				uint32_t m_dwGroupNameKey;
 				std::string m_strGroupName;
 
-				std::map<DWORD, CTokenVector> m_kMap_dwKey_kVct_stToken;
+				std::map<uint32_t, CTokenVector> m_kMap_dwKey_kVct_stToken;
 
 				SGroupNode* pParentNode;
 				std::vector<SGroupNode*> ChildNodeVector;
@@ -46,7 +46,7 @@ class CTextFileLoader
 				{
 					m_pOwner->SetChildNode(c_szKey);
 				}
-				CGotoChild(CTextFileLoader* pOwner, DWORD dwIndex) : m_pOwner(pOwner)
+				CGotoChild(CTextFileLoader* pOwner, uint32_t dwIndex) : m_pOwner(pOwner)
 				{
 					m_pOwner->SetChildNode(dwIndex);
 				}
@@ -77,31 +77,31 @@ class CTextFileLoader
 		bool IsEmpty();
 
 		void SetTop();
-		DWORD GetChildNodeCount();
-		BOOL SetChildNode(const char* c_szKey);
-		BOOL SetChildNode(const std::string& c_rstrKeyHead, DWORD dwIndex);
-		BOOL SetChildNode(DWORD dwIndex);
-		BOOL SetParentNode();
-		BOOL GetCurrentNodeName(std::string* pstrName);
+		uint32_t GetChildNodeCount();
+		int32_t SetChildNode(const char* c_szKey);
+		int32_t SetChildNode(const std::string& c_rstrKeyHead, uint32_t dwIndex);
+		int32_t SetChildNode(uint32_t dwIndex);
+		int32_t SetParentNode();
+		int32_t GetCurrentNodeName(std::string* pstrName);
 
-		BOOL IsToken(const std::string& c_rstrKey);
-		BOOL GetTokenVector(const std::string& c_rstrKey, CTokenVector** ppTokenVector);
-		BOOL GetTokenBoolean(const std::string& c_rstrKey, BOOL* pData);
-		BOOL GetTokenByte(const std::string& c_rstrKey, BYTE* pData);
-		BOOL GetTokenWord(const std::string& c_rstrKey, WORD* pData);
-		BOOL GetTokenInteger(const std::string& c_rstrKey, int* pData);
-		BOOL GetTokenDoubleWord(const std::string& c_rstrKey, DWORD* pData);
-		BOOL GetTokenFloat(const std::string& c_rstrKey, float* pData);
-		BOOL GetTokenVector2(const std::string& c_rstrKey, D3DXVECTOR2* pVector2);
-		BOOL GetTokenVector3(const std::string& c_rstrKey, D3DXVECTOR3* pVector3);
-		BOOL GetTokenVector4(const std::string& c_rstrKey, D3DXVECTOR4* pVector4);
+		int32_t IsToken(const std::string& c_rstrKey);
+		int32_t GetTokenVector(const std::string& c_rstrKey, CTokenVector** ppTokenVector);
+		int32_t GetTokenBoolean(const std::string& c_rstrKey, int32_t* pData);
+		int32_t GetTokenByte(const std::string& c_rstrKey, uint8_t* pData);
+		int32_t GetTokenWord(const std::string& c_rstrKey, uint16_t* pData);
+		int32_t GetTokenInteger(const std::string& c_rstrKey, int* pData);
+		int32_t GetTokenDoubleWord(const std::string& c_rstrKey, uint32_t* pData);
+		int32_t GetTokenFloat(const std::string& c_rstrKey, float* pData);
+		int32_t GetTokenVector2(const std::string& c_rstrKey, D3DXVECTOR2* pVector2);
+		int32_t GetTokenVector3(const std::string& c_rstrKey, D3DXVECTOR3* pVector3);
+		int32_t GetTokenVector4(const std::string& c_rstrKey, D3DXVECTOR4* pVector4);
 
-		BOOL GetTokenPosition(const std::string& c_rstrKey, D3DXVECTOR3* pVector);
-		BOOL GetTokenQuaternion(const std::string& c_rstrKey, D3DXQUATERNION* pQ);
-		BOOL GetTokenDirection(const std::string& c_rstrKey, D3DVECTOR* pVector);
-		BOOL GetTokenColor(const std::string& c_rstrKey, D3DXCOLOR* pColor);
-		BOOL GetTokenColor(const std::string& c_rstrKey, D3DCOLORVALUE* pColor);
-		BOOL GetTokenString(const std::string& c_rstrKey, std::string* pString);
+		int32_t GetTokenPosition(const std::string& c_rstrKey, D3DXVECTOR3* pVector);
+		int32_t GetTokenQuaternion(const std::string& c_rstrKey, D3DXQUATERNION* pQ);
+		int32_t GetTokenDirection(const std::string& c_rstrKey, D3DVECTOR* pVector);
+		int32_t GetTokenColor(const std::string& c_rstrKey, D3DXCOLOR* pColor);
+		int32_t GetTokenColor(const std::string& c_rstrKey, D3DCOLORVALUE* pColor);
+		int32_t GetTokenString(const std::string& c_rstrKey, std::string* pString);
 
 	protected:
 		void __DestroyGroupNodeVector();
@@ -112,10 +112,10 @@ class CTextFileLoader
 		std::string m_strFileName;
 
 		char* m_acBufData;
-		DWORD m_dwBufSize;
-		DWORD m_dwBufCapacity;
+		uint32_t m_dwBufSize;
+		uint32_t m_dwBufCapacity;
 
-		DWORD m_dwcurLineIndex;
+		uint32_t m_dwcurLineIndex;
 
 		CMemoryTextFileLoader m_textFileLoader;
 
@@ -125,7 +125,7 @@ class CTextFileLoader
 		std::vector<SGroupNode*> m_kVct_pkNode;
 
 	protected:
-		static std::map<DWORD, CTextFileLoader*> ms_kMap_dwNameKey_pkTextFileLoader;
+		static std::map<uint32_t, CTextFileLoader*> ms_kMap_dwNameKey_pkTextFileLoader;
 		static bool ms_isCacheMode;
 };
 

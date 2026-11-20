@@ -15,7 +15,7 @@ namespace NSound
 	} TSoundData;
 	typedef struct SSoundInstance
 	{
-			DWORD dwFrame;
+			uint32_t dwFrame;
 			std::string strSoundFileName;
 	} TSoundInstance;
 	typedef std::vector<TSoundData> TSoundDataVector;

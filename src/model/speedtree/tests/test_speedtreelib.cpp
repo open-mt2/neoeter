@@ -72,7 +72,7 @@ namespace
 							  "BeechLeaves_RT_1.tga";
 		mockSpt += std::string("\x00\x00\x00\x00\x00\x00\x00\x00", 8);
 
-		bool loadOk = wrapper.LoadTree("test_tree.spt", reinterpret_cast<const BYTE*>(mockSpt.data()), static_cast<unsigned int>(mockSpt.size()));
+		bool loadOk = wrapper.LoadTree("test_tree.spt", reinterpret_cast<const uint8_t*>(mockSpt.data()), static_cast<unsigned int>(mockSpt.size()));
 		assert(loadOk);
 
 		const float* bbox = wrapper.GetBoundingBox();

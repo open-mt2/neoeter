@@ -32,19 +32,19 @@ OSVERSIONINFOA CIME::ms_stOSVI = {};
 
 HINSTANCE CIME::ms_hImm32Dll = nullptr;
 HINSTANCE CIME::ms_hCurrentImeDll = nullptr;
-DWORD CIME::ms_dwImeState = 0;
-DWORD CIME::ms_adwId[2] = {0, 0};
+uint32_t CIME::ms_dwImeState = 0;
+uint32_t CIME::ms_adwId[2] = {0, 0};
 
-DWORD CIME::ms_dwIMELevel = 3;
-DWORD CIME::ms_dwIMELevelSaved = 3;
+uint32_t CIME::ms_dwIMELevel = 3;
+uint32_t CIME::ms_dwIMELevelSaved = 3;
 
 bool CIME::ms_bCandidateList = false;
-DWORD CIME::ms_dwCandidateCount = 0;
+uint32_t CIME::ms_dwCandidateCount = 0;
 bool CIME::ms_bVerticalCandidate = false;
 int CIME::ms_iCandListIndexBase = 0;
-WCHAR CIME::ms_wszCandidate[CIME::MAX_CANDLIST][CIME::MAX_CANDIDATE_LENGTH] = {};
-DWORD CIME::ms_dwCandidateSelection = 0;
-DWORD CIME::ms_dwCandidatePageSize = 0;
+wchar_t CIME::ms_wszCandidate[CIME::MAX_CANDLIST][CIME::MAX_CANDIDATE_LENGTH] = {};
+uint32_t CIME::ms_dwCandidateSelection = 0;
+uint32_t CIME::ms_dwCandidatePageSize = 0;
 
 bool CIME::ms_bReadingInformation = false;
 int CIME::ms_iReadingError = 0;
@@ -62,8 +62,8 @@ int CIME::ms_lastpos = 0;
 int CIME::ms_ulbegin = 0;
 int CIME::ms_ulend = 0;
 
-UINT CIME::ms_uOutputCodePage = 65001;
-UINT CIME::ms_uInputCodePage = 65001;
+uint32_t CIME::ms_uOutputCodePage = 65001;
+uint32_t CIME::ms_uInputCodePage = 65001;
 
 std::string CIME::m_stText;
 std::string CIME::m_stComposition;
@@ -180,13 +180,13 @@ int CIME::GetCodePage() { return (int)ms_uOutputCodePage; }
 
 int CIME::GetCandidateCount() { return 0; }
 int CIME::GetCandidatePageCount() { return 0; }
-int CIME::GetCandidate(DWORD, std::string&) { return 0; }
+int CIME::GetCandidate(uint32_t, std::string&) { return 0; }
 int CIME::GetCandidateSelection() { return 0; }
 int CIME::GetReading(std::string&) { return 0; }
 int CIME::GetReadingError() { return 0; }
 
-void CIME::SetInputMode(DWORD dwMode) { ms_dwImeState = dwMode; }
-DWORD CIME::GetInputMode() { return ms_dwImeState; }
+void CIME::SetInputMode(uint32_t dwMode) { ms_dwImeState = dwMode; }
+uint32_t CIME::GetInputMode() { return ms_dwImeState; }
 
 bool CIME::IsIMEEnabled() { return ms_bImeEnabled; }
 
@@ -257,12 +257,12 @@ void CIME::CloseReadingInformation() { ms_bReadingInformation = false; }
 void CIME::ChangeInputLanguage() {}
 void CIME::ChangeInputLanguageWorker() {}
 
-LRESULT CIME::WMInputLanguage(HWND, UINT, WPARAM, LPARAM) { return 0; }
-LRESULT CIME::WMStartComposition(HWND, UINT, WPARAM, LPARAM) { return 0; }
-LRESULT CIME::WMComposition(HWND, UINT, WPARAM, LPARAM) { return 0; }
-LRESULT CIME::WMEndComposition(HWND, UINT, WPARAM, LPARAM) { return 0; }
-LRESULT CIME::WMNotify(HWND, UINT, WPARAM, LPARAM) { return 0; }
-LRESULT CIME::WMChar(HWND, UINT, WPARAM wParam, LPARAM lParam)
+intptr_t CIME::WMInputLanguage(HWND, uint32_t, uintptr_t, intptr_t) { return 0; }
+intptr_t CIME::WMStartComposition(HWND, uint32_t, uintptr_t, intptr_t) { return 0; }
+intptr_t CIME::WMComposition(HWND, uint32_t, uintptr_t, intptr_t) { return 0; }
+intptr_t CIME::WMEndComposition(HWND, uint32_t, uintptr_t, intptr_t) { return 0; }
+intptr_t CIME::WMNotify(HWND, uint32_t, uintptr_t, intptr_t) { return 0; }
+intptr_t CIME::WMChar(HWND, uint32_t, uintptr_t wParam, intptr_t lParam)
 {
 	// Printable characters arrive as committed UTF-8 through SDL_TEXTINPUT
 	// (OnSDLTextInput). WM_CHAR is still used for editing keys and the
@@ -341,7 +341,7 @@ void CIME::DelCurPos()
 
 void CIME::CheckInputLocale() {}
 void CIME::CheckToggleState() {}
-void CIME::SetSupportLevel(DWORD dwImeLevel) { ms_dwIMELevel = dwImeLevel; }
+void CIME::SetSupportLevel(uint32_t dwImeLevel) { ms_dwIMELevel = dwImeLevel; }
 
 void CIME::InsertString(wchar_t* /*szString*/, int /*iSize*/) {}
 void CIME::OnChar(wchar_t c)
@@ -354,7 +354,7 @@ void CIME::OnChar(wchar_t c)
 	ms_curpos = ms_lastpos = (int)m_stText.size();
 }
 
-UINT CIME::GetCodePageFromLang(LANGID) { return 65001; }
+uint32_t CIME::GetCodePageFromLang(LANGID) { return 65001; }
 void CIME::ResultProcess(HIMC) {}
 void CIME::CompositionProcessBuilding(HIMC) {}
 void CIME::CompositionProcess(HIMC) {}
@@ -362,7 +362,7 @@ void CIME::AttributeProcess(HIMC) {}
 void CIME::CandidateProcess(HIMC) {}
 void CIME::ReadingProcess(HIMC) {}
 bool CIME::IsMax(const wchar_t*, int) { return false; }
-DWORD CIME::GetImeId(UINT) { return 0; }
+uint32_t CIME::GetImeId(uint32_t) { return 0; }
 bool CIME::GetReadingWindowOrientation() { return false; }
 void CIME::SetupImeApi() {}
 

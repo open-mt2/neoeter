@@ -6,6 +6,8 @@
 
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
 #include <windows.h>
+#include <cstdint>
+#include <cstddef>
 #else
 #include <Platform/Platform.h>
 #endif
@@ -21,14 +23,14 @@ class CMemoryTextFileLoader
 		virtual ~CMemoryTextFileLoader();
 
 		void Bind(int bufSize, const void* c_pvBuf);
-		DWORD GetLineCount();
-		bool CheckLineIndex(DWORD dwLine);
-		bool SplitLine(DWORD dwLine, CTokenVector* pstTokenVector,
+		uint32_t GetLineCount();
+		bool CheckLineIndex(uint32_t dwLine);
+		bool SplitLine(uint32_t dwLine, CTokenVector* pstTokenVector,
 					   const char* c_szDelimeter = " \t");
-		int SplitLine2(DWORD dwLine, CTokenVector* pstTokenVector,
+		int SplitLine2(uint32_t dwLine, CTokenVector* pstTokenVector,
 					   const char* c_szDelimeter = " \t");
-		bool SplitLineByTab(DWORD dwLine, CTokenVector* pstTokenVector);
-		const std::string& GetLineString(DWORD dwLine);
+		bool SplitLineByTab(uint32_t dwLine, CTokenVector* pstTokenVector);
+		const std::string& GetLineString(uint32_t dwLine);
 
 	protected:
 		std::vector<std::string> m_stLineVector;

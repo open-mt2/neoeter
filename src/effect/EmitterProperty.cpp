@@ -1,15 +1,15 @@
 #include <Neoeter/Effect/StdAfx.h>
 #include <Neoeter/Effect/EmitterProperty.h>
 
-BYTE CEmitterProperty::GetEmitterShape()
+uint8_t CEmitterProperty::GetEmitterShape()
 {
 	return m_byEmitterShape;
 }
-BYTE CEmitterProperty::GetEmitterAdvancedType()
+uint8_t CEmitterProperty::GetEmitterAdvancedType()
 {
 	return m_byEmitterAdvancedType;
 }
-BOOL CEmitterProperty::isEmitFromEdge()
+int32_t CEmitterProperty::isEmitFromEdge()
 {
 	return m_bEmitFromEdgeFlag;
 }

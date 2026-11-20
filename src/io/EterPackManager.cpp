@@ -132,7 +132,7 @@ std::string CEterPackManager::ConvertFileName(std::string fileName)
 	return convertedFileName;
 }
 
-bool CEterPackManager::CompareName(const char* c_szDirectoryName, DWORD /*dwLength*/, const char* c_szFileName)
+bool CEterPackManager::CompareName(const char* c_szDirectoryName, uint32_t /*dwLength*/, const char* c_szFileName)
 {
 	const char* c_pszSrc = c_szDirectoryName;
 	const char* c_pszCmp = c_szFileName;
@@ -161,7 +161,7 @@ struct TimeChecker
 		}
 
 		const char* name;
-		DWORD baseTime;
+		uint32_t baseTime;
 };
 
 bool CEterPackManager::Get(const std::string& fileName, TPackDataPtr& dataPtr)

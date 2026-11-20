@@ -8,7 +8,7 @@
 
 #include <deque>
 
-typedef DWORD TLightID;
+typedef uint32_t TLightID;
 
 enum ELightType
 {
@@ -46,8 +46,8 @@ class CLight : public CGraphicBase, public CLightBase
 
 		TLightID GetLightID() { return m_LightID; }
 
-		BOOL isEdited() { return m_isEdited; }
-		void SetDeviceLight(BOOL bActive);
+		int32_t isEdited() { return m_isEdited; }
+		void SetDeviceLight(int32_t bActive);
 
 		void SetDiffuseColor(float fr, float fg, float fb, float fa = 1.0f);
 		void SetAmbientColor(float fr, float fg, float fb, float fa = 1.0f);
@@ -64,7 +64,7 @@ class CLight : public CGraphicBase, public CLightBase
 		TLightID m_LightID; // Light ID. equal to D3D light index
 
 		D3DLIGHT9 m_d3dLight;
-		BOOL m_isEdited;
+		int32_t m_isEdited;
 		float m_fDistance;
 
 		TTransitorColor m_DiffuseColorTransitor;
@@ -106,8 +106,8 @@ class CLightManager : public CGraphicBase, public CLightBase, public CSingleton<
 		/////
 
 		void SetCenterPosition(const D3DXVECTOR3& c_rv3Position);
-		void SetLimitLightCount(DWORD dwLightCount);
-		void SetSkipIndex(DWORD dwSkipIndex);
+		void SetLimitLightCount(uint32_t dwLightCount);
+		void SetSkipIndex(uint32_t dwSkipIndex);
 
 	protected:
 		TLightIDDeque m_NonUsingLightIDDeque;
@@ -116,8 +116,8 @@ class CLightManager : public CGraphicBase, public CLightBase, public CSingleton<
 		TLightSortVector m_LightSortVector;
 
 		D3DXVECTOR3 m_v3CenterPosition;
-		DWORD m_dwLimitLightCount;
-		DWORD m_dwSkipIndex;
+		uint32_t m_dwLimitLightCount;
+		uint32_t m_dwSkipIndex;
 
 	protected:
 		TLightID NewLightID();

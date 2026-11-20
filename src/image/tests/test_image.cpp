@@ -26,13 +26,13 @@
 
 namespace fs = std::filesystem;
 
-static std::vector<BYTE> BuildMinimalDXT1DDS(DWORD width, DWORD height)
+static std::vector<uint8_t> BuildMinimalDXT1DDS(uint32_t width, uint32_t height)
 {
 	// 4 bytes magic ("DDS ") + 124 bytes header + 8 bytes (one 4x4 DXT1 block)
-	std::vector<BYTE> buf(4 + 124 + 8, 0);
+	std::vector<uint8_t> buf(4 + 124 + 8, 0);
 
 	// Magic: "DDS "
-	DWORD magic = MAKEFOURCC('D', 'D', 'S', ' ');
+	uint32_t magic = MAKEFOURCC('D', 'D', 'S', ' ');
 	memcpy(&buf[0], &magic, 4);
 
 	// DDSURFACEDESC2 offsets:
@@ -42,15 +42,15 @@ static std::vector<BYTE> BuildMinimalDXT1DDS(DWORD width, DWORD height)
 	// dwMipMapCount = 1 72: ddpfPixelFormat.dwSize = 32 76:
 	// ddpfPixelFormat.dwFlags = DDPF_FOURCC (0x4) 80: ddpfPixelFormat.dwFourCC =
 	// "DXT1"
-	DWORD dwSize = 124;
-	DWORD dwFlags = 0x00081007;
-	DWORD dwLinearSize = 8;
-	DWORD dwMipMapCount = 1;
-	DWORD ddpfSize = 32;
-	DWORD ddpfFlags = 0x4;
-	DWORD ddpfFourCC = MAKEFOURCC('D', 'X', 'T', '1');
+	uint32_t dwSize = 124;
+	uint32_t dwFlags = 0x00081007;
+	uint32_t dwLinearSize = 8;
+	uint32_t dwMipMapCount = 1;
+	uint32_t ddpfSize = 32;
+	uint32_t ddpfFlags = 0x4;
+	uint32_t ddpfFourCC = MAKEFOURCC('D', 'X', 'T', '1');
 
-	BYTE* hdr = &buf[4];
+	uint8_t* hdr = &buf[4];
 	memcpy(hdr + 0, &dwSize, 4);
 	memcpy(hdr + 4, &dwFlags, 4);
 	memcpy(hdr + 8, &height, 4);
@@ -64,9 +64,9 @@ static std::vector<BYTE> BuildMinimalDXT1DDS(DWORD width, DWORD height)
 	// DXT1 4x4 block:
 	// col0 = 0xF800 (pure red in RGB565), col1 = 0x001F (pure blue in RGB565)
 	// row[0..3] = 0x00 (all pixels select col_0 -> pure red 0xFFFF0000)
-	WORD col0 = 0xF800;
-	WORD col1 = 0x001F;
-	BYTE* block = &buf[128];
+	uint16_t col0 = 0xF800;
+	uint16_t col1 = 0x001F;
+	uint8_t* block = &buf[128];
 	memcpy(block + 0, &col0, 2);
 	memcpy(block + 2, &col1, 2);
 	memset(block + 4, 0x00, 4);
@@ -115,7 +115,7 @@ int main()
 		// Set top-left origin bit (0x20) so Save/Load preserves row order directly
 		tgaOut.GetHeader().desc |= IMAGEDESC_TOPLEFT;
 
-		DWORD* pixels = tgaOut.GetBasePointer();
+		uint32_t* pixels = tgaOut.GetBasePointer();
 		for (int i = 0; i < 8; ++i)
 			pixels[i] = 0xFFFF0000; // Run of 8 identical red pixels
 		for (int i = 8; i < 16; ++i)
@@ -125,8 +125,8 @@ int main()
 		TEST_ASSERT(saved);
 
 		std::ifstream f(tmpFile, std::ios::binary);
-		std::vector<BYTE> fileBytes((std::istreambuf_iterator<char>(f)),
-									std::istreambuf_iterator<char>());
+		std::vector<uint8_t> fileBytes((std::istreambuf_iterator<char>(f)),
+									   std::istreambuf_iterator<char>());
 		f.close();
 		TEST_ASSERT(!fileBytes.empty());
 
@@ -137,11 +137,11 @@ int main()
 		TEST_ASSERT(tgaIn.GetWidth() == 4);
 		TEST_ASSERT(tgaIn.GetHeight() == 4);
 
-		DWORD* loadedPixels = tgaIn.GetBasePointer();
+		uint32_t* loadedPixels = tgaIn.GetBasePointer();
 		for (int i = 0; i < 8; ++i)
 			TEST_ASSERT(loadedPixels[i] == 0xFFFF0000);
 		for (int i = 8; i < 16; ++i)
-			TEST_ASSERT(loadedPixels[i] == static_cast<DWORD>(0xFF00FF00 + i));
+			TEST_ASSERT(loadedPixels[i] == static_cast<uint32_t>(0xFF00FF00 + i));
 
 		fs::remove(tmpFile);
 		printf("  [PASS] CTGAImage RLE compression & decompression round-trip\n");
@@ -149,7 +149,7 @@ int main()
 
 	// 3. Test CDXTCImage 64-bit DDS header parsing & DXT1 block decompression
 	{
-		std::vector<BYTE> ddsBytes = BuildMinimalDXT1DDS(4, 4);
+		std::vector<uint8_t> ddsBytes = BuildMinimalDXT1DDS(4, 4);
 
 		CDXTCImage dxt;
 		const bool hdrLoaded = dxt.LoadHeaderFromMemory(
@@ -162,7 +162,7 @@ int main()
 		// Populate m_bCompVector[0] and decompress on 64-bit address space
 		dxt.m_bCompVector[0].assign(dxt.m_pbCompBufferByLevels[0],
 									dxt.m_pbCompBufferByLevels[0] + 8);
-		std::vector<DWORD> decompressed(4 * 4, 0);
+		std::vector<uint32_t> decompressed(4 * 4, 0);
 		dxt.Decompress(0, decompressed.data());
 
 		// RGB565 0xF800 -> R = (0x1F << 3) = 0xF8, G = 0, B = 0, A = 0xFF ->

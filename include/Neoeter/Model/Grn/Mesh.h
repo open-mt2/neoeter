@@ -27,7 +27,7 @@ class CGrannyMesh
 				STriGroupNode* pNextTriGroupNode;
 				int idxPos;
 				int triCount;
-				DWORD mtrlIndex;
+				uint32_t mtrlIndex;
 		} TTriGroupNode;
 
 	public:
@@ -80,7 +80,7 @@ class CGrannyMesh
 		granny_mesh_deformer* m_pgrnMeshDeformer;
 
 		// Granny Material Data
-		std::vector<DWORD> m_mtrlIndexVector;
+		std::vector<uint32_t> m_mtrlIndexVector;
 
 		// TriGroups Data
 		TTriGroupNode* m_triGroupNodes;

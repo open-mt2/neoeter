@@ -6,8 +6,8 @@
 class CGraphicMarkInstance
 {
 	public:
-		static DWORD Type();
-		BOOL IsType(DWORD dwType);
+		static uint32_t Type();
+		int32_t IsType(uint32_t dwType);
 
 		void SetImageFileName(const char* c_szFileName);
 		const std::string& GetImageFileName();
@@ -23,7 +23,7 @@ class CGraphicMarkInstance
 		void SetDepth(float fDepth);
 		void SetDiffuseColor(float fr, float fg, float fb, float fa);
 		void SetPosition(float fx, float fy);
-		void SetIndex(UINT uIndex);
+		void SetIndex(uint32_t uIndex);
 		void SetScale(float fScale);
 
 		void Load();
@@ -50,7 +50,7 @@ class CGraphicMarkInstance
 		virtual void OnRender();
 		virtual void OnSetImagePointer();
 
-		virtual BOOL OnIsType(DWORD dwType);
+		virtual int32_t OnIsType(uint32_t dwType);
 
 		void SetImagePointer(CGraphicImage* pImage);
 
@@ -58,16 +58,16 @@ class CGraphicMarkInstance
 		D3DXCOLOR m_DiffuseColor;
 		D3DXVECTOR2 m_v2Position;
 
-		UINT m_uIndex;
+		uint32_t m_uIndex;
 
-		FLOAT m_fScale;
-		FLOAT m_fDepth;
+		float m_fScale;
+		float m_fDepth;
 
 		CGraphicImage::TRef m_roImage;
 		std::string m_stImageFileName;
 
 	public:
-		static void CreateSystem(UINT uCapacity);
+		static void CreateSystem(uint32_t uCapacity);
 		static void DestroySystem();
 
 		static CGraphicMarkInstance* New();

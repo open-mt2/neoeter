@@ -14,7 +14,7 @@ class CGrannyMaterial : public CReferenceObject
 	public:
 		typedef CRef<CGrannyMaterial> TRef;
 
-		static void CreateSphereMap(UINT uMapIndex, const char* c_szSphereMapImageFileName);
+		static void CreateSphereMap(uint32_t uMapIndex, const char* c_szSphereMapImageFileName);
 		static void DestroySphereMap();
 
 	public:
@@ -40,7 +40,7 @@ class CGrannyMaterial : public CReferenceObject
 		void Copy(CGrannyMaterial& rkMtrl);
 		bool IsEqual(granny_material* pgrnMaterial) const;
 		bool IsIn(const char* c_szImageName, int* iStage);
-		void SetSpecularInfo(BOOL bFlag, float fPower, BYTE uSphereMapIndex);
+		void SetSpecularInfo(int32_t bFlag, float fPower, uint8_t uSphereMapIndex);
 
 		void ApplyRenderState();
 		void RestoreRenderState();
@@ -65,7 +65,7 @@ class CGrannyMaterial : public CReferenceObject
 	protected:
 		CGraphicImage* __GetImagePointer(const char* c_szFileName);
 
-		BOOL __IsSpecularEnable() const;
+		int32_t __IsSpecularEnable() const;
 		float __GetSpecularPower() const;
 
 		void __ApplyDiffuseRenderState();
@@ -79,10 +79,10 @@ class CGrannyMaterial : public CReferenceObject
 		EType m_eType;
 
 		float m_fSpecularPower;
-		BOOL m_bSpecularEnable;
+		int32_t m_bSpecularEnable;
 		bool m_bTwoSideRender;
-		DWORD m_dwLastCullRenderStateForTwoSideRendering;
-		BYTE m_bSphereMapIndex;
+		uint32_t m_dwLastCullRenderStateForTwoSideRendering;
+		uint8_t m_bSphereMapIndex;
 
 		void (CGrannyMaterial::*m_pfnApplyRenderState)();
 		void (CGrannyMaterial::*m_pfnRestoreRenderState)();
@@ -104,14 +104,14 @@ class CGrannyMaterialPalette
 		void Clear();
 		void Copy(const CGrannyMaterialPalette& rkMtrlPalSrc);
 
-		DWORD RegisterMaterial(granny_material* pgrnMaterial);
+		uint32_t RegisterMaterial(granny_material* pgrnMaterial);
 		void SetMaterialImagePointer(const char* c_szMtrlName, CGraphicImage* pImage);
 		void SetMaterialData(const char* c_szMtrlName, const SMaterialData& c_rkMaterialData);
-		void SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower);
+		void SetSpecularInfo(const char* c_szMtrlName, int32_t bEnable, float fPower);
 
-		CGrannyMaterial& GetMaterialRef(DWORD mtrlIndex);
+		CGrannyMaterial& GetMaterialRef(uint32_t mtrlIndex);
 
-		DWORD GetMaterialCount() const;
+		uint32_t GetMaterialCount() const;
 
 	protected:
 		std::vector<CGrannyMaterial::TRef> m_mtrlVector;

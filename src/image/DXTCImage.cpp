@@ -42,49 +42,49 @@
 #pragma pack(push, 1)
 typedef struct _DDCOLORKEY_COMPAT
 {
-		DWORD dwColorSpaceLowValue;
-		DWORD dwColorSpaceHighValue;
+		uint32_t dwColorSpaceLowValue;
+		uint32_t dwColorSpaceHighValue;
 } DDCOLORKEY_COMPAT;
 
 typedef struct _DDSCAPS2_COMPAT
 {
-		DWORD dwCaps;
-		DWORD dwCaps2;
-		DWORD dwCaps3;
-		DWORD dwCaps4;
+		uint32_t dwCaps;
+		uint32_t dwCaps2;
+		uint32_t dwCaps3;
+		uint32_t dwCaps4;
 } DDSCAPS2_COMPAT;
 
 typedef struct _DDSURFACEDESC2_COMPAT
 {
-		DWORD dwSize;
-		DWORD dwFlags;
-		DWORD dwHeight;
-		DWORD dwWidth;
+		uint32_t dwSize;
+		uint32_t dwFlags;
+		uint32_t dwHeight;
+		uint32_t dwWidth;
 		union
 		{
-				LONG lPitch;
-				DWORD dwLinearSize;
+				int32_t lPitch;
+				uint32_t dwLinearSize;
 		} DUMMYUNIONNAMEN(1);
-		DWORD dwBackBufferCount;
+		uint32_t dwBackBufferCount;
 		union
 		{
-				DWORD dwMipMapCount;
-				DWORD dwRefreshRate;
+				uint32_t dwMipMapCount;
+				uint32_t dwRefreshRate;
 		} DUMMYUNIONNAMEN(2);
-		DWORD dwAlphaBitDepth;
-		DWORD dwReserved;
-		DWORD lpSurface; // 32-bit pointer field in on-disk DDS header
+		uint32_t dwAlphaBitDepth;
+		uint32_t dwReserved;
+		uint32_t lpSurface; // 32-bit pointer field in on-disk DDS header
 		union
 		{
 				DDCOLORKEY_COMPAT ddckCKDestOverlay;
-				DWORD dwEmptyFaceColor;
+				uint32_t dwEmptyFaceColor;
 		} DUMMYUNIONNAMEN(3);
 		DDCOLORKEY_COMPAT ddckCKDestBlt;
 		DDCOLORKEY_COMPAT ddckCKSrcOverlay;
 		DDCOLORKEY_COMPAT ddckCKSrcBlt;
 		XDDPIXELFORMAT ddpfPixelFormat;
 		DDSCAPS2_COMPAT ddsCaps;
-		DWORD dwTextureStage;
+		uint32_t dwTextureStage;
 } DDSURFACEDESC2;
 #pragma pack(pop)
 
@@ -94,33 +94,33 @@ static_assert(sizeof(DDSURFACEDESC2) == 124,
 
 struct DXTColBlock
 {
-		WORD col0;
-		WORD col1;
+		uint16_t col0;
+		uint16_t col1;
 
 		// no bit fields - use bytes
-		BYTE row[4];
+		uint8_t row[4];
 };
 
 struct DXTAlphaBlockExplicit
 {
-		WORD row[4];
+		uint16_t row[4];
 };
 
 struct DXTAlphaBlock3BitLinear
 {
-		BYTE alpha0;
-		BYTE alpha1;
+		uint8_t alpha0;
+		uint8_t alpha1;
 
-		BYTE stuff[6];
+		uint8_t stuff[6];
 };
 
 // use cast to struct instead of RGBA_MAKE as struct is much
 struct Color8888
 {
-		BYTE b; // Last one is MSB, 1st is LSB.
-		BYTE g; // order of the output ARGB or BGRA, etc...
-		BYTE r; // change the order of names to change the
-		BYTE a;
+		uint8_t b; // Last one is MSB, 1st is LSB.
+		uint8_t g; // order of the output ARGB or BGRA, etc...
+		uint8_t r; // change the order of names to change the
+		uint8_t a;
 };
 
 struct Color565
@@ -133,9 +133,9 @@ struct Color565
 /////////////////////////////////////
 // should be in ddraw.h
 #ifndef MAKEFOURCC
-#define MAKEFOURCC(ch0, ch1, ch2, ch3)                \
-	((DWORD)(BYTE)(ch0) | ((DWORD)(BYTE)(ch1) << 8) | \
-	 ((DWORD)(BYTE)(ch2) << 16) | ((DWORD)(BYTE)(ch3) << 24))
+#define MAKEFOURCC(ch0, ch1, ch2, ch3)                            \
+	((uint32_t)(uint8_t)(ch0) | ((uint32_t)(uint8_t)(ch1) << 8) | \
+	 ((uint32_t)(uint8_t)(ch2) << 16) | ((uint32_t)(uint8_t)(ch3) << 24))
 #endif // defined(MAKEFOURCC)
 
 CDXTCImage::CDXTCImage() { Initialize(); }
@@ -159,20 +159,20 @@ void CDXTCImage::Clear()
 	Initialize();
 }
 
-bool CDXTCImage::LoadHeaderFromMemory(const BYTE* c_pbMap, int iSize)
+bool CDXTCImage::LoadHeaderFromMemory(const uint8_t* c_pbMap, int iSize)
 {
 	//////////////////////////////////////
 	// start reading the file
 	// from Microsoft's mssdk D3DIM example "Compress"
-	DWORD dwMagic;
+	uint32_t dwMagic;
 
 	// Read magic number
-	if (iSize < static_cast<int>(sizeof(DWORD)))
+	if (iSize < static_cast<int>(sizeof(uint32_t)))
 		return false;
 
-	memcpy(&dwMagic, c_pbMap, sizeof(DWORD));
-	c_pbMap += sizeof(DWORD);
-	iSize -= sizeof(DWORD);
+	memcpy(&dwMagic, c_pbMap, sizeof(uint32_t));
+	c_pbMap += sizeof(uint32_t);
+	iSize -= sizeof(uint32_t);
 
 	// Check whether the magic header is correct
 	if (dwMagic != MAKEFOURCC('D', 'D', 'S', ' '))
@@ -216,7 +216,7 @@ bool CDXTCImage::LoadHeaderFromMemory(const BYTE* c_pbMap, int iSize)
 	m_nWidth = ddsd.dwWidth;
 	m_nHeight = ddsd.dwHeight;
 	//!@#
-	m_dwMipMapCount = std::max<DWORD>(1, ddsd.dwMipMapCount);
+	m_dwMipMapCount = std::max<uint32_t>(1, ddsd.dwMipMapCount);
 	m_dwFlags = ddsd.dwFlags;
 
 	if (ddsd.dwFlags & DDSD_PITCH)
@@ -230,7 +230,7 @@ bool CDXTCImage::LoadHeaderFromMemory(const BYTE* c_pbMap, int iSize)
 
 		if (ddsd.dwFlags & DDSD_MIPMAPCOUNT)
 		{
-			for (DWORD dwLinearSize = ddsd.dwLinearSize, i = 0; i < m_dwMipMapCount;
+			for (uint32_t dwLinearSize = ddsd.dwLinearSize, i = 0; i < m_dwMipMapCount;
 				 ++i, dwLinearSize >>= 2)
 			{
 				m_pbCompBufferByLevels[i] = c_pbMap;
@@ -246,7 +246,7 @@ bool CDXTCImage::LoadHeaderFromMemory(const BYTE* c_pbMap, int iSize)
 	return true;
 }
 
-bool CDXTCImage::Copy(int miplevel, BYTE* pbDest, long lDestPitch)
+bool CDXTCImage::Copy(int miplevel, uint8_t* pbDest, long lDestPitch)
 {
 	if (!(m_dwFlags & DDSD_MIPMAPCOUNT))
 		if (miplevel)
@@ -257,14 +257,14 @@ bool CDXTCImage::Copy(int miplevel, BYTE* pbDest, long lDestPitch)
 	return true;
 }
 
-void CDXTCImage::Unextract(BYTE* pbDest, int /*iWidth*/, int /*iHeight*/,
+void CDXTCImage::Unextract(uint8_t* pbDest, int /*iWidth*/, int /*iHeight*/,
 						   int iPitch)
 {
 	if (!m_pbCompBufferByLevels[0])
 		return;
 
 	DXTColBlock* pBlock;
-	BYTE* pPos = (BYTE*)&m_pbCompBufferByLevels[0][0];
+	uint8_t* pPos = (uint8_t*)&m_pbCompBufferByLevels[0][0];
 	int xblocks = m_nWidth / 4;
 	int yblocks = (m_nHeight / 4) * ((iPitch / m_nWidth) / 2);
 
@@ -277,7 +277,7 @@ void CDXTCImage::Unextract(BYTE* pbDest, int /*iWidth*/, int /*iHeight*/,
 	}
 }
 
-void CDXTCImage::Decompress(int miplevel, DWORD* pdwDest)
+void CDXTCImage::Decompress(int miplevel, uint32_t* pdwDest)
 {
 	switch (m_CompFormat)
 	{
@@ -304,53 +304,53 @@ void CDXTCImage::Decompress(int miplevel, DWORD* pdwDest)
 	}
 }
 
-inline DWORD Color8888ToDWORD(const Color8888& col)
+inline uint32_t Color8888ToDWORD(const Color8888& col)
 {
-	DWORD dw;
-	memcpy(&dw, &col, sizeof(DWORD));
+	uint32_t dw;
+	memcpy(&dw, &col, sizeof(uint32_t));
 	return dw;
 }
 
 inline void GetColorBlockColors(DXTColBlock* pBlock, Color8888* col_0,
 								Color8888* col_1, Color8888* col_2,
-								Color8888* col_3, WORD& wrd)
+								Color8888* col_3, uint16_t& wrd)
 {
-	WORD rawCol0, rawCol1;
-	memcpy(&rawCol0, &pBlock->col0, sizeof(WORD));
-	memcpy(&rawCol1, &pBlock->col1, sizeof(WORD));
+	uint16_t rawCol0, rawCol1;
+	memcpy(&rawCol0, &pBlock->col0, sizeof(uint16_t));
+	memcpy(&rawCol1, &pBlock->col1, sizeof(uint16_t));
 
 	col_0->a = 0xff;
-	col_0->r = (BYTE)(((rawCol0 >> 11) & 0x1f) << 3); // shift to full precision
-	col_0->g = (BYTE)(((rawCol0 >> 5) & 0x3f) << 2);
-	col_0->b = (BYTE)((rawCol0 & 0x1f) << 3);
+	col_0->r = (uint8_t)(((rawCol0 >> 11) & 0x1f) << 3); // shift to full precision
+	col_0->g = (uint8_t)(((rawCol0 >> 5) & 0x3f) << 2);
+	col_0->b = (uint8_t)((rawCol0 & 0x1f) << 3);
 
 	col_1->a = 0xff;
-	col_1->r = (BYTE)(((rawCol1 >> 11) & 0x1f) << 3); // shift to full precision
-	col_1->g = (BYTE)(((rawCol1 >> 5) & 0x3f) << 2);
-	col_1->b = (BYTE)((rawCol1 & 0x1f) << 3);
+	col_1->r = (uint8_t)(((rawCol1 >> 11) & 0x1f) << 3); // shift to full precision
+	col_1->g = (uint8_t)(((rawCol1 >> 5) & 0x3f) << 2);
+	col_1->b = (uint8_t)((rawCol1 & 0x1f) << 3);
 
 	if (rawCol0 > rawCol1)
 	{
 		// Four-color block: derive the other two colors.
 		// 00 = color_0, 01 = color_1, 10 = color_2, 11 = color_3
-		wrd = (WORD)(((WORD)col_0->r * 2 + (WORD)col_1->r) / 3);
-		col_2->r = (BYTE)wrd;
+		wrd = (uint16_t)(((uint16_t)col_0->r * 2 + (uint16_t)col_1->r) / 3);
+		col_2->r = (uint8_t)wrd;
 
-		wrd = (WORD)(((WORD)col_0->g * 2 + (WORD)col_1->g) / 3);
-		col_2->g = (BYTE)wrd;
+		wrd = (uint16_t)(((uint16_t)col_0->g * 2 + (uint16_t)col_1->g) / 3);
+		col_2->g = (uint8_t)wrd;
 
-		wrd = (WORD)(((WORD)col_0->b * 2 + (WORD)col_1->b) / 3);
-		col_2->b = (BYTE)wrd;
+		wrd = (uint16_t)(((uint16_t)col_0->b * 2 + (uint16_t)col_1->b) / 3);
+		col_2->b = (uint8_t)wrd;
 		col_2->a = 0xff;
 
-		wrd = (WORD)(((WORD)col_0->r + (WORD)col_1->r * 2) / 3);
-		col_3->r = (BYTE)wrd;
+		wrd = (uint16_t)(((uint16_t)col_0->r + (uint16_t)col_1->r * 2) / 3);
+		col_3->r = (uint8_t)wrd;
 
-		wrd = (WORD)(((WORD)col_0->g + (WORD)col_1->g * 2) / 3);
-		col_3->g = (BYTE)wrd;
+		wrd = (uint16_t)(((uint16_t)col_0->g + (uint16_t)col_1->g * 2) / 3);
+		col_3->g = (uint8_t)wrd;
 
-		wrd = (WORD)(((WORD)col_0->b + (WORD)col_1->b * 2) / 3);
-		col_3->b = (BYTE)wrd;
+		wrd = (uint16_t)(((uint16_t)col_0->b + (uint16_t)col_1->b * 2) / 3);
+		col_3->b = (uint8_t)wrd;
 		col_3->a = 0xff;
 	}
 	else
@@ -358,12 +358,12 @@ inline void GetColorBlockColors(DXTColBlock* pBlock, Color8888* col_0,
 		// Three-color block: derive the other color.
 		// 00 = color_0,  01 = color_1,  10 = color_2,
 		// 11 = transparent.
-		wrd = (WORD)(((WORD)col_0->r + (WORD)col_1->r) / 2);
-		col_2->r = (BYTE)wrd;
-		wrd = (WORD)(((WORD)col_0->g + (WORD)col_1->g) / 2);
-		col_2->g = (BYTE)wrd;
-		wrd = (WORD)(((WORD)col_0->b + (WORD)col_1->b) / 2);
-		col_2->b = (BYTE)wrd;
+		wrd = (uint16_t)(((uint16_t)col_0->r + (uint16_t)col_1->r) / 2);
+		col_2->r = (uint8_t)wrd;
+		wrd = (uint16_t)(((uint16_t)col_0->g + (uint16_t)col_1->g) / 2);
+		col_2->g = (uint8_t)wrd;
+		wrd = (uint16_t)(((uint16_t)col_0->b + (uint16_t)col_1->b) / 2);
+		col_2->b = (uint8_t)wrd;
 		col_2->a = 0xff;
 
 		col_3->r = 0x00; // random color to indicate alpha
@@ -373,27 +373,27 @@ inline void GetColorBlockColors(DXTColBlock* pBlock, Color8888* col_0,
 	}
 }
 
-inline void DecodeColorBlock(DWORD* pImPos, DXTColBlock* pColorBlock, int width,
-							 DWORD* col_0, DWORD* col_1, DWORD* col_2,
-							 DWORD* col_3)
+inline void DecodeColorBlock(uint32_t* pImPos, DXTColBlock* pColorBlock, int width,
+							 uint32_t* col_0, uint32_t* col_1, uint32_t* col_2,
+							 uint32_t* col_3)
 {
 	// width is width of image in pixels
-	DWORD bits;
+	uint32_t bits;
 	int y, n;
 
-	DWORD c0, c1, c2, c3;
-	memcpy(&c0, col_0, sizeof(DWORD));
-	memcpy(&c1, col_1, sizeof(DWORD));
-	memcpy(&c2, col_2, sizeof(DWORD));
-	memcpy(&c3, col_3, sizeof(DWORD));
+	uint32_t c0, c1, c2, c3;
+	memcpy(&c0, col_0, sizeof(uint32_t));
+	memcpy(&c1, col_1, sizeof(uint32_t));
+	memcpy(&c2, col_2, sizeof(uint32_t));
+	memcpy(&c3, col_3, sizeof(uint32_t));
 
 	// bit masks = 00000011, 00001100, 00110000, 11000000
-	const DWORD masks[] = {3, 12, 3 << 4, 3 << 6};
+	const uint32_t masks[] = {3, 12, 3 << 4, 3 << 6};
 	const int shift[] = {0, 2, 4, 6};
 
 	// r steps through lines in y
 	for (y = 0; y < 4;
-		 ++y, pImPos += width - 4) // no width * 4 as DWORD ptr inc will * 4
+		 ++y, pImPos += width - 4) // no width * 4 as uint32_t ptr inc will * 4
 	{
 		// n steps through pixels
 		for (n = 0; n < 4; ++n)
@@ -405,7 +405,7 @@ inline void DecodeColorBlock(DWORD* pImPos, DXTColBlock* pColorBlock, int width,
 			{
 				case 0:
 					*pImPos = c0;
-					pImPos++; // increment to next DWORD
+					pImPos++; // increment to next uint32_t
 					break;
 
 				case 1:
@@ -432,31 +432,31 @@ inline void DecodeColorBlock(DWORD* pImPos, DXTColBlock* pColorBlock, int width,
 	}
 }
 
-inline void DecodeAlphaExplicit(DWORD* pImPos,
+inline void DecodeAlphaExplicit(uint32_t* pImPos,
 								DXTAlphaBlockExplicit* pAlphaBlock, int width,
-								DWORD alphazero)
+								uint32_t alphazero)
 {
 	// decodes to 32 bit format only
 	int row, pix;
 
-	WORD wrd;
+	uint16_t wrd;
 
 	Color8888 col;
 	col.r = col.g = col.b = 0;
 
 	for (row = 0; row < 4; row++, pImPos += width - 4)
 	{
-		memcpy(&wrd, &pAlphaBlock->row[row], sizeof(WORD));
+		memcpy(&wrd, &pAlphaBlock->row[row], sizeof(uint16_t));
 
 		for (pix = 0; pix < 4; ++pix)
 		{
 			// zero the alpha bits of image pixel
 			*pImPos &= alphazero;
 
-			col.a = (BYTE)(wrd & 0x000f); // get only low 4 bits
+			col.a = (uint8_t)(wrd & 0x000f); // get only low 4 bits
 			col.a =
-				(BYTE)(col.a |
-					   (col.a << 4)); // This allows max 4 bit alpha to be 0xff alpha
+				(uint8_t)(col.a |
+						  (col.a << 4)); // This allows max 4 bit alpha to be 0xff alpha
 
 			*pImPos |=
 				Color8888ToDWORD(col); // or the bits into the prev. nulled alpha
@@ -468,13 +468,13 @@ inline void DecodeAlphaExplicit(DWORD* pImPos,
 	}
 }
 
-static BYTE gBits[4][4];
-static WORD gAlphas[8];
+static uint8_t gBits[4][4];
+static uint16_t gAlphas[8];
 static Color8888 gACol[4][4];
 
-inline void DecodeAlpha3BitLinear(DWORD* pImPos,
+inline void DecodeAlpha3BitLinear(uint32_t* pImPos,
 								  DXTAlphaBlock3BitLinear* pAlphaBlock,
-								  int width, DWORD alphazero)
+								  int width, uint32_t alphazero)
 {
 	gAlphas[0] = pAlphaBlock->alpha0;
 	gAlphas[1] = pAlphaBlock->alpha1;
@@ -484,65 +484,65 @@ inline void DecodeAlpha3BitLinear(DWORD* pImPos,
 	{
 		// 8-alpha block:  derive the other 6 alphas.
 		// 000 = alpha_0, 001 = alpha_1, others are interpolated
-		gAlphas[2] = (WORD)((6 * gAlphas[0] + gAlphas[1]) / 7);		// Bit code 010
-		gAlphas[3] = (WORD)((5 * gAlphas[0] + 2 * gAlphas[1]) / 7); // Bit code 011
-		gAlphas[4] = (WORD)((4 * gAlphas[0] + 3 * gAlphas[1]) / 7); // Bit code 100
-		gAlphas[5] = (WORD)((3 * gAlphas[0] + 4 * gAlphas[1]) / 7); // Bit code 101
-		gAlphas[6] = (WORD)((2 * gAlphas[0] + 5 * gAlphas[1]) / 7); // Bit code 110
-		gAlphas[7] = (WORD)((gAlphas[0] + 6 * gAlphas[1]) / 7);		// Bit code 111
+		gAlphas[2] = (uint16_t)((6 * gAlphas[0] + gAlphas[1]) / 7);		// Bit code 010
+		gAlphas[3] = (uint16_t)((5 * gAlphas[0] + 2 * gAlphas[1]) / 7); // Bit code 011
+		gAlphas[4] = (uint16_t)((4 * gAlphas[0] + 3 * gAlphas[1]) / 7); // Bit code 100
+		gAlphas[5] = (uint16_t)((3 * gAlphas[0] + 4 * gAlphas[1]) / 7); // Bit code 101
+		gAlphas[6] = (uint16_t)((2 * gAlphas[0] + 5 * gAlphas[1]) / 7); // Bit code 110
+		gAlphas[7] = (uint16_t)((gAlphas[0] + 6 * gAlphas[1]) / 7);		// Bit code 111
 	}
 	else
 	{
 		// 6-alpha block:  derive the other alphas.
 		// 000 = alpha_0, 001 = alpha_1, others are interpolated
-		gAlphas[2] = (WORD)((4 * gAlphas[0] + gAlphas[1]) / 5);		// Bit code 010
-		gAlphas[3] = (WORD)((3 * gAlphas[0] + 2 * gAlphas[1]) / 5); // Bit code 011
-		gAlphas[4] = (WORD)((2 * gAlphas[0] + 3 * gAlphas[1]) / 5); // Bit code 100
-		gAlphas[5] = (WORD)((gAlphas[0] + 4 * gAlphas[1]) / 5);		// Bit code 101
-		gAlphas[6] = 0;												// Bit code 110
-		gAlphas[7] = 255;											// Bit code 111
+		gAlphas[2] = (uint16_t)((4 * gAlphas[0] + gAlphas[1]) / 5);		// Bit code 010
+		gAlphas[3] = (uint16_t)((3 * gAlphas[0] + 2 * gAlphas[1]) / 5); // Bit code 011
+		gAlphas[4] = (uint16_t)((2 * gAlphas[0] + 3 * gAlphas[1]) / 5); // Bit code 100
+		gAlphas[5] = (uint16_t)((gAlphas[0] + 4 * gAlphas[1]) / 5);		// Bit code 101
+		gAlphas[6] = 0;													// Bit code 110
+		gAlphas[7] = 255;												// Bit code 111
 	}
 
 	// Decode 3-bit fields into array of 16 BYTES with same value
-	const DWORD mask = 0x00000007; // bits = 00 00 01 11
-	DWORD bits = 0;
+	const uint32_t mask = 0x00000007; // bits = 00 00 01 11
+	uint32_t bits = 0;
 	memcpy(&bits, &(pAlphaBlock->stuff[0]), 3);
 
-	gBits[0][0] = (BYTE)(bits & mask);
+	gBits[0][0] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[0][1] = (BYTE)(bits & mask);
+	gBits[0][1] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[0][2] = (BYTE)(bits & mask);
+	gBits[0][2] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[0][3] = (BYTE)(bits & mask);
+	gBits[0][3] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[1][0] = (BYTE)(bits & mask);
+	gBits[1][0] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[1][1] = (BYTE)(bits & mask);
+	gBits[1][1] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[1][2] = (BYTE)(bits & mask);
+	gBits[1][2] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[1][3] = (BYTE)(bits & mask);
+	gBits[1][3] = (uint8_t)(bits & mask);
 
 	// now for last two rows:
 	bits = 0;
 	memcpy(&bits, &(pAlphaBlock->stuff[3]), 3); // last 3 bytes
 
-	gBits[2][0] = (BYTE)(bits & mask);
+	gBits[2][0] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[2][1] = (BYTE)(bits & mask);
+	gBits[2][1] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[2][2] = (BYTE)(bits & mask);
+	gBits[2][2] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[2][3] = (BYTE)(bits & mask);
+	gBits[2][3] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[3][0] = (BYTE)(bits & mask);
+	gBits[3][0] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[3][1] = (BYTE)(bits & mask);
+	gBits[3][1] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[3][2] = (BYTE)(bits & mask);
+	gBits[3][2] = (uint8_t)(bits & mask);
 	bits >>= 3;
-	gBits[3][3] = (BYTE)(bits & mask);
+	gBits[3][3] = (uint8_t)(bits & mask);
 
 	// decode the codes into alpha values
 	int row, pix;
@@ -551,7 +551,7 @@ inline void DecodeAlpha3BitLinear(DWORD* pImPos,
 	{
 		for (pix = 0; pix < 4; ++pix)
 		{
-			gACol[row][pix].a = (BYTE)gAlphas[gBits[row][pix]];
+			gACol[row][pix].a = (uint8_t)gAlphas[gBits[row][pix]];
 
 			assert(gACol[row][pix].r == 0);
 			assert(gACol[row][pix].g == 0);
@@ -573,24 +573,24 @@ inline void DecodeAlpha3BitLinear(DWORD* pImPos,
 	}
 }
 
-void CDXTCImage::DecompressDXT1(int miplevel, DWORD* pdwDest)
+void CDXTCImage::DecompressDXT1(int miplevel, uint32_t* pdwDest)
 {
 	int xblocks, yblocks;
-	UINT nWidth = m_nWidth >> miplevel;
-	UINT nHeight = m_nHeight >> miplevel;
+	uint32_t nWidth = m_nWidth >> miplevel;
+	uint32_t nHeight = m_nHeight >> miplevel;
 
 	xblocks = nWidth / 4;
 	yblocks = nHeight / 4;
 
 	int x, y;
-	DWORD* pBase = (DWORD*)pdwDest;
-	WORD* pPos = (WORD*)&m_bCompVector[miplevel][0]; // pos in compressed data
-	DWORD* pImPos;
+	uint32_t* pBase = (uint32_t*)pdwDest;
+	uint16_t* pPos = (uint16_t*)&m_bCompVector[miplevel][0]; // pos in compressed data
+	uint32_t* pImPos;
 
 	DXTColBlock* pBlock;
 
 	Color8888 col_0, col_1, col_2, col_3;
-	WORD wrd;
+	uint16_t wrd;
 
 	for (y = 0; y < yblocks; ++y)
 	{
@@ -601,37 +601,37 @@ void CDXTCImage::DecompressDXT1(int miplevel, DWORD* pdwDest)
 		{
 			GetColorBlockColors(pBlock, &col_0, &col_1, &col_2, &col_3, wrd);
 
-			pImPos = (DWORD*)((uintptr_t)pBase + x * 16 + (y * 4) * nWidth * 4);
-			DecodeColorBlock(pImPos, pBlock, nWidth, (DWORD*)&col_0, (DWORD*)&col_1,
-							 (DWORD*)&col_2, (DWORD*)&col_3);
+			pImPos = (uint32_t*)((uintptr_t)pBase + x * 16 + (y * 4) * nWidth * 4);
+			DecodeColorBlock(pImPos, pBlock, nWidth, (uint32_t*)&col_0, (uint32_t*)&col_1,
+							 (uint32_t*)&col_2, (uint32_t*)&col_3);
 		}
 	}
 }
 
-void CDXTCImage::DecompressDXT3(int miplevel, DWORD* pdwDest)
+void CDXTCImage::DecompressDXT3(int miplevel, uint32_t* pdwDest)
 {
 	int xblocks, yblocks;
-	UINT nWidth = m_nWidth >> miplevel;
-	UINT nHeight = m_nHeight >> miplevel;
+	uint32_t nWidth = m_nWidth >> miplevel;
+	uint32_t nHeight = m_nHeight >> miplevel;
 
 	xblocks = nWidth / 4;
 	yblocks = nHeight / 4;
 
 	int x, y;
-	DWORD* pBase = (DWORD*)pdwDest;
-	WORD* pPos = (WORD*)&m_bCompVector[miplevel][0]; // pos in compressed data
-	DWORD* pImPos;									 // pos in decompressed data
+	uint32_t* pBase = (uint32_t*)pdwDest;
+	uint16_t* pPos = (uint16_t*)&m_bCompVector[miplevel][0]; // pos in compressed data
+	uint32_t* pImPos;										 // pos in decompressed data
 
 	DXTColBlock* pBlock;
 	DXTAlphaBlockExplicit* pAlphaBlock;
 
 	Color8888 col_0, col_1, col_2, col_3;
-	WORD wrd;
+	uint16_t wrd;
 
 	col_0.a = 0;
 	col_0.r = col_0.g = col_0.b = 0xff;
 
-	DWORD alphazero = Color8888ToDWORD(col_0);
+	uint32_t alphazero = Color8888ToDWORD(col_0);
 
 	for (y = 0; y < yblocks; ++y)
 	{
@@ -648,10 +648,10 @@ void CDXTCImage::DecompressDXT3(int miplevel, DWORD* pdwDest)
 			GetColorBlockColors(pBlock, &col_0, &col_1, &col_2, &col_3, wrd);
 
 			// Decode the color block into the bitmap bits
-			pImPos = (DWORD*)((uintptr_t)pBase + x * 16 + (y * 4) * nWidth * 4);
+			pImPos = (uint32_t*)((uintptr_t)pBase + x * 16 + (y * 4) * nWidth * 4);
 
-			DecodeColorBlock(pImPos, pBlock, nWidth, (DWORD*)&col_0, (DWORD*)&col_1,
-							 (DWORD*)&col_2, (DWORD*)&col_3);
+			DecodeColorBlock(pImPos, pBlock, nWidth, (uint32_t*)&col_0, (uint32_t*)&col_1,
+							 (uint32_t*)&col_2, (uint32_t*)&col_3);
 
 			// Overwrite the previous alpha bits with the alpha block info
 			DecodeAlphaExplicit(pImPos, pAlphaBlock, nWidth, alphazero);
@@ -659,30 +659,30 @@ void CDXTCImage::DecompressDXT3(int miplevel, DWORD* pdwDest)
 	}
 }
 
-void CDXTCImage::DecompressDXT5(int level, DWORD* pdwDest)
+void CDXTCImage::DecompressDXT5(int level, uint32_t* pdwDest)
 {
 	int xblocks, yblocks;
-	UINT nWidth = m_nWidth >> level;
-	UINT nHeight = m_nHeight >> level;
+	uint32_t nWidth = m_nWidth >> level;
+	uint32_t nHeight = m_nHeight >> level;
 
 	xblocks = nWidth / 4;
 	yblocks = nHeight / 4;
 
 	int x, y;
 
-	DWORD* pBase = (DWORD*)pdwDest;
-	WORD* pPos = (WORD*)&m_bCompVector[level][0]; // pos in compressed data
-	DWORD* pImPos;								  // pos in decompressed data
+	uint32_t* pBase = (uint32_t*)pdwDest;
+	uint16_t* pPos = (uint16_t*)&m_bCompVector[level][0]; // pos in compressed data
+	uint32_t* pImPos;									  // pos in decompressed data
 
 	DXTColBlock* pBlock;
 	DXTAlphaBlock3BitLinear* pAlphaBlock;
 
 	Color8888 col_0, col_1, col_2, col_3;
-	WORD wrd;
+	uint16_t wrd;
 
 	col_0.a = 0;
 	col_0.r = col_0.g = col_0.b = 0xff;
-	DWORD alphazero = Color8888ToDWORD(col_0);
+	uint32_t alphazero = Color8888ToDWORD(col_0);
 
 	for (y = 0; y < yblocks; ++y)
 	{
@@ -700,10 +700,10 @@ void CDXTCImage::DecompressDXT5(int level, DWORD* pdwDest)
 			GetColorBlockColors(pBlock, &col_0, &col_1, &col_2, &col_3, wrd);
 
 			// Decode the color block into the bitmap bits
-			pImPos = (DWORD*)((uintptr_t)pBase + x * 16 + (y * 4) * nWidth * 4);
+			pImPos = (uint32_t*)((uintptr_t)pBase + x * 16 + (y * 4) * nWidth * 4);
 
-			DecodeColorBlock(pImPos, pBlock, nWidth, (DWORD*)&col_0, (DWORD*)&col_1,
-							 (DWORD*)&col_2, (DWORD*)&col_3);
+			DecodeColorBlock(pImPos, pBlock, nWidth, (uint32_t*)&col_0, (uint32_t*)&col_1,
+							 (uint32_t*)&col_2, (uint32_t*)&col_3);
 
 			// Overwrite the previous alpha bits with the alpha block info
 			DecodeAlpha3BitLinear(pImPos, pAlphaBlock, nWidth, alphazero);
@@ -711,22 +711,22 @@ void CDXTCImage::DecompressDXT5(int level, DWORD* pdwDest)
 	}
 }
 
-void CDXTCImage::DecompressARGB(int level, DWORD* pdwDest)
+void CDXTCImage::DecompressARGB(int level, uint32_t* pdwDest)
 {
-	UINT lPitch = m_lPitch >> (level * 2);
+	uint32_t lPitch = m_lPitch >> (level * 2);
 	memcpy(pdwDest, &m_bCompVector[level][0], lPitch);
 }
 
-static WORD GetNumberOfBits(DWORD dwMask)
+static uint16_t GetNumberOfBits(uint32_t dwMask)
 {
-	WORD wBits;
+	uint16_t wBits;
 	for (wBits = 0; dwMask; wBits++)
 		dwMask = (dwMask & (dwMask - 1));
 
 	return wBits;
 }
 
-VOID CDXTCImage::DecodePixelFormat(CHAR* strPixelFormat,
+void CDXTCImage::DecodePixelFormat(char* strPixelFormat,
 								   XDDPIXELFORMAT* pxddpf)
 {
 	switch (pxddpf->dwFourCC)
@@ -734,10 +734,10 @@ VOID CDXTCImage::DecodePixelFormat(CHAR* strPixelFormat,
 		case 0:
 		{
 			// This dds texture isn't compressed so write out ARGB format
-			WORD a = GetNumberOfBits(pxddpf->dwRGBAlphaBitMask);
-			WORD r = GetNumberOfBits(pxddpf->dwRBitMask);
-			WORD g = GetNumberOfBits(pxddpf->dwGBitMask);
-			WORD b = GetNumberOfBits(pxddpf->dwBBitMask);
+			uint16_t a = GetNumberOfBits(pxddpf->dwRGBAlphaBitMask);
+			uint16_t r = GetNumberOfBits(pxddpf->dwRBitMask);
+			uint16_t g = GetNumberOfBits(pxddpf->dwGBitMask);
+			uint16_t b = GetNumberOfBits(pxddpf->dwBBitMask);
 
 			_snprintf(strPixelFormat, 31, "ARGB-%d%d%d%d%s", a, r, g, b,
 					  pxddpf->dwBBitMask & DDPF_ALPHAPREMULT ? "-premul" : "");

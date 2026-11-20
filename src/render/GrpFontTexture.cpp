@@ -113,7 +113,7 @@ bool CGraphicFontTexture::Create(const char* c_szFontName, int fontSize, bool bI
 	m_y = 0;
 	m_step = 0;
 
-	DWORD width = 256, height = 256;
+	uint32_t width = 256, height = 256;
 	if (GetMaxTextureWidth() > 512)
 		width = 512;
 	if (GetMaxTextureHeight() > 512)
@@ -136,7 +136,7 @@ bool CGraphicFontTexture::Create(const char* c_szFontName, int fontSize, bool bI
 	return true;
 }
 
-HFONT CGraphicFontTexture::GetFont(WORD codePage)
+HFONT CGraphicFontTexture::GetFont(uint16_t codePage)
 {
 	HFONT hFont = NULL;
 	TFontMap::iterator i = m_fontMap.find(codePage);
@@ -155,7 +155,7 @@ HFONT CGraphicFontTexture::GetFont(WORD codePage)
 		logFont.lfEscapement = 0;
 		logFont.lfOrientation = 0;
 		logFont.lfWeight = FW_NORMAL;
-		logFont.lfItalic = (BYTE)m_bItalic;
+		logFont.lfItalic = (uint8_t)m_bItalic;
 		logFont.lfUnderline = FALSE;
 		logFont.lfStrikeOut = FALSE;
 		logFont.lfCharSet = GetCharsetFromCodePage(codePage);
@@ -201,7 +201,7 @@ bool CGraphicFontTexture::UpdateTexture()
 	if (!pFontTexture)
 		return false;
 
-	WORD* pwDst;
+	uint16_t* pwDst;
 	int pitch;
 
 	if (!pFontTexture->Lock(&pitch, (void**)&pwDst))
@@ -212,7 +212,7 @@ bool CGraphicFontTexture::UpdateTexture()
 	int width = m_dib.GetWidth();
 	int height = m_dib.GetHeight();
 
-	DWORD* pdwSrc = (DWORD*)m_dib.GetPointer();
+	uint32_t* pdwSrc = (uint32_t*)m_dib.GetPointer();
 
 	for (int y = 0; y < height; ++y, pwDst += pitch, pdwSrc += width)
 		for (int x = 0; x < width; ++x)
@@ -222,7 +222,7 @@ bool CGraphicFontTexture::UpdateTexture()
 	return true;
 }
 
-CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::GetCharacterInfomation(WORD codePage, wchar_t keyValue)
+CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::GetCharacterInfomation(uint16_t codePage, wchar_t keyValue)
 {
 	TCharacterKey code(codePage, keyValue);
 
@@ -291,7 +291,7 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 			}
 		}
 
-		DWORD* pdwDIBData = (DWORD*)m_dib.GetPointer();
+		uint32_t* pdwDIBData = (uint32_t*)m_dib.GetPointer();
 		int nDIBWidth = m_dib.GetWidth();
 
 		int top = ascender - slot->bitmap_top;
@@ -359,7 +359,7 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 		size.cx += ceilf(stABC.abcfC);
 	size.cx++;
 
-	LONG lAdvance = ceilf(stABC.abcfA + stABC.abcfB + stABC.abcfC);
+	int32_t lAdvance = ceilf(stABC.abcfA + stABC.abcfB + stABC.abcfC);
 
 	int width = m_dib.GetWidth();
 	int height = m_dib.GetHeight();
@@ -392,9 +392,9 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	int nChrHeight = size.cy;
 	int nDIBWidth = m_dib.GetWidth();
 
-	DWORD* pdwDIBData = (DWORD*)m_dib.GetPointer();
-	DWORD* pdwDIBBase = pdwDIBData + nDIBWidth * m_y + m_x;
-	DWORD* pdwDIBRow;
+	uint32_t* pdwDIBData = (uint32_t*)m_dib.GetPointer();
+	uint32_t* pdwDIBBase = pdwDIBData + nDIBWidth * m_y + m_x;
+	uint32_t* pdwDIBRow;
 
 	pdwDIBRow = pdwDIBBase;
 	for (nChrY = 0; nChrY < nChrHeight; ++nChrY, pdwDIBRow += nDIBWidth)
@@ -429,7 +429,7 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	return &rNewCharInfo;
 }
 
-bool CGraphicFontTexture::CheckTextureIndex(DWORD dwTexture)
+bool CGraphicFontTexture::CheckTextureIndex(uint32_t dwTexture)
 {
 	if (dwTexture >= m_pFontTextureVector.size())
 		return false;
@@ -437,7 +437,7 @@ bool CGraphicFontTexture::CheckTextureIndex(DWORD dwTexture)
 	return true;
 }
 
-void CGraphicFontTexture::SelectTexture(DWORD dwTexture)
+void CGraphicFontTexture::SelectTexture(uint32_t dwTexture)
 {
 	assert(CheckTextureIndex(dwTexture));
 	m_lpd3dTexture = m_pFontTextureVector[dwTexture]->GetD3DTexture();

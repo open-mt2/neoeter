@@ -8,14 +8,14 @@
 #define MACRO_IsLeadByte(c) ((0x81 <= (c) && (c) <= 0x9f) || ((0xe0 <= (c)) && (c) <= 0xfc))
 #define MACRO_IsTailByte(c) ((0x40 <= (c) && (c) <= 0x7e) || (0x80 <= (c) && (c) <= 0xfc))
 
-BOOL ShiftJIS_IsLeadByte(const char chByte)
+int32_t ShiftJIS_IsLeadByte(const char chByte)
 {
 	const unsigned char byByte = (unsigned char)chByte;
 
 	return MACRO_IsLeadByte(byByte);
 }
 
-BOOL ShiftJIS_IsTrailByte(const char chByte)
+int32_t ShiftJIS_IsTrailByte(const char chByte)
 {
 	const unsigned char byByte = (unsigned char)chByte;
 

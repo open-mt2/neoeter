@@ -151,7 +151,7 @@ bool CBoundaryShapeManager::PointInside(float fX, float fY)
 {
 	bool bInside = false;
 
-	for (DWORD i = 0; i < m_vBoundaries.size() && !bInside; ++i)
+	for (uint32_t i = 0; i < m_vBoundaries.size() && !bInside; ++i)
 		bInside = PointInShape(m_vBoundaries[i], fX, fY);
 
 	return bInside;
@@ -164,9 +164,9 @@ bool CBoundaryShapeManager::PointInShape(SBoundaryShape& sShape, float fX, float
 {
 	bool bInside = false;
 
-	for (DWORD k = 0; k < sShape.m_vContours.size(); ++k)
+	for (uint32_t k = 0; k < sShape.m_vContours.size(); ++k)
 	{
-		for (DWORD i = 0, j = sShape.m_vContours[k].size() - 1; i < sShape.m_vContours[k].size(); j = i++)
+		for (uint32_t i = 0, j = sShape.m_vContours[k].size() - 1; i < sShape.m_vContours[k].size(); j = i++)
 		{
 			if ((((sShape.m_vContours[k][i][1] <= fY) && (fY < sShape.m_vContours[k][j][1])) ||
 				 ((sShape.m_vContours[k][j][1] <= fY) && (fY < sShape.m_vContours[k][i][1]))) &&

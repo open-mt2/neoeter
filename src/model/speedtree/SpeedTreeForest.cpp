@@ -38,14 +38,14 @@ CSpeedTreeForest::~CSpeedTreeForest()
 void CSpeedTreeForest::Clear()
 {
 	TTreeMap::iterator itor = m_pMainTreeMap.begin();
-	UINT uiCount;
+	uint32_t uiCount;
 
 	while (itor != m_pMainTreeMap.end())
 	{
 		CSpeedTreeWrapper* pMainTree = (itor++)->second;
 		CSpeedTreeWrapper** ppInstances = pMainTree->GetInstances(uiCount);
 
-		for (UINT i = 0; i < uiCount; ++i)
+		for (uint32_t i = 0; i < uiCount; ++i)
 			delete ppInstances[i];
 
 		delete pMainTree;
@@ -54,7 +54,7 @@ void CSpeedTreeForest::Clear()
 	m_pMainTreeMap.clear();
 }
 
-CSpeedTreeWrapper* CSpeedTreeForest::GetMainTree(DWORD dwCRC)
+CSpeedTreeWrapper* CSpeedTreeForest::GetMainTree(uint32_t dwCRC)
 {
 	TTreeMap::iterator itor = m_pMainTreeMap.find(dwCRC);
 
@@ -64,7 +64,7 @@ CSpeedTreeWrapper* CSpeedTreeForest::GetMainTree(DWORD dwCRC)
 	return itor->second;
 }
 
-BOOL CSpeedTreeForest::GetMainTree(DWORD dwCRC, CSpeedTreeWrapper** ppMainTree, const char* c_pszFileName)
+int32_t CSpeedTreeForest::GetMainTree(uint32_t dwCRC, CSpeedTreeWrapper** ppMainTree, const char* c_pszFileName)
 {
 	TTreeMap::iterator itor = m_pMainTreeMap.find(dwCRC);
 
@@ -82,21 +82,21 @@ BOOL CSpeedTreeForest::GetMainTree(DWORD dwCRC, CSpeedTreeWrapper** ppMainTree, 
 
 		pTree = new CSpeedTreeWrapper;
 
-		if (!pTree->LoadTree(c_pszFileName, (const BYTE*)data->data(), data->size()))
+		if (!pTree->LoadTree(c_pszFileName, (const uint8_t*)data->data(), data->size()))
 		{
 			delete pTree;
 			pTree = nullptr;
 			return FALSE;
 		}
 
-		m_pMainTreeMap.insert(std::map<DWORD, CSpeedTreeWrapper*>::value_type(dwCRC, pTree));
+		m_pMainTreeMap.insert(std::map<uint32_t, CSpeedTreeWrapper*>::value_type(dwCRC, pTree));
 	}
 
 	*ppMainTree = pTree;
 	return TRUE;
 }
 
-CSpeedTreeWrapper* CSpeedTreeForest::CreateInstance(float x, float y, float z, DWORD dwTreeCRC, const char* c_szTreeName)
+CSpeedTreeWrapper* CSpeedTreeForest::CreateInstance(float x, float y, float z, uint32_t dwTreeCRC, const char* c_szTreeName)
 {
 	CSpeedTreeWrapper* pMainTree;
 	if (!GetMainTree(dwTreeCRC, &pMainTree, c_szTreeName))
@@ -157,14 +157,14 @@ void CSpeedTreeForest::SetWindStrength(float fStrength)
 	m_fWindStrength = fStrength;
 
 	TTreeMap::iterator itor = m_pMainTreeMap.begin();
-	UINT uiCount;
+	uint32_t uiCount;
 
 	while (itor != m_pMainTreeMap.end())
 	{
 		CSpeedTreeWrapper* pMainTree = (itor++)->second;
 		CSpeedTreeWrapper** ppInstances = pMainTree->GetInstances(uiCount);
 
-		for (UINT i = 0; i < uiCount; ++i)
+		for (uint32_t i = 0; i < uiCount; ++i)
 			ppInstances[i]->GetSpeedTree()->SetWindStrength(m_fWindStrength);
 	}
 }

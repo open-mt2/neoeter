@@ -42,7 +42,7 @@ namespace
 		InsertItemTimeEvent(table, 0.0f, value);
 	}
 
-	void add_constant_color(TTimeEventTableColor* table, DWORD value)
+	void add_constant_color(TTimeEventTableColor* table, uint32_t value)
 	{
 		DWORDCOLOR color;
 		color.m_dwColor = value;
@@ -57,7 +57,7 @@ namespace
 		InsertItemTimeEvent(table, 100.0f, value);
 	}
 
-	void add_spanning_color(TTimeEventTableColor* table, DWORD value)
+	void add_spanning_color(TTimeEventTableColor* table, uint32_t value)
 	{
 		DWORDCOLOR color;
 		color.m_dwColor = value;
@@ -156,7 +156,7 @@ namespace
 			assert(system.Update(dt));
 
 		// 2 particles per second at 0.5 s per update -> exactly one per update.
-		assert(system.GetEmissionCount() == static_cast<DWORD>(updates));
+		assert(system.GetEmissionCount() == static_cast<uint32_t>(updates));
 		assert(system.ParticleCount() == static_cast<std::size_t>(updates));
 
 		CParticleInstance* first = system.FirstParticle();

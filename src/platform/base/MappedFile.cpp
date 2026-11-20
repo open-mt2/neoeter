@@ -17,14 +17,14 @@ CMappedFile::CMappedFile()
 
 CMappedFile::~CMappedFile() { Destroy(); }
 
-BOOL CMappedFile::Create(const char* filename)
+int32_t CMappedFile::Create(const char* filename)
 {
 	Destroy();
 	return CFileBase::Create(filename, FILEMODE_READ);
 }
 
-BOOL CMappedFile::Create(const char* filename, const void** dest, int offset,
-						 int size)
+int32_t CMappedFile::Create(const char* filename, const void** dest, int offset,
+							int size)
 {
 	if (!CMappedFile::Create(filename))
 		return FALSE;
@@ -35,10 +35,10 @@ BOOL CMappedFile::Create(const char* filename, const void** dest, int offset,
 
 LPCVOID CMappedFile::Get() { return m_lpData; }
 
-void CMappedFile::Link(DWORD dwBufSize, const void* c_pvBufData)
+void CMappedFile::Link(uint32_t dwBufSize, const void* c_pvBufData)
 {
 	m_dwBufLinkSize = dwBufSize;
-	m_pbBufLinkData = (BYTE*)c_pvBufData;
+	m_pbBufLinkData = (uint8_t*)c_pvBufData;
 }
 
 void CMappedFile::BindLZObject(CLZObject* pLZObj)
@@ -57,7 +57,7 @@ void CMappedFile::BindLZObjectWithBufferedSize(CLZObject* pLZObj)
 	Link(m_pLZObj->GetBufferSize(), m_pLZObj->GetBuffer());
 }
 
-BYTE* CMappedFile::AppendDataBlock(const void* pBlock, DWORD dwBlockSize)
+uint8_t* CMappedFile::AppendDataBlock(const void* pBlock, uint32_t dwBlockSize)
 {
 	if (m_pbAppendResultDataBlock)
 	{
@@ -66,7 +66,7 @@ BYTE* CMappedFile::AppendDataBlock(const void* pBlock, DWORD dwBlockSize)
 
 	// realloc
 	m_dwAppendResultDataSize = m_dwBufLinkSize + dwBlockSize;
-	m_pbAppendResultDataBlock = new BYTE[m_dwAppendResultDataSize];
+	m_pbAppendResultDataBlock = new uint8_t[m_dwAppendResultDataSize];
 
 	memcpy(m_pbAppendResultDataBlock, m_pbBufLinkData, m_dwBufLinkSize);
 	memcpy(m_pbAppendResultDataBlock + m_dwBufLinkSize, pBlock, dwBlockSize);
@@ -117,7 +117,7 @@ void CMappedFile::Destroy()
 	CFileBase::Destroy();
 }
 
-int CMappedFile::Seek(DWORD offset, int iSeekType)
+int CMappedFile::Seek(uint32_t offset, int iSeekType)
 {
 	switch (iSeekType)
 	{
@@ -155,10 +155,10 @@ int CMappedFile::Map(const void** dest, int offset, int size)
 #if defined(_WIN32)
 	SYSTEM_INFO SysInfo;
 	GetSystemInfo(&SysInfo);
-	DWORD dwSysGran = SysInfo.dwAllocationGranularity;
-	DWORD dwFileMapStart = (m_dataOffset / dwSysGran) * dwSysGran;
-	DWORD dwMapViewSize = (m_dataOffset % dwSysGran) + m_mapSize;
-	INT iViewDelta = m_dataOffset - dwFileMapStart;
+	uint32_t dwSysGran = SysInfo.dwAllocationGranularity;
+	uint32_t dwFileMapStart = (m_dataOffset / dwSysGran) * dwSysGran;
+	uint32_t dwMapViewSize = (m_dataOffset % dwSysGran) + m_mapSize;
+	int32_t iViewDelta = m_dataOffset - dwFileMapStart;
 
 	m_hFM = CreateFileMapping(m_hFile,					// handle
 							  NULL,						// security
@@ -188,8 +188,8 @@ int CMappedFile::Map(const void** dest, int offset, int size)
 	if (pageSize <= 0)
 		pageSize = 4096;
 
-	DWORD dwFileMapStart = (m_dataOffset / (DWORD)pageSize) * (DWORD)pageSize;
-	DWORD dwMapViewSize = (m_dataOffset % (DWORD)pageSize) + m_mapSize;
+	uint32_t dwFileMapStart = (m_dataOffset / (uint32_t)pageSize) * (uint32_t)pageSize;
+	uint32_t dwMapViewSize = (m_dataOffset % (uint32_t)pageSize) + m_mapSize;
 	int iViewDelta = m_dataOffset - dwFileMapStart;
 
 	int fd = (int)(intptr_t)m_hFile;
@@ -213,16 +213,16 @@ int CMappedFile::Map(const void** dest, int offset, int size)
 	return (m_mapSize);
 }
 
-BYTE* CMappedFile::GetCurrentSeekPoint()
+uint8_t* CMappedFile::GetCurrentSeekPoint()
 {
 	return m_pbBufLinkData + m_seekPosition;
 }
 
-DWORD CMappedFile::Size() { return m_dwBufLinkSize; }
+uint32_t CMappedFile::Size() { return m_dwBufLinkSize; }
 
-DWORD CMappedFile::GetPosition() { return m_dataOffset; }
+uint32_t CMappedFile::GetPosition() { return m_dataOffset; }
 
-BOOL CMappedFile::Read(void* dest, int bytes)
+int32_t CMappedFile::Read(void* dest, int bytes)
 {
 	if (m_seekPosition + bytes > Size())
 		return FALSE;
@@ -232,7 +232,7 @@ BOOL CMappedFile::Read(void* dest, int bytes)
 	return TRUE;
 }
 
-DWORD CMappedFile::GetSeekPosition(void) { return m_seekPosition; }
+uint32_t CMappedFile::GetSeekPosition(void) { return m_seekPosition; }
 
 void CMappedFile::Unmap(LPCVOID data)
 {
@@ -244,7 +244,7 @@ void CMappedFile::Unmap(LPCVOID data)
 		long pageSize = sysconf(_SC_PAGE_SIZE);
 		if (pageSize <= 0)
 			pageSize = 4096;
-		DWORD dwMapViewSize = (m_dataOffset % (DWORD)pageSize) + m_mapSize;
+		uint32_t dwMapViewSize = (m_dataOffset % (uint32_t)pageSize) + m_mapSize;
 		munmap(m_lpMapData, dwMapViewSize);
 		m_lpMapData = NULL;
 	}

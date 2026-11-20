@@ -239,7 +239,7 @@ bool CGraphicObjectInstance::isIntersect(const CRay& c_rRay, float* pu, float* p
 						  4, 5, 6, 5, 7, 6};
 
 	int triCount = 12;
-	WORD* pcurIdx = (WORD*)Indices;
+	uint16_t* pcurIdx = (uint16_t*)Indices;
 
 	while (triCount--)
 	{
@@ -368,12 +368,12 @@ void CGraphicObjectInstance::UpdateCollisionData(const CStaticCollisionDataVecto
 	OnUpdateCollisionData(pscdVector);
 }
 
-DWORD CGraphicObjectInstance::GetCollisionInstanceCount()
+uint32_t CGraphicObjectInstance::GetCollisionInstanceCount()
 {
 	return m_StaticCollisionInstanceVector.size();
 }
 
-CBaseCollisionInstance* CGraphicObjectInstance::GetCollisionInstanceData(DWORD dwIndex)
+CBaseCollisionInstance* CGraphicObjectInstance::GetCollisionInstanceData(uint32_t dwIndex)
 {
 	if (dwIndex > m_StaticCollisionInstanceVector.size())
 	{
@@ -417,7 +417,7 @@ bool CGraphicObjectInstance::GetObjectHeight(float fX, float fY, float* pfHeight
 	return OnGetObjectHeight(fX, fY, pfHeight);
 }
 
-void CGraphicObjectInstance::SetPortal(DWORD dwIndex, int iID)
+void CGraphicObjectInstance::SetPortal(uint32_t dwIndex, int iID)
 {
 	if (dwIndex >= PORTAL_ID_MAX_NUM)
 	{
@@ -428,7 +428,7 @@ void CGraphicObjectInstance::SetPortal(DWORD dwIndex, int iID)
 	m_abyPortalID[dwIndex] = iID;
 }
 
-int CGraphicObjectInstance::GetPortal(DWORD dwIndex)
+int CGraphicObjectInstance::GetPortal(uint32_t dwIndex)
 {
 	if (dwIndex >= PORTAL_ID_MAX_NUM)
 	{

@@ -16,7 +16,7 @@ class CNetworkAddress
 		bool Set(const char* c_szAddr, int port);
 
 		void SetLocalIP();
-		void SetIP(DWORD ip);
+		void SetIP(uint32_t ip);
 		void SetIP(const char* c_szIP);
 		bool SetDNS(const char* c_szDNS);
 
@@ -27,7 +27,7 @@ class CNetworkAddress
 
 		void GetIP(char* szIP, int len);
 
-		DWORD GetIP();
+		uint32_t GetIP();
 
 		operator const SOCKADDR_IN&() const;
 

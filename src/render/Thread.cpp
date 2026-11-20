@@ -17,7 +17,7 @@ int CThread::Create(void* arg)
 	return true;
 }
 
-UINT CThread::Run(void* arg)
+uint32_t CThread::Run(void* arg)
 {
 	if (!Setup())
 		return 0;
@@ -26,7 +26,7 @@ UINT CThread::Run(void* arg)
 }
 
 /* Static */
-UINT CALLBACK CThread::EntryPoint(void* pThis)
+uint32_t CALLBACK CThread::EntryPoint(void* pThis)
 {
 	CThread* pThread = (CThread*)pThis;
 	return pThread->Run(pThread->Arg());

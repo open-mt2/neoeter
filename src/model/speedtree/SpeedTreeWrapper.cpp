@@ -119,9 +119,9 @@ void CSpeedTreeWrapper::OnRenderPCBlocker()
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 
-	DWORD dwLighting = STATEMANAGER.GetRenderState(D3DRS_LIGHTING);
-	DWORD dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
-	DWORD dwAlphaBlendEnable =
+	uint32_t dwLighting = STATEMANAGER.GetRenderState(D3DRS_LIGHTING);
+	uint32_t dwFogEnable = STATEMANAGER.GetRenderState(D3DRS_FOGENABLE);
+	uint32_t dwAlphaBlendEnable =
 		STATEMANAGER.GetRenderState(D3DRS_ALPHABLENDENABLE);
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, TRUE);
 	STATEMANAGER.SaveRenderState(D3DRS_COLORVERTEX, TRUE);
@@ -260,14 +260,14 @@ void CSpeedTreeWrapper::OnRender()
 	STATEMANAGER.RestoreRenderState(D3DRS_FOGENABLE);
 }
 
-UINT CSpeedTreeWrapper::GetCollisionObjectCount()
+uint32_t CSpeedTreeWrapper::GetCollisionObjectCount()
 {
 	assert(m_pSpeedTree);
 	return m_pSpeedTree->GetCollisionObjectCount();
 }
 
 void CSpeedTreeWrapper::GetCollisionObject(
-	UINT nIndex, CSpeedTreeRT::ECollisionObjectType& eType, float* pPosition,
+	uint32_t nIndex, CSpeedTreeRT::ECollisionObjectType& eType, float* pPosition,
 	float* pDimensions)
 {
 	assert(m_pSpeedTree);
@@ -279,7 +279,7 @@ void CSpeedTreeWrapper::OnUpdateCollisionData(
 {
 	D3DXMATRIX mat;
 	D3DXMatrixTranslation(&mat, m_afPos[0], m_afPos[1], m_afPos[2]);
-	for (UINT i = 0; i < GetCollisionObjectCount(); ++i)
+	for (uint32_t i = 0; i < GetCollisionObjectCount(); ++i)
 	{
 		CSpeedTreeRT::ECollisionObjectType ObjectType;
 		CStaticCollisionData CollisionData;
@@ -353,7 +353,7 @@ void CSpeedTreeWrapper::CalculateBBox()
 
 	const D3DXMATRIX& c_rmatTransform = GetTransform();
 
-	for (DWORD i = 0; i < 8; ++i)
+	for (uint32_t i = 0; i < 8; ++i)
 	{
 		D3DXVec4Transform(&m_v4TBBox[i], &m_v4TBBox[i], &c_rmatTransform);
 		if (0 == i)
@@ -438,7 +438,7 @@ CSpeedTreeWrapper::~CSpeedTreeWrapper()
 ///////////////////////////////////////////////////////////////////////
 //	CSpeedTreeWrapper::LoadTree
 bool CSpeedTreeWrapper::LoadTree(const char* pszSptFile,
-								 const BYTE* c_pbBlock = NULL,
+								 const uint8_t* c_pbBlock = NULL,
 								 unsigned int uiBlockSize = 0,
 								 unsigned int nSeed, float fSize,
 								 float fSizeVariance)
@@ -930,7 +930,7 @@ void CSpeedTreeWrapper::RenderBranches(void) const
 
 		// set alpha test value
 		STATEMANAGER.SetRenderState(
-			D3DRS_ALPHAREF, DWORD(m_pGeometryCache->m_fBranchAlphaTestValue));
+			D3DRS_ALPHAREF, uint32_t(m_pGeometryCache->m_fBranchAlphaTestValue));
 
 		// render if this LOD has branches
 		if (m_pBranchIndexCounts &&
@@ -991,7 +991,7 @@ void CSpeedTreeWrapper::RenderFronds(void) const
 
 		// set alpha test value
 		STATEMANAGER.SetRenderState(
-			D3DRS_ALPHAREF, DWORD(m_pGeometryCache->m_fFrondAlphaTestValue));
+			D3DRS_ALPHAREF, uint32_t(m_pGeometryCache->m_fFrondAlphaTestValue));
 
 		// render if this LOD has fronds
 		if (m_pFrondIndexCounts &&
@@ -1089,7 +1089,7 @@ void CSpeedTreeWrapper::RenderLeaves(void) const
 			STATEMANAGER.SetStreamSource(0, m_pLeafVertexBuffer[unLod],
 										 sizeof(SFVFLeafVertex));
 			STATEMANAGER.SetRenderState(D3DRS_ALPHAREF,
-										DWORD(pLeaf->m_fAlphaTestValue));
+										uint32_t(pLeaf->m_fAlphaTestValue));
 
 			ms_faceCount += pLeaf->m_usLeafCount * 2;
 			STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLELIST, 0,
@@ -1107,7 +1107,7 @@ void CSpeedTreeWrapper::RenderBillboards(void) const
 	struct SBillboardVertex
 	{
 			float fX, fY, fZ;
-			DWORD dColor;
+			uint32_t dColor;
 			float fU, fV;
 	};
 
@@ -1129,7 +1129,7 @@ void CSpeedTreeWrapper::RenderBillboards(void) const
 		};
 		STATEMANAGER.SetRenderState(
 			D3DRS_ALPHAREF,
-			DWORD(m_pGeometryCache->m_sBillboard0.m_fAlphaTestValue));
+			uint32_t(m_pGeometryCache->m_sBillboard0.m_fAlphaTestValue));
 
 		ms_faceCount += 2;
 		STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, sVertex,
@@ -1153,7 +1153,7 @@ void CSpeedTreeWrapper::RenderBillboards(void) const
 		};
 		STATEMANAGER.SetRenderState(
 			D3DRS_ALPHAREF,
-			DWORD(m_pGeometryCache->m_sBillboard1.m_fAlphaTestValue));
+			uint32_t(m_pGeometryCache->m_sBillboard1.m_fAlphaTestValue));
 
 		ms_faceCount += 2;
 		STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, sVertex,

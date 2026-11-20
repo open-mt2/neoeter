@@ -52,7 +52,7 @@ static void SDLSetFixedWindowSize(SDL_Window* window, int width, int height)
 
 HINSTANCE CMSWindow::ms_hInstance = NULL;
 
-LRESULT CMSWindow::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
+intptr_t CMSWindow::WindowProcedure(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam)
 {
 	// The window is SDL-owned on every target (T1.2); the WM_* messages are
 	// synthesised by CMSApplication from SDL events, so there is no Win32
@@ -74,7 +74,7 @@ LRESULT CMSWindow::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM 
 	return 0;
 }
 
-void CMSWindow::OnSize(WPARAM wParam, LPARAM /*lParam*/)
+void CMSWindow::OnSize(uintptr_t wParam, intptr_t /*lParam*/)
 {
 	if (wParam == SIZE_MINIMIZED)
 	{
@@ -112,7 +112,7 @@ void CMSWindow::Destroy()
 	m_isVisible = false;
 }
 
-bool CMSWindow::Create(const char* c_szName, int /*brush*/, DWORD /*cs*/, DWORD /*ws*/, HICON /*hIcon*/, int /*iCursorResource*/, int width, int height)
+bool CMSWindow::Create(const char* c_szName, int /*brush*/, uint32_t /*cs*/, uint32_t /*ws*/, HICON /*hIcon*/, int /*iCursorResource*/, int width, int height)
 {
 	Destroy();
 

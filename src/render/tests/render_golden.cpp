@@ -48,7 +48,7 @@ namespace
 
 	constexpr int kWidth = 160;
 	constexpr int kHeight = 120;
-	constexpr DWORD kBackground = 0xFF101820;
+	constexpr uint32_t kBackground = 0xFF101820;
 	constexpr float kFogStart = 3.0f;
 	constexpr float kFogEnd = 12.0f;
 
@@ -57,12 +57,12 @@ namespace
 			float x;
 			float y;
 			float z;
-			DWORD color;
+			uint32_t color;
 			float u;
 			float v;
 	};
 
-	constexpr DWORD kFvf = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+	constexpr uint32_t kFvf = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
 
 	struct Renderer : public CGraphicBase
 	{
@@ -91,12 +91,12 @@ namespace
 				STATEMANAGER.SetTransform(D3DTS_PROJECTION, &identity);
 			}
 
-			void Draw(D3DPRIMITIVETYPE primitive, UINT primitiveCount,
+			void Draw(D3DPRIMITIVETYPE primitive, uint32_t primitiveCount,
 					  const std::vector<Vertex>& vertices)
 			{
 				Device()->SetFVF(kFvf);
 				STATEMANAGER.DrawPrimitiveUP(primitive, primitiveCount, vertices.data(),
-											 static_cast<UINT>(sizeof(Vertex)));
+											 static_cast<uint32_t>(sizeof(Vertex)));
 			}
 	};
 
@@ -136,9 +136,9 @@ namespace
 		renderer.IdentityWorldView();
 	}
 
-	DWORD FloatBits(float value)
+	uint32_t FloatBits(float value)
 	{
-		DWORD bits = 0;
+		uint32_t bits = 0;
 		static_assert(sizeof(bits) == sizeof(value), "float is not 32 bit");
 		std::memcpy(&bits, &value, sizeof(bits));
 		return bits;
@@ -151,7 +151,7 @@ namespace
 	}
 
 	std::vector<Vertex> Quad(float left, float top, float right, float bottom, float z,
-							 DWORD color, float u0 = 0.0f, float v0 = 0.0f,
+							 uint32_t color, float u0 = 0.0f, float v0 = 0.0f,
 							 float u1 = 1.0f, float v1 = 1.0f)
 	{
 		return {
@@ -165,13 +165,13 @@ namespace
 	}
 
 	std::vector<Vertex> TexturedQuad(float left, float top, float right, float bottom, float z,
-									 DWORD color, float uMax, float vMax)
+									 uint32_t color, float uMax, float vMax)
 	{
 		return Quad(left, top, right, bottom, z, color, 0.0f, 0.0f, uMax, vMax);
 	}
 
 	LPDIRECT3DTEXTURE9 CreateTexture(LPDIRECT3DDEVICE9 device, int width, int height,
-									 const std::vector<DWORD>& pixels)
+									 const std::vector<uint32_t>& pixels)
 	{
 		LPDIRECT3DTEXTURE9 texture = nullptr;
 		if (FAILED(D3DXCreateTexture(device, width, height, 1, 0, D3DFMT_A8R8G8B8,
@@ -187,8 +187,8 @@ namespace
 
 		for (int y = 0; y < height; ++y)
 		{
-			DWORD* row = reinterpret_cast<DWORD*>(static_cast<BYTE*>(locked.pBits) +
-												  static_cast<std::size_t>(y) * locked.Pitch);
+			uint32_t* row = reinterpret_cast<uint32_t*>(static_cast<uint8_t*>(locked.pBits) +
+														static_cast<std::size_t>(y) * locked.Pitch);
 			for (int x = 0; x < width; ++x)
 				row[x] = pixels[static_cast<std::size_t>(y) * width + x];
 		}
@@ -197,9 +197,9 @@ namespace
 		return texture;
 	}
 
-	LPDIRECT3DTEXTURE9 MakeCheckerTexture(LPDIRECT3DDEVICE9 device, int size, int cell, DWORD even, DWORD odd)
+	LPDIRECT3DTEXTURE9 MakeCheckerTexture(LPDIRECT3DDEVICE9 device, int size, int cell, uint32_t even, uint32_t odd)
 	{
-		std::vector<DWORD> pixels(static_cast<std::size_t>(size) * size);
+		std::vector<uint32_t> pixels(static_cast<std::size_t>(size) * size);
 		for (int y = 0; y < size; ++y)
 			for (int x = 0; x < size; ++x)
 				pixels[static_cast<std::size_t>(y) * size + x] =
@@ -209,7 +209,7 @@ namespace
 
 	LPDIRECT3DTEXTURE9 MakeAlphaCheckerTexture(LPDIRECT3DDEVICE9 device, int size, int cell)
 	{
-		std::vector<DWORD> pixels(static_cast<std::size_t>(size) * size);
+		std::vector<uint32_t> pixels(static_cast<std::size_t>(size) * size);
 		for (int y = 0; y < size; ++y)
 		{
 			for (int x = 0; x < size; ++x)
@@ -363,7 +363,7 @@ namespace
 			{0, 4, 7, 3}, // left
 			{1, 2, 6, 5}, // right
 		};
-		const DWORD faceColors[6] = {
+		const uint32_t faceColors[6] = {
 			D3DCOLOR_ARGB(255, 210, 70, 70),
 			D3DCOLOR_ARGB(255, 70, 200, 90),
 			D3DCOLOR_ARGB(255, 70, 90, 210),
@@ -377,7 +377,7 @@ namespace
 		for (int face = 0; face < 6; ++face)
 		{
 			const int* indices = faces[face];
-			const DWORD color = faceColors[face];
+			const uint32_t color = faceColors[face];
 			const int order[6] = {0, 1, 2, 0, 2, 3};
 			for (int i = 0; i < 6; ++i)
 			{

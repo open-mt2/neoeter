@@ -183,7 +183,7 @@ bool CTextureSet::SetTexture(unsigned long ulIndex,
 
 void CTextureSet::Reload(float fTerrainTexCoordBase)
 {
-	for (DWORD dwIndex = 1; dwIndex < GetTextureCount(); ++dwIndex)
+	for (uint32_t dwIndex = 1; dwIndex < GetTextureCount(); ++dwIndex)
 	{
 		TTerrainTexture& tex = m_Textures[dwIndex];
 
@@ -274,7 +274,7 @@ bool CTextureSet::Save(const char* c_pszFileName)
 	fprintf(pFile, "TextureCount %ld\n", static_cast<long>(GetTextureCount() - 1)); // -1 을 하는 이유는 지우개 때문임
 	fprintf(pFile, "\n");
 
-	for (DWORD i = 1; i < GetTextureCount(); ++i)
+	for (uint32_t i = 1; i < GetTextureCount(); ++i)
 	{
 		TTerrainTexture& rTex = m_Textures[i];
 

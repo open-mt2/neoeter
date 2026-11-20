@@ -68,14 +68,14 @@ void CSpeedTreeDirectX::Render(unsigned long ulRenderBitVector)
 	if (!(ulRenderBitVector & Forest_RenderToShadow) && !(ulRenderBitVector & Forest_RenderToMiniMap))
 		UpdateCompundMatrix(CCameraManager::Instance().GetCurrentCamera()->GetEye(), ms_matView, ms_matProj);
 
-	DWORD dwLightState = STATEMANAGER.GetRenderState(D3DRS_LIGHTING);
-	DWORD dwColorVertexState = STATEMANAGER.GetRenderState(D3DRS_COLORVERTEX);
-	DWORD dwFogVertexMode = STATEMANAGER.GetRenderState(D3DRS_FOGVERTEXMODE);
+	uint32_t dwLightState = STATEMANAGER.GetRenderState(D3DRS_LIGHTING);
+	uint32_t dwColorVertexState = STATEMANAGER.GetRenderState(D3DRS_COLORVERTEX);
+	uint32_t dwFogVertexMode = STATEMANAGER.GetRenderState(D3DRS_FOGVERTEXMODE);
 
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, TRUE);
 	STATEMANAGER.SetRenderState(D3DRS_COLORVERTEX, TRUE);
 
-	UINT uiCount;
+	uint32_t uiCount;
 	TTreeMap::const_iterator itor = m_pMainTreeMap.begin();
 
 	while (itor != m_pMainTreeMap.end())
@@ -83,7 +83,7 @@ void CSpeedTreeDirectX::Render(unsigned long ulRenderBitVector)
 		CSpeedTreeWrapper* pMainTree = (itor++)->second;
 		CSpeedTreeWrapper** ppInstances = pMainTree->GetInstances(uiCount);
 
-		for (UINT i = 0; i < uiCount; ++i)
+		for (uint32_t i = 0; i < uiCount; ++i)
 		{
 			ppInstances[i]->Advance();
 		}
@@ -144,7 +144,7 @@ void CSpeedTreeDirectX::Render(unsigned long ulRenderBitVector)
 
 			pMainTree->SetupBranchForTreeType();
 
-			for (UINT i = 0; i < uiCount; ++i)
+			for (uint32_t i = 0; i < uiCount; ++i)
 				if (ppInstances[i]->isShow())
 					ppInstances[i]->RenderBranches();
 		}
@@ -163,7 +163,7 @@ void CSpeedTreeDirectX::Render(unsigned long ulRenderBitVector)
 
 			pMainTree->SetupFrondForTreeType();
 
-			for (UINT i = 0; i < uiCount; ++i)
+			for (uint32_t i = 0; i < uiCount; ++i)
 				if (ppInstances[i]->isShow())
 					ppInstances[i]->RenderFronds();
 		}
@@ -192,7 +192,7 @@ void CSpeedTreeDirectX::Render(unsigned long ulRenderBitVector)
 
 			pMainTree->SetupLeafForTreeType();
 
-			for (UINT i = 0; i < uiCount; ++i)
+			for (uint32_t i = 0; i < uiCount; ++i)
 				if (ppInstances[i]->isShow())
 					ppInstances[i]->RenderLeaves();
 		}
@@ -220,7 +220,7 @@ void CSpeedTreeDirectX::Render(unsigned long ulRenderBitVector)
 
 			pMainTree->SetupBranchForTreeType();
 
-			for (UINT i = 0; i < uiCount; ++i)
+			for (uint32_t i = 0; i < uiCount; ++i)
 				if (ppInstances[i]->isShow())
 					ppInstances[i]->RenderBillboards();
 		}

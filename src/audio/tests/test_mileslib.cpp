@@ -138,7 +138,7 @@ namespace
 		CEterPackManager packMgr;
 		CSoundManager soundMgr;
 
-		BOOL created = soundMgr.Create();
+		int32_t created = soundMgr.Create();
 		assert(created == TRUE);
 
 		// Volume & scale controls

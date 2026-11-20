@@ -43,7 +43,7 @@ class CEffectInstance : public CGraphicObjectInstance
 		void SetEffectDataPointer(CEffectData* pEffectData);
 
 		void Clear();
-		BOOL isAlive();
+		int32_t isAlive();
 		void SetActive();
 		void SetDeactive();
 		void SetGlobalMatrix(const D3DXMATRIX& c_rmatGlobal);
@@ -67,8 +67,8 @@ class CEffectInstance : public CGraphicObjectInstance
 		virtual bool OnGetObjectHeight(float fX, float fY, float* pfHeight) { return false; }
 
 	protected:
-		BOOL m_isAlive;
-		DWORD m_dwFrame;
+		int32_t m_isAlive;
+		uint32_t m_dwFrame;
 		D3DXMATRIX m_matGlobal;
 
 		CEffectData* m_pkEftData;

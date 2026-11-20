@@ -9,9 +9,9 @@
 #include <Platform/GLCompat.h>
 #include <Neoeter/Render/MSWindow.h>
 
-DWORD CScreen::ms_diffuseColor = 0xffffffff;
-DWORD CScreen::ms_clearColor = 0L;
-DWORD CScreen::ms_clearStencil = 0L;
+uint32_t CScreen::ms_diffuseColor = 0xffffffff;
+uint32_t CScreen::ms_clearColor = 0L;
+uint32_t CScreen::ms_clearStencil = 0L;
 float CScreen::ms_clearDepth = 1.0f;
 Frustum CScreen::ms_frustum;
 
@@ -113,7 +113,7 @@ void CScreen::RenderBar3d(const D3DXVECTOR3* c_pv3Positions)
 	}
 }
 
-void CScreen::RenderGradationBar3d(float sx, float sy, float sz, float ex, float ey, float ez, DWORD dwStartColor, DWORD dwEndColor)
+void CScreen::RenderGradationBar3d(float sx, float sy, float sz, float ex, float ey, float ez, uint32_t dwStartColor, uint32_t dwEndColor)
 {
 	assert(ms_lpd3dDevice != NULL);
 	if (sx == ex) return;
@@ -244,7 +244,7 @@ void CScreen::RenderBar2d(float sx, float sy, float ex, float ey, float z)
 	RenderBar3d(sx, sy, z, ex, ey, z);
 }
 
-void CScreen::RenderGradationBar2d(float sx, float sy, float ex, float ey, DWORD dwStartColor, DWORD dwEndColor, float ez)
+void CScreen::RenderGradationBar2d(float sx, float sy, float ex, float ey, uint32_t dwStartColor, uint32_t dwEndColor, float ez)
 {
 	RenderGradationBar3d(sx, sy, ez, ex, ey, ez, dwStartColor, dwEndColor);
 }
@@ -535,7 +535,7 @@ bool CScreen::GetCursorXYPosition(float* px, float* py)
 	posVertices[2] = TPosition(v3Eye.x + 90000000.0f, v3Eye.y + 90000000.0f, 0.0f);
 	posVertices[3] = TPosition(v3Eye.x + 90000000.0f, v3Eye.y - 90000000.0f, 0.0f);
 
-	static const WORD sc_awFillRectIndices[6] = {
+	static const uint16_t sc_awFillRectIndices[6] = {
 		0,
 		2,
 		1,
@@ -571,7 +571,7 @@ bool CScreen::GetCursorZPosition(float* pz)
 	posVertices[2] = TPosition(v3Eye.x + 90000000.0f, 0.0f, v3Eye.z + 90000000.0f);
 	posVertices[3] = TPosition(v3Eye.x + 90000000.0f, 0.0f, v3Eye.z - 90000000.0f);
 
-	static const WORD sc_awFillRectIndices[6] = {
+	static const uint16_t sc_awFillRectIndices[6] = {
 		0,
 		2,
 		1,
@@ -603,7 +603,7 @@ void CScreen::GetPickingPosition(float t, float* x, float* y, float* z)
 	*z = ms_vtPickRayOrig.z + ms_vtPickRayDir.z * t;
 }
 
-void CScreen::SetDiffuseColor(DWORD diffuseColor)
+void CScreen::SetDiffuseColor(uint32_t diffuseColor)
 {
 	ms_diffuseColor = diffuseColor;
 }
@@ -623,7 +623,7 @@ void CScreen::SetClearDepth(float depth)
 	ms_clearDepth = depth;
 }
 
-void CScreen::SetClearStencil(DWORD stencil)
+void CScreen::SetClearStencil(uint32_t stencil)
 {
 	ms_clearStencil = stencil;
 }
@@ -651,31 +651,31 @@ void CScreen::Clear()
 #endif
 }
 
-BOOL CScreen::IsLostDevice()
+int32_t CScreen::IsLostDevice()
 {
 	if (!ms_lpd3dDevice)
 		return TRUE;
 
 	IDirect3DDevice9& rkD3DDev = *ms_lpd3dDevice;
-	HRESULT hrTestCooperativeLevel = rkD3DDev.TestCooperativeLevel();
+	int32_t hrTestCooperativeLevel = rkD3DDev.TestCooperativeLevel();
 	if (FAILED(hrTestCooperativeLevel))
 		return TRUE;
 
 	return FALSE;
 }
 
-BOOL CScreen::RestoreDevice()
+int32_t CScreen::RestoreDevice()
 {
 	if (!ms_lpd3dDevice)
 		return FALSE;
 
-	UINT iD3DAdapterInfo = ms_iD3DAdapterInfo;
+	uint32_t iD3DAdapterInfo = ms_iD3DAdapterInfo;
 	IDirect3D9& rkD3D = *ms_lpd3d;
 	IDirect3DDevice9& rkD3DDev = *ms_lpd3dDevice;
 	D3DPRESENT_PARAMETERS& rkD3DPP = ms_d3dPresentParameter;
 	D3D_CDisplayModeAutoDetector& rkD3DDetector = ms_kD3DDetector;
 
-	HRESULT hrTestCooperativeLevel = rkD3DDev.TestCooperativeLevel();
+	int32_t hrTestCooperativeLevel = rkD3DDev.TestCooperativeLevel();
 
 	if (FAILED(hrTestCooperativeLevel))
 	{
@@ -698,7 +698,7 @@ BOOL CScreen::RestoreDevice()
 
 			rkD3DPP.BackBufferFormat = rkD3DDMDesktop.Format;
 
-			HRESULT hrReset = rkD3DDev.Reset(&rkD3DPP);
+			int32_t hrReset = rkD3DDev.Reset(&rkD3DPP);
 
 			if (FAILED(hrReset))
 			{
@@ -735,7 +735,7 @@ void CScreen::Show(HWND hWnd)
 {
 	assert(ms_lpd3dDevice != NULL);
 
-	HRESULT hr = ms_lpd3dDevice->Present(NULL, NULL, hWnd, NULL);
+	int32_t hr = ms_lpd3dDevice->Present(NULL, NULL, hWnd, NULL);
 	if (D3DERR_DEVICELOST == hr)
 		RestoreDevice();
 

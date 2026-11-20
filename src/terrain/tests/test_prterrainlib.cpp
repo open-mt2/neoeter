@@ -118,9 +118,9 @@ namespace
 		assert(terrain.GetHeightMapValue(0, 0) == 0);
 
 		// Out-of-bounds shadow color check
-		DWORD oobColor1 = terrain.GetShadowMapColor(-10.0f, 100.0f);
+		uint32_t oobColor1 = terrain.GetShadowMapColor(-10.0f, 100.0f);
 		assert(oobColor1 == 0xFFFFFFFF);
-		DWORD oobColor2 = terrain.GetShadowMapColor(30000.0f, 100.0f);
+		uint32_t oobColor2 = terrain.GetShadowMapColor(30000.0f, 100.0f);
 		assert(oobColor2 == 0xFFFFFFFF);
 
 		// Initialize shadow map pixel at (10, 10)
@@ -129,7 +129,7 @@ namespace
 		terrain.m_awShadowMap[10 * CTerrainImpl::SHADOWMAP_XSIZE + 10] = 0x001F;
 		float coordX = (10.0f / (CTerrainImpl::SHADOWMAP_XSIZE - 1)) * CTerrainImpl::TERRAIN_XSIZE;
 		float coordY = (10.0f / (CTerrainImpl::SHADOWMAP_YSIZE - 1)) * CTerrainImpl::TERRAIN_XSIZE;
-		DWORD color = terrain.GetShadowMapColor(coordX, coordY);
+		uint32_t color = terrain.GetShadowMapColor(coordX, coordY);
 		// Alpha must be 0xFF
 		assert((color & 0xFF000000) == 0xFF000000);
 
@@ -142,13 +142,13 @@ namespace
 
 		// 1. Test HeightMap loading via VFS
 		const char* heightmapPath = "/tmp/test_heightmap.raw";
-		std::vector<WORD> mockHeight(CTerrainImpl::HEIGHTMAP_RAW_XSIZE * CTerrainImpl::HEIGHTMAP_RAW_YSIZE, 420);
+		std::vector<uint16_t> mockHeight(CTerrainImpl::HEIGHTMAP_RAW_XSIZE * CTerrainImpl::HEIGHTMAP_RAW_YSIZE, 420);
 		// Set distinctive value at grid (5, 5) -> raw index (6 * HEIGHTMAP_RAW_XSIZE + 6)
 		mockHeight[6 * CTerrainImpl::HEIGHTMAP_RAW_XSIZE + 6] = 1337;
 
 		{
 			std::ofstream out(heightmapPath, std::ios::binary);
-			out.write(reinterpret_cast<const char*>(mockHeight.data()), mockHeight.size() * sizeof(WORD));
+			out.write(reinterpret_cast<const char*>(mockHeight.data()), mockHeight.size() * sizeof(uint16_t));
 		}
 
 		bool hLoaded = terrain.LoadHeightMap(heightmapPath);
@@ -161,13 +161,13 @@ namespace
 #pragma pack(push, 1)
 		struct MockAttrHeader
 		{
-				WORD magic = 2634;
-				WORD width = CTerrainImpl::ATTRMAP_XSIZE;
-				WORD height = CTerrainImpl::ATTRMAP_YSIZE;
+				uint16_t magic = 2634;
+				uint16_t width = CTerrainImpl::ATTRMAP_XSIZE;
+				uint16_t height = CTerrainImpl::ATTRMAP_YSIZE;
 		} attrHeader;
 #pragma pack(pop)
 
-		std::vector<BYTE> mockAttr(CTerrainImpl::ATTRMAP_XSIZE * CTerrainImpl::ATTRMAP_YSIZE, CTerrainImpl::ATTRIBUTE_BLOCK);
+		std::vector<uint8_t> mockAttr(CTerrainImpl::ATTRMAP_XSIZE * CTerrainImpl::ATTRMAP_YSIZE, CTerrainImpl::ATTRIBUTE_BLOCK);
 		mockAttr[10] = CTerrainImpl::ATTRIBUTE_WATER;
 
 		{
@@ -186,16 +186,16 @@ namespace
 #pragma pack(push, 1)
 		struct MockWaterHeader
 		{
-				WORD magic = 5426;
-				WORD width = CTerrainImpl::WATERMAP_XSIZE;
-				WORD height = CTerrainImpl::WATERMAP_YSIZE;
-				BYTE layerCount = 2;
+				uint16_t magic = 5426;
+				uint16_t width = CTerrainImpl::WATERMAP_XSIZE;
+				uint16_t height = CTerrainImpl::WATERMAP_YSIZE;
+				uint8_t layerCount = 2;
 		} waterHeader;
 #pragma pack(pop)
 
-		std::vector<BYTE> mockWaterGrid(CTerrainImpl::WATERMAP_XSIZE * CTerrainImpl::WATERMAP_YSIZE, 0);
+		std::vector<uint8_t> mockWaterGrid(CTerrainImpl::WATERMAP_XSIZE * CTerrainImpl::WATERMAP_YSIZE, 0);
 		mockWaterGrid[25] = 1;
-		int32_t mockHeights[2] = {500, 1200}; // on-disk type is LONG (32-bit), not long
+		int32_t mockHeights[2] = {500, 1200}; // on-disk type is int32_t (32-bit), not long
 
 		{
 			std::ofstream out(watermapPath, std::ios::binary);

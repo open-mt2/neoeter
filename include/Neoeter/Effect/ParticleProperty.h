@@ -38,12 +38,12 @@ class CParticleProperty
 		void InsertTexture(const char* c_szFileName);
 		bool SetTexture(const char* c_szFileName);
 
-		__forceinline BYTE GetTextureAnimationType()
+		__forceinline uint8_t GetTextureAnimationType()
 		{
 			return m_byTexAniType;
 		}
 
-		__forceinline DWORD GetTextureAnimationFrameCount()
+		__forceinline uint32_t GetTextureAnimationFrameCount()
 		{
 			return m_ImageVector.size();
 		}
@@ -53,22 +53,22 @@ class CParticleProperty
 			return m_fTexAniDelay;
 		}
 
-		BYTE m_byTexAniType;
+		uint8_t m_byTexAniType;
 		float m_fTexAniDelay;
-		BOOL m_bTexAniRandomStartFrameFlag;
+		int32_t m_bTexAniRandomStartFrameFlag;
 
-		BYTE m_bySrcBlendType;
-		BYTE m_byDestBlendType;
-		BYTE m_byColorOperationType;
-		BYTE m_byBillboardType;
+		uint8_t m_bySrcBlendType;
+		uint8_t m_byDestBlendType;
+		uint8_t m_byColorOperationType;
+		uint8_t m_byBillboardType;
 
-		BYTE m_byRotationType;
+		uint8_t m_byRotationType;
 		float m_fRotationSpeed;
-		WORD m_wRotationRandomStartingBegin;
-		WORD m_wRotationRandomStartingEnd;
+		uint16_t m_wRotationRandomStartingBegin;
+		uint16_t m_wRotationRandomStartingEnd;
 
-		BOOL m_bAttachFlag;
-		BOOL m_bStretchFlag;
+		int32_t m_bAttachFlag;
+		int32_t m_bStretchFlag;
 
 		TTimeEventTableFloat m_TimeEventGravity;
 		TTimeEventTableFloat m_TimeEventAirResistance;

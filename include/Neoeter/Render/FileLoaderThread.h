@@ -28,8 +28,8 @@ class CFileLoaderThread
 		void Shutdown();
 
 	protected:
-		static UINT CALLBACK EntryPoint(void* pThis);
-		UINT Run(void* arg);
+		static uint32_t CALLBACK EntryPoint(void* pThis);
+		uint32_t Run(void* arg);
 
 		void* Arg() const { return m_pArg; }
 		void Arg(void* arg) { m_pArg = arg; }
@@ -41,8 +41,8 @@ class CFileLoaderThread
 		unsigned m_uThreadID;
 
 	protected:
-		UINT Setup();
-		UINT Execute(void* pvArg);
+		uint32_t Setup();
+		uint32_t Execute(void* pvArg);
 		void Destroy();
 		void Process();
 

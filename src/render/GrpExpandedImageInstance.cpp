@@ -8,7 +8,7 @@
 
 CDynamicPool<CGraphicExpandedImageInstance> CGraphicExpandedImageInstance::ms_kPool;
 
-void CGraphicExpandedImageInstance::CreateSystem(UINT uCapacity)
+void CGraphicExpandedImageInstance::CreateSystem(uint32_t uCapacity)
 {
 	ms_kPool.Create(uCapacity);
 }
@@ -205,9 +205,9 @@ void CGraphicExpandedImageInstance::SetRenderingMode(int iMode)
 	m_iRenderingMode = iMode;
 }
 
-DWORD CGraphicExpandedImageInstance::Type()
+uint32_t CGraphicExpandedImageInstance::Type()
 {
-	static DWORD s_dwType = GetCRC32("CGraphicExpandedImageInstance", strlen("CGraphicExpandedImageInstance"));
+	static uint32_t s_dwType = GetCRC32("CGraphicExpandedImageInstance", strlen("CGraphicExpandedImageInstance"));
 	return (s_dwType);
 }
 
@@ -219,7 +219,7 @@ void CGraphicExpandedImageInstance::OnSetImagePointer()
 	SetOrigin(float(GetWidth()) / 2.0f, float(GetHeight()) / 2.0f);
 }
 
-BOOL CGraphicExpandedImageInstance::OnIsType(DWORD dwType)
+int32_t CGraphicExpandedImageInstance::OnIsType(uint32_t dwType)
 {
 	if (CGraphicExpandedImageInstance::Type() == dwType)
 		return TRUE;

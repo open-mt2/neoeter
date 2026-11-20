@@ -164,7 +164,7 @@ void CGrannyLODController::SetMaterialData(const char* c_szImageName, const SMat
 	}
 }
 
-void CGrannyLODController::SetSpecularInfo(const char* c_szMtrlName, BOOL bEnable, float fPower)
+void CGrannyLODController::SetSpecularInfo(const char* c_szMtrlName, int32_t bEnable, float fPower)
 {
 	std::deque<CGrannyModelInstance*>::iterator i;
 	for (i = m_que_pkModelInst.begin(); i != m_que_pkModelInst.end(); ++i)
@@ -287,7 +287,7 @@ void CGrannyLODController::AddModel(CGraphicThing* pThing, int iSrcModel, CGrann
 	m_que_pkModelInst.push_front(pModelInstance);
 }
 
-void CGrannyLODController::__ReserveSharedDeformableVertexBuffer(DWORD deformableVertexCount)
+void CGrannyLODController::__ReserveSharedDeformableVertexBuffer(uint32_t deformableVertexCount)
 {
 	if (m_pkSharedDeformableVertexBuffer &&
 		m_pkSharedDeformableVertexBuffer->GetVertexCount() >= deformableVertexCount)
@@ -379,12 +379,12 @@ void CGrannyLODController::SetLODLimits(float /*fNearLOD*/, float fFarLOD)
 	m_fLODDistance = fFarLOD;
 }
 
-void CGrannyLODController::SetLODLevel(BYTE bLodLevel)
+void CGrannyLODController::SetLODLevel(uint8_t bLodLevel)
 {
 	assert(m_que_pkModelInst.size() > 0);
 
 	if (m_que_pkModelInst.size() > 0)
-		m_bLODLevel = (BYTE)MIN(m_que_pkModelInst.size() - 1, bLodLevel);
+		m_bLODLevel = (uint8_t)MIN(m_que_pkModelInst.size() - 1, bLodLevel);
 }
 
 void CGrannyLODController::CreateDeviceObjects()
@@ -465,7 +465,7 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 		float fLODFactor = fMINMAX(0.0f, (m_fLODDistance - fDistanceFromCamera), m_fLODDistance);
 
 		if (m_fLODDistance > 0.0f)
-			m_dwLODAniFPS = (DWORD)((CGrannyModelInstance::ANIFPS_MAX - CGrannyModelInstance::ANIFPS_MIN) * fLODFactor / m_fLODDistance + CGrannyModelInstance::ANIFPS_MIN);
+			m_dwLODAniFPS = (uint32_t)((CGrannyModelInstance::ANIFPS_MAX - CGrannyModelInstance::ANIFPS_MIN) * fLODFactor / m_fLODDistance + CGrannyModelInstance::ANIFPS_MIN);
 		else
 			m_dwLODAniFPS = CGrannyModelInstance::ANIFPS_MIN;
 
@@ -474,7 +474,7 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 		m_dwLODAniFPS *= 10;
 
 		float fLODStep = m_fLODDistance / m_que_pkModelInst.size();
-		BYTE bLODLevel = BYTE(fLODFactor / fLODStep);
+		uint8_t bLODLevel = uint8_t(fLODFactor / fLODStep);
 
 		if (m_fLODDistance <= 5000.0f)
 		{
@@ -495,7 +495,7 @@ void CGrannyLODController::UpdateLODLevel(float fDistanceFromCenter, float fDist
 				bLODLevel = 3;
 			}
 
-			bLODLevel = (BYTE)(m_que_pkModelInst.size() - min(bLODLevel, m_que_pkModelInst.size()) - 1);
+			bLODLevel = (uint8_t)(m_que_pkModelInst.size() - min(bLODLevel, m_que_pkModelInst.size()) - 1);
 		}
 
 		if (ms_isMinLODModeEnable)
@@ -528,10 +528,10 @@ void CGrannyLODController::UpdateTime(float fElapsedTime)
 
 	m_pCurrentModelInstance->Update(m_dwLODAniFPS);
 
-	// DWORD t3=timeGetTime();
+	// uint32_t t3=timeGetTime();
 	m_pCurrentModelInstance->UpdateLocalTime(fElapsedTime);
 
-	// DWORD t4=timeGetTime();
+	// uint32_t t4=timeGetTime();
 
 #ifdef __PERFORMANCE_CHECKER__
 	{
@@ -572,7 +572,7 @@ void CGrannyLODController::RefreshAttachedModelInstance()
 	if (!m_pCurrentModelInstance)
 		return;
 
-	for (DWORD i = 0; i < m_AttachedModelDataVector.size(); ++i)
+	for (uint32_t i = 0; i < m_AttachedModelDataVector.size(); ++i)
 	{
 		TAttachingModelData& rModelData = m_AttachedModelDataVector[i];
 
@@ -677,7 +677,7 @@ void CGrannyLODController::SetMotionAtEnd()
 		m_pCurrentModelInstance->SetMotionAtEnd();
 }
 
-BOOL CGrannyLODController::isModelInstance()
+int32_t CGrannyLODController::isModelInstance()
 {
 	if (!m_pCurrentModelInstance)
 		return FALSE;

@@ -2,6 +2,8 @@
 
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
 #include <windows.h>
+#include <cstdint>
+#include <cstddef>
 #else
 #include <Platform/Platform.h>
 #endif
@@ -18,28 +20,28 @@ class CTimer : public CSingleton<CTimer>
 		void SetBaseTime();
 
 		float GetCurrentSecond();
-		DWORD GetCurrentMillisecond();
+		uint32_t GetCurrentMillisecond();
 
 		float GetElapsedSecond();
-		DWORD GetElapsedMilliecond();
+		uint32_t GetElapsedMilliecond();
 
 		void UseCustomTime();
 
 	protected:
 		bool m_bUseRealTime;
-		DWORD m_dwBaseTime;
-		DWORD m_dwCurrentTime;
+		uint32_t m_dwBaseTime;
+		uint32_t m_dwCurrentTime;
 		float m_fCurrentTime;
-		DWORD m_dwElapsedTime;
+		uint32_t m_dwElapsedTime;
 		int m_index;
 };
 
-BOOL ELTimer_Init();
+int32_t ELTimer_Init();
 
-DWORD ELTimer_GetMSec();
+uint32_t ELTimer_GetMSec();
 
-VOID ELTimer_SetServerMSec(DWORD dwServerTime);
-DWORD ELTimer_GetServerMSec();
+void ELTimer_SetServerMSec(uint32_t dwServerTime);
+uint32_t ELTimer_GetServerMSec();
 
-VOID ELTimer_SetFrameMSec();
-DWORD ELTimer_GetFrameMSec();
+void ELTimer_SetFrameMSec();
+uint32_t ELTimer_GetFrameMSec();

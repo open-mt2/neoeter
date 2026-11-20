@@ -43,7 +43,7 @@ bool NSound::LoadSoundInformationPiece(const char* c_szFileName, NSound::TSoundD
 	rSoundDataVector.resize(iCount);
 
 	char szSoundDataHeader[32 + 1];
-	for (DWORD i = 0; i < rSoundDataVector.size(); ++i)
+	for (uint32_t i = 0; i < rSoundDataVector.size(); ++i)
 	{
 		_snprintf(szSoundDataHeader, sizeof(szSoundDataHeader), "sounddata%02d", i);
 		CTokenVector* pTokenVector;
@@ -109,7 +109,7 @@ bool NSound::SaveSoundInformationPiece(const char* c_szFileName, NSound::TSoundD
 
 	fprintf(File, "SoundDataCount    %d\n", (int)rSoundDataVector.size());
 
-	for (DWORD i = 0; i < rSoundDataVector.size(); ++i)
+	for (uint32_t i = 0; i < rSoundDataVector.size(); ++i)
 	{
 		NSound::TSoundData& rSoundData = rSoundDataVector[i];
 		fprintf(File, "SoundData%02u       %f \"%s\"\n", (unsigned int)i, rSoundData.fTime, rSoundData.strSoundFileName.c_str());
@@ -124,17 +124,17 @@ void NSound::DataToInstance(const TSoundDataVector& c_rSoundDataVector, TSoundIn
 	if (c_rSoundDataVector.empty())
 		return;
 
-	DWORD dwFPS = 60;
+	uint32_t dwFPS = 60;
 	const float c_fFrameTime = 1.0f / float(dwFPS);
 
 	pSoundInstanceVector->clear();
 	pSoundInstanceVector->resize(c_rSoundDataVector.size());
-	for (DWORD i = 0; i < c_rSoundDataVector.size(); ++i)
+	for (uint32_t i = 0; i < c_rSoundDataVector.size(); ++i)
 	{
 		const TSoundData& c_rSoundData = c_rSoundDataVector[i];
 		TSoundInstance& rSoundInstance = pSoundInstanceVector->at(i);
 
-		rSoundInstance.dwFrame = (DWORD)(c_rSoundData.fTime / c_fFrameTime);
+		rSoundInstance.dwFrame = (uint32_t)(c_rSoundData.fTime / c_fFrameTime);
 		rSoundInstance.strSoundFileName = c_rSoundData.strSoundFileName;
 	}
 }

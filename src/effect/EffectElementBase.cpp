@@ -60,7 +60,7 @@ void CEffectElementBase::GetPosition(float fTime, D3DXVECTOR3& rPosition)
 /*
 bool CEffectElementBase::isVisible(float fTime)
 {
-	for (DWORD i = 0; i < m_TimeEventTableVisible.size(); ++i)
+	for (uint32_t i = 0; i < m_TimeEventTableVisible.size(); ++i)
 	{
 		float fPointTime = m_TimeEventTableVisible[i];
 
@@ -99,7 +99,7 @@ void CEffectElementBase::Clear()
 	OnClear();
 }
 
-BOOL CEffectElementBase::LoadScript(CTextFileLoader& rTextFileLoader)
+int32_t CEffectElementBase::LoadScript(CTextFileLoader& rTextFileLoader)
 {
 	CTokenVector* pTokenVector;
 	if (!rTextFileLoader.GetTokenFloat("starttime", &m_fStartTime))
@@ -110,8 +110,8 @@ BOOL CEffectElementBase::LoadScript(CTextFileLoader& rTextFileLoader)
 	{
 		m_TimeEventTablePosition.clear();
 
-		DWORD dwIndex = 0;
-		for (DWORD i = 0; i < pTokenVector->size(); ++dwIndex)
+		uint32_t dwIndex = 0;
+		for (uint32_t i = 0; i < pTokenVector->size(); ++dwIndex)
 		{
 			TEffectPosition EffectPosition;
 			EffectPosition.m_fTime = atof(pTokenVector->at(i++).c_str());

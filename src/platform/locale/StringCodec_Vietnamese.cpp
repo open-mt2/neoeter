@@ -195,11 +195,11 @@ int EL_String_Decode_Vietnamese(const char* multi, int multiLen, wchar_t* wide, 
 	if (multiLen > 0)
 	{
 		/* 첫글자는 무조건 변경 */
-		wchar_t prev = cp1258_to_unicode[(BYTE)multi[src++]];
+		wchar_t prev = cp1258_to_unicode[(uint8_t)multi[src++]];
 
 		while (src < multiLen)
 		{
-			wchar_t unicode = cp1258_to_unicode[(BYTE)multi[src]];
+			wchar_t unicode = cp1258_to_unicode[(uint8_t)multi[src]];
 
 			/* 다음 문자가 Tone 인가? */
 			if (IsTone(unicode))

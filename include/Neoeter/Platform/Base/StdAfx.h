@@ -11,6 +11,8 @@
 #pragma warning(disable : 4244) // type conversion possible lose of data
 
 #include <windows.h>
+#include <cstdint>
+#include <cstddef>
 #include <assert.h>
 #include <stdio.h>
 #pragma warning(disable : 4201)

@@ -82,7 +82,7 @@ int main()
 	grannyMaterial.Name = "Material";
 
 	CGrannyMaterialPalette source;
-	const DWORD index = source.RegisterMaterial(&grannyMaterial);
+	const uint32_t index = source.RegisterMaterial(&grannyMaterial);
 	TEST_ASSERT(index == 0);
 
 	CGrannyMaterialPalette first;

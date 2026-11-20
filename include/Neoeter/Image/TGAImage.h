@@ -16,7 +16,7 @@ class CTGAImage : public CImage
 		virtual ~CTGAImage();
 
 		virtual void Create(int width, int height);
-		virtual bool LoadFromMemory(int iSize, const BYTE* c_pbMem);
+		virtual bool LoadFromMemory(int iSize, const uint8_t* c_pbMem);
 		virtual bool SaveToDiskFile(const char* c_szFileName);
 
 		void SetCompressed(bool isCompress = true);
@@ -25,13 +25,13 @@ class CTGAImage : public CImage
 		TGA_HEADER& GetHeader();
 
 	protected:
-		int GetRawPixelCount(const DWORD* data);
-		int GetRLEPixelCount(const DWORD* data);
+		int GetRawPixelCount(const uint32_t* data);
+		int GetRLEPixelCount(const uint32_t* data);
 
 	protected:
 		TGA_HEADER m_Header;
-		DWORD m_dwFlag;
-		DWORD* m_pdwEndPtr;
+		uint32_t m_dwFlag;
+		uint32_t* m_pdwEndPtr;
 };
 
 #endif
