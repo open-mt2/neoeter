@@ -1,7 +1,7 @@
 #include "font/FontRasterizer.h"
 
-#include <Neoeter/Platform/Locale/CodePageId.h>
 #include <Neoeter/Platform/Platform.h>
+#include <Neoeter/Render/Util.h>
 
 #include <cmath>
 #include <cstring>
