@@ -1,9 +1,8 @@
 // SDL-backed IME (T1.6).
 //
-// The Windows IMM/TSF implementation in IME.cpp is compiled out when
-// OPENMT2_SDL_WINDOW is defined (both targets). SDL delivers the platform IME
-// as SDL_TEXTEDITING (composition) and SDL_TEXTINPUT (committed text); this
-// file turns those events into the text buffer the Python `ime` module reads.
+// SDL is the IME host on every target. It delivers the platform IME as
+// SDL_TEXTEDITING (composition) and SDL_TEXTINPUT (committed text); this file
+// turns those events into the text buffer the Python `ime` module reads.
 //
 // Limitation: SDL does not expose the candidate list or the reading window, so
 // those APIs return empty results. The OS IME window is still shown by SDL on
@@ -12,8 +11,6 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/IME.h>
 #include <Neoeter/Platform/Base/Utils.h>
-
-#if defined(OPENMT2_SDL_WINDOW)
 
 #include <SDL2/SDL.h>
 
@@ -422,5 +419,3 @@ void CIME::OnSDLTextInput(const char* utf8)
 	if (ms_pEvent)
 		ms_pEvent->OnUpdate();
 }
-
-#endif // OPENMT2_SDL_WINDOW
