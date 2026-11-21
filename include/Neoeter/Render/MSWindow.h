@@ -50,6 +50,10 @@ class CMSWindow
 		static SDL_Renderer* GetSDLRenderer() { return ms_pSDLRenderer; }
 		static SDL_GLContext GetGLContext() { return ms_pGLContext; }
 
+		// Shows the frame the renderer just drew: swaps the GL context, presents
+		// the software renderer, or updates the window surface, in that order.
+		static void Present();
+
 		virtual intptr_t WindowProcedure(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
 		virtual void OnSize(uintptr_t wParam, intptr_t lParam);
 

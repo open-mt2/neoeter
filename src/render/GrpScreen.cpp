@@ -4,8 +4,7 @@
 #include <Neoeter/Render/StateManager.h>
 
 // T1.9: the window and the renderer are SDL2 + GL on every target (T1.2,
-// T1.4), so this translation unit needs them on Windows too.
-#include <SDL2/SDL.h>
+// T1.4); the screen flushes the façade and lets the window show the frame.
 #include <Neoeter/Platform/GLCompat.h>
 #include <Neoeter/Render/MSWindow.h>
 
@@ -739,40 +738,23 @@ void CScreen::Show(PlatformWindow hWnd)
 	if (D3DERR_DEVICELOST == hr)
 		RestoreDevice();
 
-#if defined(OPENMT2_SDL_WINDOW)
-	if (CMSWindow::ms_pSDLWindow)
-	{
-		SDL_GL_SwapWindow(CMSWindow::ms_pSDLWindow);
-	}
-#endif
+	CMSWindow::Present();
 }
 
 void CScreen::Show(RECT* pSrcRect)
 {
 	assert(ms_lpd3dDevice != NULL);
 	ms_lpd3dDevice->Present(pSrcRect, NULL, NULL, NULL);
-#if defined(OPENMT2_SDL_WINDOW)
-	if (CMSWindow::ms_pSDLWindow)
-	{
-		SDL_GL_SwapWindow(CMSWindow::ms_pSDLWindow);
-	}
-#endif
+
+	CMSWindow::Present();
 }
 
 void CScreen::Show(RECT* pSrcRect, PlatformWindow hWnd)
 {
 	assert(ms_lpd3dDevice != NULL);
 	ms_lpd3dDevice->Present(pSrcRect, NULL, hWnd, NULL);
-#if defined(OPENMT2_SDL_WINDOW)
-	if (CMSWindow::ms_pSDLRenderer)
-	{
-		SDL_RenderPresent(CMSWindow::ms_pSDLRenderer);
-	}
-	else if (CMSWindow::ms_pSDLWindow)
-	{
-		SDL_UpdateWindowSurface(CMSWindow::ms_pSDLWindow);
-	}
-#endif
+
+	CMSWindow::Present();
 }
 
 void CScreen::ProjectPosition(float x, float y, float z, float* pfX, float* pfY)

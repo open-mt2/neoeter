@@ -134,15 +134,12 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, uint32_t /*cs*/, uin
 		if (height <= 0) height = 768;
 	}
 
-	Uint32 windowFlags = SDL_WINDOW_SHOWN;
-
-#if defined(OPENMT2_RENDERER_GL)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	windowFlags |= SDL_WINDOW_OPENGL;
-#endif
+
+	Uint32 windowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
 	// Do NOT specify SDL_WINDOW_RESIZABLE; set min/max size equal to target dimensions.
 	// Tiling WMs (i3, Sway, Hyprland, bspwm) automatically treat fixed-size windows as floating.
@@ -166,7 +163,6 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, uint32_t /*cs*/, uin
 	SDL_SetWindowSize(ms_pSDLWindow, width, height);
 	SDL_SetWindowPosition(ms_pSDLWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
-#if defined(OPENMT2_RENDERER_GL)
 	ms_pGLContext = SDL_GL_CreateContext(ms_pSDLWindow);
 	if (!ms_pGLContext)
 	{
@@ -196,7 +192,6 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, uint32_t /*cs*/, uin
 		SDL_GL_SwapWindow(ms_pSDLWindow);
 		Tracef("[SDL2] Initialized OpenGL context for window %p\n", ms_pSDLWindow);
 	}
-#endif
 
 	Neoeter::Debug::Initialize();
 
@@ -261,10 +256,8 @@ bool CMSWindow::SetFullscreen(bool enabled, int width, int height)
 		}
 	}
 
-#if defined(OPENMT2_RENDERER_GL)
 	if (ms_pGLContext)
 		SDL_GL_MakeCurrent(ms_pSDLWindow, ms_pGLContext);
-#endif
 
 	int actualWidth = width;
 	int actualHeight = height;
@@ -291,6 +284,22 @@ void CMSWindow::SetVisibleMode(bool isVisible)
 			SDL_ShowWindow(ms_pSDLWindow);
 		else
 			SDL_HideWindow(ms_pSDLWindow);
+	}
+}
+
+void CMSWindow::Present()
+{
+	if (ms_pGLContext && ms_pSDLWindow)
+	{
+		SDL_GL_SwapWindow(ms_pSDLWindow);
+	}
+	else if (ms_pSDLRenderer)
+	{
+		SDL_RenderPresent(ms_pSDLRenderer);
+	}
+	else if (ms_pSDLWindow)
+	{
+		SDL_UpdateWindowSurface(ms_pSDLWindow);
 	}
 }
 
