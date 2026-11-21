@@ -10,3 +10,5 @@ using PlatformModule = void*;
 using PlatformHandle = void*;
 using PlatformCursor = void*;
 using PlatformImeContext = void*;
+using PlatformSocketArg = uint32_t;
+using PlatformDword = uint32_t;

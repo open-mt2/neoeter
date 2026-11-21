@@ -13,6 +13,7 @@
 #include <Neoeter/Audio/StdAfx.h>
 #include <Neoeter/Audio/MSSCompat.h>
 #include <Neoeter/Audio/SoundManager.h>
+#include <Neoeter/Platform/Port.h>
 
 #include <cassert>
 #include <cmath>
@@ -135,7 +136,7 @@ int main()
 {
 	// Direct runs (outside CTest) stay headless too; the CMake test property
 	// sets the same variable and wins because overwrite is disabled.
-	setenv("OPENMT2_AUDIO_BACKEND", "null", 0);
+	Neoeter::Platform::SetEnvironment("OPENMT2_AUDIO_BACKEND", "null");
 
 	test_engine_uses_null_backend();
 	test_3d_sample_lifecycle_without_device();

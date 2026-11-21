@@ -6,6 +6,7 @@
 
 #include <windows.h>
 #include <imm.h>
+#include <process.h>
 
 // The port names its directory operation CreateDirectory; the Win32 macro of
 // the same name would rename the interface on this target.
@@ -21,3 +22,5 @@ using PlatformModule = HMODULE;
 using PlatformHandle = HANDLE;
 using PlatformCursor = HCURSOR;
 using PlatformImeContext = HIMC;
+using PlatformSocketArg = unsigned long;
+using PlatformDword = unsigned long;

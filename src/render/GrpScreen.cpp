@@ -312,7 +312,7 @@ void CScreen::RenderCircle3d(float fx, float fy, float fz, float fRadius, int iS
 class CD3DXMeshRenderingOption : public CScreen
 {
 	public:
-		uint32_t m_dwVS;
+		PlatformDword m_dwVS;
 
 		CD3DXMeshRenderingOption(D3DFILLMODE d3dFillMode, const D3DXMATRIX& c_rmatWorld)
 		{
