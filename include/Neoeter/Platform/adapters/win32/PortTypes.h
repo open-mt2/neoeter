@@ -5,6 +5,11 @@
 #endif
 
 #include <windows.h>
+#include <imm.h>
+
+// The port names its directory operation CreateDirectory; the Win32 macro of
+// the same name would rename the interface on this target.
+#undef CreateDirectory
 
 // Opaque handles the engine and the client exchange. They are the real Win32
 // handles on this target and void pointers in the POSIX adapter, so no caller

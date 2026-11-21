@@ -10,6 +10,7 @@
 #endif
 #include <Neoeter/Platform/Base/FileDir.h>
 #include <Neoeter/Platform/Base/Utils.h>
+#include <Neoeter/Platform/Port.h>
 #include <assert.h>
 #include <sys/stat.h>
 
@@ -463,11 +464,7 @@ void MyCreateDirectory(const char* path)
 		{
 			memset(dir, 0, len);
 			strncpy(dir, path, p - path);
-#if defined(_WIN32)
-			CreateDirectory(dir, NULL);
-#else
-			mkdir(dir, 0755);
-#endif
+			Neoeter::Platform::CreateDirectory(dir);
 		}
 
 		++p;

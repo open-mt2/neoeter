@@ -4,6 +4,7 @@
 #include <cstddef>
 
 #include <Neoeter/Platform/PlatformWindow.h>
+#include <Neoeter/Platform/Port.h>
 
 #if defined(_WIN32) || defined(_WIN64)
 #ifndef WIN32_LEAN_AND_MEAN
@@ -1631,16 +1632,6 @@ inline typename std::common_type<T, U>::type max(T a, U b)
 }
 #endif
 
-// Directory Creation Helper
-inline BOOL CreateDirectoryA(LPCSTR lpPathName, LPVOID lpSecurityAttributes)
-{
-	(void)lpSecurityAttributes;
-	return mkdir(lpPathName, 0755) == 0;
-}
-#ifndef CreateDirectory
-#define CreateDirectory CreateDirectoryA
-#endif
-
 // Timer & Multimedia Helpers
 struct TIMECAPS
 {
@@ -1937,3 +1928,10 @@ inline BOOL SetFileAttributes(LPCSTR, DWORD) { return TRUE; }
 #define DIK_MAIL 0xEC
 #define DIK_MEDIASELECT 0xED
 #endif
+
+// Legacy two-argument directory helper; new code calls the port directly.
+inline BOOL CreateDirectory(const char* path, void* attributes)
+{
+	(void)attributes;
+	return Neoeter::Platform::CreateDirectory(path) ? TRUE : FALSE;
+}

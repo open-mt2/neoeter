@@ -16,7 +16,7 @@ namespace
 		public:
 			uint64_t MonotonicMillis() override
 			{
-				return static_cast<uint64_t>(GetTickCount64());
+				return static_cast<uint64_t>(GetTickCount());
 			}
 
 			void SleepMillis(uint32_t milliseconds) override
@@ -49,7 +49,7 @@ namespace
 				if (path == nullptr)
 					return false;
 
-				if (CreateDirectoryA(path, nullptr) != 0)
+				if (::CreateDirectoryA(path, nullptr) != 0)
 					return true;
 
 				return GetLastError() == ERROR_ALREADY_EXISTS;

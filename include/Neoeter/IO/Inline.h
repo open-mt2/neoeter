@@ -2,6 +2,7 @@
 #define __INC_ETERPACK_INLINE_H__
 
 #include <Neoeter/Platform/Platform.h>
+#include <Neoeter/Platform/Port.h>
 #include <cstring>
 #include <cctype>
 
@@ -20,7 +21,7 @@ inline void inlinePathCreate(const char* path)
 		{
 			memset(dir, 0, sizeof(dir));
 			strncpy(dir, path, len);
-			CreateDirectory(dir, NULL);
+			Neoeter::Platform::CreateDirectory(dir);
 		}
 		p = k + 1;
 	}
