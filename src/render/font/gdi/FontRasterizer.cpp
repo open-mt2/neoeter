@@ -102,6 +102,12 @@ namespace
 		if (!MeasureGlyph(dc, codePage, codepoint, glyph))
 			return;
 
+		// The atlas conversion below reads the low byte as coverage, so the cell
+		// must be white on black; the DIB DC defaults to black on white, which
+		// turns every cell into a solid box.
+		::SetTextColor(dc, RGB(255, 255, 255));
+		::SetBkColor(dc, 0);
+
 		TextOutW(dc, x, y, &codepoint, 1);
 
 		for (int row = 0; row < glyph.cellHeight; ++row)
