@@ -4,14 +4,14 @@
 
 namespace
 {
-bool IsPlainAscii(const char* text)
-{
-	for (; *text; ++text)
-		if ((unsigned char)*text >= 0x80)
-			return false;
+	bool IsPlainAscii(const char* text)
+	{
+		for (; *text; ++text)
+			if ((unsigned char)*text >= 0x80)
+				return false;
 
-	return true;
-}
+		return true;
+	}
 }
 
 bool FontLocator_Fontconfig(const char* family, std::string& path)

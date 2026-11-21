@@ -14,27 +14,27 @@
 
 namespace
 {
-class CFakeRasterizer : public CFontRasterizer
-{
-	public:
-		bool MeasureGlyph(PlatformDeviceContext, uint16_t, wchar_t, FontGlyph& glyph) override
-		{
-			glyph.cellWidth = 6;
-			glyph.cellHeight = 8;
-			glyph.left = 1;
-			glyph.top = 2;
-			glyph.advance = 7;
-			glyph.lineHeight = 8;
-			glyph.ascender = 6;
-			return true;
-		}
+	class CFakeRasterizer : public CFontRasterizer
+	{
+		public:
+			bool MeasureGlyph(PlatformDeviceContext, uint16_t, wchar_t, FontGlyph& glyph) override
+			{
+				glyph.cellWidth = 6;
+				glyph.cellHeight = 8;
+				glyph.left = 1;
+				glyph.top = 2;
+				glyph.advance = 7;
+				glyph.lineHeight = 8;
+				glyph.ascender = 6;
+				return true;
+			}
 
-		void DrawGlyph(PlatformDeviceContext, uint32_t* target, int targetWidth, int targetHeight, int x, int y, wchar_t, uint16_t) override
-		{
-			if (x >= 0 && x < targetWidth && y >= 0 && y < targetHeight)
-				target[y * targetWidth + x] = 0x0FFF;
-		}
-};
+			void DrawGlyph(PlatformDeviceContext, uint32_t* target, int targetWidth, int targetHeight, int x, int y, wchar_t, uint16_t) override
+			{
+				if (x >= 0 && x < targetWidth && y >= 0 && y < targetHeight)
+					target[y * targetWidth + x] = 0x0FFF;
+			}
+	};
 }
 
 int main()
