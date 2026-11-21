@@ -15,6 +15,19 @@ foreach(TEST_NAME test_grpmath test_detector test_jpeg test_input test_ime test_
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endforeach()
 
+# The font seam is FreeType-backed on the platforms that ship it; the Windows
+# backend is compile-checked with the engine.
+if(UNIX)
+    add_executable(test_font_rasterizer test_font_rasterizer.cpp)
+    target_link_libraries(test_font_rasterizer PRIVATE neoeter_render)
+    target_include_directories(test_font_rasterizer PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
+    )
+    target_compile_options(test_font_rasterizer PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    add_test(NAME test_font_rasterizer COMMAND test_font_rasterizer)
+endif()
+
 # TA.1: shared test helpers and always-on asserts (tests/support/TestAssert.h)
 foreach(_test_target test_eterlib test_grpmath test_detector test_jpeg test_input test_ime test_shader_stats test_debug_rows)
     target_include_directories(${_test_target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

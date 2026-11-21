@@ -4,8 +4,11 @@
 #include "GrpImageTexture.h"
 #include "GrpDIB.h"
 
-#include <vector>
 #include <map>
+#include <memory>
+#include <vector>
+
+class CFontRasterizer;
 
 class CGraphicFontTexture : public CGraphicTexture
 {
@@ -51,24 +54,17 @@ class CGraphicFontTexture : public CGraphicTexture
 
 		bool AppendTexture();
 
-		HFONT GetFont(uint16_t codePage);
-
 	protected:
 		typedef std::vector<CGraphicImageTexture*> TGraphicImageTexturePointerVector;
 		typedef std::map<TCharacterKey, TCharacterInfomation> TCharacterInfomationMap;
-		typedef std::map<uint16_t, HFONT> TFontMap;
 
 	protected:
 		CGraphicDib m_dib;
-
-		HFONT m_hFontOld;
-		HFONT m_hFont;
+		std::unique_ptr<CFontRasterizer> m_pRasterizer;
 
 		TGraphicImageTexturePointerVector m_pFontTextureVector;
 
 		TCharacterInfomationMap m_charInfoMap;
-
-		TFontMap m_fontMap;
 
 		int m_x;
 		int m_y;

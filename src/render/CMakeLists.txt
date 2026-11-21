@@ -57,6 +57,7 @@ find_package(SDL2 REQUIRED)
 if(UNIX)
     find_package(OpenGL REQUIRED)
     find_package(Freetype REQUIRED)
+    find_package(Fontconfig QUIET)
 endif()
 
 file(GLOB ETERLIB_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
@@ -65,9 +66,21 @@ if(NOT NEOETER_DEBUG_UI)
 endif()
 
 if(WIN32)
-    list(APPEND ETERLIB_SOURCES adapters/win32/NativeWindow.cpp)
+    list(APPEND ETERLIB_SOURCES
+        adapters/win32/NativeWindow.cpp
+        font/gdi/FontRasterizer.cpp
+    )
 else()
-    list(APPEND ETERLIB_SOURCES adapters/posix/NativeWindow.cpp)
+    list(APPEND ETERLIB_SOURCES
+        adapters/posix/NativeWindow.cpp
+        font/freetype/FontLocator.cpp
+        font/freetype/FontRasterizer.cpp
+    )
+    if(Fontconfig_FOUND)
+        list(APPEND ETERLIB_SOURCES font/freetype/FontLocatorFontconfig.cpp)
+    else()
+        list(APPEND ETERLIB_SOURCES font/freetype/FontLocatorFallback.cpp)
+    endif()
 endif()
 file(GLOB ETERLIB_HEADERS CONFIGURE_DEPENDS
     "${NEOETER_INCLUDE_DIR}/Neoeter/Render/*.h"
@@ -113,14 +126,8 @@ endif()
 
 # Optional: resolve font face names to files (FontLocator.cpp). Without it the
 # lookup falls back to fixed FHS paths, which don't exist on NixOS.
-if(UNIX)
-    find_package(Fontconfig QUIET)
-    if(Fontconfig_FOUND)
-        target_link_libraries(neoeter_render PRIVATE Fontconfig::Fontconfig)
-        target_compile_definitions(neoeter_render PRIVATE OPENMT2_HAVE_FONTCONFIG=1)
-    else()
-        message(STATUS "neoeter_render: fontconfig not found, using fixed font paths")
-    endif()
+if(UNIX AND Fontconfig_FOUND)
+    target_link_libraries(neoeter_render PRIVATE Fontconfig::Fontconfig)
 endif()
 
 # Unit Tests

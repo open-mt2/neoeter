@@ -1,6 +1,5 @@
 #pragma once
 
-#if defined(OPENMT2_PLATFORM_LINUX)
 #include <string>
 
 // Resolves a Windows font face name (e.g. "Tahoma") to a font file on disk.
@@ -8,4 +7,8 @@
 // sans-serif), then a few well-known FHS paths. Results are cached per name.
 // Returns an empty string when nothing usable is found.
 std::string FontLocator_FindFontFile(const char* fontName);
-#endif
+
+// Family lookup through fontconfig. A build without fontconfig links the
+// fallback translation unit, which returns false and leaves the path and FHS
+// lookups in place.
+bool FontLocator_Fontconfig(const char* family, std::string& path);
