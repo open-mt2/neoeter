@@ -10,7 +10,7 @@
 // The D3DX compat shim must decode non-DDS images (TGA/JPG/BMP) on every
 // target that uses the GL renderer, not only on Linux. On Windows the decode was
 // guarded by OPENMT2_PLATFORM_LINUX, so every such texture became an empty 64x64
-// image and the call still returned S_OK (open-mt2/devkit#136).
+// image and the call still returned S_OK.
 //
 // The shim uploads through the process-wide render backend. A recording backend
 // stands in for GL here, so the test needs no GL context and also proves the

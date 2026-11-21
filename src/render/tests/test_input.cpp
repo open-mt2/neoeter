@@ -1,4 +1,4 @@
-// T1.3 — SDL2 input on every target.
+// SDL2 input on every target.
 //
 // The game speaks DirectInput scan codes (DIK_*) everywhere: the Python
 // bindings expose them, the player input handler switches on them, and the

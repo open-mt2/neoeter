@@ -3,7 +3,7 @@
 // ============================================================================
 // Png.h - minimal PNG IO and image comparison helpers for the render goldens
 // ============================================================================
-// TA.4 needs two things the rest of the test suite does not:
+// The render goldens need two things the rest of the test suite does not:
 //  1. a dependency-light PNG writer (zlib is already part of the image), and
 //  2. a perceptual comparison so a driver update does not fail CI on a single
 //     off-by-one channel while still catching real rendering regressions.

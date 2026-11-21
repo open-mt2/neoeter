@@ -1,4 +1,4 @@
-// Deterministic effect updates (TA.5).
+// Deterministic effect updates.
 //
 // Particle physics in EffectLib is driven by decorator chains over elapsed
 // time. This test pins the result of a fixed-step update against hand-computed

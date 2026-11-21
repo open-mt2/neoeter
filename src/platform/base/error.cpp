@@ -24,7 +24,7 @@ int32_t CALLBACK EnumerateLoadedModulesProc(PCSTR ModuleName, uint32_t ModuleBas
 }
 
 #if defined(_WIN64)
-// 64-bit builds get the DWORD64 variant of the module walk (D10).
+// 64-bit builds get the DWORD64 variant of the module walk.
 int32_t CALLBACK EnumerateLoadedModulesProc64(PCSTR ModuleName, DWORD64 ModuleBase, DWORD64 ModuleSize, PVOID UserContext)
 {
 	DWORD64 offset = *((DWORD64*)UserContext);

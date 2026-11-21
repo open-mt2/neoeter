@@ -166,7 +166,7 @@
 #endif
 
 #ifdef __cplusplus
-// T1.9: MinGW's windows.h does not define the min/max macros MSVC
+// MinGW's windows.h does not define the min/max macros MSVC
 // provided, so publish the same helpers the non-Windows branch uses
 // (including mixed-type calls such as min(int, size_t)).
 #include <algorithm>

@@ -2,7 +2,7 @@
 #define __MILESLIB_CSOUNDDATA_H__
 
 #include <sstream>
-// T4.1: Miles is gone on every target; MSSCompat is the miniaudio shim.
+// MSSCompat is the miniaudio shim.
 #include "MSSCompat.h"
 #include <Neoeter/Platform/Base/MappedFile.h>
 

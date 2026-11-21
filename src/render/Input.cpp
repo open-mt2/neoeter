@@ -5,7 +5,7 @@
 
 #include <array>
 
-// T1.3: SDL2 is the only keyboard backend on every target. DirectInput's
+// SDL2 is the only keyboard backend on every target. DirectInput's
 // device object, coop level and re-acquire dance are gone; the game keeps
 // seeing the same DIK_* codes and edge events it always did.
 
@@ -181,7 +181,7 @@ namespace
 		{SDL_SCANCODE_AC_BOOKMARKS, DIK_WEBFAVORITES},
 		{SDL_SCANCODE_STOP, DIK_STOP},
 
-		// Layout-specific keys. Text entry goes through SDL_TEXTINPUT (T1.6), so
+		// Layout-specific keys. Text entry goes through SDL_TEXTINPUT, so
 		// these are only interesting to code that polls IsPressed().
 		{SDL_SCANCODE_INTERNATIONAL3, DIK_YEN},
 		{SDL_SCANCODE_LANG1, DIK_KANA},

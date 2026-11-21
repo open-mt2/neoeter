@@ -94,7 +94,7 @@ class CIME
 		static void ChangeInputLanguage();
 		static void ChangeInputLanguageWorker();
 
-		// SDL text events (T1.6). Wired from CMSApplication::MessageProcess.
+		// SDL text events. Wired from CMSApplication::MessageProcess.
 		static void OnSDLTextEditing(const char* utf8, int start, int length);
 		static void OnSDLTextInput(const char* utf8);
 
@@ -201,7 +201,7 @@ class CIME
 		wchar_t m_wszComposition[IMESTR_MAXLEN];
 		static wchar_t m_wText[IMESTR_MAXLEN];
 
-		// SDL text input buffer (T1.6): UTF-8 text and the current composition.
+		// SDL text input buffer: UTF-8 text and the current composition.
 		static std::string m_stText;
 		static std::string m_stComposition;
 		// Live IME object, so the static SDL callbacks can honour number mode,

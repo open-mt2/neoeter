@@ -1,6 +1,6 @@
 #pragma once
 
-// GL entry-point compatibility layer (T1.4).
+// GL entry-point compatibility layer.
 //
 // Linux links the real libGL and gets every prototype from <GL/glext.h>.
 // Windows only exports GL 1.1 from opengl32.dll, so the newer entry points
@@ -150,7 +150,7 @@ extern PFNGLDELETESHADERPROC glDeleteShader;
 extern PFNGLDELETEPROGRAMPROC glDeleteProgram;
 
 // Resolves every pointer above. Returns false when one is missing; the caller
-// should log the failure and fall back (T1.5 decides what the fallback is).
+// should log the failure and fall back.
 bool Platform_LoadGLFunctions(void* (*getProcAddress)(const char*));
 
 #elif defined(__APPLE__)

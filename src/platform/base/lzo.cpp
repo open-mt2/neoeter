@@ -322,7 +322,7 @@ bool CLZObject::Encrypt(uint32_t* pdwKey)
 	uint8_t* pbBuffer = m_pbBuffer + sizeof(THeader);
 	m_pHeader->dwEncryptSize =
 		// TEA works on 32-bit words. uint32_t is unsigned long on Windows x64 (LLP64),
-		// a distinct type from uint32_t although the same width (T0.3 width audit).
+		// a distinct type from uint32_t although the same width.
 		tea_encrypt(reinterpret_cast<uint32_t*>(pbBuffer),
 					reinterpret_cast<const uint32_t*>(pbBuffer),
 					reinterpret_cast<const uint32_t*>(pdwKey),

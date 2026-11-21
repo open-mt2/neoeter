@@ -1,4 +1,4 @@
-// Backend selection (T1.7, invariant R8).
+// Backend selection.
 //
 // The backend is chosen at configure time: one binary per backend, no runtime
 // #if maze. Only the GL backend exists today; OPENMT2_RENDERER_GL is defined by

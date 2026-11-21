@@ -40,7 +40,7 @@ void CShaderStats::OnCreated(bool isVertex, const char* fileName)
 	{
 		// One line per shader file, not per instance: shaders are created once
 		// and then reused, and a flood of identical lines hides the signal.
-		TraceError("[SHADER] '%s' is ignored by the GL renderer (D13, T5.2)",
+		TraceError("[SHADER] '%s' is ignored by the GL renderer",
 				   name.c_str());
 	}
 }

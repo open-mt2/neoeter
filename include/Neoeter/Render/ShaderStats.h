@@ -11,8 +11,8 @@
 // falls back to fixed-function.
 //
 // These counters make the delta measurable instead of silent: the feature
-// matrix (T1.8) records the static call sites, and this class records what a
-// real frame actually creates/binds/uploads. T5.2 uses both.
+// matrix records the static call sites, and this class records what a real
+// frame actually creates/binds/uploads.
 class CShaderStats
 {
 	public:

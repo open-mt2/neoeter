@@ -1,4 +1,4 @@
-// T1.6 — SDL text input state machine.
+// SDL text input state machine.
 //
 // The tests drive CIME with the same events SDL delivers (TEXTEDITING and
 // TEXTINPUT) and check the buffer the Python `ime` module reads. No X server,

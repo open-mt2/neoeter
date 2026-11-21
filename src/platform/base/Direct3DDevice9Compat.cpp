@@ -1,9 +1,9 @@
-// Direct3D 9 compatibility façade (T1.7).
+// Direct3D 9 compatibility façade.
 //
-// State tracking and resource bookkeeping only: every OpenGL call now lives
-// behind the renderer seam in src/backends/gl/ (invariant R1). The façade
-// records D3D9 state and hands the backend value snapshots (R3); handles are
-// opaque (R2) and all drawing goes through IRenderBackend::Draw (R4).
+// State tracking and resource bookkeeping only: every OpenGL call lives
+// behind the renderer seam in src/backends/gl/. The façade records D3D9
+// state and hands the backend value snapshots; handles are opaque and all
+// drawing goes through IRenderBackend::Draw.
 
 #include <Neoeter/Platform/DirectXMathCompat.h>
 
@@ -12,8 +12,8 @@ void* g_pfnForceLinkImageLoader[] = {
 	(void*)&Platform_GetImageInfo,
 	(void*)&Platform_DecodeImage};
 
-// The renderer, not the platform, selects this translation unit (R8): the GL
-// compatibility facade is the Windows path too (T1.5).
+// The renderer, not the platform, selects this translation unit: the GL
+// compatibility facade is the Windows path too.
 #if defined(OPENMT2_RENDERER_GL)
 #include <Neoeter/Platform/RenderBackend.h>
 #include <algorithm>

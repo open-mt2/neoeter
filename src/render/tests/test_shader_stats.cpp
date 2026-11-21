@@ -1,8 +1,8 @@
-// T1.8 / D13 — the shader no-op must be measurable, not silent.
+// The shader no-op must be measurable, not silent.
 //
 // The GL compatibility renderer creates dummy shader objects and discards
-// binds and constant uploads. CShaderStats counts what a frame asks for so
-// T5.2 can prove the delta closes.
+// binds and constant uploads. CShaderStats counts what a frame asks for, so
+// the delta can be measured.
 
 #include <support/TestAssert.h>
 

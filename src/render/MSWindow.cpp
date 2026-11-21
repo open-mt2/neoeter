@@ -10,7 +10,7 @@
 #include <Neoeter/Platform/GLCompat.h>
 
 // Windows GL headers only ship the 1.1 subset; the constant comes from
-// glext.h, which the loader work (T1.4) adds.
+// glext.h, which the loader adds.
 #ifndef GL_LOWER_LEFT
 #define GL_LOWER_LEFT 0x8CA1
 #endif
@@ -56,7 +56,7 @@ PlatformInstance CMSWindow::ms_hInstance = NULL;
 
 intptr_t CMSWindow::WindowProcedure(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam)
 {
-	// The window is SDL-owned on every target (T1.2); the WM_* messages are
+	// The window is SDL-owned on every target; the WM_* messages are
 	// synthesised by CMSApplication from SDL events, so there is no Win32
 	// window procedure to chain to.
 	(void)hWnd;

@@ -1,6 +1,6 @@
 #pragma once
 
-// T1.3: the keyboard is SDL2 on every target. This header only exposes the
+// The keyboard is SDL2 on every target. This header only exposes the
 // game-facing contract (DirectInput scan codes + edge events); the SDL
 // translation lives in Input.cpp.
 

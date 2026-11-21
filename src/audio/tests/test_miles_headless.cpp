@@ -1,4 +1,4 @@
-// Headless audio characterization (TA.5).
+// Headless audio characterization.
 //
 // The client must be able to boot and drive its audio subsystem on machines
 // without a sound card (CI containers, servers). OPENMT2_AUDIO_BACKEND=null

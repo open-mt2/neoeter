@@ -1,4 +1,4 @@
-// SDL-backed IME (T1.6).
+// SDL-backed IME.
 //
 // SDL is the IME host on every target. It delivers the platform IME as
 // SDL_TEXTEDITING (composition) and SDL_TEXTINPUT (committed text); this file

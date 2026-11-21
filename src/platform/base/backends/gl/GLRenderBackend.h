@@ -1,11 +1,11 @@
 #pragma once
 
-// OpenGL backend (T1.7).
+// OpenGL backend.
 //
 // Everything in EterBase that touches an OpenGL symbol lives under
-// src/backends/gl/ (invariant R1). The class is a pass-through: it translates
-// the D3D9 vocabulary of the snapshot into the fixed-function GL calls the
-// pre-seam renderer issued, in the same order.
+// src/backends/gl/. The class is a pass-through: it translates
+// the D3D9 vocabulary of the snapshot into the fixed-function GL calls, in
+// the same order.
 
 #include <Neoeter/Platform/RenderBackend.h>
 

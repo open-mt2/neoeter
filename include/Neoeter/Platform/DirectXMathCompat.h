@@ -8,14 +8,14 @@
 #include <algorithm>
 
 #if defined(_WIN32) && !defined(USE_PLATFORM_D3D_COMPAT)
-// Legacy Windows branch (D1/D2 retired the native path). The DirectX SDK
-// headers are gone: the compat vocabulary below is the only contract, so a
-// Windows build defines USE_PLATFORM_D3D_COMPAT and takes the else branch.
+// Windows branch that still includes the DirectX SDK headers directly.
+// The compat vocabulary below is otherwise the only contract, so a Windows
+// build defines USE_PLATFORM_D3D_COMPAT and takes the else branch.
 #include <d3d9.h>
 #else
 
-// Renderer seam contract (T1.7): resources are named by opaque handles so no
-// GL type leaks above the backend (invariant R2).
+// Renderer seam contract: resources are named by opaque handles so no
+// GL type leaks above the backend.
 #include "RenderBackend.h"
 
 // Image decoding behind the D3DX shim (ImageLoaderCompat.cpp, stb_image). It is
@@ -23,7 +23,7 @@
 #include <Neoeter/Platform/Base/ImageLoaderCompat.h>
 
 // d3d9.h defines this; <windows.h> alone does not. The compat vocabulary needs
-// it for the DXT formats (T1.5 drops the DirectX SDK headers).
+// it for the DXT formats.
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)                \
 	((DWORD)(BYTE)(ch0) | ((DWORD)(BYTE)(ch1) << 8) | \
@@ -2601,7 +2601,7 @@ inline HRESULT D3DXCreateTextureFromFileInMemoryEx(
 	if (!pSrcData || SrcDataSize == 0 || !ppTexture) return E_FAIL;
 
 	// An image that cannot be decoded fails, so the caller reports it instead of
-	// drawing an empty texture (open-mt2/devkit#136).
+	// drawing an empty texture.
 	uint32_t w = 0, h = 0;
 	std::vector<uint8_t> pixels;
 	if (!Platform_DecodeImage(pSrcData, SrcDataSize, &w, &h, pixels)) return E_FAIL;

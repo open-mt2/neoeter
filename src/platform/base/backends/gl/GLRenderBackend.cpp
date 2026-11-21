@@ -1,9 +1,9 @@
-// OpenGL backend (T1.7).
+// OpenGL backend.
 //
-// This is the only file in EterBase that issues OpenGL calls (invariant R1).
-// The code below is the pre-seam renderer with the D3D9 façade removed: state
-// application follows src/Direct3DDevice9Compat.cpp's previous SetupGLState(),
-// vertex-array setup and draw order verbatim so Linux output is unchanged.
+// This is the only file in EterBase that issues OpenGL calls.
+// The code below is the renderer with the D3D9 façade removed: state
+// application, vertex-array setup and draw order match the D3D9 path so Linux
+// output stays unchanged.
 
 #if defined(OPENMT2_RENDERER_GL)
 

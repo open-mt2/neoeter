@@ -1,5 +1,5 @@
 // ============================================================================
-// test_render_golden.cpp - headless renderer goldens (TA.4)
+// test_render_golden.cpp - headless renderer goldens
 // ============================================================================
 // Pins a set of small, scripted scenes rendered through the real client
 // renderer: CGraphicDevice (device startup + state manager) on top of the

@@ -5,7 +5,7 @@
 #include <Neoeter/Platform/DirectXMathCompat.h>
 #include <Neoeter/Platform/RenderBackend.h>
 
-// T1.7 — renderer seam contract.
+// Renderer seam contract.
 //
 // The façade must describe state in value snapshots that carry no GL types, and
 // a draw without vertex data must stay a no-op (it must not reach the backend,

@@ -1,4 +1,4 @@
-// Skinning / animation reference values (TA.5).
+// Skinning / animation reference values.
 //
 // The client deforms skinned meshes and samples animation curves on the CPU;
 // once GR2 assets are converted the math has to keep producing the same poses.

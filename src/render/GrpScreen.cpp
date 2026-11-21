@@ -3,8 +3,8 @@
 #include <Neoeter/Render/Camera.h>
 #include <Neoeter/Render/StateManager.h>
 
-// T1.9: the window and the renderer are SDL2 + GL on every target (T1.2,
-// T1.4); the screen flushes the façade and lets the window show the frame.
+// The window and the renderer are SDL2 + GL on every target; the screen
+// flushes the façade and lets the window show the frame.
 #include <Neoeter/Render/MSWindow.h>
 
 uint32_t CScreen::ms_diffuseColor = 0xffffffff;
