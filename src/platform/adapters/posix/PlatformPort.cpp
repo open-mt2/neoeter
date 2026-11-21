@@ -1,11 +1,13 @@
 #include <Neoeter/Platform/Port.h>
 
 #include <chrono>
+#include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
 #include <filesystem>
+#include <mutex>
 #include <thread>
 
 #include <glob.h>
@@ -13,6 +15,22 @@
 
 namespace
 {
+	struct PosixThread
+	{
+			std::thread thread;
+			std::mutex mutex;
+			std::condition_variable finished;
+			bool done;
+	};
+
+	struct PosixSemaphore
+	{
+			std::mutex mutex;
+			std::condition_variable available;
+			uint32_t count;
+			uint32_t maximum;
+	};
+
 	class PosixPort final : public Neoeter::Platform::IPlatformPort
 	{
 		public:
@@ -133,6 +151,116 @@ namespace
 			PlatformModule ModuleHandle() override
 			{
 				return nullptr;
+			}
+
+			PlatformThreadHandle StartThread(uint32_t (*entry)(void*), void* arg) override
+			{
+				PosixThread* thread = new PosixThread();
+				thread->thread = std::thread([thread, entry, arg]
+											 {
+					entry(arg);
+					{
+						std::lock_guard<std::mutex> lock(thread->mutex);
+						thread->done = true;
+					}
+					thread->finished.notify_all(); });
+				return thread;
+			}
+
+			bool JoinThread(PlatformThreadHandle handle, uint32_t timeoutMilliseconds) override
+			{
+				PosixThread* thread = static_cast<PosixThread*>(handle);
+				if (thread == nullptr)
+					return false;
+
+				std::unique_lock<std::mutex> lock(thread->mutex);
+				bool finished = true;
+				if (timeoutMilliseconds == Neoeter::Platform::kPlatformInfinite)
+					thread->finished.wait(lock, [thread]
+										  { return thread->done; });
+				else
+					finished = thread->finished.wait_for(lock, std::chrono::milliseconds(timeoutMilliseconds),
+														 [thread]
+														 { return thread->done; });
+				lock.unlock();
+
+				if (!finished)
+					return false;
+
+				if (thread->thread.joinable())
+					thread->thread.join();
+
+				return true;
+			}
+
+			void CloseThread(PlatformThreadHandle handle) override
+			{
+				PosixThread* thread = static_cast<PosixThread*>(handle);
+				if (thread == nullptr)
+					return;
+
+				bool done = false;
+				{
+					std::lock_guard<std::mutex> lock(thread->mutex);
+					done = thread->done;
+				}
+
+				if (thread->thread.joinable())
+					thread->thread.detach();
+
+				if (done)
+					delete thread;
+			}
+
+			PlatformSemaphoreHandle CreateSemaphore(uint32_t initialCount, uint32_t maximumCount) override
+			{
+				PosixSemaphore* semaphore = new PosixSemaphore();
+				semaphore->count = initialCount;
+				semaphore->maximum = maximumCount;
+				return semaphore;
+			}
+
+			bool ReleaseSemaphore(PlatformSemaphoreHandle handle, uint32_t count) override
+			{
+				PosixSemaphore* semaphore = static_cast<PosixSemaphore*>(handle);
+				if (semaphore == nullptr)
+					return false;
+
+				std::lock_guard<std::mutex> lock(semaphore->mutex);
+				if (semaphore->count + count > semaphore->maximum)
+					return false;
+
+				semaphore->count += count;
+				semaphore->available.notify_all();
+				return true;
+			}
+
+			bool WaitSemaphore(PlatformSemaphoreHandle handle, uint32_t timeoutMilliseconds) override
+			{
+				PosixSemaphore* semaphore = static_cast<PosixSemaphore*>(handle);
+				if (semaphore == nullptr)
+					return false;
+
+				std::unique_lock<std::mutex> lock(semaphore->mutex);
+				if (timeoutMilliseconds == Neoeter::Platform::kPlatformInfinite)
+				{
+					semaphore->available.wait(lock, [semaphore]
+											  { return semaphore->count > 0; });
+				}
+				else if (!semaphore->available.wait_for(lock, std::chrono::milliseconds(timeoutMilliseconds),
+														[semaphore]
+														{ return semaphore->count > 0; }))
+				{
+					return false;
+				}
+
+				--semaphore->count;
+				return true;
+			}
+
+			void CloseSemaphore(PlatformSemaphoreHandle handle) override
+			{
+				delete static_cast<PosixSemaphore*>(handle);
 			}
 
 			bool IsLinux() override

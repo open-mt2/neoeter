@@ -90,6 +90,14 @@ namespace
 
 			PlatformModule ModuleHandle() override { return reinterpret_cast<PlatformModule>(0x1); }
 
+			PlatformThreadHandle StartThread(uint32_t (*)(void*), void*) override { return nullptr; }
+			bool JoinThread(PlatformThreadHandle, uint32_t) override { return true; }
+			void CloseThread(PlatformThreadHandle) override {}
+			PlatformSemaphoreHandle CreateSemaphore(uint32_t, uint32_t) override { return nullptr; }
+			bool ReleaseSemaphore(PlatformSemaphoreHandle, uint32_t) override { return true; }
+			bool WaitSemaphore(PlatformSemaphoreHandle, uint32_t) override { return false; }
+			void CloseSemaphore(PlatformSemaphoreHandle) override {}
+
 			bool IsLinux() override { return true; }
 			int CompilerVersion() override { return 1900; }
 			void SetFloatingPointPrecision() override { precisionSet = true; }

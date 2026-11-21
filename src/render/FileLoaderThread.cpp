@@ -1,39 +1,51 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/IO/EterPackManager.h>
+#include <Neoeter/Platform/Port.h>
 #include <Neoeter/Render/FileLoaderThread.h>
 #include <Neoeter/Render/ResourceManager.h>
 
-CFileLoaderThread::CFileLoaderThread() : m_hThread(NULL), m_pArg(NULL), m_uThreadID(0), m_bShutdowned(false)
+#ifdef CreateSemaphore
+#undef CreateSemaphore
+#endif
+
+CFileLoaderThread::CFileLoaderThread() : m_hThread(NULL), m_pArg(NULL), m_hSemaphore(NULL), m_bShutdowned(false)
 {
 }
 
 CFileLoaderThread::~CFileLoaderThread()
 {
+	Shutdown();
 	Destroy();
 }
 
 int CFileLoaderThread::Create(void* arg)
 {
-	Arg(arg);
-	m_hThread = (PlatformHandle)_beginthreadex(NULL, 0, EntryPoint, this, 0, &m_uThreadID);
-
-	if (!m_hThread)
+	if (m_hThread != NULL)
 		return false;
 
-	SetThreadPriority(m_hThread, THREAD_PRIORITY_NORMAL);
+	m_hSemaphore = Neoeter::Platform::CreateSemaphore(0, 65535);
+	if (m_hSemaphore == NULL)
+		return false;
+
+	Arg(arg);
+	m_hThread = Neoeter::Platform::StartThread(&CFileLoaderThread::EntryPoint, this);
+	if (m_hThread == NULL)
+	{
+		Neoeter::Platform::CloseSemaphore(m_hSemaphore);
+		m_hSemaphore = NULL;
+		return false;
+	}
+
 	return true;
 }
 
 uint32_t CFileLoaderThread::Run(void* arg)
 {
-	if (!Setup())
-		return 0;
-
 	return (Execute(arg));
 }
 
 /* Static */
-uint32_t CALLBACK CFileLoaderThread::EntryPoint(void* pThis)
+uint32_t CFileLoaderThread::EntryPoint(void* pThis)
 {
 	CFileLoaderThread* pThread = (CFileLoaderThread*)pThis;
 	return pThread->Run(pThread->Arg());
@@ -42,65 +54,42 @@ uint32_t CALLBACK CFileLoaderThread::EntryPoint(void* pThis)
 //////////////////////////////////////////////////////////////////////////
 void CFileLoaderThread::Destroy()
 {
-	if (m_hSemaphore)
-	{
-		CloseHandle(m_hSemaphore);
-		m_hSemaphore = NULL;
-	}
-}
-
-uint32_t CFileLoaderThread::Setup()
-{
-	m_hSemaphore = CreateSemaphore(NULL,  // no security attributes
-								   0,	  // initial count
-								   65535, // maximum count
-								   NULL); // unnamed semaphore
-	if (!m_hSemaphore)
-		return 0;
-
-	return 1;
 }
 
 void CFileLoaderThread::Shutdown()
 {
-	if (!m_hSemaphore)
+	if (m_bShutdowned.exchange(true))
 		return;
 
-	int32_t bRet;
+	if (m_hSemaphore != NULL)
+		Neoeter::Platform::ReleaseSemaphore(m_hSemaphore, 1);
 
-	m_bShutdowned = true;
-
-	do
+	bool joined = true;
+	if (m_hThread != NULL)
 	{
-		bRet = ReleaseSemaphore(m_hSemaphore, 1, NULL);
-	} while (!bRet);
+		joined = Neoeter::Platform::JoinThread(m_hThread, 10000);
+		Neoeter::Platform::CloseThread(m_hThread);
+		m_hThread = NULL;
+	}
 
-	WaitForSingleObject(m_hThread, 10000); // 쓰레드가 종료 되기를 10초 기다림
+	if (joined && m_hSemaphore != NULL)
+	{
+		Neoeter::Platform::CloseSemaphore(m_hSemaphore);
+		m_hSemaphore = NULL;
+	}
 }
 
 uint32_t CFileLoaderThread::Execute(void* /*pvArg*/)
 {
-	while (!m_bShutdowned)
+	while (!m_bShutdowned.load())
 	{
-		uint32_t dwWaitResult;
-
-		dwWaitResult = WaitForSingleObject(m_hSemaphore, INFINITE);
-
-		if (m_bShutdowned)
+		if (!Neoeter::Platform::WaitSemaphore(m_hSemaphore, Neoeter::Platform::kPlatformInfinite))
 			break;
 
-		switch (dwWaitResult)
-		{
-			case WAIT_OBJECT_0:
-			{
-				Process();
-			}
+		if (m_bShutdowned.load())
 			break;
 
-			case WAIT_TIMEOUT:
-				TraceError("CFileLoaderThread::Execute: Timeout occured while time-out interval is INIFITE");
-				break;
-		}
+		Process();
 	}
 
 	Destroy();
@@ -117,12 +106,8 @@ void CFileLoaderThread::Request(const std::string& c_rstFileName) // called in m
 	m_pRequestDeque.push_back(pData);
 	m_RequestMutex.Unlock();
 
-	++m_iRestSemCount;
-
-	if (!ReleaseSemaphore(m_hSemaphore, m_iRestSemCount, NULL))
+	if (!Neoeter::Platform::ReleaseSemaphore(m_hSemaphore, 1))
 		TraceError("CFileLoaderThread::Request: ReleaseSemaphore error");
-
-	--m_iRestSemCount;
 }
 
 bool CFileLoaderThread::Fetch(TData& data) // called in main thread
@@ -164,5 +149,5 @@ void CFileLoaderThread::Process() // called in loader thread
 	m_pCompleteDeque.push_back(request);
 	m_CompleteMutex.Unlock();
 
-	Sleep(g_iLoadingDelayTime);
+	Neoeter::Platform::SleepMillis(g_iLoadingDelayTime);
 }

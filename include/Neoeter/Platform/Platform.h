@@ -808,9 +808,6 @@ inline HANDLE CreateSemaphoreA(void* /*lpSemaphoreAttributes*/, LONG lInitialCou
 	h->maxCount = lMaximumCount;
 	return (HANDLE)h;
 }
-#ifndef CreateSemaphore
-#define CreateSemaphore CreateSemaphoreA
-#endif
 
 inline BOOL ReleaseSemaphore(HANDLE hSemaphore, LONG lReleaseCount, LONG* lpPreviousCount)
 {

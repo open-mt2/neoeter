@@ -11,6 +11,20 @@
 
 namespace
 {
+	struct Win32ThreadStart
+	{
+			uint32_t (*entry)(void*);
+			void* arg;
+	};
+
+	unsigned __stdcall Win32ThreadEntry(void* parameter)
+	{
+		Win32ThreadStart* start = static_cast<Win32ThreadStart*>(parameter);
+		const uint32_t result = start->entry(start->arg);
+		delete start;
+		return result;
+	}
+
 	class Win32Port final : public Neoeter::Platform::IPlatformPort
 	{
 		public:
@@ -146,6 +160,49 @@ namespace
 			PlatformModule ModuleHandle() override
 			{
 				return GetModuleHandleA(nullptr);
+			}
+
+			PlatformThreadHandle StartThread(uint32_t (*entry)(void*), void* arg) override
+			{
+				Win32ThreadStart* start = new Win32ThreadStart{entry, arg};
+				const uintptr_t handle = _beginthreadex(nullptr, 0, Win32ThreadEntry, start, 0, nullptr);
+				if (handle == 0)
+				{
+					delete start;
+					return nullptr;
+				}
+
+				return reinterpret_cast<PlatformThreadHandle>(handle);
+			}
+
+			bool JoinThread(PlatformThreadHandle thread, uint32_t timeoutMilliseconds) override
+			{
+				return WaitForSingleObject(thread, timeoutMilliseconds) == WAIT_OBJECT_0;
+			}
+
+			void CloseThread(PlatformThreadHandle thread) override
+			{
+				CloseHandle(thread);
+			}
+
+			PlatformSemaphoreHandle CreateSemaphore(uint32_t initialCount, uint32_t maximumCount) override
+			{
+				return CreateSemaphoreA(nullptr, static_cast<LONG>(initialCount), static_cast<LONG>(maximumCount), nullptr);
+			}
+
+			bool ReleaseSemaphore(PlatformSemaphoreHandle semaphore, uint32_t count) override
+			{
+				return ::ReleaseSemaphore(semaphore, static_cast<LONG>(count), nullptr) != 0;
+			}
+
+			bool WaitSemaphore(PlatformSemaphoreHandle semaphore, uint32_t timeoutMilliseconds) override
+			{
+				return WaitForSingleObject(semaphore, timeoutMilliseconds) == WAIT_OBJECT_0;
+			}
+
+			void CloseSemaphore(PlatformSemaphoreHandle semaphore) override
+			{
+				CloseHandle(semaphore);
 			}
 
 			bool IsLinux() override

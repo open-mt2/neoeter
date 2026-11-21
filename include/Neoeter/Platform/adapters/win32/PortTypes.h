@@ -8,9 +8,10 @@
 #include <imm.h>
 #include <process.h>
 
-// The port names its directory operation CreateDirectory; the Win32 macro of
-// the same name would rename the interface on this target.
+// The port names its directory and semaphore operations after the Win32
+// functions; the macros of the same name would rename the interface here.
 #undef CreateDirectory
+#undef CreateSemaphore
 
 // Opaque handles the engine and the client exchange. They are the real Win32
 // handles on this target and void pointers in the POSIX adapter, so no caller
@@ -24,3 +25,5 @@ using PlatformCursor = HCURSOR;
 using PlatformImeContext = HIMC;
 using PlatformSocketArg = unsigned long;
 using PlatformDword = unsigned long;
+using PlatformThreadHandle = HANDLE;
+using PlatformSemaphoreHandle = HANDLE;

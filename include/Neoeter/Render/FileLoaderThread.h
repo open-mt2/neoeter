@@ -1,9 +1,13 @@
 #ifndef __INC_YMIR_ETERLIB_FILELOADERTHREAD_H__
 #define __INC_YMIR_ETERLIB_FILELOADERTHREAD_H__
 
+#include <atomic>
 #include <deque>
 #include <memory>
 #include <vector>
+
+#include <Neoeter/Platform/PortTypes.h>
+
 #include "Thread.h"
 #include "Mutex.h"
 
@@ -34,14 +38,12 @@ class CFileLoaderThread
 		void* Arg() const { return m_pArg; }
 		void Arg(void* arg) { m_pArg = arg; }
 
-		PlatformHandle m_hThread;
+		PlatformThreadHandle m_hThread;
 
 	private:
 		void* m_pArg;
-		unsigned m_uThreadID;
 
 	protected:
-		uint32_t Setup();
 		uint32_t Execute(void* pvArg);
 		void Destroy();
 		void Process();
@@ -53,9 +55,8 @@ class CFileLoaderThread
 		std::deque<TData> m_pCompleteDeque;
 		Mutex m_CompleteMutex;
 
-		PlatformHandle m_hSemaphore;
-		int m_iRestSemCount;
-		bool m_bShutdowned;
+		PlatformSemaphoreHandle m_hSemaphore;
+		std::atomic<bool> m_bShutdowned;
 };
 
 #endif

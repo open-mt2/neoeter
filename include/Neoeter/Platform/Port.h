@@ -10,6 +10,8 @@ namespace Neoeter
 {
 	namespace Platform
 	{
+		static const uint32_t kPlatformInfinite = 0xFFFFFFFFu;
+
 		class IPlatformPort
 		{
 			public:
@@ -37,6 +39,13 @@ namespace Neoeter
 				virtual void ShutdownCom() = 0;
 
 				virtual PlatformModule ModuleHandle() = 0;
+				virtual PlatformThreadHandle StartThread(uint32_t (*entry)(void*), void* arg) = 0;
+				virtual bool JoinThread(PlatformThreadHandle thread, uint32_t timeoutMilliseconds) = 0;
+				virtual void CloseThread(PlatformThreadHandle thread) = 0;
+				virtual PlatformSemaphoreHandle CreateSemaphore(uint32_t initialCount, uint32_t maximumCount) = 0;
+				virtual bool ReleaseSemaphore(PlatformSemaphoreHandle semaphore, uint32_t count) = 0;
+				virtual bool WaitSemaphore(PlatformSemaphoreHandle semaphore, uint32_t timeoutMilliseconds) = 0;
+				virtual void CloseSemaphore(PlatformSemaphoreHandle semaphore) = 0;
 				virtual bool IsLinux() = 0;
 				virtual int CompilerVersion() = 0;
 				virtual void SetFloatingPointPrecision() = 0;
@@ -133,6 +142,41 @@ namespace Neoeter
 		inline PlatformModule ModuleHandle()
 		{
 			return Platform_GetPort().ModuleHandle();
+		}
+
+		inline PlatformThreadHandle StartThread(uint32_t (*entry)(void*), void* arg)
+		{
+			return Platform_GetPort().StartThread(entry, arg);
+		}
+
+		inline bool JoinThread(PlatformThreadHandle thread, uint32_t timeoutMilliseconds)
+		{
+			return Platform_GetPort().JoinThread(thread, timeoutMilliseconds);
+		}
+
+		inline void CloseThread(PlatformThreadHandle thread)
+		{
+			Platform_GetPort().CloseThread(thread);
+		}
+
+		inline PlatformSemaphoreHandle CreateSemaphore(uint32_t initialCount, uint32_t maximumCount)
+		{
+			return Platform_GetPort().CreateSemaphore(initialCount, maximumCount);
+		}
+
+		inline bool ReleaseSemaphore(PlatformSemaphoreHandle semaphore, uint32_t count)
+		{
+			return Platform_GetPort().ReleaseSemaphore(semaphore, count);
+		}
+
+		inline bool WaitSemaphore(PlatformSemaphoreHandle semaphore, uint32_t timeoutMilliseconds)
+		{
+			return Platform_GetPort().WaitSemaphore(semaphore, timeoutMilliseconds);
+		}
+
+		inline void CloseSemaphore(PlatformSemaphoreHandle semaphore)
+		{
+			Platform_GetPort().CloseSemaphore(semaphore);
 		}
 
 		inline bool IsLinux()

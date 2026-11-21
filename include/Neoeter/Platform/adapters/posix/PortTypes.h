@@ -12,3 +12,5 @@ using PlatformCursor = void*;
 using PlatformImeContext = void*;
 using PlatformSocketArg = uint32_t;
 using PlatformDword = uint32_t;
+using PlatformThreadHandle = void*;
+using PlatformSemaphoreHandle = void*;
