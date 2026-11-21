@@ -1,4 +1,5 @@
 #pragma once
+#include <Neoeter/Render/Pool.h>
 
 template <typename T>
 class CDynamic

@@ -1,4 +1,7 @@
 #pragma once
+#include <Neoeter/Platform/Base/Singleton.h>
+
+#include <queue>
 
 class IEvent
 {

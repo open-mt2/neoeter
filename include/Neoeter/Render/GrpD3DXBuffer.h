@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Neoeter/Platform/DirectXMathCompat.h>
+
 class CDirect3DXBuffer
 {
 	public:

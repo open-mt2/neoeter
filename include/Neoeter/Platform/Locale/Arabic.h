@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 wchar_t Arabic_ConvSymbol(wchar_t c);
 

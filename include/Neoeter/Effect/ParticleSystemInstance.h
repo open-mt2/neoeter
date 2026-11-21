@@ -3,11 +3,15 @@
 #include "EffectElementBaseInstance.h"
 #include "ParticleInstance.h"
 #include "ParticleProperty.h"
+#include <Neoeter/Effect/EmitterProperty.h>
+
+class CParticleSystemData;
 
 #include <Neoeter/Render/GrpScreen.h>
 #include <Neoeter/Render/StateManager.h>
 #include <Neoeter/Render/GrpImageInstance.h>
 #include "EmitterProperty.h"
+#include <list>
 
 class CParticleSystemInstance : public CEffectElementBaseInstance
 {

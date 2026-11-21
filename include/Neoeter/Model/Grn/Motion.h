@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Neoeter/Model/Grn/GrannyCompat.h>
+
 class CGrannyMotion
 {
 	public:

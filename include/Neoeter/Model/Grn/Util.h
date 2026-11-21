@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Neoeter/Model/Grn/GrannyCompat.h>
+
 // bool GrannyMeshGetTextureAnimation(granny_mesh* pgrnMesh, float* puVelocity, float* pvVelocity);
 // bool GrannyMeshIsTextureAnimation(granny_mesh* pgrnMesh);
 bool GrannyMeshIsDeform(granny_mesh* pgrnMesh);

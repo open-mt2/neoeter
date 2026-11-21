@@ -24,6 +24,7 @@
 **************************************************************************************/
 #ifndef _lineintersect_utils_h
 #define _lineintersect_utils_h
+#include <Neoeter/Platform/DirectXMathCompat.h>
 
 void IntersectLineSegments(const D3DXVECTOR3& A1,
 						   const D3DXVECTOR3& A2,

@@ -1,4 +1,5 @@
 #pragma once
+#include <Neoeter/Platform/DirectXMathCompat.h>
 
 float CrossProduct2D(float x1, float y1, float x2, float y2);
 
