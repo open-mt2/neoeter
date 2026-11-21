@@ -1,13 +1,8 @@
 #ifndef __INC_ETERIMAGELIB_IMAGE_H__
 #define __INC_ETERIMAGELIB_IMAGE_H__
 
-#if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
-#include <windows.h>
-#include <cstdint>
-#include <cstddef>
-#else
 #include <Neoeter/Platform/Platform.h>
-#endif
+
 #include <string>
 
 #pragma pack(push)

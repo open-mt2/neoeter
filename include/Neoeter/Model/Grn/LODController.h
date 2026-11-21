@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4786)
-#endif
-
 #include <deque>
 #include "Thing.h"
 #include "ModelInstance.h"

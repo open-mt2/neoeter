@@ -312,7 +312,7 @@ void CScreen::RenderCircle3d(float fx, float fy, float fz, float fRadius, int iS
 class CD3DXMeshRenderingOption : public CScreen
 {
 	public:
-		DWORD m_dwVS;
+		uint32_t m_dwVS;
 
 		CD3DXMeshRenderingOption(D3DFILLMODE d3dFillMode, const D3DXMATRIX& c_rmatWorld)
 		{
@@ -731,7 +731,7 @@ void CScreen::End()
 	STATEMANAGER.EndScene();
 }
 
-void CScreen::Show(HWND hWnd)
+void CScreen::Show(PlatformWindow hWnd)
 {
 	assert(ms_lpd3dDevice != NULL);
 
@@ -759,7 +759,7 @@ void CScreen::Show(RECT* pSrcRect)
 #endif
 }
 
-void CScreen::Show(RECT* pSrcRect, HWND hWnd)
+void CScreen::Show(RECT* pSrcRect, PlatformWindow hWnd)
 {
 	assert(ms_lpd3dDevice != NULL);
 	ms_lpd3dDevice->Present(pSrcRect, NULL, hWnd, NULL);

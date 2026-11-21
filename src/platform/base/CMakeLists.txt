@@ -43,6 +43,12 @@ if(NOT _NEOETER_BASE_VERSION)
 endif()
 
 # Source files
+if(WIN32)
+    set(PLATFORM_PORT_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/../adapters/win32/PlatformPort.cpp)
+else()
+    set(PLATFORM_PORT_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/../adapters/posix/PlatformPort.cpp)
+endif()
+
 set(ETERBASE_SOURCES
     CPostIt.cpp
     CRC32.cpp
@@ -56,6 +62,7 @@ set(ETERBASE_SOURCES
     ImageWriterCompat.cpp
     lzo.cpp
     MappedFile.cpp
+    Port.cpp
     Random.cpp
     RenderBackend.cpp
     StdAfx.cpp
@@ -71,6 +78,7 @@ set(ETERBASE_SOURCES
     Poly/Poly.cpp
     Poly/Symbol.cpp
     Poly/SymTable.cpp
+    ${PLATFORM_PORT_SOURCE}
 )
 
 set(ETERBASE_HEADERS
@@ -101,6 +109,9 @@ set(ETERBASE_HEADERS
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/Poly/Symbol.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Base/Poly/SymTable.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Platform.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/PlatformWindow.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/Port.h
+    ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/PortTypes.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/GLCompat.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/RenderBackend.h
     ${NEOETER_INCLUDE_DIR}/Neoeter/Platform/stb_image.h

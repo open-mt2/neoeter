@@ -12,9 +12,9 @@ class CInputKeyboard
 		CInputKeyboard();
 		virtual ~CInputKeyboard();
 
-		// Kept as HWND for the historical call sites (CPythonApplication); SDL2
+		// Kept as PlatformWindow for the historical call sites (CPythonApplication); SDL2
 		// owns the device, so the handle is not used.
-		bool InitializeKeyboard(HWND hWnd);
+		bool InitializeKeyboard(PlatformWindow hWnd);
 		void UpdateKeyboard();
 		void ResetKeyboard();
 

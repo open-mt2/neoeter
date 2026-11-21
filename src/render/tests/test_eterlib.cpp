@@ -127,7 +127,7 @@ namespace
 		};
 
 		TestIME ime;
-		ime.Initialize(reinterpret_cast<HWND>(1));
+		ime.Initialize(reinterpret_cast<PlatformWindow>(1));
 		ime.SetMax(64);
 		ime.SetText("Metin2Linux", 11);
 		std::string out;
@@ -177,7 +177,7 @@ namespace
 	void test_graphic_dib()
 	{
 		CGraphicDib dib;
-		bool created = dib.Create(reinterpret_cast<HDC>(1), 32, 32);
+		bool created = dib.Create(reinterpret_cast<PlatformDeviceContext>(1), 32, 32);
 		assert(created);
 		assert(dib.GetWidth() == 32);
 		assert(dib.GetHeight() == 32);

@@ -246,8 +246,8 @@ class CGraphicBase
 		static uint32_t ms_iD3DModeInfo;
 		static D3D_CDisplayModeAutoDetector ms_kD3DDetector;
 
-		static HWND ms_hWnd;
-		static HDC ms_hDC;
+		static PlatformWindow ms_hWnd;
+		static PlatformDeviceContext ms_hDC;
 		static LPDIRECT3D9 ms_lpd3d;
 		static LPDIRECT3DDEVICE9 ms_lpd3dDevice;
 		static ID3DXMatrixStack* ms_lpd3dMatStack;

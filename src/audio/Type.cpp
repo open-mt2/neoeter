@@ -1,5 +1,6 @@
 #include <Neoeter/Audio/StdAfx.h>
 #include <Neoeter/Audio/Type.h>
+#include <Neoeter/Platform/Port.h>
 #include <Neoeter/Render/TextFileLoader.h>
 
 std::string NSound::strResult;
@@ -81,11 +82,7 @@ bool NSound::SaveSoundInformationPiece(const char* c_szFileName, NSound::TSoundD
 	{
 		if (IsFile(c_szFileName)) // 데이터는 비어있는데 파일이 있다면
 		{
-#ifdef _WIN32
-			_unlink(c_szFileName); // 지운다.
-#else
-			unlink(c_szFileName);
-#endif
+			Neoeter::Platform::RemoveFile(c_szFileName);
 		}
 		return true;
 	}

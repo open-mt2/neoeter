@@ -21,7 +21,7 @@ void CSoundData::Assign(const char* filename)
 	m_assigned = true;
 }
 
-LPVOID CSoundData::Get()
+void* CSoundData::Get()
 {
 	++m_iRefCount;
 	m_dwAccessTime = ELTimer_GetMSec();

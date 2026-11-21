@@ -1,7 +1,9 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/MSWindow.h>
-#include <Neoeter/Render/SdlPlatform.h>
+#include <Neoeter/Platform/PlatformWindow.h>
 #include <Neoeter/Debug/Debug.h>
+
+#include "NativeWindow.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
@@ -50,9 +52,9 @@ static void SDLSetFixedWindowSize(SDL_Window* window, int width, int height)
 	SDL_SetWindowMaximumSize(window, width, height);
 }
 
-HINSTANCE CMSWindow::ms_hInstance = NULL;
+PlatformInstance CMSWindow::ms_hInstance = NULL;
 
-intptr_t CMSWindow::WindowProcedure(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam)
+intptr_t CMSWindow::WindowProcedure(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam)
 {
 	// The window is SDL-owned on every target (T1.2); the WM_* messages are
 	// synthesised by CMSApplication from SDL events, so there is no Win32
@@ -198,36 +200,12 @@ bool CMSWindow::Create(const char* c_szName, int /*brush*/, uint32_t /*cs*/, uin
 
 	Neoeter::Debug::Initialize();
 
-	m_hWnd = (HWND)ms_pSDLWindow;
+	m_hWnd = (PlatformWindow)ms_pSDLWindow;
 	m_isActive = true;
 	m_isVisible = true;
 	Platform_SetWindowResolution(width, height);
 	Platform_SetWarpMouseCallback([](int x, int y)
-								  {
-									  if (!ms_pSDLWindow)
-										  return;
-
-#if defined(_WIN32) || defined(_WIN64)
-									  SDL_SysWMinfo info;
-									  SDL_VERSION(&info.version);
-
-									  if (SDL_GetWindowWMInfo(ms_pSDLWindow, &info))
-									  {
-										  POINT point = {x, y};
-										  ClientToScreen(info.info.win.window, &point);
-										  SetCursorPos(point.x, point.y);
-									  }
-									  else
-									  {
-										  int windowX = 0;
-										  int windowY = 0;
-										  SDL_GetWindowPosition(ms_pSDLWindow, &windowX, &windowY);
-										  SDL_WarpMouseGlobal(windowX + x, windowY + y);
-									  }
-#else
-									  SDL_WarpMouseInWindow(ms_pSDLWindow, x, y);
-#endif
-								  });
+								  { Platform_WarpMouseInWindow(ms_pSDLWindow, x, y); });
 	SetRect(&m_rect, 0, 0, width, height);
 
 	Tracef("[SDL2] Created native game window (floating): %p ('%s', %dx%d, video driver: %s)\n",
@@ -340,12 +318,12 @@ bool CMSWindow::IsActive()
 	return m_isActive;
 }
 
-HINSTANCE CMSWindow::GetInstance()
+PlatformInstance CMSWindow::GetInstance()
 {
 	return ms_hInstance;
 }
 
-HWND CMSWindow::GetWindowHandle()
+PlatformWindow CMSWindow::GetWindowHandle()
 {
 	return m_hWnd;
 }

@@ -28,7 +28,7 @@ void CGraphicDib::Destroy()
 	Initialize();
 }
 
-bool CGraphicDib::Create(HDC hDC, int width, int height)
+bool CGraphicDib::Create(PlatformDeviceContext hDC, int width, int height)
 {
 	Destroy();
 
@@ -64,7 +64,7 @@ bool CGraphicDib::Create(HDC hDC, int width, int height)
 	return true;
 }
 
-HDC CGraphicDib::GetDCHandle()
+PlatformDeviceContext CGraphicDib::GetDCHandle()
 {
 	return m_hDC;
 }
@@ -141,7 +141,7 @@ void CGraphicDib::TextOut(int ix, int iy, const char* c_szText)
 	::TextOut(m_hDC, ix, iy, c_szText, strlen(c_szText));
 }
 
-void CGraphicDib::Put(HDC hDC, int x, int y)
+void CGraphicDib::Put(PlatformDeviceContext hDC, int x, int y)
 {
 	SetDIBitsToDevice(
 		hDC,

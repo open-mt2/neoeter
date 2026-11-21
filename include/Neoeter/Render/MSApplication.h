@@ -8,7 +8,7 @@ class CMSApplication : public CMSWindow
 		CMSApplication();
 		virtual ~CMSApplication();
 
-		void Initialize(HINSTANCE hInstance);
+		void Initialize(PlatformInstance hInstance);
 
 		void MessageLoop();
 
@@ -18,5 +18,5 @@ class CMSApplication : public CMSWindow
 	protected:
 		void ClearWindowClass();
 
-		intptr_t WindowProcedure(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WindowProcedure(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
 };

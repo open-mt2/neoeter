@@ -236,7 +236,7 @@ bool CNetworkStream::Connect(const CNetworkAddress& c_rkNetAddr, int limitSec)
 		return false;
 	}
 
-	DWORD arg = 1;
+	uint32_t arg = 1;
 	ioctlsocket(m_sock, FIONBIO, &arg);	// Non-blocking mode
 
 	if (connect(m_sock, (PSOCKADDR)&m_addr, m_addr.GetSize()) == SOCKET_ERROR)

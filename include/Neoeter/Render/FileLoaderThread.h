@@ -34,7 +34,7 @@ class CFileLoaderThread
 		void* Arg() const { return m_pArg; }
 		void Arg(void* arg) { m_pArg = arg; }
 
-		HANDLE m_hThread;
+		PlatformHandle m_hThread;
 
 	private:
 		void* m_pArg;
@@ -53,7 +53,7 @@ class CFileLoaderThread
 		std::deque<TData> m_pCompleteDeque;
 		Mutex m_CompleteMutex;
 
-		HANDLE m_hSemaphore;
+		PlatformHandle m_hSemaphore;
 		int m_iRestSemCount;
 		bool m_bShutdowned;
 };

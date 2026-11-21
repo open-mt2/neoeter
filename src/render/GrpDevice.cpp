@@ -46,7 +46,7 @@ void CGraphicDevice::RegisterWarningString(uint32_t uiMsg, const char* c_szStrin
 	m_kMap_strWarningMessage[uiMsg] = c_szString;
 }
 
-void CGraphicDevice::__WarningMessage(HWND hWnd, uint32_t uiMsg)
+void CGraphicDevice::__WarningMessage(PlatformWindow hWnd, uint32_t uiMsg)
 {
 	if (m_kMap_strWarningMessage.end() == m_kMap_strWarningMessage.find(uiMsg))
 		return;
@@ -219,7 +219,7 @@ bool CGraphicDevice::__IsInDriverBlackList(D3D_CAdapterInfo& rkD3DAdapterInfo)
 	return ret;
 }
 
-int CGraphicDevice::Create(HWND hWnd, int iHres, int iVres, bool Windowed, int /*iBit*/, int iReflashRate)
+int CGraphicDevice::Create(PlatformWindow hWnd, int iHres, int iVres, bool Windowed, int /*iBit*/, int iReflashRate)
 {
 	int iRet = CREATE_OK;
 

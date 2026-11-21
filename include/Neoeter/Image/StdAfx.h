@@ -3,18 +3,13 @@
 
 #pragma once
 
-#if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <cstdint>
-#include <cstddef>
-#include <assert.h>
-#else
 #include <Neoeter/Platform/Platform.h>
+
 #include <cassert>
 #include <cstdio>
 #include <cstdarg>
-#endif
+#include <cstdint>
+#include <cstddef>
 
 #include <string>
 #include <vector>

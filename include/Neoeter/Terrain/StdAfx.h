@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4702)
-#endif
-
 #include <Neoeter/Platform/Platform.h>
 #include <Neoeter/Platform/DirectXMathCompat.h>
 

@@ -22,7 +22,7 @@ class CSoundData
 		virtual ~CSoundData();
 
 		void Assign(const char* filename);
-		LPVOID Get();
+		void* Get();
 		uint32_t GetSize();
 		void Release();
 		uint32_t GetAccessTime();
@@ -41,7 +41,7 @@ class CSoundData
 		uint32_t m_dwAccessTime;
 		uint32_t m_dwPlayTime;
 		uint32_t m_size;
-		LPVOID m_data;
+		void* m_data;
 		long m_flag;
 		bool m_assigned;
 

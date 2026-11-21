@@ -603,7 +603,7 @@ int main(int argc, char** argv)
 
 	CGraphicDevice device;
 	device.InitBackBufferCount(1);
-	const int createResult = device.Create(reinterpret_cast<HWND>(1), kWidth, kHeight, true, 32, 0);
+	const int createResult = device.Create(reinterpret_cast<PlatformWindow>(1), kWidth, kHeight, true, 32, 0);
 	if (createResult != CGraphicDevice::CREATE_OK)
 	{
 		std::fprintf(stderr, "[FAIL] CGraphicDevice::Create returned 0x%x\n", createResult);

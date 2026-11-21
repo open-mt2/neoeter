@@ -25,13 +25,13 @@ bool CIME::ms_bCaptureInput = false;
 bool CIME::ms_bChineseIME = false;
 bool CIME::ms_bUseIMMCandidate = false;
 
-HWND CIME::ms_hWnd = nullptr;
+PlatformWindow CIME::ms_hWnd = nullptr;
 HKL CIME::ms_hklCurrent = nullptr;
 char CIME::ms_szKeyboardLayout[KL_NAMELENGTH + 1] = {};
 OSVERSIONINFOA CIME::ms_stOSVI = {};
 
-HINSTANCE CIME::ms_hImm32Dll = nullptr;
-HINSTANCE CIME::ms_hCurrentImeDll = nullptr;
+PlatformInstance CIME::ms_hImm32Dll = nullptr;
+PlatformInstance CIME::ms_hCurrentImeDll = nullptr;
 uint32_t CIME::ms_dwImeState = 0;
 uint32_t CIME::ms_adwId[2] = {0, 0};
 
@@ -126,7 +126,7 @@ CIME::~CIME()
 		ms_pSdlInstance = nullptr;
 }
 
-bool CIME::Initialize(HWND hWnd)
+bool CIME::Initialize(PlatformWindow hWnd)
 {
 	ms_hWnd = hWnd;
 	ms_bInitialized = true;
@@ -257,12 +257,12 @@ void CIME::CloseReadingInformation() { ms_bReadingInformation = false; }
 void CIME::ChangeInputLanguage() {}
 void CIME::ChangeInputLanguageWorker() {}
 
-intptr_t CIME::WMInputLanguage(HWND, uint32_t, uintptr_t, intptr_t) { return 0; }
-intptr_t CIME::WMStartComposition(HWND, uint32_t, uintptr_t, intptr_t) { return 0; }
-intptr_t CIME::WMComposition(HWND, uint32_t, uintptr_t, intptr_t) { return 0; }
-intptr_t CIME::WMEndComposition(HWND, uint32_t, uintptr_t, intptr_t) { return 0; }
-intptr_t CIME::WMNotify(HWND, uint32_t, uintptr_t, intptr_t) { return 0; }
-intptr_t CIME::WMChar(HWND, uint32_t, uintptr_t wParam, intptr_t lParam)
+intptr_t CIME::WMInputLanguage(PlatformWindow, uint32_t, uintptr_t, intptr_t) { return 0; }
+intptr_t CIME::WMStartComposition(PlatformWindow, uint32_t, uintptr_t, intptr_t) { return 0; }
+intptr_t CIME::WMComposition(PlatformWindow, uint32_t, uintptr_t, intptr_t) { return 0; }
+intptr_t CIME::WMEndComposition(PlatformWindow, uint32_t, uintptr_t, intptr_t) { return 0; }
+intptr_t CIME::WMNotify(PlatformWindow, uint32_t, uintptr_t, intptr_t) { return 0; }
+intptr_t CIME::WMChar(PlatformWindow, uint32_t, uintptr_t wParam, intptr_t lParam)
 {
 	// Printable characters arrive as committed UTF-8 through SDL_TEXTINPUT
 	// (OnSDLTextInput). WM_CHAR is still used for editing keys and the

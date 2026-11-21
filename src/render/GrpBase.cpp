@@ -24,8 +24,8 @@ uint32_t CGraphicBase::ms_iD3DDevInfo = 0;
 uint32_t CGraphicBase::ms_iD3DModeInfo = 0;
 D3D_CDisplayModeAutoDetector CGraphicBase::ms_kD3DDetector;
 
-HWND CGraphicBase::ms_hWnd;
-HDC CGraphicBase::ms_hDC;
+PlatformWindow CGraphicBase::ms_hWnd;
+PlatformDeviceContext CGraphicBase::ms_hDC;
 
 LPDIRECT3D9 CGraphicBase::ms_lpd3d = NULL;
 LPDIRECT3DDEVICE9 CGraphicBase::ms_lpd3dDevice = NULL;

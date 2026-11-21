@@ -37,7 +37,7 @@ bool CVertexShader::CreateFromDiskFile(const char* c_szFileName, const uint32_t*
 	if (FAILED(D3DXAssembleShaderFromFile(c_szFileName, 0, NULL, 0, &lpd3dxShaderBuffer, &lpd3dxErrorBuffer)))
 		return false;
 
-	if (FAILED(ms_lpd3dDevice->CreateVertexShader((const DWORD*)lpd3dxShaderBuffer->GetBufferPointer(), &m_handle)))
+	if (FAILED(ms_lpd3dDevice->CreateVertexShader((const uint32_t*)lpd3dxShaderBuffer->GetBufferPointer(), &m_handle)))
 		return false;
 
 	// D13: the GL path returns a dummy handle; record the parity delta.

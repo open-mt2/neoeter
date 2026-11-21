@@ -1,17 +1,12 @@
 #ifndef __INC_MILESLIB_STDAFX_H__
 #define __INC_MILESLIB_STDAFX_H__
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
-#ifdef _WIN32
-#include <windows.h>
+#include <Neoeter/Platform/Platform.h>
+
 #include <cstdint>
 #include <cstddef>
-#else
-#include "Neoeter/Platform/Platform.h"
-#endif
 
 // #include <crtdbg.h>
 

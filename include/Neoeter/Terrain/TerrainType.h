@@ -69,32 +69,6 @@ typedef struct
 } TTerrainGlobals;
 
 /* Converts a floating point number to an integer by truncation */
-#if defined(_MSC_VER) && defined(_M_IX86)
-#define PR_FLOAT_TO_INTASM __asm {									\
-	__asm fld PR_FCNV				\
-	__asm fistp PR_ICNV }
-
-#define PR_FLOAT_TO_FIXED(inreal, outint) \
-	{                                     \
-		PR_FCNV = (inreal) * 65536.0f;    \
-		PR_FLOAT_TO_INTASM;               \
-		(outint) = PR_ICNV;               \
-	}
-
-#define PR_FLOAT_TO_INT(inreal, outint)                       \
-	{                                                         \
-		PR_FCNV = (inreal);                                   \
-		PR_FLOAT_TO_INTASM;                                   \
-		(outint) = PR_ICNV > PR_FCNV ? PR_ICNV - 1 : PR_ICNV; \
-	}
-
-#define PR_FLOAT_ADD_TO_INT(inreal, outint) \
-	{                                       \
-		PR_FCNV = (inreal);                 \
-		PR_FLOAT_TO_INTASM;                 \
-		(outint) += PR_ICNV;                \
-	}
-#else
 #define PR_FLOAT_TO_FIXED(inreal, outint)                              \
 	{                                                                  \
 		(outint) = static_cast<long>(std::floor((inreal) * 65536.0f)); \
@@ -109,6 +83,5 @@ typedef struct
 	{                                                      \
 		(outint) += static_cast<long>(std::floor(inreal)); \
 	}
-#endif
 
 #endif // __TERRAIN_TYPES_H__

@@ -40,8 +40,8 @@ class CMSWindow
 		int GetScreenWidth();
 		int GetScreenHeight();
 
-		HWND GetWindowHandle();
-		HINSTANCE GetInstance();
+		PlatformWindow GetWindowHandle();
+		PlatformInstance GetInstance();
 
 		static SDL_Window* ms_pSDLWindow;
 		static SDL_Renderer* ms_pSDLRenderer;
@@ -50,15 +50,15 @@ class CMSWindow
 		static SDL_Renderer* GetSDLRenderer() { return ms_pSDLRenderer; }
 		static SDL_GLContext GetGLContext() { return ms_pGLContext; }
 
-		virtual intptr_t WindowProcedure(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		virtual intptr_t WindowProcedure(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
 		virtual void OnSize(uintptr_t wParam, intptr_t lParam);
 
 	protected:
-		HWND m_hWnd;
+		PlatformWindow m_hWnd;
 		RECT m_rect;
 		bool m_isActive;
 		bool m_isVisible;
 
 	protected:
-		static HINSTANCE ms_hInstance;
+		static PlatformInstance ms_hInstance;
 };

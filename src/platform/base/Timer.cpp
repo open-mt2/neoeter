@@ -1,9 +1,6 @@
 #include <Neoeter/Platform/Base/StdAfx.h>
 #include <Neoeter/Platform/Base/Timer.h>
-
-#if defined(_WIN32)
-#pragma comment(lib, "winmm.lib")
-#endif
+#include <Neoeter/Platform/Port.h>
 
 static uint32_t gs_dwBaseTime = 0;
 static uint32_t gs_dwServerTime = 0;
@@ -12,13 +9,13 @@ static uint32_t gs_dwFrameTime = 0;
 
 int32_t ELTimer_Init()
 {
-	gs_dwBaseTime = timeGetTime();
+	gs_dwBaseTime = Neoeter::Platform::TickCount();
 	return 1;
 }
 
 uint32_t ELTimer_GetMSec()
 {
-	return timeGetTime() - gs_dwBaseTime;
+	return Neoeter::Platform::TickCount() - gs_dwBaseTime;
 }
 
 void ELTimer_SetServerMSec(uint32_t dwServerTime)

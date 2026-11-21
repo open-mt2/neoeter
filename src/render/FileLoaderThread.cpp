@@ -15,7 +15,7 @@ CFileLoaderThread::~CFileLoaderThread()
 int CFileLoaderThread::Create(void* arg)
 {
 	Arg(arg);
-	m_hThread = (HANDLE)_beginthreadex(NULL, 0, EntryPoint, this, 0, &m_uThreadID);
+	m_hThread = (PlatformHandle)_beginthreadex(NULL, 0, EntryPoint, this, 0, &m_uThreadID);
 
 	if (!m_hThread)
 		return false;

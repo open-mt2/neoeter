@@ -63,6 +63,12 @@ file(GLOB ETERLIB_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 if(NOT NEOETER_DEBUG_UI)
     list(FILTER ETERLIB_SOURCES EXCLUDE REGEX "/Debug\\.cpp$")
 endif()
+
+if(WIN32)
+    list(APPEND ETERLIB_SOURCES adapters/win32/NativeWindow.cpp)
+else()
+    list(APPEND ETERLIB_SOURCES adapters/posix/NativeWindow.cpp)
+endif()
 file(GLOB ETERLIB_HEADERS CONFIGURE_DEPENDS
     "${NEOETER_INCLUDE_DIR}/Neoeter/Render/*.h"
     "${NEOETER_INCLUDE_DIR}/Neoeter/Platform/*.h"

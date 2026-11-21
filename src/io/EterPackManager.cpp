@@ -1,4 +1,5 @@
 #include <Neoeter/IO/StdAfx.h>
+#include <Neoeter/Platform/Port.h>
 
 #include <fstream>
 #include <iterator>
@@ -8,15 +9,11 @@
 #include <filesystem>
 #include <algorithm>
 
-#if defined(_WIN32)
-#include <io.h> // _access
-#endif
-
 namespace fs = std::filesystem;
 
 static std::string FindCaseInsensitiveFile(const std::string& path)
 {
-	if (_access(path.c_str(), 0) == 0)
+	if (Neoeter::Platform::FileExists(path.c_str()))
 		return path;
 
 	std::error_code ec;
@@ -288,7 +285,7 @@ bool CEterPackManager::isExist(const char* c_szFileName)
 		return (_access(normPath.c_str(), 0) == 0) || (_access(lowerPath.c_str(), 0) == 0);
 	}
 
-	if ((_access(normPath.c_str(), 0) == 0) || (_access(lowerPath.c_str(), 0) == 0))
+	if (Neoeter::Platform::FileExists(normPath.c_str()) || Neoeter::Platform::FileExists(lowerPath.c_str()))
 		return true;
 
 	return isExistInPack(c_szFileName);

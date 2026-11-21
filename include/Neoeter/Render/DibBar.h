@@ -10,7 +10,7 @@ class CDibBar
 		CDibBar();
 		virtual ~CDibBar();
 
-		bool Create(HDC hdc, uint32_t dwWidth, uint32_t dwHeight);
+		bool Create(PlatformDeviceContext hdc, uint32_t dwWidth, uint32_t dwHeight);
 		void Invalidate();
 		void SetClipRect(const RECT& c_rRect);
 		void ClearBar();

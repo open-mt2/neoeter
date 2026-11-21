@@ -36,7 +36,7 @@ class CGraphicDevice : public CGraphicBase
 		void InitBackBufferCount(uint32_t uBackBufferCount);
 
 		void Destroy();
-		int Create(HWND hWnd, int hres, int vres, bool Windowed = true, int bit = 32, int ReflashRate = 0);
+		int Create(PlatformWindow hWnd, int hres, int vres, bool Windowed = true, int bit = 32, int ReflashRate = 0);
 
 		EDeviceState GetDeviceState();
 		bool Reset();
@@ -47,7 +47,7 @@ class CGraphicDevice : public CGraphicBase
 	protected:
 		void __Initialize();
 		bool __IsInDriverBlackList(D3D_CAdapterInfo& rkD3DAdapterInfo);
-		void __WarningMessage(HWND hWnd, uint32_t uiMsg);
+		void __WarningMessage(PlatformWindow hWnd, uint32_t uiMsg);
 
 		void __InitializeDefaultIndexBufferList();
 		void __DestroyDefaultIndexBufferList();

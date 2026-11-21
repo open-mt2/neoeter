@@ -251,7 +251,7 @@ const char* GetFontFaceFromCodePage(uint16_t codePage)
 
 	const char* fontFace = GetFontFaceFromCodePage9x(codePage);
 
-	HDC hDC = GetDC(NULL);
+	PlatformDeviceContext hDC = GetDC(NULL);
 
 	if (EnumFontFamiliesEx(hDC, &logFont, (FONTENUMPROC)EnumFontFamExProc, (intptr_t)fontFace, 0) == 0)
 	{

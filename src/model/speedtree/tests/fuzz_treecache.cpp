@@ -1,5 +1,6 @@
 #include <Neoeter/Model/SpeedTree/SpeedTreeRTCompat.h>
 #include <Neoeter/Model/SpeedTree/TreeCacheFormat.h>
+#include <Neoeter/Platform/Port.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -35,11 +36,7 @@ extern "C" int LLVMFuzzerInitialize(int*, char***)
 	TreeCache::FormatHash(hash, name);
 	g_cachePath = (g_cacheDir / (std::string(name) + ".tree")).string();
 
-#ifdef _WIN32
-	_putenv_s("MT2_TREECACHE", g_cacheDir.string().c_str());
-#else
-	setenv("MT2_TREECACHE", g_cacheDir.string().c_str(), 1);
-#endif
+	Neoeter::Platform::SetEnvironment("MT2_TREECACHE", g_cacheDir.string().c_str());
 	return 0;
 }
 

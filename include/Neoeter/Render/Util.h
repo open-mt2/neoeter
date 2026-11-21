@@ -5,11 +5,7 @@
 #include <map>
 #include <vector>
 
-#ifdef _WIN32
 #include "Neoeter/Platform/DirectXMathCompat.h"
-#else
-#include "Neoeter/Platform/DirectXMathCompat.h"
-#endif
 
 template <typename T>
 class CTransitor

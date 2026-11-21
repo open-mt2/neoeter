@@ -8,7 +8,7 @@ CThread::CThread() : m_hThread(NULL), m_pArg(NULL), m_uThreadID(0)
 int CThread::Create(void* arg)
 {
 	Arg(arg);
-	m_hThread = (HANDLE)_beginthreadex(NULL, 0, EntryPoint, this, 0, &m_uThreadID);
+	m_hThread = (PlatformHandle)_beginthreadex(NULL, 0, EntryPoint, this, 0, &m_uThreadID);
 
 	if (!m_hThread)
 		return false;

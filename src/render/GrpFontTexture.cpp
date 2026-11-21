@@ -65,7 +65,7 @@ bool CGraphicFontTexture::IsEmpty() const
 
 void CGraphicFontTexture::Destroy()
 {
-	HDC hDC = m_dib.GetDCHandle();
+	PlatformDeviceContext hDC = m_dib.GetDCHandle();
 	if (hDC)
 		SelectObject(hDC, m_hFontOld);
 
@@ -122,7 +122,7 @@ bool CGraphicFontTexture::Create(const char* c_szFontName, int fontSize, bool bI
 	if (!m_dib.Create(ms_hDC, width, height))
 		return false;
 
-	HDC hDC = m_dib.GetDCHandle();
+	PlatformDeviceContext hDC = m_dib.GetDCHandle();
 
 	m_hFont = GetFont(GetDefaultCodePage());
 
@@ -343,7 +343,7 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	}
 #endif
 
-	HDC hDC = m_dib.GetDCHandle();
+	PlatformDeviceContext hDC = m_dib.GetDCHandle();
 	SelectObject(hDC, GetFont(code.first));
 
 	ABCFLOAT stABC;

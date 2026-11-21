@@ -39,7 +39,7 @@ bool CSoundInstance2D::SetSound(CSoundData* pSoundData)
 	// 또, m_pSoundData가 pSoundData와 같고 m_pSoundData의 레퍼런스
 	// 카운터가 1일 경우, 불필요하게 로드가 일어나므로 미리 레퍼런스
 	// 카운터를 올려놔야 한다.
-	LPVOID lpData = pSoundData->Get();
+	void* lpData = pSoundData->Get();
 
 	AIL_init_sample(m_sample);
 

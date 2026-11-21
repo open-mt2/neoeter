@@ -216,7 +216,7 @@ CInputKeyboard::~CInputKeyboard()
 {
 }
 
-bool CInputKeyboard::InitializeKeyboard(HWND /*hWnd*/)
+bool CInputKeyboard::InitializeKeyboard(PlatformWindow /*hWnd*/)
 {
 	// SDL2 drives the device from the window/event loop (CMSWindow::Create,
 	// CMSApplication::MessageProcess); there is nothing to acquire here.

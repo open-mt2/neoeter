@@ -138,7 +138,7 @@ void CDibBar::__BuildTextureBlockList(uint32_t dwWidth, uint32_t dwHeight, uint3
 	}
 }
 
-bool CDibBar::Create(HDC hdc, uint32_t dwWidth, uint32_t dwHeight)
+bool CDibBar::Create(PlatformDeviceContext hdc, uint32_t dwWidth, uint32_t dwHeight)
 {
 	if (!m_dib.Create(hdc, dwWidth, dwHeight))
 	{

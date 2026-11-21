@@ -1,7 +1,4 @@
 #include <Neoeter/Render/StdAfx.h>
-#ifdef _WIN32
-#include <io.h>
-#endif
 #include <Neoeter/Platform/Base/CRC32.h>
 #include <Neoeter/Platform/Base/Timer.h>
 #include <Neoeter/Platform/Base/Stl.h>

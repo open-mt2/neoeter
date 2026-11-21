@@ -3,14 +3,9 @@
 #include <string>
 #include <vector>
 
-#ifdef _WIN32
-#include <imm.h>
-#pragma comment(lib, "imm32.lib")
+#include <Neoeter/Platform/Platform.h>
+
 struct INPUTCONTEXT;
-#else
-#include "Neoeter/Platform/Platform.h"
-struct INPUTCONTEXT;
-#endif
 
 class IIMEEventSink
 {
@@ -43,7 +38,7 @@ class CIME
 		CIME();
 		virtual ~CIME();
 
-		bool Initialize(HWND hWnd);
+		bool Initialize(PlatformWindow hWnd);
 		void Uninitialize(void);
 
 		static void Clear();
@@ -103,12 +98,12 @@ class CIME
 		static void OnSDLTextEditing(const char* utf8, int start, int length);
 		static void OnSDLTextInput(const char* utf8);
 
-		intptr_t WMInputLanguage(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
-		intptr_t WMStartComposition(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
-		intptr_t WMComposition(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
-		intptr_t WMEndComposition(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
-		intptr_t WMNotify(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
-		intptr_t WMChar(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMInputLanguage(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMStartComposition(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMComposition(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMEndComposition(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMNotify(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
+		intptr_t WMChar(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam);
 
 	protected:
 		void IncCurPos();
@@ -141,7 +136,7 @@ class CIME
 
 		static INPUTCONTEXT*(WINAPI* _ImmLockIMC)(HIMC);
 		static int32_t(WINAPI* _ImmUnlockIMC)(HIMC);
-		static LPVOID(WINAPI* _ImmLockIMCC)(HIMCC);
+		static void*(WINAPI* _ImmLockIMCC)(HIMCC);
 		static int32_t(WINAPI* _ImmUnlockIMCC)(HIMCC);
 
 		static uint32_t(WINAPI* _GetReadingString)(HIMC, uint32_t, LPWSTR, PINT, int32_t*, PUINT);
@@ -168,13 +163,13 @@ class CIME
 		static bool ms_bChineseIME;
 		static bool ms_bUseIMMCandidate;
 
-		static HWND ms_hWnd;
+		static PlatformWindow ms_hWnd;
 		static HKL ms_hklCurrent;
 		static char ms_szKeyboardLayout[KL_NAMELENGTH + 1];
 		static OSVERSIONINFOA ms_stOSVI;
 
-		static HINSTANCE ms_hImm32Dll;
-		static HINSTANCE ms_hCurrentImeDll;
+		static PlatformInstance ms_hImm32Dll;
+		static PlatformInstance ms_hCurrentImeDll;
 		static uint32_t ms_dwImeState;
 
 		static uint32_t ms_adwId[2];

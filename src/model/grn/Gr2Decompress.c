@@ -99,10 +99,6 @@ static void Dictionary_Free(TDictionary* dictionary);
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef _MSC_VER
-#include <crtdbg.h>
-#endif
-
 #ifndef min
 #define min(x, y) ((x) > (y)) ? (y) : (x)
 #endif

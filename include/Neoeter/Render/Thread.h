@@ -18,7 +18,7 @@ class CThread
 		void* Arg() const { return m_pArg; }
 		void Arg(void* arg) { m_pArg = arg; }
 
-		HANDLE m_hThread;
+		PlatformHandle m_hThread;
 
 	private:
 		void* m_pArg;

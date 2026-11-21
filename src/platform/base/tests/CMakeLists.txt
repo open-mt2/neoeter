@@ -14,6 +14,7 @@ set(TEST_TARGETS
     test_image_loader
     test_render_seam
     test_compat_image_decode
+    test_platform_port
     test_version
 )
 

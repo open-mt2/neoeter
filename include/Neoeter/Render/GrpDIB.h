@@ -7,24 +7,24 @@ class CGraphicDib
 		virtual ~CGraphicDib();
 
 		void Destroy();
-		bool Create(HDC hDC, int width, int height);
+		bool Create(PlatformDeviceContext hDC, int width, int height);
 
 		void SetBkMode(int iBkMode);
 		void TextOut(int ix, int iy, const char* c_szText);
-		void Put(HDC hDC, int x, int y);
+		void Put(PlatformDeviceContext hDC, int x, int y);
 
 		int GetWidth();
 		int GetHeight();
 
 		void* GetPointer();
 
-		HDC GetDCHandle();
+		PlatformDeviceContext GetDCHandle();
 
 	protected:
 		void Initialize();
 
 	protected:
-		HDC m_hDC;
+		PlatformDeviceContext m_hDC;
 		HBITMAP m_hBmp;
 		BITMAPINFO m_bmi;
 

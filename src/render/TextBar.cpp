@@ -30,19 +30,19 @@ void CTextBar::__SetFont(int fontSize, bool isBold)
 	strcpy(logFont.lfFaceName, GetFontFaceFromCodePage(iCodePage));
 	m_hFont = CreateFontIndirect(&logFont);
 
-	HDC hdc = m_dib.GetDCHandle();
+	PlatformDeviceContext hdc = m_dib.GetDCHandle();
 	m_hOldFont = (HFONT)SelectObject(hdc, m_hFont);
 }
 
 void CTextBar::SetTextColor(int r, int g, int b)
 {
-	HDC hDC = m_dib.GetDCHandle();
+	PlatformDeviceContext hDC = m_dib.GetDCHandle();
 	::SetTextColor(hDC, RGB(r, g, b));
 }
 
 void CTextBar::GetTextExtent(const char* c_szText, SIZE* p_size)
 {
-	HDC hDC = m_dib.GetDCHandle();
+	PlatformDeviceContext hDC = m_dib.GetDCHandle();
 	GetTextExtentPoint32(hDC, c_szText, strlen(c_szText), p_size);
 }
 
@@ -68,6 +68,6 @@ CTextBar::CTextBar(int fontSize, bool isBold)
 
 CTextBar::~CTextBar()
 {
-	HDC hdc = m_dib.GetDCHandle();
+	PlatformDeviceContext hdc = m_dib.GetDCHandle();
 	SelectObject(hdc, m_hOldFont);
 }

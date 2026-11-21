@@ -1,12 +1,6 @@
 #pragma once
 
-#if (defined(_WIN32) || defined(_WIN64)) && !defined(USE_PLATFORM_COMPAT)
-#include <windows.h>
-#include <cstdint>
-#include <cstddef>
-#else
 #include <Neoeter/Platform/Platform.h>
-#endif
 
 #include <cstddef>
 #include <unordered_map>

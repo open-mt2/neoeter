@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4786) // character 255 넘어가는거 끄기
-#endif
-
 #include <Neoeter/Platform/Platform.h>
 #include <Neoeter/Platform/DirectXMathCompat.h>
 #include "GrannyCompat.h"

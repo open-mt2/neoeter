@@ -2,6 +2,7 @@
 #include <support/TreeCacheFixture.h>
 
 #include <Neoeter/Model/SpeedTree/SpeedTreeRTCompat.h>
+#include <Neoeter/Platform/Port.h>
 
 #include <cstdio>
 #include <cstdlib>
@@ -28,20 +29,12 @@ namespace
 
 	void SetTreeCacheEnv(const std::string& path)
 	{
-#ifdef _WIN32
-		_putenv_s("MT2_TREECACHE", path.c_str());
-#else
-		setenv("MT2_TREECACHE", path.c_str(), 1);
-#endif
+		Neoeter::Platform::SetEnvironment("MT2_TREECACHE", path.c_str());
 	}
 
 	void ClearTreeCacheEnv()
 	{
-#ifdef _WIN32
-		_putenv_s("MT2_TREECACHE", "");
-#else
-		unsetenv("MT2_TREECACHE");
-#endif
+		Neoeter::Platform::SetEnvironment("MT2_TREECACHE", "");
 	}
 
 	std::string CachePath(const fs::path& dir, uint32_t hash)

@@ -1,6 +1,6 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Render/MSApplication.h>
-#include <Neoeter/Render/SdlPlatform.h>
+#include <Neoeter/Platform/PlatformWindow.h>
 #include <Neoeter/Debug/Debug.h>
 #include <Neoeter/Render/IME.h>
 
@@ -165,7 +165,7 @@ CMSApplication::~CMSApplication()
 	//		UnregisterClass(*i, ms_hInstance);
 }
 
-void CMSApplication::Initialize(HINSTANCE hInstance)
+void CMSApplication::Initialize(PlatformInstance hInstance)
 {
 	ms_hInstance = hInstance;
 }
@@ -343,7 +343,7 @@ bool CMSApplication::MessageProcess()
 	return true;
 }
 
-intptr_t CMSApplication::WindowProcedure(HWND hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam)
+intptr_t CMSApplication::WindowProcedure(PlatformWindow hWnd, uint32_t uiMsg, uintptr_t wParam, intptr_t lParam)
 {
 	switch (uiMsg)
 	{
