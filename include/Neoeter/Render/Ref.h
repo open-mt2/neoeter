@@ -4,6 +4,7 @@
 #include "ReferenceObject.h"
 
 #include <assert.h>
+#include <cstddef>
 
 template <typename T>
 class CRef

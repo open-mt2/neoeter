@@ -1,6 +1,8 @@
 #ifndef __INC_ETERLIB_THREAD_H__
 #define __INC_ETERLIB_THREAD_H__
 
+#include <Neoeter/Platform/Platform.h>
+
 class CThread
 {
 	public:

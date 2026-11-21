@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Neoeter/Platform/Platform.h>
+
 #ifndef VC_EXTRALEAN
 
 class CNetworkAddress

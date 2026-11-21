@@ -1,6 +1,8 @@
 #ifndef __INC_ETERLIB_SINGLETON_H__
 #define __INC_ETERLIB_SINGLETON_H__
 
+#include <Neoeter/Platform/Platform.h>
+
 #include <assert.h>
 #include <cstdint>
 

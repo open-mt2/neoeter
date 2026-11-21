@@ -1,5 +1,9 @@
 #pragma once
 
+#include <Neoeter/Platform/DirectXMathCompat.h>
+
+#include <cstdint>
+
 class CColorTransitionHelper
 {
 	public:

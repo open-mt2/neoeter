@@ -1,6 +1,8 @@
 #ifndef __INC_ETERLIB_MUTEX_H__
 #define __INC_ETERLIB_MUTEX_H__
 
+#include <Neoeter/Platform/Platform.h>
+
 class Mutex
 {
 	public:

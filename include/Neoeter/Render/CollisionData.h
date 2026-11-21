@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Neoeter/Platform/DirectXMathCompat.h>
+
 // Collision Detection
 typedef struct SSphereData
 {

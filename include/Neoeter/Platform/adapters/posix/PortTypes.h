@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 // Opaque handles the engine and the client exchange. They are the real Win32
 // handles on the Windows target and void pointers here, so no caller outside
 // the platform adapters names a Win32 type.

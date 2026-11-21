@@ -6,6 +6,8 @@
 
 #include <windows.h>
 #include <imm.h>
+
+#include <cstdint>
 #include <process.h>
 
 // The port names its directory and semaphore operations after the Win32

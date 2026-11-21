@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ReferenceObject.h"
+#include <cstdint>
 #include <string>
 
 class CResource : public CReferenceObject

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Neoeter/Platform/Base/Stl.h>
+#include <Neoeter/Platform/Platform.h>
 
 #include <SDL2/SDL.h>
 
