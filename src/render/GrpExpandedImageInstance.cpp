@@ -1,8 +1,5 @@
 #include <Neoeter/Render/StdAfx.h>
 #include <Neoeter/Platform/Base/CRC32.h>
-#if defined(OPENMT2_PLATFORM_LINUX)
-#include <Neoeter/Platform/GLCompat.h>
-#endif
 #include <Neoeter/Render/GrpExpandedImageInstance.h>
 #include <Neoeter/Render/StateManager.h>
 
@@ -129,20 +126,15 @@ void CGraphicExpandedImageInstance::OnRender()
 		STATEMANAGER.SetTexture(1, NULL);
 		STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
-#if defined(OPENMT2_PLATFORM_LINUX)
-		// Set wrap modes dynamically: clamp non-repeating axes to avoid 1px border bleed
-		GLint wrapS = (su < -0.001f || eu > 1.001f) ? GL_REPEAT : GL_CLAMP_TO_EDGE;
-		GLint wrapT = (sv < -0.001f || ev > 1.001f) ? GL_REPEAT : GL_CLAMP_TO_EDGE;
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
-#endif
+		// UVs that leave [0, 1] must wrap; the others clamp so the filter does not
+		// bleed the opposite edge into the image.
+		STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSU, (su < -0.001f || eu > 1.001f) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
+		STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSV, (sv < -0.001f || ev > 1.001f) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);
 
-#if defined(OPENMT2_PLATFORM_LINUX)
-		if (wrapS == GL_REPEAT) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		if (wrapT == GL_REPEAT) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-#endif
+		STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSU);
+		STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSV);
 	}
 	// STATEMANAGER.DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 4, 2, c_FillRectIndices, D3DFMT_INDEX16, vertices, sizeof(TPDTVertex));
 	/////////////////////////////////////////////////////////////

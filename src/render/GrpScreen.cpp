@@ -5,7 +5,6 @@
 
 // T1.9: the window and the renderer are SDL2 + GL on every target (T1.2,
 // T1.4); the screen flushes the façade and lets the window show the frame.
-#include <Neoeter/Platform/GLCompat.h>
 #include <Neoeter/Render/MSWindow.h>
 
 uint32_t CScreen::ms_diffuseColor = 0xffffffff;
@@ -631,23 +630,12 @@ void CScreen::ClearDepthBuffer()
 {
 	assert(ms_lpd3dDevice != NULL);
 	ms_lpd3dDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, ms_clearColor, ms_clearDepth, ms_clearStencil);
-#if defined(OPENMT2_RENDERER_GL)
-	glClear(GL_DEPTH_BUFFER_BIT);
-#endif
 }
 
 void CScreen::Clear()
 {
 	assert(ms_lpd3dDevice != NULL);
 	ms_lpd3dDevice->Clear(0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, ms_clearColor, ms_clearDepth, ms_clearStencil);
-#if defined(OPENMT2_RENDERER_GL)
-	glClearColor(
-		((ms_clearColor >> 16) & 0xFF) / 255.0f,
-		((ms_clearColor >> 8) & 0xFF) / 255.0f,
-		(ms_clearColor & 0xFF) / 255.0f,
-		((ms_clearColor >> 24) & 0xFF) / 255.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#endif
 }
 
 int32_t CScreen::IsLostDevice()
