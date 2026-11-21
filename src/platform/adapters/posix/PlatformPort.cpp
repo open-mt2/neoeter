@@ -84,9 +84,12 @@ namespace
 				return files;
 			}
 
-			bool RaiseTimerResolution(uint32_t*) override
+			bool RaiseTimerResolution(uint32_t* periodMilliseconds) override
 			{
-				return false;
+				if (periodMilliseconds != nullptr)
+					*periodMilliseconds = 1;
+
+				return true;
 			}
 
 			void RestoreTimerResolution(uint32_t) override
