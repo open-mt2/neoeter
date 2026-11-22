@@ -15,7 +15,7 @@ void PrintfTabs(FILE* File, int iTabCount, const char* c_szString, ...)
 	for (int i = 0; i < iTabCount; ++i)
 		fprintf(File, "    ");
 
-	fprintf(File, szBuf);
+	fprintf(File, "%s", szBuf);
 }
 
 bool LoadTextData(const char* c_szFileName, CTokenMap& rstTokenMap)

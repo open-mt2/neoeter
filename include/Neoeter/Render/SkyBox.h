@@ -102,7 +102,7 @@ class CSkyObject : public CScreen
 		typedef std::vector<CSkyObjectQuad> TSkyObjectQuadVector;
 		typedef TSkyObjectQuadVector::iterator TSkyObjectQuadIterator;
 
-		typedef struct
+		typedef struct TSkyObjectFace
 		{
 				void StartTransition();
 				bool Update();
