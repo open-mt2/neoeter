@@ -16,6 +16,7 @@ set(NEOETER_PACKAGES
     platform/base
     platform/locale
     platform/math
+    script
     io
     image
     render

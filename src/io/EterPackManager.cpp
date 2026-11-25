@@ -164,7 +164,101 @@ struct TimeChecker
 		DWORD baseTime;
 };
 
+std::string CEterPackManager::ResolveName(const std::string& fileName)
+{
+	std::string name = ConvertFileName(fileName);
+	std::lock_guard<std::mutex> lock(m_redirectMutex);
+	for (int hop = 0; hop < 16 && !m_redirects.empty(); ++hop)
+	{
+		auto it = m_redirects.find(name);
+		if (it == m_redirects.end())
+			break;
+		name = it->second;
+	}
+	return name;
+}
+
+void CEterPackManager::SetRedirect(const std::string& from, const std::string& to)
+{
+	std::string key = ConvertFileName(from);
+	std::string value = ConvertFileName(to);
+	std::lock_guard<std::mutex> lock(m_redirectMutex);
+	m_redirects[key] = value;
+}
+
+bool CEterPackManager::RemoveRedirect(const std::string& from)
+{
+	std::string key = ConvertFileName(from);
+	std::lock_guard<std::mutex> lock(m_redirectMutex);
+	return m_redirects.erase(key) != 0;
+}
+
+void CEterPackManager::SetOverride(const std::string& fileName, TPackDataPtr data)
+{
+	std::string key = ConvertFileName(fileName);
+	std::lock_guard<std::mutex> lock(m_redirectMutex);
+	if (data)
+		m_overrides[key] = std::move(data);
+	else
+		m_overrides.erase(key);
+}
+
+bool CEterPackManager::RemoveOverride(const std::string& fileName)
+{
+	std::string key = ConvertFileName(fileName);
+	std::lock_guard<std::mutex> lock(m_redirectMutex);
+	return m_overrides.erase(key) != 0;
+}
+
+void CEterPackManager::SetResolveHook(TResolveHook hook)
+{
+	std::lock_guard<std::mutex> lock(m_redirectMutex);
+	m_resolveHook = hook ? std::make_shared<TResolveHook>(std::move(hook)) : nullptr;
+}
+
+void CEterPackManager::ClearRedirects()
+{
+	std::lock_guard<std::mutex> lock(m_redirectMutex);
+	m_redirects.clear();
+	m_overrides.clear();
+	m_resolveHook.reset();
+}
+
+int CEterPackManager::GetFromRedirectLayer(const std::string& fileName, TPackDataPtr* dataPtr, std::string& resolved)
+{
+	resolved = ResolveName(fileName);
+
+	std::shared_ptr<TResolveHook> hook;
+	{
+		std::lock_guard<std::mutex> lock(m_redirectMutex);
+		auto it = m_overrides.find(resolved);
+		if (it != m_overrides.end())
+		{
+			if (dataPtr)
+				*dataPtr = it->second;
+			return 1;
+		}
+		hook = m_resolveHook;
+	}
+
+	// The hook runs unlocked so it may call back into the manager.
+	if (hook && (*hook)(resolved, dataPtr))
+		return (!dataPtr || *dataPtr) ? 1 : 0;
+
+	return 0;
+}
+
 bool CEterPackManager::Get(const std::string& fileName, TPackDataPtr& dataPtr)
+{
+	std::string resolved;
+	if (GetFromRedirectLayer(fileName, &dataPtr, resolved))
+		return true;
+
+	// Keep the caller's spelling for loose files unless a redirect applied.
+	return GetOriginal(resolved == ConvertFileName(fileName) ? fileName : resolved, dataPtr);
+}
+
+bool CEterPackManager::GetOriginal(const std::string& fileName, TPackDataPtr& dataPtr)
 {
 	if (m_iSearchMode == SEARCH_FILE_FIRST)
 	{
@@ -273,6 +367,17 @@ bool CEterPackManager::isExistInPack(const char* c_szFileName)
 }
 
 bool CEterPackManager::isExist(const char* c_szFileName)
+{
+	std::string resolved;
+	if (GetFromRedirectLayer(c_szFileName, nullptr, resolved))
+		return true;
+
+	if (resolved != ConvertFileName(c_szFileName))
+		return isExistOriginal(resolved.c_str());
+	return isExistOriginal(c_szFileName);
+}
+
+bool CEterPackManager::isExistOriginal(const char* c_szFileName)
 {
 	std::string normPath = NormalizeSeparators(c_szFileName);
 	std::string lowerPath = ConvertFileName(c_szFileName);

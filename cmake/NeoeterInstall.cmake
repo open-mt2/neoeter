@@ -4,6 +4,7 @@ set(NEOETER_INSTALL_TARGETS
     neoeter_platform_base
     neoeter_platform_locale
     neoeter_platform_math
+    neoeter_script
     neoeter_io
     neoeter_image
     neoeter_render
@@ -22,6 +23,7 @@ endif()
 set_target_properties(neoeter_platform_base PROPERTIES EXPORT_NAME "Platform::Base")
 set_target_properties(neoeter_platform_locale PROPERTIES EXPORT_NAME "Platform::Locale")
 set_target_properties(neoeter_platform_math PROPERTIES EXPORT_NAME "Platform::Math")
+set_target_properties(neoeter_script PROPERTIES EXPORT_NAME "Script")
 set_target_properties(neoeter_io PROPERTIES EXPORT_NAME "IO")
 set_target_properties(neoeter_image PROPERTIES EXPORT_NAME "Image")
 set_target_properties(neoeter_render PROPERTIES EXPORT_NAME "Render")

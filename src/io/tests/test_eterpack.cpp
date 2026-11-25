@@ -192,6 +192,58 @@ int main()
 		printf("  [PASS] Pack information and resource listing\n");
 	}
 
+	// 5. Redirect / override / resolve-hook layer
+	{
+		const char* swordPath = "D:\\Ymir Work\\Item\\Weapon\\SWORD_001.GR2";
+		auto asString = [](const CEterPackManager::TPackDataPtr& p)
+		{ return std::string(p->begin(), p->end()); };
+
+		// Redirect: virtual name -> existing pack file, with chains and case folding.
+		packMgr.SetRedirect("mod/alias.gr2", "MOD/ALIAS2.GR2");
+		packMgr.SetRedirect("mod/alias2.gr2", swordPath);
+		TEST_ASSERT(packMgr.ResolveName("Mod\\Alias.gr2") == "d:/ymir work/item/weapon/sword_001.gr2");
+		TEST_ASSERT(packMgr.isExist("mod/alias.gr2"));
+		CEterPackManager::TPackDataPtr data;
+		TEST_ASSERT(packMgr.Get("mod/alias.gr2", data) && asString(data) == swordContent);
+
+		// Cycles terminate instead of hanging.
+		packMgr.SetRedirect("loop/a", "loop/b");
+		packMgr.SetRedirect("loop/b", "loop/a");
+		TEST_ASSERT(!packMgr.isExist("loop/a"));
+
+		// Override takes precedence over the pack and applies after redirects.
+		auto custom = std::make_shared<std::vector<char>>(std::vector<char>{'N', 'E', 'W'});
+		packMgr.SetOverride(swordPath, custom);
+		TEST_ASSERT(packMgr.Get(swordPath, data) && asString(data) == "NEW");
+		TEST_ASSERT(packMgr.Get("mod/alias.gr2", data) && asString(data) == "NEW");
+		packMgr.SetOverride("virtual/only.txt", custom);
+		TEST_ASSERT(packMgr.isExist("VIRTUAL/ONLY.TXT"));
+		TEST_ASSERT(!packMgr.isExistInPack("virtual/only.txt"));
+		TEST_ASSERT(packMgr.RemoveOverride(swordPath));
+		TEST_ASSERT(packMgr.Get(swordPath, data) && asString(data) == swordContent);
+
+		// Resolve hook: serves files on demand, sees normalized names, can decline.
+		std::string lastQuery;
+		packMgr.SetResolveHook([&](const std::string& name, CEterPackManager::TPackDataPtr* out)
+							   {
+			lastQuery = name;
+			if (name != "hook/file.bin")
+				return false;
+			if (out)
+				*out = std::make_shared<std::vector<char>>(std::vector<char>{'H'});
+			return true; });
+		TEST_ASSERT(packMgr.isExist("Hook\\File.BIN") && lastQuery == "hook/file.bin");
+		TEST_ASSERT(packMgr.Get("hook/file.bin", data) && asString(data) == "H");
+		TEST_ASSERT(packMgr.Get(swordPath, data) && asString(data) == swordContent);
+		TEST_ASSERT(!packMgr.isExist("hook/missing.bin"));
+
+		packMgr.ClearRedirects();
+		TEST_ASSERT(!packMgr.isExist("mod/alias.gr2"));
+		TEST_ASSERT(!packMgr.isExist("hook/file.bin"));
+		TEST_ASSERT(!packMgr.isExist("virtual/only.txt"));
+		printf("  [PASS] Redirects, overrides and resolve hook\n");
+	}
+
 	// Clean up temporary directory
 	fs::remove_all(tempRoot);
 

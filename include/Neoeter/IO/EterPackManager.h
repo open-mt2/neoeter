@@ -15,6 +15,8 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include <functional>
+#include <mutex>
 
 #if __has_include(<Neoeter/Platform/Base/Singleton.h>)
 #include <Neoeter/Platform/Base/Singleton.h>
@@ -84,6 +86,11 @@ class CEterPackManager : public CSingleton<CEterPackManager>
 		typedef std::unordered_map<std::string, std::shared_ptr<FileProvider>> TFileMap;
 		typedef std::shared_ptr<std::vector<char>> TPackDataPtr;
 
+		// Called for every lookup with the normalized (lowercase, '/') name after
+		// redirects are applied. When `out` is null only existence is queried.
+		// Return true to serve the file, false to fall through to packs/disk.
+		typedef std::function<bool(const std::string& name, TPackDataPtr* out)> TResolveHook;
+
 		struct SPackInfo
 		{
 				std::string name;
@@ -114,6 +121,17 @@ class CEterPackManager : public CSingleton<CEterPackManager>
 		bool RegisterPack(const std::string& name, const std::string& container);
 		std::string ConvertFileName(std::string fileName);
 
+		// Redirect/override layer, consulted before packs and loose files.
+		// Names are normalized with ConvertFileName. Thread-safe.
+		void SetRedirect(const std::string& from, const std::string& to);
+		bool RemoveRedirect(const std::string& from);
+		void SetOverride(const std::string& fileName, TPackDataPtr data);
+		bool RemoveOverride(const std::string& fileName);
+		void SetResolveHook(TResolveHook hook);
+		void ClearRedirects();
+		// Applies redirects (chains are followed, cycles stop after 16 hops).
+		std::string ResolveName(const std::string& fileName);
+
 		const TFileMap& GetFileMap();
 		std::vector<SPackInfo> GetPackInfos();
 		std::vector<SFileInfo> GetPackFiles(const std::string& packName);
@@ -122,6 +140,10 @@ class CEterPackManager : public CSingleton<CEterPackManager>
 		bool CompareName(const char* c_szDirectoryName, DWORD iLength, const char* c_szFileName);
 		bool GetFromPack(const std::string& fileName, TPackDataPtr& dataPtr);
 		bool GetFromFile(const std::string& fileName, TPackDataPtr& dataPtr);
+		bool GetOriginal(const std::string& fileName, TPackDataPtr& dataPtr);
+		bool isExistOriginal(const char* c_szFileName);
+		// 1 = served, 0 = not handled, fills `resolved` with the redirected name.
+		int GetFromRedirectLayer(const std::string& fileName, TPackDataPtr* dataPtr, std::string& resolved);
 
 	protected:
 		int m_iSearchMode;
@@ -130,4 +152,9 @@ class CEterPackManager : public CSingleton<CEterPackManager>
 		TEterPackMap m_PackMap;
 
 		CRITICAL_SECTION m_csFinder;
+
+		std::mutex m_redirectMutex;
+		std::unordered_map<std::string, std::string> m_redirects;
+		std::unordered_map<std::string, TPackDataPtr> m_overrides;
+		std::shared_ptr<TResolveHook> m_resolveHook;
 };

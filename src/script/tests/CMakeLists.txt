@@ -1,0 +1,5 @@
+add_executable(test_script_core test_script_core.cpp)
+target_link_libraries(test_script_core PRIVATE neoeter_script)
+target_include_directories(test_script_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options(test_script_core PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+add_test(NAME test_script_core COMMAND test_script_core)
